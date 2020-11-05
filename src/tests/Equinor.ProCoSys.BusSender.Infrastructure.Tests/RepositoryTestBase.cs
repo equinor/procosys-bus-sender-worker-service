@@ -2,8 +2,7 @@
 
 namespace Equinor.ProCoSys.BusSender.Infrastructure.Tests
 {
-    [TestClass]
-    public class RepositoryTestBase
+    public abstract class RepositoryTestBase
     {
         protected ContextHelper ContextHelper;
 

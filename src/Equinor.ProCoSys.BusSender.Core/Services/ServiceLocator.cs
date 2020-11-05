@@ -16,8 +16,6 @@ namespace Equinor.ProCoSys.BusSender.Core.Services
             return _scope.ServiceProvider.GetService<T>();
         }
 
-        public IServiceScope CreateScope() => _factory.CreateScope();
-
         public void Dispose()
         {
             _scope?.Dispose();

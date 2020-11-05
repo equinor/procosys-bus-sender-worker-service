@@ -24,7 +24,7 @@ namespace Equinor.ProCoSys.BusSender.Core.Tests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
+        [ExpectedException(typeof(Exception))]
         public async Task ShouldCrashOnNoTopicClients()
         {
             var emptyTopicClients = new TopicClients();

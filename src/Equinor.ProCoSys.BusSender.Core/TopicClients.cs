@@ -1,6 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Equinor.ProCoSys.BusSender.Core.Interfaces;
 using Microsoft.Azure.ServiceBus;
@@ -17,7 +20,11 @@ namespace Equinor.ProCoSys.BusSender.Core
 
         public Task Send(string topic, string message)
         {
-            var topicClient = _topicClients.Single(t => t.Key == topic).Value;
+            var topicClient = _topicClients.SingleOrDefault(t => t.Key == topic).Value;
+            if (topicClient == null)
+            {
+                throw new Exception($"Unable to find TopicClient for topic: {topic}");
+            }
             return topicClient.SendAsync(new Message(Encoding.UTF8.GetBytes(message)));
         }
 

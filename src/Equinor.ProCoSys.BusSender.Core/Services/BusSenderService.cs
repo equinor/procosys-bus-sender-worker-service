@@ -34,10 +34,9 @@ namespace Equinor.ProCoSys.BusSender.Core.Services
                 {
                     _logger.LogTrace($"Sending: {busEvent.Message}");
                     await _topicClients.Send(busEvent.Event, busEvent.Message);
-                    busEvent.Sent = 3;
+                    busEvent.Sent = Status.Sent;
                     await _unitOfWork.SaveChangesAsync();
                 }
-
             }
             catch (Exception exception)
             {

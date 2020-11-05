@@ -13,7 +13,7 @@ namespace Equinor.ProCoSys.BusSender.Worker
         private readonly ILogger<TimedWorkerService> _logger;
         private readonly IEntryPointService _entryPointService;
         private Timer _timer;
-        private int _timeout;
+        private readonly int _timeout;
 
         public TimedWorkerService(ILogger<TimedWorkerService> logger, IEntryPointService entryPointService, IConfiguration configuration)
         {
@@ -24,9 +24,9 @@ namespace Equinor.ProCoSys.BusSender.Worker
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            _logger.LogWarning($"TimedWorkerService at: {DateTimeOffset.Now}");
+            _logger.LogInformation($"TimedWorkerService at: {DateTimeOffset.Now}");
 
-            _timer = new Timer(DoWork, null, 5000, Timeout.Infinite );
+            _timer = new Timer(DoWork, null, 5000, Timeout.Infinite);
 
             return Task.CompletedTask;
         }
@@ -35,13 +35,17 @@ namespace Equinor.ProCoSys.BusSender.Worker
         {
             try
             {
-                _logger.LogTrace($"TimedWorkerService started do work at: { DateTimeOffset.Now}");
+                _logger.LogTrace($"TimedWorkerService started do work at: {DateTimeOffset.Now}");
                 await _entryPointService.SendMessageChunk();
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, $"TimedWorker service failed in do work at: {DateTimeOffset.Now}");
             }
             finally
             {
                 _logger.LogTrace($"Resetting timer at: { DateTimeOffset.Now}");
-                _timer.Change(_timeout, Timeout.Infinite );
+                _timer.Change(_timeout, Timeout.Infinite);
             }
         }
 

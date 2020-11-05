@@ -18,6 +18,7 @@ namespace Equinor.ProCoSys.BusSender.Core.Tests
         private BusSenderService _dut;
         private Mock<IUnitOfWork> _iUnitOfWork;
         private Mock<ITopicClient> _topicClientMock1, _topicClientMock2, _topicClientMock3;
+        private List<BusEvent> _busEvents;
 
         [TestInitialize]
         public void Setup()
@@ -30,13 +31,13 @@ namespace Equinor.ProCoSys.BusSender.Core.Tests
             topicClients.Add("topic2", _topicClientMock2.Object);
             topicClients.Add("topic3", _topicClientMock3.Object);
 
-            var busEvents = new List<BusEvent>
+            _busEvents = new List<BusEvent>
             {
                 new BusEvent
                 {
                     Created = DateTime.Now.AddMinutes(-10),
                     Event = "topic2",
-                    Sent = 0,
+                    Sent = Status.UnProcessed,
                     Id = 1,
                     Message = "Message 10 minutes ago not sent"
                 },
@@ -44,7 +45,7 @@ namespace Equinor.ProCoSys.BusSender.Core.Tests
                 {
                     Created = DateTime.Now.AddMinutes(-10),
                     Event = "topic3",
-                    Sent = 0,
+                    Sent = Status.UnProcessed,
                     Id = 1,
                     Message = "Message 10 minutes ago not sent"
                 }
@@ -52,7 +53,7 @@ namespace Equinor.ProCoSys.BusSender.Core.Tests
             var busEventRepository = new Mock<IBusEventRepository>();
             _iUnitOfWork = new Mock<IUnitOfWork>();
 
-            busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk()).Returns(() => Task.FromResult(busEvents));
+            busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk()).Returns(() => Task.FromResult(_busEvents));
             _dut = new BusSenderService(topicClients, busEventRepository.Object, _iUnitOfWork.Object, new Mock<ILogger<BusSenderService>>().Object);
         }
 
@@ -68,10 +69,16 @@ namespace Equinor.ProCoSys.BusSender.Core.Tests
         [TestMethod]
         public async Task SendMessagesViaCorrectTopicClients()
         {
+            Assert.AreEqual(Status.UnProcessed, _busEvents[0].Sent);
+            Assert.AreEqual(Status.UnProcessed, _busEvents[0].Sent);
+
             await _dut.SendMessageChunk();
             _topicClientMock1.Verify(t => t.SendAsync(It.IsAny<Message>()),Times.Never);
             _topicClientMock2.Verify(t => t.SendAsync(It.IsAny<Message>()), Times.Once);
             _topicClientMock3.Verify(t => t.SendAsync(It.IsAny<Message>()), Times.Once);
+
+            Assert.AreEqual(Status.Sent, _busEvents[0].Sent);
+            Assert.AreEqual(Status.Sent, _busEvents[0].Sent);
         }
 
         [TestMethod]
