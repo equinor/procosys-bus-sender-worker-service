@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Equinor.ProCoSys.BusSender.Core.Interfaces;
 using Equinor.ProCoSys.BusSender.Core.Models;
 using Equinor.ProCoSys.BusSender.Core.Services;
+using Equinor.ProCoSys.BusSender.Core.Telemetry;
 using Microsoft.Azure.ServiceBus;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -54,11 +55,11 @@ namespace Equinor.ProCoSys.BusSender.Core.Tests
             _iUnitOfWork = new Mock<IUnitOfWork>();
 
             busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk()).Returns(() => Task.FromResult(_busEvents));
-            _dut = new BusSenderService(topicClients, busEventRepository.Object, _iUnitOfWork.Object, new Mock<ILogger<BusSenderService>>().Object);
+            _dut = new BusSenderService(topicClients, busEventRepository.Object, _iUnitOfWork.Object, new Mock<ILogger<BusSenderService>>().Object, new Mock<ITelemetryClient>().Object);
         }
 
         [TestMethod]
-        public async Task StopSerivce_ShouldCloseOnAllTopicClients()
+        public async Task StopService_ShouldCloseOnAllTopicClients()
         {
             await _dut.StopService();
             _topicClientMock1.Verify(t => t.CloseAsync(), Times.Once);

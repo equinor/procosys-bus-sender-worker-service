@@ -1,6 +1,7 @@
 ﻿using Equinor.ProCoSys.BusSender.Core;
 using Equinor.ProCoSys.BusSender.Core.Interfaces;
 using Equinor.ProCoSys.BusSender.Core.Services;
+using Equinor.ProCoSys.BusSender.Core.Telemetry;
 using Equinor.ProCoSys.BusSender.Infrastructure.Data;
 using Equinor.ProCoSys.BusSender.Infrastructure.Repositories;
 using Microsoft.Azure.ServiceBus;
@@ -52,6 +53,7 @@ namespace Equinor.ProCoSys.BusSender.Infrastructure
         public static IServiceCollection AddServices(this IServiceCollection services)
             => services.AddSingleton<IServiceLocator, ServiceLocator>()
                 .AddSingleton<IEntryPointService, EntryPointService>()
+                .AddScoped<ITelemetryClient, ConsoleTelemetryClient>()
                 .AddScoped<IBusSenderService, BusSenderService>();
     }
 }
