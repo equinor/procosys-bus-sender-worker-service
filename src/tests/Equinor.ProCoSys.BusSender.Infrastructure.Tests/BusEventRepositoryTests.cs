@@ -53,7 +53,7 @@ namespace Equinor.ProCoSys.BusSender.Infrastructure.Tests
         }
 
         [TestMethod]
-        public void GetEarliestUnProcessedEventChunk()
+        public void GetEarliestUnProcessedEventChunk_ShouldReturnCorrectItemSequenceAndNumberOfItems()
         {
             var result = _dut.GetEarliestUnProcessedEventChunk();
             Assert.AreEqual(5, result.Result.Count);

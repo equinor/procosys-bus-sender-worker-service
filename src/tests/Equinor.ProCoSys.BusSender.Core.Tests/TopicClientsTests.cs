@@ -25,14 +25,14 @@ namespace Equinor.ProCoSys.BusSender.Core.Tests
 
         [TestMethod]
         [ExpectedException(typeof(Exception))]
-        public async Task ShouldCrashOnNoTopicClients()
+        public async Task Send_ShouldCrashOnNoTopicClients()
         {
             var emptyTopicClients = new TopicClients();
             await emptyTopicClients.Send("test", "test");
         }
 
         [TestMethod]
-        public async Task CloseAllShouldCallAllTopicClients()
+        public async Task CloseAll_ShouldCallAllTopicClients()
         {
             await _dut.CloseAllAsync();
             _topicClientMock1.Verify(t => t.CloseAsync(),Times.Once);
@@ -40,7 +40,7 @@ namespace Equinor.ProCoSys.BusSender.Core.Tests
         }
 
         [TestMethod]
-        public async Task OnlySendOnCorrectTopicClient()
+        public async Task Send_ShouldOnlySendOnCorrectTopicClient()
         {
             await _dut.Send("topic1", "abc");
             _topicClientMock1.Verify(t => t.SendAsync(It.IsAny<Message>()), Times.Once);

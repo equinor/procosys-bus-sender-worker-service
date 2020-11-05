@@ -58,7 +58,7 @@ namespace Equinor.ProCoSys.BusSender.Core.Tests
         }
 
         [TestMethod]
-        public async Task CloseOnAllTopicClients()
+        public async Task StopSerivce_ShouldCloseOnAllTopicClients()
         {
             await _dut.StopService();
             _topicClientMock1.Verify(t => t.CloseAsync(), Times.Once);
@@ -67,7 +67,7 @@ namespace Equinor.ProCoSys.BusSender.Core.Tests
         }
 
         [TestMethod]
-        public async Task SendMessagesViaCorrectTopicClients()
+        public async Task SendMessageChunk_ShouldSendOnCorrectTopicClients()
         {
             Assert.AreEqual(Status.UnProcessed, _busEvents[0].Sent);
             Assert.AreEqual(Status.UnProcessed, _busEvents[0].Sent);
@@ -82,7 +82,7 @@ namespace Equinor.ProCoSys.BusSender.Core.Tests
         }
 
         [TestMethod]
-        public async Task SendMessageSavesAfterEachSend()
+        public async Task SendMessageChunk_ShouldSaveChangesAfterEachSend()
         {
             await _dut.SendMessageChunk();
             _iUnitOfWork.Verify(t => t.SaveChangesAsync(), Times.Between(2,2,Range.Inclusive));
