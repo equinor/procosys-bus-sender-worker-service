@@ -130,7 +130,7 @@ stages:
   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
   jobs:
   - deployment:
-    environment: 'pcs-queue-receiver'
+    environment: 'pcs-bus-sender'
     pool:
       vmImage: $(vmImageName)
     strategy:
