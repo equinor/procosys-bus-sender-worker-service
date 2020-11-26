@@ -38,10 +38,18 @@ stages:
         projects: '**/*.csproj'
         arguments: '--configuration $(buildConfiguration)'
 
+    - task: DotNetCoreCLI@2
+      displayName: 'dotnet test $(buildConfiguration)'
+      inputs:
+        command: test
+        projects: '**/*[Tt]ests/*.csproj'
+        arguments: '--configuration $(buildConfiguration)'
+
 - stage: "PublishAndPack"
   displayName: 'Publish and Pack'
   dependsOn: 'Build'
   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/dev'))
+
   jobs:
   - job: PackAndPublish
     displayName: Pack Worker, then publish both
@@ -115,6 +123,7 @@ stages:
         publishVstsFeed: 'ProCoSysOfficial'
         allowPackageConflicts: true
 
+
 - stage: "PushRelease"
   displayName: 'Push release'
   dependsOn: 'PushPrerelease'
@@ -130,6 +139,7 @@ stages:
           steps:
             - task: NuGetAuthenticate@0
               displayName: 'NuGet Authenticate'
+
             - task: DotNetCoreCLI@2
               displayName: 'NuGet push release'
               inputs:
