@@ -4,6 +4,14 @@
     <VersionPrefix>1.0.1</VersionPrefix>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UserSecretsId>dotnet-BusSenderWorkerService-AB46807F-9F82-483F-B09B-E35626C31429</UserSecretsId>
+    <PublishSingleFile>true</PublishSingleFile>
+    <PublishReadyToRun>true</PublishReadyToRun>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <ApplicationIcon />
+    <OutputType>Exe</OutputType>
+    <StartupObject>Equinor.ProCoSys.BusSender.Worker.Program</StartupObject>
+    <Nullable>enable</Nullable>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 

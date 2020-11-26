@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <!-- Required elements-->
+    <id>PcsBusSender.Worker</id>
+    <version>$version$</version>
+    <description>Executable for PCS bus sender service</description>
+    <authors>Equinor ASA</authors>
+  </metadata>
+  <files>
+    <file src="bin\Release\netcoreapp3.1\win-x64\publish\Equinor.ProCoSys.BusSender.Worker.exe" target="lib\netcoreapp3.1"></file>
+    <file src="bin\Release\netcoreapp3.1\win-x64\appsettings.json"  target="lib\netcoreapp3.1"></file>
+  </files>
+</package>
