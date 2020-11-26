@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <!-- Required elements-->
-    <id>PcsBusSender.Worker</id>
+    <id>Equinor.ProCoSys.BusSender.Worker</id>
     <version>$version$</version>
     <description>Executable for PCS bus sender service</description>
     <authors>Equinor ASA</authors>

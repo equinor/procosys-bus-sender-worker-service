@@ -85,6 +85,12 @@ stages:
           # Set variable
           "##vso[task.setvariable variable=$variableName;isOutput=true]$($version)"
           Write-Host "Setting variable named $variableName with value $($version)" # Use as prefix in variale referenace
+    
+    - task: DotNetCoreCLI@2
+      displayName: Restore
+      inputs:
+        command: restore
+        projects: '**/*.csproj'
 
     - task: DotNetCoreCLI@2
       displayName: 'dotnet publish $(buildConfiguration)'
