@@ -87,13 +87,12 @@ stages:
           Write-Host "Setting variable named $variableName with value $($version)" # Use as prefix in variale referenace
 
     - task: DotNetCoreCLI@2
-      - script: pwd
-        displayName: 'Test path'
-      - script: dotnet pack src/Equinor.ProCoSys.BusSender.Worker/Equinor.ProCoSys.BusSender.Worker.csproj -f netcoreapp3.1 -r win-x64 -p:NuspecFile=worker.nuspec -p:NuspecProperties=version=$(getVersion.packageVersion) -c $(buildConfiguration) -o $(Build.ArtifactStagingDirectory)\packages\releases
-        displayName: 'Create NuGet Package - Release Version'
-      - script: dotnet pack src/Equinor.ProCoSys.BusSender.Worker/Equinor.ProCoSys.BusSender.Worker.csproj -f netcoreapp3.1 -r win-x64 -p:NuspecFile=worker.nuspec -p:NuspecProperties=version=$(getVersion.packageVersion)-"$(Build.BuildNumber)" -c $(buildConfiguration) -o $(Build.ArtifactStagingDirectory)\packages\prereleases
-        displayName: 'Create NuGet Package - Prerelease Version'
-
+      displayName: 'Create NuGet Package - Release Version'
+      inputs:
+        command: pack
+        projects: 'src/Equinor.ProCoSys.BusSender.Worker/Equinor.ProCoSys.BusSender.Worker.csproj'
+        arguments: '-f netcoreapp3.1 -r win-x64 -p:NuspecFile=worker.nuspec -p:NuspecProperties=version=$(getVersion.packageVersion) -c $(buildConfiguration) -o $(Build.ArtifactStagingDirectory)\packages\releases'
+    
     - publish: '$(Build.ArtifactStagingDirectory)/packages'
       artifact: 'packages'      
       
