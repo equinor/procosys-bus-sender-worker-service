@@ -118,6 +118,6 @@ stages:
               inputs:
                 command: push
                 feedsToUse: 'select'
-                packagesToPush: '$(Build.ArtifactStagingDirectory)/*.nupkg'
+                packagesToPush: '$(Pipeline.Workspace)/packages/*.nupkg'
                 publishVstsFeed: 'ProCoSysOfficial'
                 allowPackageConflicts: true
