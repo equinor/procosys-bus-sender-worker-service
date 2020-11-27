@@ -95,11 +95,11 @@ stages:
     
     - publish: '$(Build.ArtifactStagingDirectory)'
       artifact: 'packages'      
-
+      
 - stage: "PushRelease"
   displayName: 'Push release'
-  dependsOn: 'PushPrerelease'
-  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+  dependsOn: 'PublishAndPack'
+  condition: succeeded()
   jobs:
   - deployment:
     environment: 'pcs-bus-sender'
