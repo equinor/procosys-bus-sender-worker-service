@@ -109,6 +109,16 @@ stages:
       runOnce:
         deploy:
           steps:
+            - task: PowerShell@2
+              name: getVersion # Name of the pipeline variable used as prefix in referenace. Example $(getVersion.packageVersion)
+              displayName: 'see folder content'
+              inputs:
+                targetType: inline
+                pwsh: true
+                script: |
+                  dir
+                  pwd
+
             - task: NuGetAuthenticate@0
               displayName: 'NuGet Authenticate'
 
@@ -117,6 +127,6 @@ stages:
               inputs:
                 command: push
                 feedsToUse: 'select'
-                packagesToPush: '$(Pipeline.Workspace)/packages/releases/*.nupkg'
+                packagesToPush: '$(Pipeline.Workspace)/*.nupkg'
                 publishVstsFeed: 'ProCoSysOfficial'
                 allowPackageConflicts: true
