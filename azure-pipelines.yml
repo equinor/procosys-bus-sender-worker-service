@@ -118,6 +118,6 @@ stages:
               inputs:
                 command: push
                 feedsToUse: 'select'
-                packagesToPush: '$(Pipeline.Workspace)/packages/*.nupkg'
+                packagesToPush: '$(Pipeline.Workspace)/packages/Equinor.ProCoSys.BusSender.Worker.*.nupkg'
                 publishVstsFeed: 'ProCoSysOfficial'
                 allowPackageConflicts: true
