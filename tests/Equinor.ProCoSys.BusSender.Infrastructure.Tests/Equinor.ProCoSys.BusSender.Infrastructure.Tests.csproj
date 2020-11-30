@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Equinor.ProCoSys.BusSender.Infrastructure\Equinor.ProCoSys.BusSender.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\Equinor.ProCoSys.BusSender.Infrastructure\Equinor.ProCoSys.BusSender.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
