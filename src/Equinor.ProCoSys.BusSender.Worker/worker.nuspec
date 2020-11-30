@@ -3,7 +3,7 @@
   <metadata>
     <!-- Required elements-->
     <id>Equinor.ProCoSys.BusSender.Worker</id>
-    <version>$version$</version>
+    <version>1.0.3</version>
     <description>Executable for PCS bus sender service</description>
     <authors>Equinor ASA</authors>
   </metadata>

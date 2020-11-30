@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Worker">
 
   <PropertyGroup>
-    <VersionPrefix>1.0.2</VersionPrefix>
+    <VersionPrefix>1.0.3</VersionPrefix>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UserSecretsId>dotnet-BusSenderWorkerService-AB46807F-9F82-483F-B09B-E35626C31429</UserSecretsId>
     <PublishSingleFile>true</PublishSingleFile>
