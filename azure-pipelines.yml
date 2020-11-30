@@ -95,13 +95,9 @@ stages:
     - script: dotnet publish --configuration $(buildConfiguration) -r win-x64
       displayName: 'dotnet publish $(buildConfiguration)'
 
-    - task: DotNetCoreCLI@2
+    - script: dotnet pack src/Equinor.ProCoSys.BusSender.Worker/Equinor.ProCoSys.BusSender.Worker.csproj -p:NuspecFile=worker.nuspec -p:NuspecProperties=version=$(getVersion.packageVersion) -c $(buildConfiguration) -o $(Build.ArtifactStagingDirectory)\packages\releases
       displayName: 'Create NuGet Package - Release Version'
-      inputs:
-        command: pack
-        projects: 'src/Equinor.ProCoSys.BusSender.Worker/Equinor.ProCoSys.BusSender.Worker.csproj'
-        arguments: '-f netcoreapp3.1 -r win-x64 -p:NuspecFile=src/Equinor.ProCoSys.BusSender.Worker/worker.nuspec -p:NuspecProperties=version=$(getVersion.packageVersion) -c $(buildConfiguration) -o $(Build.ArtifactStagingDirectory)\packages\releases'
-    
+
     - publish: '$(Build.ArtifactStagingDirectory)'
       artifact: 'packages'      
       
