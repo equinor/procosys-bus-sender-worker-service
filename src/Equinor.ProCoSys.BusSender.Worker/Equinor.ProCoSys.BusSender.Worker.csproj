@@ -25,4 +25,8 @@
     <ProjectReference Include="..\Equinor.ProCoSys.BusSender.Core\Equinor.ProCoSys.BusSender.Core.csproj" />
     <ProjectReference Include="..\Equinor.ProCoSys.BusSender.Infrastructure\Equinor.ProCoSys.BusSender.Infrastructure.csproj" />
   </ItemGroup>
+
+<PropertyGroup>
+  <NuspecFile>worker.nuspec</NuspecFile>
+</PropertyGroup>
 </Project>
