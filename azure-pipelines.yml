@@ -48,8 +48,16 @@ stages:
 - stage: "PublishAndPack"
   displayName: 'Publish and Pack'
   dependsOn: 'Build'
-  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/dev'))
-
+  condition:  |
+   and
+   (
+     succeeded(),
+     or
+     ( 
+       eq(variables['Build.SourceBranch'], 'refs/heads/master'),
+       eq(variables['Build.SourceBranch'], 'refs/heads/dev')
+     )
+    )
   jobs:
   - job: PackAndPublish
     displayName: Pack Worker, then publish both
@@ -123,6 +131,6 @@ stages:
               inputs:
                 command: push
                 feedsToUse: 'select'
-                packagesToPush: '$(Pipeline.Workspace)/packages/Equinor.ProCoSys.BusSender.Worker.*.nupkg'
+                packagesToPush: '$(Pipeline.Workspace)/packages/releases/Equinor.ProCoSys.BusSender.Worker.*.nupkg'
                 publishVstsFeed: 'ProCoSysOfficial'
                 allowPackageConflicts: true
