@@ -114,9 +114,9 @@ stages:
 
     - task: DotNetCoreCLI@2
       displayName: 'NuGet push release'
-        inputs:
-          command: push
-          feedsToUse: 'select'
-          packagesToPush: '$(Build.ArtifactStagingDirectory)/packages/packages/releases/Equinor.ProCoSys.BusSender.Worker.*.nupkg'
-          publishVstsFeed: 'ProCoSysOfficial'
-          allowPackageConflicts: true      
+      inputs:
+        command: push
+        feedsToUse: 'select'
+        packagesToPush: '$(Build.ArtifactStagingDirectory)/packages/packages/releases/Equinor.ProCoSys.BusSender.Worker.*.nupkg'
+        publishVstsFeed: 'ProCoSysOfficial'
+        allowPackageConflicts: true      
