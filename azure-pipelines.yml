@@ -107,30 +107,16 @@ stages:
       displayName: 'Create NuGet Package - Release Version'
 
     - publish: '$(Build.ArtifactStagingDirectory)'
-      artifact: 'packages'      
-      
-- stage: "PushRelease"
-  displayName: 'Push release'
-  dependsOn: 'PublishAndPack'
-  condition: succeeded()
-  jobs:
-  - deployment:
-    environment: 'pcs-bus-sender'
-    pool:
-      vmImage: $(vmImageName)
-    strategy:
-      runOnce:
-        deploy:
-          steps:
+      artifact: 'packages'
 
-            - task: NuGetAuthenticate@0
-              displayName: 'NuGet Authenticate'
+    - task: NuGetAuthenticate@0
+      displayName: 'NuGet Authenticate'
 
-            - task: DotNetCoreCLI@2
-              displayName: 'NuGet push release'
-              inputs:
-                command: push
-                feedsToUse: 'select'
-                packagesToPush: '$(Build.ArtifactStagingDirectory)/packages/packages/releases/Equinor.ProCoSys.BusSender.Worker.*.nupkg'
-                publishVstsFeed: 'ProCoSysOfficial'
-                allowPackageConflicts: true
+    - task: DotNetCoreCLI@2
+      displayName: 'NuGet push release'
+        inputs:
+          command: push
+          feedsToUse: 'select'
+          packagesToPush: '$(Build.ArtifactStagingDirectory)/packages/packages/releases/Equinor.ProCoSys.BusSender.Worker.*.nupkg'
+          publishVstsFeed: 'ProCoSysOfficial'
+          allowPackageConflicts: true      
