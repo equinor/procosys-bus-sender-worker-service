@@ -1,4 +1,8 @@
-﻿using Equinor.ProCoSys.BusSender.Infrastructure;
+﻿using System;
+using System.Diagnostics;
+using System.IO;
+using Equinor.ProCoSys.BusSender.Infrastructure;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -11,6 +15,13 @@ namespace Equinor.ProCoSys.BusSender.Worker
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
                 .UseWindowsService()
+                .ConfigureAppConfiguration((_, config) =>
+                {
+                    config = new ConfigurationBuilder()
+                        .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
+                        .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+                })
+                .UseContentRoot(Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName))
                 .ConfigureServices((hostContext, services) =>
                 {
                     services.AddDbContext(hostContext.Configuration["ConnectionString"]);
