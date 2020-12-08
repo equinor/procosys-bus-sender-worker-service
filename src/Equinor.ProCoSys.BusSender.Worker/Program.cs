@@ -1,8 +1,6 @@
 ﻿using Equinor.ProCoSys.BusSender.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Serilog;
 
 namespace Equinor.ProCoSys.BusSender.Worker
 {
@@ -10,15 +8,9 @@ namespace Equinor.ProCoSys.BusSender.Worker
     {
         public static void Main(string[] args) => CreateHostBuilder(args).Build().Run();
 
-        public static IHostBuilder CreateHostBuilder(string[] args)
-        {
-            Log.Logger = new LoggerConfiguration().ReadFrom.AppSettings().CreateLogger();
-            Log.Error("Stqarter opp driten");
-            return Host.CreateDefaultBuilder(args)
-                .ConfigureLogging((hostingContext, builder) =>
-                {
-                    builder.AddFile("c:\\Logs\\myapp.txt");
-                })
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args)
+                .UseWindowsService()
                 .ConfigureServices((hostContext, services) =>
                 {
                     services.AddDbContext(hostContext.Configuration["ConnectionString"]);
@@ -31,6 +23,5 @@ namespace Equinor.ProCoSys.BusSender.Worker
 
                     services.AddHostedService<TimedWorkerService>();
                 });
-        }
     }
 }
