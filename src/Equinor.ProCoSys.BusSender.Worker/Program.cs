@@ -1,6 +1,7 @@
 ﻿using Equinor.ProCoSys.BusSender.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace Equinor.ProCoSys.BusSender.Worker
 {
@@ -10,6 +11,10 @@ namespace Equinor.ProCoSys.BusSender.Worker
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
+                .ConfigureLogging((hostingContext, builder) =>
+                {
+                    builder.AddFile("c:\\Logs\\myapp.txt");
+                })
                 .ConfigureServices((hostContext, services) =>
                 {
                     services.AddDbContext(hostContext.Configuration["ConnectionString"]);
