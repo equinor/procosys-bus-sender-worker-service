@@ -1,4 +1,5 @@
-﻿using Equinor.ProCoSys.BusSender.Core;
+﻿using System;
+using Equinor.ProCoSys.BusSender.Core;
 using Equinor.ProCoSys.BusSender.Core.Interfaces;
 using Equinor.ProCoSys.BusSender.Core.Services;
 using Equinor.ProCoSys.BusSender.Core.Telemetry;
@@ -8,6 +9,7 @@ using Microsoft.Azure.ServiceBus;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Serilog;
 
 namespace Equinor.ProCoSys.BusSender.Infrastructure
 {
@@ -37,15 +39,27 @@ namespace Equinor.ProCoSys.BusSender.Infrastructure
 
         public static void AddTopicClients(this IServiceCollection services, string serviceBusConnectionString, string topicNames)
         {
-            var topics = topicNames.Split(',');
-            var topicClients = new TopicClients();
-            foreach (var topicName in topics)
+            try
             {
-                var topicClient = new TopicClient(serviceBusConnectionString, topicName);
-                topicClients.Add(topicName, topicClient);
-            }
+                var topics = topicNames.Split(',');
+                var topicClients = new TopicClients();
+                foreach (var topicName in topics)
+                {
+                    var topicClient = new TopicClient(serviceBusConnectionString, topicName);
+                    topicClients.Add(topicName, topicClient);
+                }
 
-            services.AddSingleton<ITopicClients>(topicClients);
+                services.AddSingleton<ITopicClients>(topicClients);
+            }
+            catch (Exception e)
+            {
+                Log.Error(e.Message);
+                Log.Error(e.StackTrace);
+                Log.Error(e.InnerException.Message);
+                Log.Error(e.InnerException.StackTrace);
+                throw;
+            }
+            
         }
         public static IServiceCollection AddRepositories(this IServiceCollection services)
             => services.AddScoped<IBusEventRepository, BusEventRepository>();
