@@ -39,6 +39,7 @@ namespace Equinor.ProCoSys.BusSender.Infrastructure
 
         public static void AddTopicClients(this IServiceCollection services, string serviceBusConnectionString, string topicNames)
         {
+            
             try
             {
                 var topics = topicNames.Split(',');
