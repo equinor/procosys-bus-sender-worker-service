@@ -41,5 +41,7 @@ namespace Equinor.ProCoSys.BusSender.Core.Telemetry
             _ai
                 .GetMetric(name, dimension1Name, dimension2Name)
                 .TrackValue(metric, dimension1Value, dimension2Value);
+
+        public void Flush() => _ai.Flush();
     }
 }

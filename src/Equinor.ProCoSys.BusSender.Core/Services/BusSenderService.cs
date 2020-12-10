@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Equinor.ProCoSys.BusSender.Core.Interfaces;
+using Equinor.ProCoSys.BusSender.Core.Models;
 using Equinor.ProCoSys.BusSender.Core.Telemetry;
 using Microsoft.Extensions.Logging;
+using System.Text.Json;
 
 namespace Equinor.ProCoSys.BusSender.Core.Services
 {
@@ -43,12 +45,16 @@ namespace Equinor.ProCoSys.BusSender.Core.Services
                 _logger.LogInformation($"BusSenderService found {events.Count} messages to process");
                 foreach (var busEvent in events)
                 {
-                    _logger.LogTrace($"Sending: {busEvent.Message}");
+                    var message = JsonSerializer.Deserialize<BusEventMessage>(busEvent.Message);
+                    _telemetryClient.TrackMetric("BusSender Topic", 1, "ProjectSchema", "ProjectName", message.ProjectSchema[4..], message.ProjectName.Replace('$','_'));
                     await _topicClients.Send(busEvent.Event, busEvent.Message);
+                    
                     _telemetryClient.TrackEvent("BusSender Send",
                         new Dictionary<string, string>
                         {
                             {"Event", busEvent.Event},
+                            {"ProjectSchema", message.ProjectSchema[4..] },
+                            {"ProjectName", message.ProjectName.Replace('$','_') }
                         });
                     busEvent.Sent = Status.Sent;
                     await _unitOfWork.SaveChangesAsync();
@@ -60,6 +66,7 @@ namespace Equinor.ProCoSys.BusSender.Core.Services
                 throw;
             }
             _logger.LogDebug($"BusSenderService SendMessageChunk finished at: {DateTimeOffset.Now}");
+            _telemetryClient.Flush();
         }
 
         public async Task StopService()

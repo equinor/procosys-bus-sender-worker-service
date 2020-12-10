@@ -24,13 +24,13 @@ namespace Equinor.ProCoSys.BusSender.Worker
                 .UseContentRoot(Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName))
                 .ConfigureServices((hostContext, services) =>
                 {
+                    services.AddApplicationInsightsTelemetryWorkerService();
                     services.AddDbContext(hostContext.Configuration["ConnectionString"]);
                     services.AddTopicClients(
                         hostContext.Configuration["ServiceBusConnectionString"],
                         hostContext.Configuration["TopicNames"]);
                     services.AddRepositories();
                     services.AddServices();
-                    services.AddApplicationInsightsTelemetryWorkerService();
 
                     services.AddHostedService<TimedWorkerService>();
                 });

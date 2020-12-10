@@ -32,5 +32,9 @@ namespace Equinor.ProCoSys.BusSender.Core.Telemetry
 
         public void TrackMetric(string name, double metric, string dimension1Name, string dimension2Name, string dimension1Value, string dimension2Value) =>
             Console.WriteLine($"Metric:\t{name}:{Environment.NewLine}\t{metric}{Environment.NewLine}\t{dimension1Name}: {dimension1Value}{Environment.NewLine}\t\t{dimension2Name}: {dimension2Value}");
+
+        public void Flush()
+        {
+        }
     }
 }
