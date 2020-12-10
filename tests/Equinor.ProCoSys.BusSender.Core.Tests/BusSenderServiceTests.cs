@@ -40,7 +40,7 @@ namespace Equinor.ProCoSys.BusSender.Core.Tests
                     Event = "topic2",
                     Sent = Status.UnProcessed,
                     Id = 1,
-                    Message = "Message 10 minutes ago not sent"
+                    Message = "{\"ProjectSchema\":\"NGPCS_TEST_BROWN\",\"ProjectName\":\"Message 10 minutes ago not sent\"}"
                 },
                 new BusEvent
                 {
@@ -48,7 +48,7 @@ namespace Equinor.ProCoSys.BusSender.Core.Tests
                     Event = "topic3",
                     Sent = Status.UnProcessed,
                     Id = 1,
-                    Message = "Message 10 minutes ago not sent"
+                    Message = "{\"ProjectSchema\":\"NGPCS_TEST_BROWN\",\"ProjectName\":\"Message 10 minutes ago not sent\"}"
                 }
             };
             var busEventRepository = new Mock<IBusEventRepository>();
