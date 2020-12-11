@@ -5,6 +5,7 @@ using Equinor.ProCoSys.BusSender.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace Equinor.ProCoSys.BusSender.Worker
 {
@@ -22,6 +23,12 @@ namespace Equinor.ProCoSys.BusSender.Worker
                         .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
                 })
                 .UseContentRoot(Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName))
+                .ConfigureLogging(builder =>
+                {
+                    builder.AddApplicationInsights();
+                    builder.AddFilter<Microsoft.Extensions.Logging.ApplicationInsights.ApplicationInsightsLoggerProvider>
+                                 ("", LogLevel.Information);
+                })
                 .ConfigureServices((hostContext, services) =>
                 {
                     services.AddApplicationInsightsTelemetryWorkerService();

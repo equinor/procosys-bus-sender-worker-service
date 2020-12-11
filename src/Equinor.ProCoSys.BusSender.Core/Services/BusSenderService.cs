@@ -35,7 +35,7 @@ namespace Equinor.ProCoSys.BusSender.Core.Services
         {
             try
             {
-                _logger.LogDebug($"BusSenderService SendMessageChunk starting at: {DateTimeOffset.Now}");
+                _logger.LogInformation($"BusSenderService SendMessageChunk starting at: {DateTimeOffset.Now}");
                 var events = await _busEventRepository.GetEarliestUnProcessedEventChunk();
                 if (events.Any())
                 {
@@ -65,7 +65,7 @@ namespace Equinor.ProCoSys.BusSender.Core.Services
                 _logger.LogError(exception, $"BusSenderService execute send failed at: {DateTimeOffset.Now}");
                 throw;
             }
-            _logger.LogDebug($"BusSenderService SendMessageChunk finished at: {DateTimeOffset.Now}");
+            _logger.LogInformation($"BusSenderService SendMessageChunk finished at: {DateTimeOffset.Now}");
             _telemetryClient.Flush();
         }
 

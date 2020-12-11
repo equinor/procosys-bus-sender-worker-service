@@ -24,7 +24,7 @@ namespace Equinor.ProCoSys.BusSender.Worker
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            _logger.LogInformation($"TimedWorkerService at: {DateTimeOffset.Now}");
+            _logger.LogInformation($"TimedWorkerService started at: {DateTimeOffset.Now}");
 
             _timer = new Timer(DoWork, null, 5000, Timeout.Infinite);
 
@@ -35,7 +35,7 @@ namespace Equinor.ProCoSys.BusSender.Worker
         {
             try
             {
-                _logger.LogTrace($"TimedWorkerService started do work at: {DateTimeOffset.Now}");
+                _logger.LogInformation($"TimedWorkerService started do work at: {DateTimeOffset.Now}");
                 await _entryPointService.SendMessageChunk();
             }
             catch (Exception e)
@@ -44,7 +44,6 @@ namespace Equinor.ProCoSys.BusSender.Worker
             }
             finally
             {
-                _logger.LogTrace($"Resetting timer at: { DateTimeOffset.Now}");
                 _timer.Change(_timeout, Timeout.Infinite);
             }
         }
