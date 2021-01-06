@@ -7,6 +7,7 @@ using Equinor.ProCoSys.BusSender.Core.Models;
 using Equinor.ProCoSys.BusSender.Core.Telemetry;
 using Microsoft.Extensions.Logging;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 
 namespace Equinor.ProCoSys.BusSender.Core.Services
 {
@@ -17,6 +18,8 @@ namespace Equinor.ProCoSys.BusSender.Core.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly ILogger<BusSenderService> _logger;
         private readonly ITelemetryClient _telemetryClient;
+        private readonly Regex _rx = new Regex(@"[\a\e\f\n\r\t\v]", RegexOptions.Compiled);
+
 
         public BusSenderService(ITopicClients topicClients,
             IBusEventRepository busEventRepository,
@@ -45,7 +48,7 @@ namespace Equinor.ProCoSys.BusSender.Core.Services
                 _logger.LogInformation($"BusSenderService found {events.Count} messages to process");
                 foreach (var busEvent in events)
                 {
-                    var message = JsonSerializer.Deserialize<BusEventMessage>(busEvent.Message);
+                    var message = JsonSerializer.Deserialize<BusEventMessage>(WashString(busEvent.Message));
                     _telemetryClient.TrackMetric("BusSender Topic", 1, "ProjectSchema", "ProjectName", message.ProjectSchema[4..], message.ProjectName.Replace('$','_'));
                     await _topicClients.Send(busEvent.Event, busEvent.Message);
                     
@@ -73,6 +76,13 @@ namespace Equinor.ProCoSys.BusSender.Core.Services
         {
             _logger.LogInformation($"BusSenderService stop reader at: {DateTimeOffset.Now}");
             await _topicClients.CloseAllAsync();
+        }
+        
+        private string WashString(string busEventMessage)
+        {
+            busEventMessage = _rx.Replace(busEventMessage, m => Regex.Escape(m.Value));
+
+            return busEventMessage;
         }
     }
 }
