@@ -56,6 +56,7 @@ namespace Equinor.ProCoSys.BusSender.Core.Services
                         new Dictionary<string, string>
                         {
                             {"Event", busEvent.Event},
+                            {"ElementNo", message.TryGetElementNo()},
                             {"ProjectSchema", message.ProjectSchema[4..] },
                             {"ProjectName", message.ProjectName.Replace('$','_') }
                         });
