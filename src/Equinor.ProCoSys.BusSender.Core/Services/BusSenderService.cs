@@ -49,17 +49,10 @@ namespace Equinor.ProCoSys.BusSender.Core.Services
                 foreach (var busEvent in events)
                 {
                     var message = JsonSerializer.Deserialize<BusEventMessage>(WashString(busEvent.Message));
-                    _telemetryClient.TrackMetric("BusSender Topic", 1, "ProjectSchema", "ProjectName", message.ProjectSchema[4..], message.ProjectName.Replace('$','_'));
+                    TrackMetric(message);
                     await _topicClients.Send(busEvent.Event, WashString(busEvent.Message));
                     
-                    _telemetryClient.TrackEvent("BusSender Send",
-                        new Dictionary<string, string>
-                        {
-                            {"Event", busEvent.Event},
-                            {"ElementNo", message.TryGetElementNo()},
-                            {"ProjectSchema", message.ProjectSchema[4..] },
-                            {"ProjectName", message.ProjectName.Replace('$','_') }
-                        });
+                    TrackEvent(busEvent.Event, message);
                     busEvent.Sent = Status.Sent;
                     await _unitOfWork.SaveChangesAsync();
                 }
@@ -71,6 +64,32 @@ namespace Equinor.ProCoSys.BusSender.Core.Services
             }
             _logger.LogInformation($"BusSenderService SendMessageChunk finished at: {DateTimeOffset.Now}");
             _telemetryClient.Flush();
+        }
+
+        private void TrackMetric(BusEventMessage message) =>
+            _telemetryClient.TrackMetric("BusSender Topic", 1, "ProjectSchema", "ProjectName", message.ProjectSchema[4..],
+                message.ProjectName.Replace('$', '_'));
+
+        private void TrackEvent(string eventType, BusEventMessage message)
+        {
+            var properties = new Dictionary<string, string>
+            {
+                {"Event", eventType},
+                {"ProjectSchema", message.ProjectSchema[4..]},
+                {"ProjectName", message.ProjectName.Replace('$', '_')}
+            };
+            if (!string.IsNullOrWhiteSpace(message.McPkgNo))
+            {
+                properties.Add("McPkgNo", message.McPkgNo);
+            }
+
+            if (!string.IsNullOrWhiteSpace(message.CommPkgNo))
+            {
+                properties.Add("CommPkgNo", message.CommPkgNo);
+            }
+
+            _telemetryClient.TrackEvent("BusSender Send",
+                properties);
         }
 
         public async Task StopService()
