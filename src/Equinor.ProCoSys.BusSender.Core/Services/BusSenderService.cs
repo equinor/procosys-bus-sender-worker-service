@@ -50,7 +50,7 @@ namespace Equinor.ProCoSys.BusSender.Core.Services
                 {
                     var message = JsonSerializer.Deserialize<BusEventMessage>(WashString(busEvent.Message));
                     _telemetryClient.TrackMetric("BusSender Topic", 1, "ProjectSchema", "ProjectName", message.ProjectSchema[4..], message.ProjectName.Replace('$','_'));
-                    await _topicClients.Send(busEvent.Event, busEvent.Message);
+                    await _topicClients.Send(busEvent.Event, WashString(busEvent.Message));
                     
                     _telemetryClient.TrackEvent("BusSender Send",
                         new Dictionary<string, string>
