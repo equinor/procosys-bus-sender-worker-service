@@ -12,6 +12,8 @@ namespace Equinor.ProCoSys.BusSender.Infrastructure.Data
 
         public virtual DbSet<BusEvent> BusEvents { get; set; } = null!;
         public Task<int> SaveChangesAsync() => base.SaveChangesAsync();
+
+
         protected override void OnModelCreating(ModelBuilder modelBuilder) => modelBuilder.ApplyConfiguration(new BusEventConfiguration());
     }
 }

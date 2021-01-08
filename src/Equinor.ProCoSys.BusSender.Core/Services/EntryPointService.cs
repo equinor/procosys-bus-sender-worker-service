@@ -1,5 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System.Net.NetworkInformation;
+using System.Threading.Tasks;
 using Equinor.ProCoSys.BusSender.Core.Interfaces;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Equinor.ProCoSys.BusSender.Core.Services
 {
@@ -11,13 +13,15 @@ namespace Equinor.ProCoSys.BusSender.Core.Services
 
         public async Task SendMessageChunk()
         {
-            var service = _serviceLocator.GetService<IBusSenderService>();
+            using var scope = _serviceLocator.CreateScope();
+            var service = scope.ServiceProvider.GetRequiredService<IBusSenderService>();
             await service.SendMessageChunk();
         }
 
         public async Task StopService()
         {
-            var service = _serviceLocator.GetService<IBusSenderService>();
+            using var scope = _serviceLocator.CreateScope();
+            var service = scope.ServiceProvider.GetRequiredService<IBusSenderService>();
             await service.StopService();
         }
     }

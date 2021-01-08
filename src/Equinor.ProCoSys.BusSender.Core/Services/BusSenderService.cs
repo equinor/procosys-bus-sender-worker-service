@@ -55,6 +55,7 @@ namespace Equinor.ProCoSys.BusSender.Core.Services
                     TrackEvent(busEvent.Event, message);
                     busEvent.Sent = Status.Sent;
                     await _unitOfWork.SaveChangesAsync();
+                    
                 }
             }
             catch (Exception exception)
