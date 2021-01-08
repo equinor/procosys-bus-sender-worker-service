@@ -52,8 +52,7 @@ namespace Equinor.ProCoSys.BusSender.Infrastructure
             => services.AddScoped<IBusEventRepository, BusEventRepository>();
 
         public static IServiceCollection AddServices(this IServiceCollection services)
-            => services.AddSingleton<IServiceLocator, ServiceLocator>()
-                .AddSingleton<IEntryPointService, EntryPointService>()
+            => services.AddSingleton<IEntryPointService, EntryPointService>()
                 .AddScoped<ITelemetryClient, ApplicationInsightsTelemetryClient>()
                 .AddScoped<IBusSenderService, BusSenderService>();
     }
