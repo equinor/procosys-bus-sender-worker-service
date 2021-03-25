@@ -6,6 +6,7 @@
     <UserSecretsId>dotnet-BusSenderWorkerService-AB46807F-9F82-483F-B09B-E35626C31429</UserSecretsId>
     <PublishSingleFile>true</PublishSingleFile>
     <PublishReadyToRun>true</PublishReadyToRun>
+    <IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <ApplicationIcon />

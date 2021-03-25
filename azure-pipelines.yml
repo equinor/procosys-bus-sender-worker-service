@@ -100,7 +100,7 @@ stages:
         command: restore
         projects: '**/*.csproj' 
           
-    - script: dotnet publish --configuration $(buildConfiguration) -r win-x64 --self-contained true
+    - script: dotnet publish --configuration $(buildConfiguration) -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeAllContentForSelfExtract=true
       displayName: 'dotnet publish $(buildConfiguration)'
 
     - script: dotnet pack src/Equinor.ProCoSys.BusSender.Worker/Equinor.ProCoSys.BusSender.Worker.csproj -p:NuspecFile=worker.nuspec -p:NuspecProperties=version=$(getVersion.packageVersion) -c $(buildConfiguration) -o $(Build.ArtifactStagingDirectory)\packages\releases
