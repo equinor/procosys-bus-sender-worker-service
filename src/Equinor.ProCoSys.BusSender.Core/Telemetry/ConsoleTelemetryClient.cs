@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Equinor.ProCoSys.BusSender.Core.Telemetry
+namespace Equinor.ProCoSys.BusSenderWorker.Core.Telemetry
 {
     public class ConsoleTelemetryClient : ITelemetryClient
     {

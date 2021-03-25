@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Equinor.ProCoSys.BusSender.Core.Models;
+using Equinor.ProCoSys.BusSenderWorker.Core.Models;
 
-namespace Equinor.ProCoSys.BusSender.Core.Interfaces
+namespace Equinor.ProCoSys.BusSenderWorker.Core.Interfaces
 {
     public interface IBusEventRepository
     {

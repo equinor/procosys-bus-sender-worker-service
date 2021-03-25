@@ -2,9 +2,10 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Equinor.ProCoSys.BusSender.Core;
-using Equinor.ProCoSys.BusSender.Core.Interfaces;
-using Equinor.ProCoSys.BusSender.Core.Models;
 using Equinor.ProCoSys.BusSender.Infrastructure.Data;
+using Equinor.ProCoSys.BusSenderWorker.Core;
+using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
+using Equinor.ProCoSys.BusSenderWorker.Core.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 

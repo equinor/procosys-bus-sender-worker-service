@@ -1,19 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
-using Equinor.ProCoSys.BusSender.Core.Interfaces;
-using Equinor.ProCoSys.BusSender.Core.Models;
-using Equinor.ProCoSys.BusSender.Core.Telemetry;
 using Microsoft.Extensions.Logging;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using Equinor.ProCoSys.BusSenderWorker.Core;
+using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
+using Equinor.ProCoSys.BusSenderWorker.Core.Models;
+using Equinor.ProCoSys.BusSenderWorker.Core.Telemetry;
+using Equinor.ProCoSys.PcsServiceBus.Sender.Interfaces;
+using Microsoft.Azure.ServiceBus;
 
 namespace Equinor.ProCoSys.BusSender.Core.Services
 {
     public class BusSenderService : IBusSenderService
     {
-        private readonly ITopicClients _topicClients;
+        private readonly IPcsBusSender _topicClients;
         private readonly IBusEventRepository _busEventRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly ILogger<BusSenderService> _logger;
@@ -21,7 +25,7 @@ namespace Equinor.ProCoSys.BusSender.Core.Services
         private readonly Regex _rx = new Regex(@"[\a\e\f\n\r\t\v]", RegexOptions.Compiled);
 
 
-        public BusSenderService(ITopicClients topicClients,
+        public BusSenderService(IPcsBusSender topicClients,
             IBusEventRepository busEventRepository,
             IUnitOfWork unitOfWork,
             ILogger<BusSenderService> logger,
@@ -50,7 +54,8 @@ namespace Equinor.ProCoSys.BusSender.Core.Services
                 {
                     var message = JsonSerializer.Deserialize<BusEventMessage>(WashString(busEvent.Message));
                     TrackMetric(message);
-                    await _topicClients.Send(busEvent.Event, WashString(busEvent.Message));
+                    var messageObject = new Message(Encoding.UTF8.GetBytes(WashString(busEvent.Message)));
+                    await _topicClients.SendAsync(busEvent.Event, messageObject);
                     
                     TrackEvent(busEvent.Event, message);
                     busEvent.Sent = Status.Sent;

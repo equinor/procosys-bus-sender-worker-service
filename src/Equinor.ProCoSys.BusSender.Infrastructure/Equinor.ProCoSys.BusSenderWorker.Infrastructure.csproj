@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.ApplicationInsights" Version="2.15.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="3.1.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Equinor.ProCoSys.BusSender.Core\Equinor.ProCoSys.BusSenderWorker.Core.csproj" />
+    <ProjectReference Include="..\Equinor.ProCoSys.PcsBus\Equinor.ProCoSys.PcsServiceBus.csproj" />
+  </ItemGroup>
+
+</Project>

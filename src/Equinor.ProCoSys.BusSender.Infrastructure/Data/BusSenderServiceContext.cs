@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
-using Equinor.ProCoSys.BusSender.Core.Interfaces;
-using Equinor.ProCoSys.BusSender.Core.Models;
 using Equinor.ProCoSys.BusSender.Infrastructure.EntityConfiguration;
+using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
+using Equinor.ProCoSys.BusSenderWorker.Core.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Equinor.ProCoSys.BusSender.Infrastructure.Data

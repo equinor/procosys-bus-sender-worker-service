@@ -1,4 +1,4 @@
-﻿namespace Equinor.ProCoSys.BusSender.Core.Models
+﻿namespace Equinor.ProCoSys.BusSenderWorker.Core.Models
 {
     public class BusEventMessage
     {

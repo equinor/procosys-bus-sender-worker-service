@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Equinor.ProCoSys.BusSender.Core;
-using Equinor.ProCoSys.BusSender.Core.Models;
 using Equinor.ProCoSys.BusSender.Infrastructure.Repositories;
+using Equinor.ProCoSys.BusSenderWorker.Core;
+using Equinor.ProCoSys.BusSenderWorker.Core.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MockQueryable.Moq;
 using Moq;
 
-namespace Equinor.ProCoSys.BusSender.Infrastructure.Tests
+namespace Equinor.ProCoSys.BusSenderWorker.Infrastructure.Tests
 {
     [TestClass]
     public class BusEventRepositoryTests : RepositoryTestBase

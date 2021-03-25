@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.Extensibility;
 
-namespace Equinor.ProCoSys.BusSender.Core.Telemetry
+namespace Equinor.ProCoSys.BusSenderWorker.Core.Telemetry
 {
     public class ApplicationInsightsTelemetryClient : ITelemetryClient
     {

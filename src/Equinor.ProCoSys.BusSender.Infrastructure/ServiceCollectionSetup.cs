@@ -1,9 +1,10 @@
-﻿using Equinor.ProCoSys.BusSender.Core;
-using Equinor.ProCoSys.BusSender.Core.Interfaces;
-using Equinor.ProCoSys.BusSender.Core.Services;
-using Equinor.ProCoSys.BusSender.Core.Telemetry;
+﻿using Equinor.ProCoSys.BusSender.Core.Services;
 using Equinor.ProCoSys.BusSender.Infrastructure.Data;
 using Equinor.ProCoSys.BusSender.Infrastructure.Repositories;
+using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
+using Equinor.ProCoSys.BusSenderWorker.Core.Telemetry;
+using Equinor.ProCoSys.PcsServiceBus.Sender;
+using Equinor.ProCoSys.PcsServiceBus.Sender.Interfaces;
 using Microsoft.Azure.ServiceBus;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -38,14 +39,14 @@ namespace Equinor.ProCoSys.BusSender.Infrastructure
         public static void AddTopicClients(this IServiceCollection services, string serviceBusConnectionString, string topicNames)
         {
             var topics = topicNames.Split(',');
-            var topicClients = new TopicClients();
+            var pcsBusSender = new PcsBusSender();
             foreach (var topicName in topics)
             {
                 var topicClient = new TopicClient(serviceBusConnectionString, topicName);
-                topicClients.Add(topicName, topicClient);
+                pcsBusSender.Add(topicName, topicClient);
             }
 
-            services.AddSingleton<ITopicClients>(topicClients);
+            services.AddSingleton<IPcsBusSender>(pcsBusSender);
         }
 
         public static IServiceCollection AddRepositories(this IServiceCollection services)

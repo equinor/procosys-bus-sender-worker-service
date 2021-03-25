@@ -1,6 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Equinor.ProCoSys.BusSender.Infrastructure.Tests
+namespace Equinor.ProCoSys.BusSenderWorker.Infrastructure.Tests
 {
     public abstract class RepositoryTestBase
     {

@@ -1,4 +1,4 @@
-﻿namespace Equinor.ProCoSys.BusSender.Core
+﻿namespace Equinor.ProCoSys.BusSenderWorker.Core
 {
     public enum Status
     {

@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace Equinor.ProCoSys.BusSender.Core.Interfaces
+namespace Equinor.ProCoSys.BusSenderWorker.Core.Interfaces
 {
     public interface IEntryPointService
     {

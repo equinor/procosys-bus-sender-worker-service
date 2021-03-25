@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Net.NetworkInformation;
 using System.Threading.Tasks;
-using Equinor.ProCoSys.BusSender.Core.Interfaces;
+using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Equinor.ProCoSys.BusSender.Core.Services

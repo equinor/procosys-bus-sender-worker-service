@@ -1,17 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Equinor.ProCoSys.BusSender.Core.Interfaces;
-using Equinor.ProCoSys.BusSender.Core.Models;
 using Equinor.ProCoSys.BusSender.Core.Services;
-using Equinor.ProCoSys.BusSender.Core.Telemetry;
+using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
+using Equinor.ProCoSys.BusSenderWorker.Core.Models;
+using Equinor.ProCoSys.BusSenderWorker.Core.Telemetry;
+using Equinor.ProCoSys.PcsServiceBus.Sender;
 using Microsoft.Azure.ServiceBus;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Range = Moq.Range;
 
-namespace Equinor.ProCoSys.BusSender.Core.Tests
+namespace Equinor.ProCoSys.BusSenderWorker.Core.Tests
 {
     [TestClass]
     public class BusSenderServiceTests
@@ -24,7 +25,7 @@ namespace Equinor.ProCoSys.BusSender.Core.Tests
         [TestInitialize]
         public void Setup()
         {
-            var topicClients = new TopicClients();
+            var topicClients = new PcsBusSender();
             _topicClientMock1 = new Mock<ITopicClient>();
             _topicClientMock2 = new Mock<ITopicClient>();
             _topicClientMock3 = new Mock<ITopicClient>();

@@ -1,4 +1,4 @@
-﻿using Equinor.ProCoSys.BusSender.Core.Models;
+﻿using Equinor.ProCoSys.BusSenderWorker.Core.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

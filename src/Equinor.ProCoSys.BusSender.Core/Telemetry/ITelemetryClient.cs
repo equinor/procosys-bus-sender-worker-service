@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Equinor.ProCoSys.BusSender.Core.Telemetry
+namespace Equinor.ProCoSys.BusSenderWorker.Core.Telemetry
 {
     public interface ITelemetryClient
     {

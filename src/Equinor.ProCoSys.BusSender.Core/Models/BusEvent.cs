@@ -1,6 +1,7 @@
 ﻿using System;
+using Equinor.ProCoSys.BusSender.Core;
 
-namespace Equinor.ProCoSys.BusSender.Core.Models
+namespace Equinor.ProCoSys.BusSenderWorker.Core.Models
 {
     public class BusEvent
     {

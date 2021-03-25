@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Moq;
 
-namespace Equinor.ProCoSys.BusSender.Infrastructure.Tests
+namespace Equinor.ProCoSys.BusSenderWorker.Infrastructure.Tests
 {
     public class ContextHelper
     {
