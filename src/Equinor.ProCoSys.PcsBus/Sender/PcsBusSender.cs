@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Equinor.ProCoSys.PcsServiceBus.Sender.Interfaces;
 using Microsoft.Azure.ServiceBus;
@@ -15,8 +16,9 @@ namespace Equinor.ProCoSys.PcsServiceBus.Sender
 
         public void Add(string topicName, ITopicClient topicClient) => _topicClients.Add(new KeyValuePair<string, ITopicClient>(topicName, topicClient));
 
-        public Task SendAsync(string topic, Message message)
+        public Task SendAsync(string topic, string jsonMessage)
         {
+            var message = new Message(Encoding.UTF8.GetBytes(jsonMessage));
             var topicClient = _topicClients.SingleOrDefault(t => t.Key == topic).Value;
             if (topicClient == null)
             {

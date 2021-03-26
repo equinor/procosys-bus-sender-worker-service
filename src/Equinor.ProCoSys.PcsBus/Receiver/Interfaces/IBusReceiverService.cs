@@ -6,6 +6,6 @@ namespace Equinor.ProCoSys.PcsServiceBus.Receiver.Interfaces
 {
     public interface IBusReceiverService
     {
-        Task ProcessMessageAsync(PcsTopic pcsTopic, Message message, CancellationToken token);
+        Task ProcessMessageAsync(PcsTopic pcsTopic, string message, CancellationToken token);
     }
 }

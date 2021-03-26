@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Equinor.ProCoSys.PcsServiceBus.Receiver.Interfaces;
@@ -41,9 +42,11 @@ namespace Equinor.ProCoSys.PcsServiceBus.Receiver
         {
             try
             {
+                var messageJson = Encoding.UTF8.GetString(message.Body);
+
                 var busReceiverService = _busReceiverServiceFactory.GetServiceInstance();
 
-                await busReceiverService.ProcessMessageAsync(subscriptionClient.PcsTopic, message, token);
+                await busReceiverService.ProcessMessageAsync(subscriptionClient.PcsTopic, messageJson, token);
                 
                 await subscriptionClient.CompleteAsync(message.SystemProperties.LockToken);
             }

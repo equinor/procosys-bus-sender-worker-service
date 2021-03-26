@@ -32,7 +32,7 @@ namespace Equinor.ProCoSys.PcsServiceBusTests
         public async Task SendAsync_ShouldThrowExceptionIfTopicNotRegistered()
         {
             // Arrange
-            var message = new Message(Encoding.UTF8.GetBytes($@"{{One small {Guid.NewGuid()}}}"));
+            var message = $@"{{One small {Guid.NewGuid()}}}";
 
             // Act
             await _dut.SendAsync("AnUnknownTopic", message);
@@ -42,14 +42,14 @@ namespace Equinor.ProCoSys.PcsServiceBusTests
         public async Task SendAsync_ShouldOnlySendViaCorrectTopicClient()
         {
             // Arrange
-            var message = new Message(Encoding.UTF8.GetBytes($@"{{One small {Guid.NewGuid()}}}"));
+            var message = $@"{{One small {Guid.NewGuid()}}}";
 
             // Act
             await _dut.SendAsync(TopicName1, message);
 
             // Assert
-            _topicClient1.Verify(t => t.SendAsync(message), Times.Once);
-            _topicClient2.Verify(t => t.SendAsync(message), Times.Never);
+            _topicClient1.Verify(t => t.SendAsync(It.IsAny<Message>()), Times.Once);
+            _topicClient2.Verify(t => t.SendAsync(It.IsAny<Message>()), Times.Never);
         }
 
         [TestMethod]

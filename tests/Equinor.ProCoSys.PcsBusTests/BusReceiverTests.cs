@@ -60,12 +60,13 @@ namespace Equinor.ProCoSys.PcsServiceBusTests
         {
             var client = new Mock<IPcsSubscriptionClient>();
             var message = new Message(Encoding.UTF8.GetBytes($"{{\"ProjectSchema\" : \"asdf\", \"ProjectName\" : \"ew2f\", \"Description\" : \"sdf\"}}"));
+
             var lockToken = Guid.NewGuid();
 
             SetLockToken(message, lockToken);
             await _dut.ProcessMessagesAsync(client.Object, message, new CancellationToken());
 
-            _busReceiverService.Verify(b => b.ProcessMessageAsync(client.Object.PcsTopic, message, It.IsAny<CancellationToken>()), Times.Once);
+            _busReceiverService.Verify(b => b.ProcessMessageAsync(client.Object.PcsTopic, Encoding.UTF8.GetString(message.Body), It.IsAny<CancellationToken>()), Times.Once);
             client.Verify(c => c.CompleteAsync(lockToken.ToString()), Times.Once);
         }
 
