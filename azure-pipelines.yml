@@ -106,6 +106,38 @@ stages:
     - script: dotnet pack src/Equinor.ProCoSys.BusSender.Worker/Equinor.ProCoSys.BusSender.Worker.csproj -p:NuspecFile=worker.nuspec -p:NuspecProperties=version=$(getVersion.packageVersion) -c $(buildConfiguration) -o $(Build.ArtifactStagingDirectory)\packages\releases
       displayName: 'Create NuGet Package - Release Version'
 
+    - task: PowerShell@2
+      name: getVersion # Name of the pipeline variable used as prefix in referenace. Example $(getVersion.packageVersion)
+      displayName: 'get version from Equinor.ProCoSys.PcsBus.PcsServiceBus.csproj'
+      inputs:
+        targetType: inline
+        pwsh: true
+        script: |
+          # Set powershell variables
+          $path = "src/Equinor.ProCoSys.PcsBus/Equinor.ProCoSys.PcsBus.PcsServiceBus.csproj"
+          $xPath = "/Project/PropertyGroup"
+          $element = "VersionPrefix"
+          $variableName = "packageVersion" # Name of the pipeline variable used as suffix in referenace. Example $(getVersion.packageVersion)
+
+          # Get version from XML file
+
+          # Check if file contains data
+          $i = Get-Content $path
+          if (!$i) {Write-Host "invalid filepath or file is empty"}
+          else {Write-Host "File validated OK"}
+
+          $xmlData = [xml](Get-Content $path) # Get content from xml file
+
+          $version = ($xmlData.ChildNodes.SelectNodes("$xPath") | Select-Object $element).$element
+          if (!$version) {Write-Host "Could not read xml value"} # Validates if value can be read from xml
+
+          # Set variable
+          "##vso[task.setvariable variable=$variableName;isOutput=true]$($version)"
+          Write-Host "Setting variable named $variableName with value $($version)" # Use as prefix in variale referenace
+
+    - script: dotnet pack src/Equinor.ProCoSys.PcsBus/Equinor.ProCoSys.PcsBus.PcsServiceBus.csproj -p:NuspecFile=Equinor.ProCoSys.PcsServiceBus.nuspec -p:NuspecProperties=version=$(getVersion.packageVersion) -c $(buildConfiguration) -o $(Build.ArtifactStagingDirectory)\packages\releases
+      displayName: 'Create NuGet Package - Release Version'
+
     - publish: '$(Build.ArtifactStagingDirectory)'
       artifact: 'packages'
 
@@ -117,6 +149,6 @@ stages:
       inputs:
         command: push
         feedsToUse: 'select'
-        packagesToPush: '$(Build.ArtifactStagingDirectory)/packages/releases/Equinor.ProCoSys.BusSender.Worker.*.nupkg'
+        packagesToPush: '$(Build.ArtifactStagingDirectory)/packages/releases/Equinor.ProCoSys.*.nupkg'
         publishVstsFeed: 'ProCoSysOfficial'
         allowPackageConflicts: true      

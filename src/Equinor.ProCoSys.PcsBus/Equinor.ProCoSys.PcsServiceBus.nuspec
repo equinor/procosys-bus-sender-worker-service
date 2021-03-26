@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package >
+  <metadata>
+    <id>Equinor.ProCoSys.PcsBus</id>
+    <version>$version$</version>
+    <description>Library necessary for communictaion with PCS service bus</description>
+    <authors>Equinor ASA</authors>
+  </metadata>
+</package>
