@@ -23,4 +23,28 @@
         public string IsClosed { get; set; }
         public const string TopicName = "project";
     }
+
+    public class ResponsibleTopic
+    {
+        private string _plant;
+
+        public string Plant
+        {
+            get
+            {
+                if (string.IsNullOrWhiteSpace(_plant))
+                {
+                    return ProjectSchema;
+                }
+                return _plant;
+            }
+            set => _plant = value;
+        }
+
+        public string ProjectSchema { get; set; }
+        public string ResponsibleGroup { get; set; }
+        public string Description { get; set; }
+        public string Code { get; set; }
+        public const string TopicName = "responsible";
+    }
 }
