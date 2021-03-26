@@ -108,13 +108,13 @@ stages:
 
     - task: PowerShell@2
       name: getVersion2 # Name of the pipeline variable used as prefix in referenace. Example $(getVersion.packageVersion)
-      displayName: 'get version from Equinor.ProCoSys.PcsBus.PcsServiceBus.csproj'
+      displayName: 'get version from Equinor.ProCoSys.PcsServiceBus.csproj'
       inputs:
         targetType: inline
         pwsh: true
         script: |
           # Set powershell variables
-          $path = "src/Equinor.ProCoSys.PcsBus/Equinor.ProCoSys.PcsBus.PcsServiceBus.csproj"
+          $path = "src/Equinor.ProCoSys.PcsBus/Equinor.ProCoSys.PcsServiceBus.csproj"
           $xPath = "/Project/PropertyGroup"
           $element = "VersionPrefix"
           $variableName = "packageVersion" # Name of the pipeline variable used as suffix in referenace. Example $(getVersion.packageVersion)
@@ -135,7 +135,7 @@ stages:
           "##vso[task.setvariable variable=$variableName;isOutput=true]$($version)"
           Write-Host "Setting variable named $variableName with value $($version)" # Use as prefix in variale referenace
 
-    - script: dotnet pack src/Equinor.ProCoSys.PcsBus/Equinor.ProCoSys.PcsBus.PcsServiceBus.csproj -p:NuspecFile=Equinor.ProCoSys.PcsServiceBus.nuspec -p:NuspecProperties=version=$(getVersion.packageVersion) -c $(buildConfiguration) -o $(Build.ArtifactStagingDirectory)\packages\releases
+    - script: dotnet pack src/Equinor.ProCoSys.PcsBus/Equinor.ProCoSys.PcsServiceBus.csproj -p:NuspecFile=Equinor.ProCoSys.PcsServiceBus.nuspec -p:NuspecProperties=version=$(getVersion.packageVersion) -c $(buildConfiguration) -o $(Build.ArtifactStagingDirectory)\packages\releases
       displayName: 'Create NuGet Package - Release Version'
 
     - publish: '$(Build.ArtifactStagingDirectory)'
