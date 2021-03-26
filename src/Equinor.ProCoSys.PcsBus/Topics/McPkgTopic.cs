@@ -2,7 +2,22 @@
 {
     public class McPkgTopic
     {
-        public string Plant { get; set; }
+        private string _plant;
+
+        public string Plant
+        {
+            get
+            {
+                if (string.IsNullOrWhiteSpace(_plant))
+                {
+                    return ProjectSchema;
+                }
+                return _plant;
+            }
+            set => _plant = value;
+        }
+
+        public string ProjectSchema { get; set; }
         public string ProjectName { get; set; }
         public string CommPkgNo { get; set; }
         public string CommPkgNoOld { get; set; }
