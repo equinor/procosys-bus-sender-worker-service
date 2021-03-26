@@ -149,6 +149,6 @@ stages:
       inputs:
         command: push
         feedsToUse: 'select'
-        packagesToPush: '$(Build.ArtifactStagingDirectory)/packages/releases/Equinor.ProCoSys.*.nupkg'
+        packagesToPush: '$(Build.ArtifactStagingDirectory)/packages/releases/Equinor.ProCoSys.BusSender.Worker.*.nupkg;$(Build.ArtifactStagingDirectory)/packages/releases/Equinor.ProCoSys.PcsServiceBus.*.nupkg'
         publishVstsFeed: 'ProCoSysOfficial'
         allowPackageConflicts: true      
