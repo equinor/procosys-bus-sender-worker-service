@@ -55,7 +55,7 @@ namespace Equinor.ProCoSys.BusSender.Core.Services
                     var message = JsonSerializer.Deserialize<BusEventMessage>(WashString(busEvent.Message));
                     if (message.ProjectName == null)
                     {
-                        message.ProjectName = string.Empty;
+                        message.ProjectName = "_";
                     }
                     TrackMetric(message);
                     await _topicClients.SendAsync(busEvent.Event, WashString(busEvent.Message));
