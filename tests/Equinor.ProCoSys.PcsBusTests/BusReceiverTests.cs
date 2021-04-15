@@ -59,7 +59,7 @@ namespace Equinor.ProCoSys.PcsServiceBusTests
         public async Task ProcessMessageAsync_ShouldCallProcessMessageAsync()
         {
             var client = new Mock<IPcsSubscriptionClient>();
-            var message = new Message(Encoding.UTF8.GetBytes($"{{\"ProjectSchema\" : \"asdf\", \"ProjectName\" : \"ew2f\", \"Description\" : \"sdf\"}}"));
+            var message = new Message(Encoding.UTF8.GetBytes($"{{\"Plant\" : \"asdf\", \"ProjectName\" : \"ew2f\", \"Description\" : \"sdf\"}}"));
 
             var lockToken = Guid.NewGuid();
 

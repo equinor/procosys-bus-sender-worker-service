@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Worker">
 
   <PropertyGroup>
-    <VersionPrefix>1.3.4</VersionPrefix>
+    <VersionPrefix>1.4.0</VersionPrefix>
     <TargetFramework>net5.0</TargetFramework>
     <UserSecretsId>dotnet-BusSenderWorkerService-AB46807F-9F82-483F-B09B-E35626C31429</UserSecretsId>
     <PublishSingleFile>true</PublishSingleFile>

@@ -4,7 +4,7 @@
     {
         public const string Event = "Event";
 
-        public const string ProjectSchema = "ProjectSchema";
+        public const string Plant = "Plant";
 
         public const string ProjectName = "ProjectName";
         public const string ProjectNameOld = "ProjectNameOld";
