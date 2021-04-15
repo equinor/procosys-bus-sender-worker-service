@@ -49,7 +49,7 @@ namespace Equinor.ProCoSys.BusSenderWorker.Core.Tests
                     Event = "topic3",
                     Sent = Status.UnProcessed,
                     Id = 1,
-                    Message = "{\"Plant\" : \"PCS$HF_LNG\", \"ProjectName\" : \"M.O790C.IM.X.0324\", \"McPkgNo\" : \"8460-E015\", \"Description\" : \"	Installere bonding til JBer ved V8 område\"}"
+                    Message = "{\"Plant\" : \"PCS$HF_LNG\", \"Responsible\" : \"8460-E015\", \"Description\" : \"	Installere bonding til JBer ved V8 område\"}"
                 }
             };
             var busEventRepository = new Mock<IBusEventRepository>();

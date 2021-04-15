@@ -73,7 +73,7 @@ namespace Equinor.ProCoSys.BusSender.Core.Services
 
         private void TrackMetric(BusEventMessage message) =>
             _telemetryClient.TrackMetric("BusSender Topic", 1, "Plant", "ProjectName", message.Plant[4..],
-                message.ProjectName.Replace('$', '_'));
+                message.ProjectName?.Replace('$', '_'));
 
         private void TrackEvent(string eventType, BusEventMessage message)
         {
@@ -81,7 +81,7 @@ namespace Equinor.ProCoSys.BusSender.Core.Services
             {
                 {"Event", eventType},
                 {"Plant", message.Plant[4..]},
-                {"ProjectName", message.ProjectName.Replace('$', '_')}
+                {"ProjectName", message.ProjectName?.Replace('$', '_')}
             };
             if (!string.IsNullOrWhiteSpace(message.McPkgNo))
             {
