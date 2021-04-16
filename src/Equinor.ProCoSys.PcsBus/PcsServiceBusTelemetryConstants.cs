@@ -1,6 +1,6 @@
 ﻿namespace Equinor.ProCoSys.PcsServiceBus
 {
-    public class BusReceiverTelemetryConstants
+    public class PcsServiceBusTelemetryConstants
     {
         public const string Event = "Event";
 
@@ -14,5 +14,6 @@
         public const string Ipo = "Ipo";
         public const string IpoEvent = "IpoEvent";
         public const string CommPkgNoOld = "CommPkgNoOld";
+        public const string ResponsibleCode = "ResponsibleCode";
     }
 }
