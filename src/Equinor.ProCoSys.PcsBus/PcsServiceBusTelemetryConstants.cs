@@ -15,5 +15,8 @@
         public const string IpoEvent = "IpoEvent";
         public const string CommPkgNoOld = "CommPkgNoOld";
         public const string ResponsibleCode = "ResponsibleCode";
+        public const string IsVoided = "IsVoided";
+        public const string Code = "Code";
+        public const string RegisterCode = "RegisterCode";
     }
 }
