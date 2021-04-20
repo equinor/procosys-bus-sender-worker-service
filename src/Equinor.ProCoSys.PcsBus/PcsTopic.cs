@@ -6,6 +6,7 @@
         CommPkg,
         McPkg,
         Ipo,
-        Responsible
+        Responsible,
+        TagFunction
     }
 }
