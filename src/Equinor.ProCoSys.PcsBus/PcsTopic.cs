@@ -2,11 +2,12 @@
 {
     public enum PcsTopic
     {
-        Project,
         CommPkg,
-        McPkg,
         Ipo,
+        McPkg,
+        Project,
         Responsible,
+        Tag,
         TagFunction
     }
 }
