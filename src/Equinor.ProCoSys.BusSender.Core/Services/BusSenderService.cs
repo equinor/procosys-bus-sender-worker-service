@@ -109,6 +109,10 @@ namespace Equinor.ProCoSys.BusSender.Core.Services
         
         private string WashString(string busEventMessage)
         {
+            busEventMessage = busEventMessage.Replace("\r","" );
+            busEventMessage = busEventMessage.Replace("\n", "");
+            busEventMessage = busEventMessage.Replace("\t", "");
+            busEventMessage = busEventMessage.Replace("\f", "");
             busEventMessage = _rx.Replace(busEventMessage, m => Regex.Escape(m.Value));
 
             return busEventMessage;
