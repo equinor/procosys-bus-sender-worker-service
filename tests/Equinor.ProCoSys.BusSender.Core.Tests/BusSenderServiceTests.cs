@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 using Equinor.ProCoSys.BusSender.Core.Services;
 using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
@@ -19,8 +20,10 @@ namespace Equinor.ProCoSys.BusSenderWorker.Core.Tests
     {
         private BusSenderService _dut;
         private Mock<IUnitOfWork> _iUnitOfWork;
-        private Mock<ITopicClient> _topicClientMock1, _topicClientMock2, _topicClientMock3;
+        private Mock<ITopicClient> _topicClientMock1, _topicClientMock2, _topicClientMock3, _topicClientMock4;
         private List<BusEvent> _busEvents;
+        private Mock<IBusEventRepository> _busEventRepository;
+        private string _messageBodyOnTopicClient4;
 
         [TestInitialize]
         public void Setup()
@@ -29,9 +32,13 @@ namespace Equinor.ProCoSys.BusSenderWorker.Core.Tests
             _topicClientMock1 = new Mock<ITopicClient>();
             _topicClientMock2 = new Mock<ITopicClient>();
             _topicClientMock3 = new Mock<ITopicClient>();
+            _topicClientMock4 = new Mock<ITopicClient>();
+            _topicClientMock4.Setup(t => t.SendAsync(It.IsAny<Message>()))
+                .Callback<Message>(m => _messageBodyOnTopicClient4 = Encoding.UTF8.GetString(m.Body));
             topicClients.Add("topic1", _topicClientMock1.Object);
             topicClients.Add("topic2", _topicClientMock2.Object);
             topicClients.Add("topic3", _topicClientMock3.Object);
+            topicClients.Add("topic4", _topicClientMock4.Object);
 
             _busEvents = new List<BusEvent>
             {
@@ -52,11 +59,11 @@ namespace Equinor.ProCoSys.BusSenderWorker.Core.Tests
                     Message = "{\"Plant\" : \"PCS$HF_LNG\", \"Responsible\" : \"8460-E015\", \"Description\" : \"	Installere bonding til JBer ved V8 område\"}"
                 }
             };
-            var busEventRepository = new Mock<IBusEventRepository>();
+            _busEventRepository = new Mock<IBusEventRepository>();
             _iUnitOfWork = new Mock<IUnitOfWork>();
 
-            busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk()).Returns(() => Task.FromResult(_busEvents));
-            _dut = new BusSenderService(topicClients, busEventRepository.Object, _iUnitOfWork.Object, new Mock<ILogger<BusSenderService>>().Object, new Mock<ITelemetryClient>().Object);
+            _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk()).Returns(() => Task.FromResult(_busEvents));
+            _dut = new BusSenderService(topicClients, _busEventRepository.Object, _iUnitOfWork.Object, new Mock<ILogger<BusSenderService>>().Object, new Mock<ITelemetryClient>().Object);
         }
 
         [TestMethod]
@@ -66,6 +73,7 @@ namespace Equinor.ProCoSys.BusSenderWorker.Core.Tests
             _topicClientMock1.Verify(t => t.CloseAsync(), Times.Once);
             _topicClientMock2.Verify(t => t.CloseAsync(), Times.Once);
             _topicClientMock3.Verify(t => t.CloseAsync(), Times.Once);
+            _topicClientMock4.Verify(t => t.CloseAsync(), Times.Once);
         }
 
         [TestMethod]
@@ -78,9 +86,28 @@ namespace Equinor.ProCoSys.BusSenderWorker.Core.Tests
             _topicClientMock1.Verify(t => t.SendAsync(It.IsAny<Message>()),Times.Never);
             _topicClientMock2.Verify(t => t.SendAsync(It.IsAny<Message>()), Times.Once);
             _topicClientMock3.Verify(t => t.SendAsync(It.IsAny<Message>()), Times.Once);
+            _topicClientMock4.Verify(t => t.SendAsync(It.IsAny<Message>()), Times.Never);
 
             Assert.AreEqual(Status.Sent, _busEvents[0].Sent);
             Assert.AreEqual(Status.Sent, _busEvents[0].Sent);
+        }
+
+        [TestMethod]
+        public async Task SendMessageChunk_ShouldCleanMessageJSon()
+        {
+            var uncleanedTestMessage = new BusEvent
+            {
+                Event = "topic4",
+                Message =
+                    "{\"Plant\" : \"PCS$HF_LNG\",\"Parameter\":\"En \t\r\n\fstreng\" }"
+            };
+            var expectedWashedMessage = "{\"Plant\" : \"PCS$HF_LNG\",\"Parameter\":\"En streng\" }";
+
+            _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk()).Returns(() => Task.FromResult(new List<BusEvent>{uncleanedTestMessage}));
+
+            await _dut.SendMessageChunk();
+
+            Assert.AreEqual(expectedWashedMessage, _messageBodyOnTopicClient4);
         }
 
         [TestMethod]
