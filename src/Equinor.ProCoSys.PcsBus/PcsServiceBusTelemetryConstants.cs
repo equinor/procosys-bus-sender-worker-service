@@ -18,5 +18,7 @@
         public const string IsVoided = "IsVoided";
         public const string Code = "Code";
         public const string RegisterCode = "RegisterCode";
+        public const string TagNo = "TagNo";
+        public const string TagNoOld = "TagNoOld";
     }
 }
