@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Worker">
 
   <PropertyGroup>
-    <VersionPrefix>1.5.10</VersionPrefix>
+    <VersionPrefix>1.5.11</VersionPrefix>
     <TargetFramework>net5.0</TargetFramework>
     <UserSecretsId>dotnet-BusSenderWorkerService-AB46807F-9F82-483F-B09B-E35626C31429</UserSecretsId>
     <PublishSingleFile>true</PublishSingleFile>
@@ -16,9 +16,6 @@
     <StartupObject>Equinor.ProCoSys.BusSender.Worker.Program</StartupObject>
     <Nullable>enable</Nullable>
     <IsPackable>true</IsPackable>
-    <AssemblyVersion>1.5.11.0</AssemblyVersion>
-    <FileVersion>1.5.11.0</FileVersion>
-    <Version>1.5.11</Version>
   </PropertyGroup>
 
   <ItemGroup>
