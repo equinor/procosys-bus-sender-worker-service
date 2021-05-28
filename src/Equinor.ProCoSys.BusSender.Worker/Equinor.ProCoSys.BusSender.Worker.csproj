@@ -16,6 +16,8 @@
     <StartupObject>Equinor.ProCoSys.BusSender.Worker.Program</StartupObject>
     <Nullable>enable</Nullable>
     <IsPackable>true</IsPackable>
+    <AssemblyVersion>1.5.11.0</AssemblyVersion>
+    <FileVersion>1.5.11.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
