@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Equinor.ProCoSys.PcsServiceBus.Topics
 {
-    public class PuncListItem
+    public class PunchListItemTopic
     {
         public string Plant { get; set; }
         public string PlantName { get; set; }
