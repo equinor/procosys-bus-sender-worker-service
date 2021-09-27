@@ -8,6 +8,7 @@
         Project,
         Responsible,
         Tag,
-        TagFunction
+        TagFunction,
+        PunchListItem
     }
 }
