@@ -15,7 +15,7 @@ namespace Equinor.ProCoSys.PcsServiceBus.Receiver
         {
             if (renewLeaseInterval == 0)
             {
-                throw new Exception("RenewLeaseInterval must be a positive integer");
+                throw new Exception("RenewLeaseIntervalMilliSec must be a positive integer");
             }
 
             RenewLeaseInterval = renewLeaseInterval;

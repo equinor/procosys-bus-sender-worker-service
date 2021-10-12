@@ -12,7 +12,7 @@ namespace Equinor.ProCoSys.BusSender.Worker
     {
         private readonly ILogger<TimedWorkerService> _logger;
         private readonly IEntryPointService _entryPointService;
-        private Timer _timer;
+        private Timer? _timer;
         private readonly int _timeout;
 
         public TimedWorkerService(ILogger<TimedWorkerService> logger, IEntryPointService entryPointService, IConfiguration configuration)
@@ -26,7 +26,7 @@ namespace Equinor.ProCoSys.BusSender.Worker
         {
             _logger.LogInformation($"TimedWorkerService started at: {DateTimeOffset.Now}");
 
-            _timer = new Timer(callback: DoWork, state: null, dueTime: 5000, period: Timeout.Infinite);
+            _timer = new Timer(DoWork, null, 5000, Timeout.Infinite);
 
             return Task.CompletedTask;
         }
@@ -44,7 +44,7 @@ namespace Equinor.ProCoSys.BusSender.Worker
             }
             finally
             {
-                _timer.Change(_timeout, Timeout.Infinite);
+                _timer?.Change(_timeout, Timeout.Infinite);
             }
         }
 

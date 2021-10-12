@@ -13,15 +13,13 @@ namespace Equinor.ProCoSys.PcsServiceBus
 
         public string ConnectionString { get; set; }
 
-        public List<KeyValuePair<PcsTopic, string>> Subscriptions { get; } = new List<KeyValuePair<PcsTopic, string>>();
-        /**
-         * Renew lease interval for service bus subscriptions in milliseconds
-         */
-        public int RenewLeaseInterval { get; private set; }
+        public List<KeyValuePair<PcsTopic, string>> Subscriptions { get; } = new();
 
-        public PcsServiceBusConfig WithRenewLeaseInterval(int renewLeaseInterval)
+        public int RenewLeaseIntervalMilliSec { get; private set; }
+
+        public PcsServiceBusConfig WithRenewLeaseInterval(int renewLeaseIntervalMilliSec)
         {
-            RenewLeaseInterval = renewLeaseInterval;
+            RenewLeaseIntervalMilliSec = renewLeaseIntervalMilliSec;
             return this;
         }
 

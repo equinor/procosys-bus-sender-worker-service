@@ -16,7 +16,7 @@ namespace Equinor.ProCoSys.PcsServiceBus
             var optionsBuilder = new PcsServiceBusConfig();
             options(optionsBuilder);
 
-            var pcsSubscriptionClients = new PcsSubscriptionClients(optionsBuilder.RenewLeaseInterval);
+            var pcsSubscriptionClients = new PcsSubscriptionClients(optionsBuilder.RenewLeaseIntervalMilliSec);
             optionsBuilder.Subscriptions.ForEach(
                 s => 
                     pcsSubscriptionClients.Add(

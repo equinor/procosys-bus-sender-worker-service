@@ -37,29 +37,29 @@ namespace Equinor.ProCoSys.PcsServiceBus.Receiver
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            _timer = new Timer(CanProceedAsLeaderCheck, null, 5000, Timeout.Infinite);
+            _timer = new Timer(CanProceedAsLeaderCheckAsync, null, 5000, Timeout.Infinite);
 
             return Task.CompletedTask;
         }
 
-        private async void CanProceedAsLeaderCheck(object state)
+        private async void CanProceedAsLeaderCheckAsync(object state)
         {
             try
             {
-                _logger.LogDebug($"CanProceedAsLeaderCheck started do work at: {DateTimeOffset.Now}");
+                _logger.LogDebug($"CanProceedAsLeaderCheckAsync started do work at: {DateTimeOffset.Now}");
 
                 if (IsLeader)
                 {
-                    await RenewLease();
+                    await RenewLeaseAsync();
                 }
                 else
                 {
-                    await TryBecomeLeader();
+                    await TryBecomeLeaderAsync();
                 }
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"CanProceedAsLeaderCheck failed at: {DateTimeOffset.Now}");
+                _logger.LogError(e, $"CanProceedAsLeaderCheckAsync failed at: {DateTimeOffset.Now}");
             }
             finally
             {
@@ -67,32 +67,32 @@ namespace Equinor.ProCoSys.PcsServiceBus.Receiver
             }
         }
 
-        private async Task TryBecomeLeader()
+        private async Task TryBecomeLeaderAsync()
         {
             var canProceedAsLeader = await _leaderElectorService.CanProceedAsLeader(_receiverId);
 
             if (canProceedAsLeader)
             {
-                _logger.LogInformation($"CanProceedAsLeaderCheck, lease obtained at: {DateTimeOffset.Now}");
+                _logger.LogInformation($"CanProceedAsLeaderCheckAsync, lease obtained at: {DateTimeOffset.Now}");
                 IsLeader = true;
                 StartMessageReceiving();
             }
         }
 
-        private async Task RenewLease()
+        private async Task RenewLeaseAsync()
         {
             var canProceedAsLeader = await _leaderElectorService.CanProceedAsLeader(_receiverId);
 
             if (!canProceedAsLeader)
             {
                 // Suddenly lost role as leader for some strange reason. Leader elector could have restarted
-                _logger.LogWarning( $"CanProceedAsLeaderCheck, lease lost at: {DateTimeOffset.Now}");
+                _logger.LogWarning( $"CanProceedAsLeaderCheckAsync, lease lost at: {DateTimeOffset.Now}");
                 IsLeader = false;
                 StopMessageReceiving();
             }
             else
             {
-                _logger.LogDebug($"CanProceedAsLeaderCheck, lease renewed at: {DateTimeOffset.Now}");
+                _logger.LogDebug($"CanProceedAsLeaderCheckAsync, lease renewed at: {DateTimeOffset.Now}");
             }
         }
 

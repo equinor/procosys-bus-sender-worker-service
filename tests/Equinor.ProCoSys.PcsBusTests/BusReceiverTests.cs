@@ -33,7 +33,7 @@ namespace Equinor.ProCoSys.PcsServiceBusTests
                 => c.RegisterPcsMessageHandler(
                     It.IsAny<Func<IPcsSubscriptionClient, Message, CancellationToken, Task>>(),
                     It.IsAny<MessageHandlerOptions>())
-            ).Callback<Func<IPcsSubscriptionClient, Message, CancellationToken, Task> , MessageHandlerOptions>((s,options) => _options = options);
+            ).Callback<Func<IPcsSubscriptionClient, Message, CancellationToken, Task> , MessageHandlerOptions>((_,options) => _options = options);
 
             _busReceiverService = new Mock<IBusReceiverService>();
             _leaderElectorService = new Mock<ILeaderElectorService>();
@@ -54,7 +54,7 @@ namespace Equinor.ProCoSys.PcsServiceBusTests
         public void StartAsync_ShouldVerifyRegisterPcsMessageHandlerWasNotCalledOnStartAsync()
         {
             _dut.StartAsync(new CancellationToken());
-            
+
             _clients.Verify(c => c.RegisterPcsMessageHandler(It.IsAny<Func<IPcsSubscriptionClient, Message, CancellationToken, Task>>(), It.IsAny<MessageHandlerOptions>()), Times.Never);
             Assert.IsNull(_options);
         }
@@ -126,9 +126,9 @@ namespace Equinor.ProCoSys.PcsServiceBusTests
             var systemProperties = message.SystemProperties;
             var type = systemProperties.GetType();
             type.GetMethod("set_LockTokenGuid", BindingFlags.Instance | BindingFlags.NonPublic)
-                .Invoke(systemProperties, new object[] {lockToken});
+                ?.Invoke(systemProperties, new object[] {lockToken});
             type.GetMethod("set_SequenceNumber", BindingFlags.Instance | BindingFlags.NonPublic)
-                .Invoke(systemProperties, new object[] {0});
+                ?.Invoke(systemProperties, new object[] {0});
         }
     }
 }
