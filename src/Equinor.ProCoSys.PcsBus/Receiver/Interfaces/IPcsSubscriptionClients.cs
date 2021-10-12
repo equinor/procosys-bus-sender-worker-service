@@ -9,5 +9,7 @@ namespace Equinor.ProCoSys.PcsServiceBus.Receiver.Interfaces
     {
         Task CloseAllAsync();
         void RegisterPcsMessageHandler(Func<IPcsSubscriptionClient, Message, CancellationToken, Task> handler, MessageHandlerOptions options);
+        void UnregisterPcsMessageHandler();
+        int RenewLeaseInterval { get; }
     }
 }

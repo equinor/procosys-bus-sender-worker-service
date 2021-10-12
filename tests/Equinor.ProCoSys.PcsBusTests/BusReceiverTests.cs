@@ -20,22 +20,26 @@ namespace Equinor.ProCoSys.PcsServiceBusTests
         MessageHandlerOptions _options;
         private Mock<ILogger<PcsBusReceiver>> _logger;
         private Mock<IBusReceiverService> _busReceiverService;
+        private Mock<ILeaderElectorService> _leaderElectorService;
 
         [TestInitialize]
         public void Setup()
         {
             _logger = new Mock<ILogger<PcsBusReceiver>>();
-            
+
             _clients = new Mock<IPcsSubscriptionClients>();
+            _clients.Setup(c => c.RenewLeaseInterval).Returns(10000);
             _clients.Setup(c
                 => c.RegisterPcsMessageHandler(
                     It.IsAny<Func<IPcsSubscriptionClient, Message, CancellationToken, Task>>(),
                     It.IsAny<MessageHandlerOptions>())
             ).Callback<Func<IPcsSubscriptionClient, Message, CancellationToken, Task> , MessageHandlerOptions>((s,options) => _options = options);
-            
-            _busReceiverService = new Mock<IBusReceiverService>();
 
-            _dut = new PcsBusReceiver(_logger.Object, _clients.Object, new SingletonBusReceiverServiceFactory(_busReceiverService.Object));
+            _busReceiverService = new Mock<IBusReceiverService>();
+            _leaderElectorService = new Mock<ILeaderElectorService>();
+            _leaderElectorService.Setup(l => l.CanProceedAsLeader(It.IsAny<Guid>())).Returns(Task.FromResult(true));
+
+            _dut = new PcsBusReceiver(_logger.Object, _clients.Object, new SingletonBusReceiverServiceFactory(_busReceiverService.Object), _leaderElectorService.Object);
         }
 
         [TestMethod]
@@ -47,11 +51,58 @@ namespace Equinor.ProCoSys.PcsServiceBusTests
         }
 
         [TestMethod]
-        public void StartAsync_ShouldVerifyRegisterOcsMessageHandlerWasCalledAndMaxConcurrentCallsWasSet()
+        public void StartAsync_ShouldVerifyRegisterPcsMessageHandlerWasNotCalledOnStartAsync()
+        {
+            _dut.StartAsync(new CancellationToken());
+            
+            _clients.Verify(c => c.RegisterPcsMessageHandler(It.IsAny<Func<IPcsSubscriptionClient, Message, CancellationToken, Task>>(), It.IsAny<MessageHandlerOptions>()), Times.Never);
+            Assert.IsNull(_options);
+        }
+
+        [TestMethod]
+        public void StartAsync_ShouldVerifyRegisterPcsMessageHandlerWasCalledAfterTimerStartOnStartAsync()
         {
             _dut.StartAsync(new CancellationToken());
 
-            _clients.Verify(c => c.RegisterPcsMessageHandler(It.IsAny<Func<IPcsSubscriptionClient, Message, CancellationToken, Task>>(), It.IsAny<MessageHandlerOptions>()));
+            Thread.Sleep(7000);
+            _clients.Verify(c => c.RegisterPcsMessageHandler(It.IsAny<Func<IPcsSubscriptionClient, Message, CancellationToken, Task>>(), It.IsAny<MessageHandlerOptions>()), Times.Once);
+            Assert.IsNotNull(_options);
+        }
+
+        [TestMethod]
+        public void StartAsync_ShouldVerifyRegisterPcsMessageHandlerWasNotCalledAfterTimerStartWhenNotProceedAsLeaderOnStartAsync()
+        {
+            _leaderElectorService.Setup(l => l.CanProceedAsLeader(It.IsAny<Guid>())).Returns(Task.FromResult(false));
+            _dut.StartAsync(new CancellationToken());
+
+            Thread.Sleep(7000);
+            _clients.Verify(c => c.RegisterPcsMessageHandler(It.IsAny<Func<IPcsSubscriptionClient, Message, CancellationToken, Task>>(), It.IsAny<MessageHandlerOptions>()), Times.Never);
+            Assert.IsNull(_options);
+        }
+
+        [TestMethod]
+        public void StartAsync_ShouldCallCanProceedAsLeader()
+        {
+            _dut.StartAsync(new CancellationToken());
+            Thread.Sleep(7000);
+            _leaderElectorService.Verify(l => l.CanProceedAsLeader(It.IsAny<Guid>()), Times.Once);
+        }
+
+        [TestMethod]
+        public void StartAsync_ShouldNotCallCanProceedAsLeaderImmediately()
+        {
+            _dut.StartAsync(new CancellationToken());
+            _leaderElectorService.Verify(l => l.CanProceedAsLeader(It.IsAny<Guid>()), Times.Never);
+        }
+
+        [TestMethod]
+        public async Task StartAsync_ShouldVerifyRegisterPcsMessageHandlerWasCalledAndMaxConcurrentCallsWasSet2()
+        {
+            await _dut.StartAsync(new CancellationToken());
+
+            Thread.Sleep(7000);
+
+            _clients.Verify(c => c.RegisterPcsMessageHandler(It.IsAny<Func<IPcsSubscriptionClient, Message, CancellationToken, Task>>(), It.IsAny<MessageHandlerOptions>()), Times.Once);
             Assert.AreEqual(1, _options.MaxConcurrentCalls);
         }
 

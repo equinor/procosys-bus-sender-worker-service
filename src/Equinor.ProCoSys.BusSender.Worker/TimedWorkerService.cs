@@ -26,12 +26,12 @@ namespace Equinor.ProCoSys.BusSender.Worker
         {
             _logger.LogInformation($"TimedWorkerService started at: {DateTimeOffset.Now}");
 
-            _timer = new Timer(DoWork, null, 5000, Timeout.Infinite);
+            _timer = new Timer(callback: DoWork, state: null, dueTime: 5000, period: Timeout.Infinite);
 
             return Task.CompletedTask;
         }
 
-        private async void DoWork(object state)
+        private async void DoWork(object? state)
         {
             try
             {

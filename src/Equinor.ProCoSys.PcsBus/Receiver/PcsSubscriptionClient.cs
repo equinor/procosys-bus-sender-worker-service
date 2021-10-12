@@ -21,6 +21,11 @@ namespace Equinor.ProCoSys.PcsServiceBus.Receiver
             base.RegisterMessageHandler(HandleMessage, messageHandlerOptions);
         }
 
+        public void UnregisterPcsMessageHandler()
+        {
+            base.UnregisterMessageHandlerAsync(TimeSpan.FromSeconds(10));
+        }
+
         private Task HandleMessage(Message message, CancellationToken token) => _pcsHandler.Invoke(this, message, token);
     }
 }

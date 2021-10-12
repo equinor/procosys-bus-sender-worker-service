@@ -19,7 +19,7 @@ namespace Equinor.ProCoSys.PcsServiceBusTests
         [TestInitialize]
         public void Setup()
         {
-            _dut = new PcsSubscriptionClients();
+            _dut = new PcsSubscriptionClients(1000);
             _client1 = new Mock<IPcsSubscriptionClient>();
             _client2 = new Mock<IPcsSubscriptionClient>();
 
@@ -38,7 +38,7 @@ namespace Equinor.ProCoSys.PcsServiceBusTests
         [TestMethod]
         public async Task AllMethodsWorkWithoutFailureOnEmpty()
         {
-            var emptyClients = new PcsSubscriptionClients();
+            var emptyClients = new PcsSubscriptionClients(1000);
             var handler = new Mock<Func<IPcsSubscriptionClient, Message, CancellationToken, Task>>();
             var options = new MessageHandlerOptions(Test);
             await emptyClients.CloseAllAsync();
