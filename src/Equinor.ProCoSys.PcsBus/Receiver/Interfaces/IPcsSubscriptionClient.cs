@@ -11,5 +11,6 @@ namespace Equinor.ProCoSys.PcsServiceBus.Receiver.Interfaces
         void RegisterPcsMessageHandler(Func<IPcsSubscriptionClient, Message, CancellationToken, Task> handler, MessageHandlerOptions messageHandlerOptions);
         Task CompleteAsync(string token);
         Task CloseAsync();
+        void UnregisterPcsMessageHandler();
     }
 }

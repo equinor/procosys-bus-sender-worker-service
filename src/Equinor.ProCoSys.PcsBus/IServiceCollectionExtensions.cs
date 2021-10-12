@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net.Http;
 using Equinor.ProCoSys.PcsServiceBus.Receiver;
 using Equinor.ProCoSys.PcsServiceBus.Receiver.Interfaces;
 using Equinor.ProCoSys.PcsServiceBus.Sender;
@@ -15,12 +16,21 @@ namespace Equinor.ProCoSys.PcsServiceBus
             var optionsBuilder = new PcsServiceBusConfig();
             options(optionsBuilder);
 
-            var pcsSubscriptionClients = new PcsSubscriptionClients();
+            var pcsSubscriptionClients = new PcsSubscriptionClients(optionsBuilder.RenewLeaseIntervalMilliSec);
             optionsBuilder.Subscriptions.ForEach(
                 s => 
                     pcsSubscriptionClients.Add(
                         new PcsSubscriptionClient(optionsBuilder.ConnectionString, s.Key, s.Value)));
             services.AddSingleton<IPcsSubscriptionClients>(pcsSubscriptionClients);
+
+            if (optionsBuilder.LeaderElectorUrl != null)
+            {
+                services.AddSingleton<ILeaderElectorService>(new LeaderElectorService(new HttpClient(), optionsBuilder.LeaderElectorUrl));
+            }
+            else
+            {
+                services.AddSingleton<ILeaderElectorService>(new AlwaysProceedLeaderElectorService());
+            }
 
             services.AddHostedService<PcsBusReceiver>();
 
