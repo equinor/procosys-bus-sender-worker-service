@@ -20,7 +20,7 @@ namespace Equinor.ProCoSys.PcsServiceBus.Topics
         public string AreaDescription { get; set; }
         public string Discipline { get; set; }
         public string McStatus { get; set; }
-        public KeyValuePair<string, string> Milestones { get; set; }
+        public KeyValuePair<string, DateTime> Milestones { get; set; }
         public List<string> ProjectNames { get; set; }
         public DateTime LastUpdated { get; set; }
         public const string TopicName = "mcpkg";
