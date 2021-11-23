@@ -9,6 +9,7 @@
         Responsible,
         Tag,
         TagFunction,
-        PunchListItem
+        PunchListItem,
+        Library
     }
 }
