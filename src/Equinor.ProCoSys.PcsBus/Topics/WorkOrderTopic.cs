@@ -33,8 +33,10 @@ namespace Equinor.ProCoSys.PcsServiceBus.Topics
         public string WoTypeCode { get; set; }
         public string ProjectProgress { get; set; }
         public string ExpendedManHours { get; set; }
-        public string CreatedAt { get; set; }
+        public DateTime CreatedAt { get; set; }
         public DateTime LastUpdated { get; set; }
+
+        public const string TopicName = "workorder";
 
     }
 }
