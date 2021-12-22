@@ -1,14 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Equinor.ProCoSys.PcsServiceBus.Topics
 {
     public class WorkOrderTopic
     {
-
         public string Plant { get; set; }
         public string PlantName { get; set; }
         public string ProjectName { get; set; }
@@ -35,8 +30,6 @@ namespace Equinor.ProCoSys.PcsServiceBus.Topics
         public string ExpendedManHours { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime LastUpdated { get; set; }
-
         public const string TopicName = "workorder";
-
     }
 }
