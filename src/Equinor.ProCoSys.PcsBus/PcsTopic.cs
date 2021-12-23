@@ -10,6 +10,7 @@
         Tag,
         TagFunction,
         PunchListItem,
-        Library
+        Library,
+        WorkOrder
     }
 }
