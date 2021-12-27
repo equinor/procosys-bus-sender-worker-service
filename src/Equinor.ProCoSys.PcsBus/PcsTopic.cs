@@ -11,6 +11,7 @@
         TagFunction,
         PunchListItem,
         Library,
-        WorkOrder
+        WorkOrder,
+        Checklist
     }
 }
