@@ -12,6 +12,7 @@
         PunchListItem,
         Library,
         WorkOrder,
-        Checklist
+        Checklist,
+        WorkOrderCutoff
     }
 }
