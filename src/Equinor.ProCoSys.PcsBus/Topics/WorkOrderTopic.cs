@@ -27,8 +27,11 @@ namespace Equinor.ProCoSys.PcsServiceBus.Topics
         public string TypeOfWorkCode { get; set; }
         public string OnShoreOffShoreCode { get; set; }
         public string WoTypeCode { get; set; }
+        public string DisciplineCode { get; set; }
+        public string DisciplineDescription { get; set; }
         public string ProjectProgress { get; set; }
         public string ExpendedManHours { get; set; }
+        public string RemainingHours { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime LastUpdated { get; set; }
         public List<string> CheckListIds { get; set; }
