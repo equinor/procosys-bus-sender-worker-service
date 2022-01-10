@@ -8,6 +8,7 @@ namespace Equinor.ProCoSys.PcsServiceBus.Topics
         public string Plant { get; set; }
         public string PlantName { get; set; }
         public string ProjectName { get; set; }
+        public string WoId { get; set; }
         public string WoNo { get; set; }
         public string WoNoOld { get; set; }
         public string CommPkgNo { get; set; }
@@ -31,6 +32,7 @@ namespace Equinor.ProCoSys.PcsServiceBus.Topics
         public string DisciplineDescription { get; set; }
         public string ProjectProgress { get; set; }
         public string ExpendedManHours { get; set; }
+        public string EstimatedHours { get; set; }
         public string RemainingHours { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime LastUpdated { get; set; }
