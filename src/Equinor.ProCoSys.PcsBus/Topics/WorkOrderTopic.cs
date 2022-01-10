@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Equinor.ProCoSys.PcsServiceBus.Topics
 {
@@ -30,6 +31,11 @@ namespace Equinor.ProCoSys.PcsServiceBus.Topics
         public string ExpendedManHours { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime LastUpdated { get; set; }
+
+        public List<string> CheckListIds { get; set; }
+
+        public List<string> JobStatuses { get; set; }
+
         public const string TopicName = "workorder";
     }
-}
+}   
