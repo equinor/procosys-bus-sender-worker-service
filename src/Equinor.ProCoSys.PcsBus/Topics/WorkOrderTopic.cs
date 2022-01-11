@@ -34,6 +34,10 @@ namespace Equinor.ProCoSys.PcsServiceBus.Topics
         public string ExpendedManHours { get; set; }
         public string EstimatedHours { get; set; }
         public string RemainingHours { get; set; }
+        public DateTime PlannedStartAtDate { get; set; }
+        public DateTime ActualStartAtDate { get; set; }
+        public DateTime PlannedFinishedAtDate { get; set; }
+        public DateTime ActualFinishedAtDate { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime LastUpdated { get; set; }
         public List<string> CheckListIds { get; set; }
