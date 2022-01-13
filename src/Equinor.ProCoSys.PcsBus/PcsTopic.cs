@@ -13,6 +13,7 @@
         Library,
         WorkOrder,
         Checklist,
+        Milestone,
         WorkOrderCutoff
     }
 }
