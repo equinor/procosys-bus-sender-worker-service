@@ -12,6 +12,8 @@
         PunchListItem,
         Library,
         WorkOrder,
-        Checklist
+        Checklist,
+        Milestone,
+        WorkOrderCutoff
     }
 }
