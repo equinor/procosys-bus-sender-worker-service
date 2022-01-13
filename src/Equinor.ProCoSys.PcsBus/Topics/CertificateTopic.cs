@@ -1,4 +1,6 @@
-﻿namespace Equinor.ProCoSys.PcsServiceBus.Topics
+﻿using Equinor.ProCoSys.PcsServiceBus.Enums;
+
+namespace Equinor.ProCoSys.PcsServiceBus.Topics
 {
     public class CertificateTopic
     {
