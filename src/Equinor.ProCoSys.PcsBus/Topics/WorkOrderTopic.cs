@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Equinor.ProCoSys.PcsServiceBus.Topics
 {
@@ -7,6 +8,7 @@ namespace Equinor.ProCoSys.PcsServiceBus.Topics
         public string Plant { get; set; }
         public string PlantName { get; set; }
         public string ProjectName { get; set; }
+        public string WoId { get; set; }
         public string WoNo { get; set; }
         public string WoNoOld { get; set; }
         public string CommPkgNo { get; set; }
@@ -26,10 +28,22 @@ namespace Equinor.ProCoSys.PcsServiceBus.Topics
         public string TypeOfWorkCode { get; set; }
         public string OnShoreOffShoreCode { get; set; }
         public string WoTypeCode { get; set; }
+        public string DisciplineCode { get; set; }
+        public string DisciplineDescription { get; set; }
         public string ProjectProgress { get; set; }
         public string ExpendedManHours { get; set; }
+        public string EstimatedHours { get; set; }
+        public string RemainingHours { get; set; }
+        public DateTime PlannedStartAtDate { get; set; }
+        public DateTime ActualStartAtDate { get; set; }
+        public DateTime PlannedFinishedAtDate { get; set; }
+        public DateTime ActualFinishedAtDate { get; set; }
         public DateTime CreatedAt { get; set; }
+        public bool IsVoided { get; set; }
         public DateTime LastUpdated { get; set; }
+        public List<string> CheckListIds { get; set; }
+        public List<string> JobStatuses { get; set; }
+
         public const string TopicName = "workorder";
     }
-}
+}   
