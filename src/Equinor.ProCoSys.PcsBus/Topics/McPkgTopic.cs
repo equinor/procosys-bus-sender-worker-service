@@ -10,6 +10,7 @@ namespace Equinor.ProCoSys.PcsServiceBus.Topics
         public string CommPkgNo { get; set; }
         public string CommPkgNoOld { get; set; }
         public string McPkgNo { get; set; }
+        public string McPkgId { get; set; }
         public string McPkgNoOld { get; set; }
         public string Description { get; set; }
         public string PlantName { get; set; }
