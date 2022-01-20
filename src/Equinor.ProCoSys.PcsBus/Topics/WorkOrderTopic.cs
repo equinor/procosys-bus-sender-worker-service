@@ -41,8 +41,6 @@ namespace Equinor.ProCoSys.PcsServiceBus.Topics
         public DateTime CreatedAt { get; set; }
         public bool IsVoided { get; set; }
         public DateTime LastUpdated { get; set; }
-        public List<string> CheckListIds { get; set; }
-        public List<string> JobStatuses { get; set; }
 
         public const string TopicName = "workorder";
     }

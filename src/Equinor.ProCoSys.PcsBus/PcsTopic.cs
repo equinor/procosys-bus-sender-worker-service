@@ -15,6 +15,7 @@
         Checklist,
         Milestone,
         WorkOrderCutoff,
-        Certificate
+        Certificate,
+        WoChecklist
     }
 }
