@@ -62,7 +62,7 @@ stages:
       replaceExistingArchive: true
       rootFolderOrFile: '$(Build.BinariesDirectory)/build'
       solution : '**/*.sln'
-      sourceFolder: '$(System.DefaultWorkingDirectory)/$(projectName)/bin/$(buildConfiguration)/net5.0'
+      sourceFolder: '$(System.DefaultWorkingDirectory)/src/$(projectName)/bin/$(buildConfiguration)/net5.0'
       targetFolder: '$(Build.BinariesDirectory)/build/App_Data/jobs/continuous/$(projectName)'
       versionSpec: '5.11.0'
       projectName: '$(projectName)'
