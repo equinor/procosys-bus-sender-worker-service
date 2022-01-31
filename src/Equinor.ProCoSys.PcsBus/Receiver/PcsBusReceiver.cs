@@ -2,8 +2,8 @@
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Azure.Messaging.ServiceBus;
 using Equinor.ProCoSys.PcsServiceBus.Receiver.Interfaces;
-using Microsoft.Azure.ServiceBus;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -100,28 +100,22 @@ namespace Equinor.ProCoSys.PcsServiceBus.Receiver
 
         private void StartMessageReceiving()
         {
-            var messageHandlerOptions = new MessageHandlerOptions(ExceptionReceivedHandler)
-            {
-                MaxConcurrentCalls = 1,
-                AutoComplete = false
-            };
-
-            _subscriptionClients.RegisterPcsMessageHandler(ProcessMessagesAsync, messageHandlerOptions);
+            _subscriptionClients.RegisterPcsMessageHandler(ProcessMessagesAsync);
         }
 
         private void StopMessageReceiving() => _subscriptionClients.UnregisterPcsMessageHandler();
 
-        public async Task ProcessMessagesAsync(IPcsSubscriptionClient subscriptionClient, Message message, CancellationToken token)
+        public async Task ProcessMessagesAsync(IPcsSubscriptionClient subscriptionClient, ProcessMessageEventArgs args, CancellationToken token)
         {
             try
             {
-                var messageJson = Encoding.UTF8.GetString(message.Body);
+                var messageJson = args.Message.Body.ToString();
 
                 var busReceiverService = _busReceiverServiceFactory.GetServiceInstance();
 
                 await busReceiverService.ProcessMessageAsync(subscriptionClient.PcsTopic, messageJson, token);
 
-                await subscriptionClient.CompleteAsync(message.SystemProperties.LockToken);
+                await args.CompleteMessageAsync(args.Message);
             }
             catch (Exception ex)
             {

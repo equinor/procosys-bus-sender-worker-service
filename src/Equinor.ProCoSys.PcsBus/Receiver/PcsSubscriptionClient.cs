@@ -1,28 +1,38 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Azure.Messaging.ServiceBus;
 using Equinor.ProCoSys.PcsServiceBus.Receiver.Interfaces;
-using Microsoft.Azure.ServiceBus;
 
 namespace Equinor.ProCoSys.PcsServiceBus.Receiver
 {
-    public class PcsSubscriptionClient : SubscriptionClient, IPcsSubscriptionClient
+    public class PcsSubscriptionClient : IPcsSubscriptionClient
     {
+        private ServiceBusReceiver _client;
+
         public PcsTopic PcsTopic { get; }
 
-        private Func<IPcsSubscriptionClient, Message, CancellationToken, Task> _pcsHandler;
-        public PcsSubscriptionClient(string connectionString, PcsTopic pcsTopic, string subscriptionName)
-            : base(connectionString, pcsTopic.ToString(), subscriptionName, ReceiveMode.PeekLock, RetryPolicy.Default) =>
-            PcsTopic = pcsTopic;
+        private Func<IPcsSubscriptionClient, ServiceBusReceivedMessage, CancellationToken, Task> _pcsHandler;
+        public PcsSubscriptionClient(ServiceBusClient client, PcsTopic pcsTopic, string subscriptionName)
+        {
+            var options = new ServiceBusProcessorOptions
+            {
+                MaxConcurrentCalls = 1,
+                AutoCompleteMessages = false
+            };
 
-        public void RegisterPcsMessageHandler(Func<IPcsSubscriptionClient, Message, CancellationToken, Task> handler, MessageHandlerOptions messageHandlerOptions)
+            _client  = client.CreateReceiver(subscriptionName, options);
+            PcsTopic = pcsTopic;
+        }
+
+        public void RegisterPcsMessageHandler(Func<IPcsSubscriptionClient, ServiceBusReceivedMessage, CancellationToken, Task> handler, ServiceBusProcessorOptions messageHandlerOptions)
         {
             _pcsHandler = handler;
-            base.RegisterMessageHandler(HandleMessage, messageHandlerOptions);
+            _client.ProcessMessageAsync += HandleMessage;
         }
 
         public void UnregisterPcsMessageHandler() => base.UnregisterMessageHandlerAsync(TimeSpan.FromSeconds(10));
 
-        private Task HandleMessage(Message message, CancellationToken token) => _pcsHandler.Invoke(this, message, token);
+        private Task HandleMessage(ProcessMessageEventArgs args) => _pcsHandler.Invoke(this, args);
     }
 }
