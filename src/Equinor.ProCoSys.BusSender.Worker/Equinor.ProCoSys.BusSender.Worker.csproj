@@ -4,7 +4,7 @@
     <VersionPrefix>1.5.27</VersionPrefix>
     <TargetFramework>net5.0</TargetFramework>
     <UserSecretsId>dotnet-BusSenderWorkerService-AB46807F-9F82-483F-B09B-E35626C31429</UserSecretsId>
-    <PublishSingleFile>true</PublishSingleFile>
+    <!--<PublishSingleFile>true</PublishSingleFile>
     <PublishReadyToRun>true</PublishReadyToRun>
     <IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>
     <IncludeNativeLibrariesInSingleFile>true</IncludeNativeLibrariesInSingleFile>
@@ -13,9 +13,9 @@
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <ApplicationIcon />
     <OutputType>Exe</OutputType>
-    <StartupObject>Equinor.ProCoSys.BusSender.Worker.Program</StartupObject>
+    <StartupObject>Equinor.ProCoSys.BusSender.Worker.Program</StartupObject>-->
     <Nullable>enable</Nullable>
-    <IsPackable>true</IsPackable>
+    <!--<IsPackable>true</IsPackable>-->
   </PropertyGroup>
 
   <ItemGroup>
