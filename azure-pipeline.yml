@@ -50,10 +50,10 @@ stages:
       command: 'restore'
       configuration: '$(buildConfiguration)'
       contents: '**'
-      feedsToUse: 'config'
+      feedsToUse: 'select'
       flattenFolders: false
       includeRootFolder: false
-      nugetConfigPath: 'nuget.config'
+      nugetConfigPath: ''
       overWrite: false
       pathToPublish: '$(Build.ArtifactStagingDirectory)'
       platform: '$(buildPlatform)'
@@ -80,8 +80,8 @@ stages:
         - task: NuGetCommand@2
           inputs:
             restoreSolution: '**/*.sln'
-            feedsToUse: 'config'
-            nugetConfigPath: './nuget.config'
+            feedsToUse: 'select'
+            nugetConfigPath: ''
         - task: DotNetCoreCLI@2
           inputs:
             command: test
