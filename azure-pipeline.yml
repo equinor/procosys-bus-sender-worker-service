@@ -50,10 +50,10 @@ stages:
       command: 'restore'
       configuration: '$(buildConfiguration)'
       contents: '**'
-      feedsToUse: 'config'
+      feedsToUse: 'select'
       flattenFolders: false
       includeRootFolder: false
-      nugetConfigPath: 'nuget.config'
+      nugetConfigPath: ''
       overWrite: false
       pathToPublish: '$(Build.ArtifactStagingDirectory)'
       platform: '$(buildPlatform)'
@@ -62,7 +62,7 @@ stages:
       replaceExistingArchive: true
       rootFolderOrFile: '$(Build.BinariesDirectory)/build'
       solution : '**/*.sln'
-      sourceFolder: '$(System.DefaultWorkingDirectory)/$(projectName)/bin/$(buildConfiguration)'
+      sourceFolder: '$(System.DefaultWorkingDirectory)/$(projectName)/bin/$(buildConfiguration)/net5.0'
       targetFolder: '$(Build.BinariesDirectory)/build/App_Data/jobs/continuous/$(projectName)'
       versionSpec: '5.11.0'
       projectName: '$(projectName)'
@@ -80,8 +80,8 @@ stages:
         - task: NuGetCommand@2
           inputs:
             restoreSolution: '**/*.sln'
-            feedsToUse: 'config'
-            nugetConfigPath: './nuget.config'
+            feedsToUse: 'select'
+            nugetConfigPath: ''
         - task: DotNetCoreCLI@2
           inputs:
             command: test
