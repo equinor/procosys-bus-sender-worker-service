@@ -29,8 +29,6 @@ namespace Equinor.ProCoSys.BusSender.Worker
             await host.RunAsync();
         }
 
-        //public static void Main(string[] args) => CreateHostBuilder(args).Build().Run();
-
         public static IHostBuilder CreateHostBuilder(string[] args)
         {
             var builder = Host.CreateDefaultBuilder(args)
@@ -113,35 +111,5 @@ namespace Equinor.ProCoSys.BusSender.Worker
 
             return builder;
         }
-
-
-
-        //Host.CreateDefaultBuilder(args)
-        //    .UseWindowsService()
-        //    .ConfigureAppConfiguration((_, config) =>
-        //    {
-        //        config = new ConfigurationBuilder()
-        //            .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
-        //            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
-        //    })
-        //    .UseContentRoot(Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName))
-        //    .ConfigureLogging(builder =>
-        //    {
-        //        builder.AddApplicationInsights();
-        //        builder.AddFilter<Microsoft.Extensions.Logging.ApplicationInsights.ApplicationInsightsLoggerProvider>
-        //                     ("", LogLevel.Information);
-        //    })
-        //    .ConfigureServices((hostContext, services) =>
-        //    {
-        //        services.AddApplicationInsightsTelemetryWorkerService();
-        //        services.AddDbContext(hostContext.Configuration["ConnectionString"]);
-        //        services.AddTopicClients(
-        //            hostContext.Configuration["ServiceBusConnectionString"],
-        //            hostContext.Configuration["TopicNames"]);
-        //        services.AddRepositories();
-        //        services.AddServices();
-
-        //        services.AddHostedService<TimedWorkerService>();
-        //    });
     }
 }
