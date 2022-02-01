@@ -115,6 +115,11 @@ namespace Equinor.ProCoSys.BusSender.Core.Services
             busEventMessage = busEventMessage.Replace("\f", "");
             busEventMessage = _rx.Replace(busEventMessage, m => Regex.Escape(m.Value));
 
+            ////Removes non printable characters
+            var pattern = "[^ -~]+";
+            var reg_exp = new Regex(pattern);
+            busEventMessage = reg_exp.Replace(busEventMessage, "");
+
             return busEventMessage;
         }
     }
