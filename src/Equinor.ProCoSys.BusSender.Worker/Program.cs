@@ -36,7 +36,7 @@ namespace Equinor.ProCoSys.BusSender.Worker
             var builder = Host.CreateDefaultBuilder(args)
                 .ConfigureAppConfiguration((context, config) =>
                 {
-                    config.AddUserSecrets<Program>();
+                    config.AddUserSecrets<Program>(true);
                     var settings = config.Build();
 
                     if (settings["EnvironmentName"] == "Local")
