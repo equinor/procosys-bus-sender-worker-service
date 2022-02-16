@@ -11,6 +11,7 @@ namespace Equinor.ProCoSys.PcsServiceBus.Topics
         public string TagCategory { get; set; }
         public string FormularGroup { get; set; }
         public string FormularDiscipline { get; set; }
+        public string Revision { get; set; }
         public string Responsible { get; set; }
         public string Status { get; set; }
         public DateTime UpdatedAt { get; set; }
