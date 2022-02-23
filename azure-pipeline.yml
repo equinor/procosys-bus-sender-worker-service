@@ -6,7 +6,7 @@
 trigger:
  branches:
    include:
-     - 89280_Azure_Web_Job
+     - master
 
 name: $(date:yyyyMMdd)$(rev:.r)
 resources:  
@@ -114,7 +114,6 @@ stages:
       package: '$(System.ArtifactsDirectory)/drop/*.zip'
       rgName: '${{ variables.envRgName }}'
       appConfigName: '${{ variables.appConfigName }}'
-      webJobsStopped: 0
       webAppName: '${{ variables.appName }}'
 
   # deploy_test
@@ -144,7 +143,6 @@ stages:
       package: '$(System.ArtifactsDirectory)/drop/*.zip'
       rgName: '${{ variables.envRgName }}'
       appConfigName: '${{ variables.appConfigName }}'
-      webJobsStopped: 0
       webAppName: '${{ variables.appName }}'
   
   # deploy_prod
@@ -174,6 +172,4 @@ stages:
       package: '$(System.ArtifactsDirectory)/drop/*.zip'
       rgName: '${{ variables.envRgName }}'
       appConfigName: '${{ variables.appConfigName }}'
-      #set to stopped until go-live
-      webJobsStopped: 1
       webAppName: '${{ variables.appName }}'
