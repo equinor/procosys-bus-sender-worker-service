@@ -25,6 +25,6 @@ namespace Equinor.ProCoSys.PcsServiceBus.Topics
         public string ManHoursExpendedLastWeek { get; set; }
         public string ManHoursEarnedLastWeek { get; set; }
 
-        public const string TopicName = "workordercutoff";
+        public const string TopicName = "wocutoff";
     }
 }
