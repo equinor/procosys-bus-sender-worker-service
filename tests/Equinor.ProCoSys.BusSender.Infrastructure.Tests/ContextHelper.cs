@@ -1,4 +1,4 @@
-﻿using Equinor.ProCoSys.BusSender.Infrastructure.Data;
+﻿using Equinor.ProCoSys.BusSenderWorker.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 

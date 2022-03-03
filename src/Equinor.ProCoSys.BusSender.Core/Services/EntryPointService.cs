@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Net.NetworkInformation;
 using System.Threading.Tasks;
 using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Equinor.ProCoSys.BusSender.Core.Services
+namespace Equinor.ProCoSys.BusSenderWorker.Core.Services
 {
     public class EntryPointService : IEntryPointService
     {

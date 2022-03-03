@@ -1,20 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 using System.Text.Json;
 using System.Text.RegularExpressions;
-using Equinor.ProCoSys.BusSenderWorker.Core;
+using System.Threading.Tasks;
 using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 using Equinor.ProCoSys.BusSenderWorker.Core.Models;
 using Equinor.ProCoSys.BusSenderWorker.Core.Telemetry;
 using Equinor.ProCoSys.PcsServiceBus.Sender.Interfaces;
 using Equinor.ProCoSys.PcsServiceBus.Topics;
-using Microsoft.Azure.ServiceBus;
+using Microsoft.Extensions.Logging;
 
-namespace Equinor.ProCoSys.BusSender.Core.Services
+namespace Equinor.ProCoSys.BusSenderWorker.Core.Services
 {
     public class BusSenderService : IBusSenderService
     {

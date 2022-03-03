@@ -3,6 +3,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Azure.Identity;
 using Equinor.ProCoSys.BusSender.Infrastructure;
+using Equinor.ProCoSys.BusSenderWorker.Infrastructure;
 using Equinor.ProCoSys.BusSenderWorker.Infrastructure.Repositories;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.AzureAppConfiguration;
