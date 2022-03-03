@@ -1,41 +1,40 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 using System.Text.Json;
 using System.Text.RegularExpressions;
-using Equinor.ProCoSys.BusSenderWorker.Core;
+using System.Threading.Tasks;
 using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 using Equinor.ProCoSys.BusSenderWorker.Core.Models;
 using Equinor.ProCoSys.BusSenderWorker.Core.Telemetry;
 using Equinor.ProCoSys.PcsServiceBus.Sender.Interfaces;
-using Microsoft.Azure.ServiceBus;
+using Equinor.ProCoSys.PcsServiceBus.Topics;
+using Microsoft.Extensions.Logging;
 
-namespace Equinor.ProCoSys.BusSender.Core.Services
+namespace Equinor.ProCoSys.BusSenderWorker.Core.Services
 {
     public class BusSenderService : IBusSenderService
     {
         private readonly IPcsBusSender _topicClients;
         private readonly IBusEventRepository _busEventRepository;
+        private readonly ITagDetailsRepository _tagDetailsRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly ILogger<BusSenderService> _logger;
         private readonly ITelemetryClient _telemetryClient;
-        private readonly Regex _rx = new Regex(@"[\a\e\f\n\r\t\v]", RegexOptions.Compiled);
-
+        private readonly Regex _rx = new(@"[\a\e\f\n\r\t\v]", RegexOptions.Compiled);
 
         public BusSenderService(IPcsBusSender topicClients,
             IBusEventRepository busEventRepository,
             IUnitOfWork unitOfWork,
             ILogger<BusSenderService> logger,
-            ITelemetryClient telemetryClient)
+            ITelemetryClient telemetryClient, ITagDetailsRepository tagDetailsRepository)
         {
             _topicClients = topicClients;
             _busEventRepository = busEventRepository;
             _unitOfWork = unitOfWork;
             _logger = logger;
             _telemetryClient = telemetryClient;
+            _tagDetailsRepository = tagDetailsRepository;
         }
 
         public async Task SendMessageChunk()
@@ -52,7 +51,14 @@ namespace Equinor.ProCoSys.BusSender.Core.Services
                 _logger.LogInformation($"BusSenderService found {events.Count} messages to process");
                 foreach (var busEvent in events)
                 {
+
+                    if (busEvent.Event == "tag")
+                    {
+                        busEvent.Message = await AttachTagDetails(busEvent.Message);
+                    }
+
                     var message = JsonSerializer.Deserialize<BusEventMessage>(WashString(busEvent.Message));
+
                     if (message.ProjectName == null)
                     {
                         message.ProjectName = "_";
@@ -63,7 +69,6 @@ namespace Equinor.ProCoSys.BusSender.Core.Services
                     TrackEvent(busEvent.Event, message);
                     busEvent.Sent = Status.Sent;
                     await _unitOfWork.SaveChangesAsync();
-                    
                 }
             }
             catch (Exception exception)
@@ -73,6 +78,19 @@ namespace Equinor.ProCoSys.BusSender.Core.Services
             }
             _logger.LogInformation($"BusSenderService SendMessageChunk finished at: {DateTimeOffset.Now}");
             _telemetryClient.Flush();
+        }
+
+        private async Task<string> AttachTagDetails(string tagMessage)
+        {
+            var tagTopic = JsonSerializer.Deserialize<TagTopic>(WashString(tagMessage));
+
+            if (tagTopic?.TagId == null || !long.TryParse(tagTopic.TagId, out var tagId))
+            {
+                throw new Exception("Could not deserialize TagTopic");
+            }
+
+            tagTopic.TagDetails = await _tagDetailsRepository.GetDetailsStringByTagId(tagId);
+            return JsonSerializer.Serialize(tagTopic);
         }
 
         private void TrackMetric(BusEventMessage message) =>

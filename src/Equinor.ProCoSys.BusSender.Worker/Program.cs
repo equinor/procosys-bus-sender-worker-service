@@ -2,7 +2,7 @@
 using System.IO;
 using System.Threading.Tasks;
 using Azure.Identity;
-using Equinor.ProCoSys.BusSender.Infrastructure;
+using Equinor.ProCoSys.BusSenderWorker.Infrastructure;
 using Equinor.ProCoSys.BusSenderWorker.Infrastructure.Repositories;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.AzureAppConfiguration;
@@ -17,14 +17,12 @@ namespace Equinor.ProCoSys.BusSender.Worker
         public IConfiguration Configuration { get; }
 
 
-        public Program(IConfiguration configuration)
-        {
-            Configuration = configuration;
-        }
+        public Program(IConfiguration configuration) 
+            => Configuration = configuration;
 
         public static async Task Main(string[] args)
         {
-            using IHost host = CreateHostBuilder(args).Build();
+            using var host = CreateHostBuilder(args).Build();
             ILogger? logger = host.Services.GetService<ILogger<Program>>();
             await host.RunAsync();
         }
@@ -37,7 +35,28 @@ namespace Equinor.ProCoSys.BusSender.Worker
                     config.AddUserSecrets<Program>(true);
                     var settings = config.Build();
 
-                    if (settings["EnvironmentName"] == "Local")
+                    var azConfig = settings.GetValue<bool>("UseAzureAppConfiguration");
+                    if (azConfig)
+                    {
+                        config.AddAzureAppConfiguration(options =>
+                        {
+                            var connectionString = settings["ConnectionStrings:AppConfig"];
+                            options.Connect(connectionString)
+                                .ConfigureKeyVault(kv =>
+                                {
+                                    kv.SetCredential(new DefaultAzureCredential());
+                                })
+                                .Select(KeyFilter.Any)
+                                .Select(KeyFilter.Any, context.HostingEnvironment.EnvironmentName)
+                                .ConfigureRefresh(refreshOptions =>
+                                {
+                                    refreshOptions.Register("Sentinel", true);
+                                    refreshOptions.SetCacheExpiration(TimeSpan.FromMinutes(5));
+                                });
+                        });
+                    }
+
+                    else if (settings["EnvironmentName"] == "Local")
                     {
                         config.AddAzureAppConfiguration(options =>
                         {
@@ -91,7 +110,7 @@ namespace Equinor.ProCoSys.BusSender.Worker
            {
                var rep = new BlobRepository(hostContext.Configuration["BlobStorage:ConnectionString"], hostContext.Configuration["BlobStorage:ContainerName"]);
 
-               string walletPath = hostContext.Configuration["WalletFileDir"];
+               var walletPath = hostContext.Configuration["WalletFileDir"];
                Directory.CreateDirectory(walletPath);
 
                rep.Download(hostContext.Configuration["BlobStorage:WalletFileName"], walletPath + "\\cwallet.sso");

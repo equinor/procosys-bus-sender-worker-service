@@ -1,10 +1,10 @@
 ﻿using System.Threading.Tasks;
-using Equinor.ProCoSys.BusSender.Infrastructure.EntityConfiguration;
 using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 using Equinor.ProCoSys.BusSenderWorker.Core.Models;
+using Equinor.ProCoSys.BusSenderWorker.Infrastructure.EntityConfiguration;
 using Microsoft.EntityFrameworkCore;
 
-namespace Equinor.ProCoSys.BusSender.Infrastructure.Data
+namespace Equinor.ProCoSys.BusSenderWorker.Infrastructure.Data
 {
     public class BusSenderServiceContext : DbContext, IUnitOfWork
     {
