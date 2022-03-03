@@ -6,6 +6,6 @@ namespace Equinor.ProCoSys.BusSenderWorker.Core.Interfaces
 {
     public interface ITagDetailsRepository
     {
-        public Task<string> GetByTagId(long tagId);
+        public Task<string> GetDetailsStringByTagId(long tagId);
     }
 }

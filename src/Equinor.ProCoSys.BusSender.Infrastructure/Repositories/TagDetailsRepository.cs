@@ -22,7 +22,7 @@ namespace Equinor.ProCoSys.BusSenderWorker.Infrastructure.Repositories
         }
 
 
-        public async Task<string> GetByTagId(long tagId)
+        public async Task<string> GetDetailsStringByTagId(long tagId)
         {
 
             await using var context = _context;
