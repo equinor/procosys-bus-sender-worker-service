@@ -42,6 +42,6 @@ namespace Equinor.ProCoSys.PcsServiceBus.Topics
         public bool IsVoided { get; set; }
         public DateTime LastUpdated { get; set; }
 
-        public const string TopicName = "workorder";
+        public const string TopicName = "wo";
     }
 }   

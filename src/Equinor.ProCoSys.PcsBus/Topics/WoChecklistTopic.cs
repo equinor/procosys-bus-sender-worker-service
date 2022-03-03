@@ -10,6 +10,6 @@
         public string FormularGroup { get; set; }
         public string Responsible { get; set; }
 
-        public const string TopicName = "workorderchecklist";
+        public const string TopicName = "wochecklist";
     }
 }
