@@ -11,6 +11,7 @@ using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 using Equinor.ProCoSys.BusSenderWorker.Core.Models;
 using Equinor.ProCoSys.BusSenderWorker.Core.Telemetry;
 using Equinor.ProCoSys.PcsServiceBus.Sender.Interfaces;
+using Equinor.ProCoSys.PcsServiceBus.Topics;
 using Microsoft.Azure.ServiceBus;
 
 namespace Equinor.ProCoSys.BusSender.Core.Services
@@ -19,6 +20,7 @@ namespace Equinor.ProCoSys.BusSender.Core.Services
     {
         private readonly IPcsBusSender _topicClients;
         private readonly IBusEventRepository _busEventRepository;
+        private readonly ITagDetailsRepository _tagDetailsRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly ILogger<BusSenderService> _logger;
         private readonly ITelemetryClient _telemetryClient;
@@ -52,6 +54,13 @@ namespace Equinor.ProCoSys.BusSender.Core.Services
                 _logger.LogInformation($"BusSenderService found {events.Count} messages to process");
                 foreach (var busEvent in events)
                 {
+
+                    if (busEvent.Event == "tag")
+                    {
+                        busEvent.Message = await AttachTagDetails(busEvent.Message);
+                    }
+
+
                     var message = JsonSerializer.Deserialize<BusEventMessage>(WashString(busEvent.Message));
                     if (message.ProjectName == null)
                     {
@@ -73,6 +82,19 @@ namespace Equinor.ProCoSys.BusSender.Core.Services
             }
             _logger.LogInformation($"BusSenderService SendMessageChunk finished at: {DateTimeOffset.Now}");
             _telemetryClient.Flush();
+        }
+
+        private async Task<string> AttachTagDetails(string tagMessage)
+        {
+            var tagTopic = JsonSerializer.Deserialize<TagTopic>(WashString(tagMessage));
+
+            if (tagTopic == null)
+            {
+                throw new Exception("Could not deserialize TagTopic");
+            }
+
+            tagTopic.TagDetails = await _tagDetailsRepository.GetByTagId(tagTopic.TagId);
+            return JsonSerializer.Serialize(tagTopic);
         }
 
         private void TrackMetric(BusEventMessage message) =>

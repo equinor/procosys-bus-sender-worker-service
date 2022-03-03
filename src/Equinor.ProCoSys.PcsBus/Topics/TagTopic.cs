@@ -7,6 +7,7 @@ namespace Equinor.ProCoSys.PcsServiceBus.Topics
     {
         public string Plant { get; set; }
         public string PlantName { get; set; }
+        public long TagId { get; set; }
         public string TagNo { get; set; }
         public string TagNoOld { get; set; }
         public string Description { get; set; }
@@ -26,6 +27,7 @@ namespace Equinor.ProCoSys.PcsServiceBus.Topics
         public string CallOffNo { get; set; }
         public string PurchaseOrderNo { get; set; }
         public string TagFunctionCode { get; set; }
+        public string TagDetails { get; set; }
         public List<string> ProjectNames { get; set; }
         public DateTime LastUpdated { get; set; }
         public const string TopicName = "tag";
