@@ -23,6 +23,7 @@ namespace Equinor.ProCoSys.BusSenderWorker.Core.Tests
         private Mock<ITopicClient> _topicClientMock1, _topicClientMock2, _topicClientMock3, _topicClientMock4;
         private List<BusEvent> _busEvents;
         private Mock<IBusEventRepository> _busEventRepository;
+
         private string _messageBodyOnTopicClient4;
 
         [TestInitialize]

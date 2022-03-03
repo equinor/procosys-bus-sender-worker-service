@@ -21,20 +21,20 @@ namespace Equinor.ProCoSys.BusSenderWorker.Core.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly ILogger<BusSenderService> _logger;
         private readonly ITelemetryClient _telemetryClient;
-        private readonly Regex _rx = new Regex(@"[\a\e\f\n\r\t\v]", RegexOptions.Compiled);
-
+        private readonly Regex _rx = new(@"[\a\e\f\n\r\t\v]", RegexOptions.Compiled);
 
         public BusSenderService(IPcsBusSender topicClients,
             IBusEventRepository busEventRepository,
             IUnitOfWork unitOfWork,
             ILogger<BusSenderService> logger,
-            ITelemetryClient telemetryClient)
+            ITelemetryClient telemetryClient, ITagDetailsRepository tagDetailsRepository)
         {
             _topicClients = topicClients;
             _busEventRepository = busEventRepository;
             _unitOfWork = unitOfWork;
             _logger = logger;
             _telemetryClient = telemetryClient;
+            _tagDetailsRepository = tagDetailsRepository;
         }
 
         public async Task SendMessageChunk()
@@ -57,8 +57,8 @@ namespace Equinor.ProCoSys.BusSenderWorker.Core.Services
                         busEvent.Message = await AttachTagDetails(busEvent.Message);
                     }
 
-
                     var message = JsonSerializer.Deserialize<BusEventMessage>(WashString(busEvent.Message));
+
                     if (message.ProjectName == null)
                     {
                         message.ProjectName = "_";
@@ -69,7 +69,6 @@ namespace Equinor.ProCoSys.BusSenderWorker.Core.Services
                     TrackEvent(busEvent.Event, message);
                     busEvent.Sent = Status.Sent;
                     await _unitOfWork.SaveChangesAsync();
-                    
                 }
             }
             catch (Exception exception)
@@ -85,12 +84,12 @@ namespace Equinor.ProCoSys.BusSenderWorker.Core.Services
         {
             var tagTopic = JsonSerializer.Deserialize<TagTopic>(WashString(tagMessage));
 
-            if (tagTopic == null)
+            if (tagTopic?.TagId == null || !long.TryParse(tagTopic.TagId, out var tagId))
             {
                 throw new Exception("Could not deserialize TagTopic");
             }
 
-            tagTopic.TagDetails = await _tagDetailsRepository.GetByTagId(tagTopic.TagId);
+            tagTopic.TagDetails = await _tagDetailsRepository.GetDetailsStringByTagId(tagId);
             return JsonSerializer.Serialize(tagTopic);
         }
 

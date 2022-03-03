@@ -7,7 +7,7 @@ namespace Equinor.ProCoSys.PcsServiceBus.Topics
     {
         public string Plant { get; set; }
         public string PlantName { get; set; }
-        public long TagId { get; set; }
+        public string TagId { get; set; }
         public string TagNo { get; set; }
         public string TagNoOld { get; set; }
         public string Description { get; set; }
