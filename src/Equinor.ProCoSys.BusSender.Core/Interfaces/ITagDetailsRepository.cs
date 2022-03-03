@@ -1,6 +1,4 @@
-﻿
-
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace Equinor.ProCoSys.BusSenderWorker.Core.Interfaces
 {
