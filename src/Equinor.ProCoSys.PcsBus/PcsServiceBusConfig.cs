@@ -43,6 +43,5 @@ namespace Equinor.ProCoSys.PcsServiceBus
             return this;
         }
 
-        public class TopicInfo
     }
 }
