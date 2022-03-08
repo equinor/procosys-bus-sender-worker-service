@@ -24,11 +24,9 @@ namespace Equinor.ProCoSys.BusSenderWorker.Infrastructure.Repositories
 
         public async Task<string> GetDetailsStringByTagId(long tagId)
         {
-
-            await using var context = _context;
-            await using var command = context.Database.GetDbConnection().CreateCommand();
+            await using var command = _context.Database.GetDbConnection().CreateCommand();
             command.CommandText = GetTagDetailsQuery(tagId);
-            await context.Database.OpenConnectionAsync();
+            await _context.Database.OpenConnectionAsync();
             await using var result = await command.ExecuteReaderAsync();
 
             if (!result.HasRows)
