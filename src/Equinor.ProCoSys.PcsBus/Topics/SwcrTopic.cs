@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Equinor.ProCoSys.PcsServiceBus.Topics
+﻿namespace Equinor.ProCoSys.PcsServiceBus.Topics
 {
     public class SwcrTopic
     {
@@ -13,8 +11,8 @@ namespace Equinor.ProCoSys.PcsServiceBus.Topics
         public string ControlSystem { get; set; }
         public string Contract { get; set; }
         public string Supplier { get; set; }
-        public DateTime DueDate { get; set; }
-        public DateTime EstimatedManhours { get; set; }
+        public string DueDate { get; set; }
+        public string EstimatedHours { get; set; }
         public string Node { get; set; }
 
         public const string TopicName = "swcr";

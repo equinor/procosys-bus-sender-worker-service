@@ -3,4 +3,5 @@
 	<s:String x:Key="/Default/Environment/InjectedLayers/FileInjectedLayer/=E09E3D4EA1F5724AA1ABBA58DCA6D515/RelativePath/@EntryValue">..\..\..\Tools\ReSharper\ProCoSys.DotSettings</s:String>
 	<s:Boolean x:Key="/Default/Environment/InjectedLayers/FileInjectedLayer/=E09E3D4EA1F5724AA1ABBA58DCA6D515/@KeyIndexDefined">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/InjectedLayers/InjectedLayerCustomization/=FileE09E3D4EA1F5724AA1ABBA58DCA6D515/@KeyIndexDefined">True</s:Boolean>
-	<s:Double x:Key="/Default/Environment/InjectedLayers/InjectedLayerCustomization/=FileE09E3D4EA1F5724AA1ABBA58DCA6D515/RelativePriority/@EntryValue">1</s:Double></wpf:ResourceDictionary>
+	<s:Double x:Key="/Default/Environment/InjectedLayers/InjectedLayerCustomization/=FileE09E3D4EA1F5724AA1ABBA58DCA6D515/RelativePriority/@EntryValue">1</s:Double>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=Swcr/@EntryIndexedValue">True</s:Boolean></wpf:ResourceDictionary>
