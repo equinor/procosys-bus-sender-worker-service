@@ -1,8 +1,8 @@
-﻿using Equinor.ProCoSys.BusSender.Core.Services;
-using Equinor.ProCoSys.BusSender.Infrastructure.Data;
-using Equinor.ProCoSys.BusSender.Infrastructure.Repositories;
-using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
+﻿using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
+using Equinor.ProCoSys.BusSenderWorker.Core.Services;
 using Equinor.ProCoSys.BusSenderWorker.Core.Telemetry;
+using Equinor.ProCoSys.BusSenderWorker.Infrastructure.Data;
+using Equinor.ProCoSys.BusSenderWorker.Infrastructure.Repositories;
 using Equinor.ProCoSys.PcsServiceBus.Sender;
 using Equinor.ProCoSys.PcsServiceBus.Sender.Interfaces;
 using Microsoft.Azure.ServiceBus;
@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace Equinor.ProCoSys.BusSender.Infrastructure
+namespace Equinor.ProCoSys.BusSenderWorker.Infrastructure
 {
     public static class ServiceCollectionSetup
     {
@@ -50,7 +50,8 @@ namespace Equinor.ProCoSys.BusSender.Infrastructure
         }
 
         public static IServiceCollection AddRepositories(this IServiceCollection services)
-            => services.AddScoped<IBusEventRepository, BusEventRepository>();
+            => services.AddScoped<IBusEventRepository, BusEventRepository>()
+                .AddScoped<ITagDetailsRepository,TagDetailsRepository>();
 
         public static IServiceCollection AddServices(this IServiceCollection services)
             => services.AddSingleton<IEntryPointService, EntryPointService>()

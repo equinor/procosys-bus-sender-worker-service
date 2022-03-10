@@ -1,15 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Equinor.ProCoSys.BusSender.Core;
-using Equinor.ProCoSys.BusSender.Infrastructure.Data;
 using Equinor.ProCoSys.BusSenderWorker.Core;
 using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 using Equinor.ProCoSys.BusSenderWorker.Core.Models;
+using Equinor.ProCoSys.BusSenderWorker.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
-namespace Equinor.ProCoSys.BusSender.Infrastructure.Repositories
+namespace Equinor.ProCoSys.BusSenderWorker.Infrastructure.Repositories
 {
     public class BusEventRepository : IBusEventRepository
     {

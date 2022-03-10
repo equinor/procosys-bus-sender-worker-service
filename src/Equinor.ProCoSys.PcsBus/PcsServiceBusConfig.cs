@@ -13,7 +13,7 @@ namespace Equinor.ProCoSys.PcsServiceBus
 
         public string ConnectionString { get; set; }
 
-        public List<KeyValuePair<PcsTopic, string>> Subscriptions { get; } = new();
+        public List<(PcsTopic pcsTopic, string topicPath, string subscrition)> Subscriptions { get; } = new();
 
         public int RenewLeaseIntervalMilliSec { get; private set; }
 
@@ -25,7 +25,13 @@ namespace Equinor.ProCoSys.PcsServiceBus
 
         public PcsServiceBusConfig WithSubscription(PcsTopic pcsTopic, string subscriptionName)
         {
-            Subscriptions.Add(new KeyValuePair<PcsTopic, string>(pcsTopic, subscriptionName));
+            Subscriptions.Add(new ValueTuple<PcsTopic, string, string>(pcsTopic, null, subscriptionName));
+            return this;
+        }
+
+        public PcsServiceBusConfig WithSubscription(PcsTopic pcsTopic,string topicPath, string subscriptionName)
+        {
+            Subscriptions.Add(new ValueTuple<PcsTopic, string, string>(pcsTopic,topicPath, subscriptionName));
             return this;
         }
 
@@ -36,5 +42,6 @@ namespace Equinor.ProCoSys.PcsServiceBus
             LeaderElectorUrl = new Uri(leaderElectorUri);
             return this;
         }
+
     }
 }

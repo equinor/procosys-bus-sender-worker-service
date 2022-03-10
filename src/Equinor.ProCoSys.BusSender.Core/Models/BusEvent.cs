@@ -1,5 +1,4 @@
 ﻿using System;
-using Equinor.ProCoSys.BusSender.Core;
 
 namespace Equinor.ProCoSys.BusSenderWorker.Core.Models
 {

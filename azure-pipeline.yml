@@ -1,0 +1,175 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+ branches:
+   include:
+     - master
+
+name: $(date:yyyyMMdd)$(rev:.r)
+resources:  
+  repositories:
+  - repository: self
+  - repository: templates
+    type: github
+    name: equinor/procosys-infra
+    endpoint: 'equinor'
+    ref: master
+
+variables:
+  - template: src/variables/global-variables.yml@templates
+  - template: src/resources/bus-sender/bus-sender-variables.yml@templates
+  
+  - name: 'buildPlatform'
+    value: 'Any CPU'    
+  - name: 'buildConfiguration'
+    value: 'Release'
+  - name: 'projectName'
+    value: 'Equinor.ProCoSys.BusSender.Worker'
+
+stages:
+# build_stage
+- stage: build
+  displayName: 'Build'
+  variables:
+    envName: 'build'
+    envGroup: '$(globalPrefix)-$(fullAppName)-${{ variables.envName }}'
+  jobs:
+  - template: src/resources/bus-sender/jobs/build.yml@templates
+    parameters:
+      dependsOn: ''
+      envGroup: '${{ variables.envGroup }}'
+      deploymentName: 'build'
+      serviceConnection: '${{ variables.nonProdServiceConnection }}'
+      archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+      archiveType: 'zip'
+      artifactName: 'drop'
+      cleanTargetFolder: false
+      command: 'restore'
+      configuration: '$(buildConfiguration)'
+      contents: '**'
+      feedsToUse: 'select'
+      flattenFolders: false
+      includeRootFolder: false
+      nugetConfigPath: ''
+      overWrite: false
+      pathToPublish: '$(Build.ArtifactStagingDirectory)'
+      platform: '$(buildPlatform)'
+      preserveTimestamp: false
+      publishLocation: 'Container'
+      replaceExistingArchive: true
+      rootFolderOrFile: '$(Build.BinariesDirectory)/build'
+      solution : '**/*.sln'
+      sourceFolder: '$(System.DefaultWorkingDirectory)/src/$(projectName)/bin/$(buildConfiguration)/net5.0'
+      targetFolder: '$(Build.BinariesDirectory)/build/App_Data/jobs/continuous/$(projectName)'
+      versionSpec: '5.11.0'
+      projectName: '$(projectName)'
+
+- stage: test
+  displayName: 'Run unit tests'
+  dependsOn: 'build'
+  pool:
+    vmImage: 'windows-latest'
+  jobs:
+    - job: 
+      displayName: 'Run tests'
+      steps:
+        - task: NuGetToolInstaller@1
+        - task: NuGetCommand@2
+          inputs:
+            restoreSolution: '**/*.sln'
+            feedsToUse: 'select'
+            nugetConfigPath: './nuget.config'
+        - task: DotNetCoreCLI@2
+          inputs:
+            command: test
+
+  
+  # deploy_dev
+- stage: deploy_dev
+  displayName: 'Deploy to Dev'
+  dependsOn: 'test'
+  variables:
+    serviceConnection: '${{variables.nonProdServiceConnection}}'
+    envName: 'dev'
+    envLabel: 'non-prod'
+    envFull: 'Development'
+    envGroup: '$(globalPrefix)-$(fullAppName)-${{ variables.envName }}'
+  jobs:
+  - template: src/resources/bus-sender/jobs/deploy.yml@templates
+    parameters:
+      dependsOn: ''
+      envFull: '${{ variables.envFull }}'
+      envGroup: '${{ variables.envGroup }}'
+      deploymentName: '${{ variables.envName }}'
+      serviceConnection: '${{ variables.serviceConnection }}'
+      appType: 'webApp'
+      artifactName: 'drop'
+      buildType: 'current'
+      downloadPath: '$(System.ArtifactsDirectory)'
+      downloadType: 'single'
+      kvName: '${{ variables.kvName }}'
+      package: '$(System.ArtifactsDirectory)/drop/*.zip'
+      rgName: '${{ variables.envRgName }}'
+      appConfigName: '${{ variables.appConfigName }}'
+      webAppName: '${{ variables.appName }}'
+
+  # deploy_test
+- stage: deploy_test
+  displayName: 'Deploy to Test'
+  dependsOn: 'deploy_dev'
+  variables:
+    serviceConnection: '${{variables.nonProdServiceConnection}}'
+    envName: 'test'
+    envLabel: 'non-prod'
+    envFull: 'Test'
+    envGroup: '$(globalPrefix)-$(fullAppName)-${{ variables.envName }}'
+  jobs:
+  - template: src/resources/bus-sender/jobs/deploy.yml@templates
+    parameters:
+      dependsOn: ''
+      envFull: '${{ variables.envFull }}'
+      envGroup: '${{ variables.envGroup }}'
+      deploymentName: '${{ variables.envName }}'
+      serviceConnection: '${{ variables.serviceConnection }}'
+      appType: 'webApp'
+      artifactName: 'drop'
+      buildType: 'current'
+      downloadPath: '$(System.ArtifactsDirectory)'
+      downloadType: 'single'
+      kvName: '${{ variables.kvName }}'
+      package: '$(System.ArtifactsDirectory)/drop/*.zip'
+      rgName: '${{ variables.envRgName }}'
+      appConfigName: '${{ variables.appConfigName }}'
+      webAppName: '${{ variables.appName }}'
+  
+  # deploy_prod
+- stage: deploy_prod
+  displayName: 'Deploy to Production'
+  dependsOn: 'deploy_test'
+  variables:
+    serviceConnection: '${{variables.prodServiceConnection}}'
+    envName: 'prod'
+    envLabel: 'prod'
+    envFull: 'Production'
+    envGroup: '$(globalPrefix)-$(fullAppName)-${{ variables.envName }}'
+  jobs:
+  - template: src/resources/bus-sender/jobs/deploy.yml@templates
+    parameters:
+      dependsOn: ''
+      envFull: '${{ variables.envFull }}'
+      envGroup: '${{ variables.envGroup }}'
+      deploymentName: '${{ variables.envName }}'
+      serviceConnection: '${{ variables.serviceConnection }}'
+      appType: 'webApp'
+      artifactName: 'drop'
+      buildType: 'current'
+      downloadPath: '$(System.ArtifactsDirectory)'
+      downloadType: 'single'
+      kvName: '${{ variables.kvName }}'
+      package: '$(System.ArtifactsDirectory)/drop/*.zip'
+      rgName: '${{ variables.envRgName }}'
+      appConfigName: '${{ variables.appConfigName }}'
+      webAppName: '${{ variables.appName }}'

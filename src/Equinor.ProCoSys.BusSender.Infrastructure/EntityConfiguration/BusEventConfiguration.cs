@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Equinor.ProCoSys.BusSender.Infrastructure.EntityConfiguration
+namespace Equinor.ProCoSys.BusSenderWorker.Infrastructure.EntityConfiguration
 {
     public class BusEventConfiguration : IEntityTypeConfiguration<BusEvent>
     {

@@ -18,9 +18,9 @@ namespace Equinor.ProCoSys.PcsServiceBus
 
             var pcsSubscriptionClients = new PcsSubscriptionClients(optionsBuilder.RenewLeaseIntervalMilliSec);
             optionsBuilder.Subscriptions.ForEach(
-                s => 
+                topicInfo => 
                     pcsSubscriptionClients.Add(
-                        new PcsSubscriptionClient(optionsBuilder.ConnectionString, s.Key, s.Value)));
+                        new PcsSubscriptionClient(optionsBuilder.ConnectionString, topicInfo.pcsTopic, topicInfo.topicPath, topicInfo.subscrition)));
             services.AddSingleton<IPcsSubscriptionClients>(pcsSubscriptionClients);
 
             if (optionsBuilder.LeaderElectorUrl != null)
