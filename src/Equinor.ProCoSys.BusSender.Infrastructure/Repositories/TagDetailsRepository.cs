@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 using Equinor.ProCoSys.BusSenderWorker.Infrastructure.Data;
@@ -20,7 +17,6 @@ namespace Equinor.ProCoSys.BusSenderWorker.Infrastructure.Repositories
             _context = context;
             _logger = logger;
         }
-
 
         public async Task<string> GetDetailsStringByTagId(long tagId)
         {
