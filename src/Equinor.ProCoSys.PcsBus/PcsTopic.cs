@@ -16,6 +16,8 @@
         Milestone,
         WorkOrderCutoff,
         Certificate,
-        WoChecklist
+        WoChecklist,
+        swcr,
+        swcrsignature
     }
 }
