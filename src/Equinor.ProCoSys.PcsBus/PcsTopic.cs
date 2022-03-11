@@ -17,7 +17,8 @@
         WorkOrderCutoff,
         Certificate,
         WoChecklist,
-        swcr,
-        swcrsignature
+        Swcr,
+        SwcrSignature,
+        PipingRevision
     }
 }
