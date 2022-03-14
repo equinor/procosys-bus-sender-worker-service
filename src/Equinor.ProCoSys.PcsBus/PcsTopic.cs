@@ -16,6 +16,9 @@
         Milestone,
         WorkOrderCutoff,
         Certificate,
-        WoChecklist
+        WoChecklist,
+        Swcr,
+        SwcrSignature,
+        PipingRevision
     }
 }

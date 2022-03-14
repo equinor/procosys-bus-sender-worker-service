@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 using Equinor.ProCoSys.BusSenderWorker.Infrastructure.Data;
@@ -21,14 +18,11 @@ namespace Equinor.ProCoSys.BusSenderWorker.Infrastructure.Repositories
             _logger = logger;
         }
 
-
         public async Task<string> GetDetailsStringByTagId(long tagId)
         {
-
-            await using var context = _context;
-            await using var command = context.Database.GetDbConnection().CreateCommand();
+            await using var command = _context.Database.GetDbConnection().CreateCommand();
             command.CommandText = GetTagDetailsQuery(tagId);
-            await context.Database.OpenConnectionAsync();
+            await _context.Database.OpenConnectionAsync();
             await using var result = await command.ExecuteReaderAsync();
 
             if (!result.HasRows)
