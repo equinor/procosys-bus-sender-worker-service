@@ -17,9 +17,9 @@ namespace Equinor.ProCoSys.PcsServiceBus.Topics
         public string JobStatusCode { get; set; }
         public string WoTypeCode { get; set; }
         public string ProjectProgress { get; set; }
-        public DateTime PlannedStartAtDate { get; set; }
-        public DateTime UpdatedAtDate { get; set; }
-        public DateTime PlannedFinishAtDate { get; set; }
+        public string PlannedStartAtDate { get; set; }
+        public string UpdatedAtDate { get; set; }
+        public string PlannedFinishAtDate { get; set; }
         public string ExpendedManHours { get; set; }
         public string ManHoursEarned { get; set; }
         public string ManHoursExpendedLastWeek { get; set; }
