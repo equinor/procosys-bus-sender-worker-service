@@ -116,11 +116,7 @@ namespace Equinor.ProCoSys.BusSender.Worker
                Console.WriteLine("Created wallet file at: " + walletPath);
 
                services.AddApplicationInsightsTelemetryWorkerService(hostContext.Configuration["ApplicationInsights:InstrumentationKey"]);
-
-              // services.AddDbContext(hostContext.Configuration["ConnectionString"]);
-              var LOCALCONNECTIONSTRING =
-                  "Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521)))(CONNECT_DATA=(SERVICE_NAME=ORCLPDB1)));User ID=PROCOSYS;Password=Bx9zBVbtrtY8wnfIYzhhARCA;Min Pool Size=0;Incr Pool Size=1";
-               services.AddDbContext(LOCALCONNECTIONSTRING); //TODO REMOVE, DO NOT PUSH
+               services.AddDbContext(hostContext.Configuration["ConnectionString"]);
                services.AddTopicClients(
                    hostContext.Configuration["ServiceBusConnectionString"],
                    hostContext.Configuration["TopicNames"]);
