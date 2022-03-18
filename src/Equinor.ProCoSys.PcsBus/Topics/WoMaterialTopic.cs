@@ -12,6 +12,8 @@
         public string TagRegisterId { get; set; }
         public string StockId { get; set; }
         public string Quantity { get; set; }
+        public string UnitName { get; set; }
+        public string UnitDescription { get; set; }
         public string AdditionalInformation { get; set; }
         public string RequiredDate { get; set; }
         public string EstimatedAvailableDate { get; set; }
