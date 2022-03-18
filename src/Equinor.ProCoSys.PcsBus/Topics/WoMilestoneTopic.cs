@@ -11,5 +11,7 @@ namespace Equinor.ProCoSys.PcsServiceBus.Topics
         public string SignedByAzureOid { get; set; }
         public string LastUpdated { get; set; }
 
+        public const string TopicName = "womilestone";
+
     }
 }
