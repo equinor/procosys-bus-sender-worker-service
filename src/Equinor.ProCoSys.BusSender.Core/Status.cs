@@ -5,6 +5,7 @@
         UnProcessed = 0,
         Processing = 1,
         Failed = 2,
-        Sent = 3
+        Sent = 3,
+        Skipped = 4
     }
 }

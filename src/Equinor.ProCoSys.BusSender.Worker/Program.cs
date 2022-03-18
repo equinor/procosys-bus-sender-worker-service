@@ -16,7 +16,6 @@ namespace Equinor.ProCoSys.BusSender.Worker
     {
         public IConfiguration Configuration { get; }
 
-
         public Program(IConfiguration configuration) 
             => Configuration = configuration;
 
@@ -117,7 +116,6 @@ namespace Equinor.ProCoSys.BusSender.Worker
                Console.WriteLine("Created wallet file at: " + walletPath);
 
                services.AddApplicationInsightsTelemetryWorkerService(hostContext.Configuration["ApplicationInsights:InstrumentationKey"]);
-
                services.AddDbContext(hostContext.Configuration["ConnectionString"]);
                services.AddTopicClients(
                    hostContext.Configuration["ServiceBusConnectionString"],

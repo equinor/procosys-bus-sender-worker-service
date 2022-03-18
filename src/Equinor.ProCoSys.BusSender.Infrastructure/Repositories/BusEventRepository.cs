@@ -24,7 +24,7 @@ namespace Equinor.ProCoSys.BusSenderWorker.Infrastructure.Repositories
         public async Task<List<BusEvent>> GetEarliestUnProcessedEventChunk()
         {
             var events = await _busEvents.Where(e => e.Sent == Status.UnProcessed).OrderBy(e => e.Created).Take(_messageChunkSize).ToListAsync();
-
+            
             return events;
         }
     }

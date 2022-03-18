@@ -19,6 +19,9 @@
         WoChecklist,
         SWCR,
         SWCRSignature,
-        PipingRevision
+        PipingRevision,
+        WoMaterial,
+        WoMilestone,
+        Stock
     }
 }
