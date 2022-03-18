@@ -49,17 +49,31 @@ namespace Equinor.ProCoSys.BusSenderWorker.Core.Services
                 }
 
                 _logger.LogInformation($"BusSenderService found {events.Count} messages to process");
+
+
                 foreach (var busEvent in events)
                 {
 
-                    if (busEvent.Event == "tag")
+                    if (busEvent.Event == TagTopic.TopicName)
                     {
                         busEvent.Message = await AttachTagDetails(busEvent.Message);
                     }
 
+                    /***
+                     * WO_MATERIAL gets several inserts when saving a material, resulting in multiple rows in the BUSEVENT table.
+                     * here we filter out all but the latest material event for a records with the same id and set those to Status = Skipped.
+                     * This is to reduce spam on the bus.
+                     */
+                    if (busEvent.Event == WoMaterialTopic.TopicName && IsNotLatestMaterialEvent(events, busEvent))
+                    {
+                        busEvent.Sent = Status.Skipped;
+                        await _unitOfWork.SaveChangesAsync();
+                        continue;
+                    }
+
                     var message = JsonSerializer.Deserialize<BusEventMessage>(WashString(busEvent.Message));
 
-                    if (message.ProjectName == null)
+                    if (message is { ProjectName: null })
                     {
                         message.ProjectName = "_";
                     }
@@ -78,6 +92,21 @@ namespace Equinor.ProCoSys.BusSenderWorker.Core.Services
             }
             _logger.LogInformation($"BusSenderService SendMessageChunk finished at: {DateTimeOffset.Now}");
             _telemetryClient.Flush();
+        }
+
+        private bool IsNotLatestMaterialEvent(IEnumerable<BusEvent> events, BusEvent busEvent)
+        { 
+            var compareTo =  JsonSerializer.Deserialize<WoMaterialIdentifier>(WashString(busEvent.Message));
+
+           return events.Any(e =>
+            {
+                var woMaterial = JsonSerializer.Deserialize<WoMaterialIdentifier>(WashString(e.Message));
+                return woMaterial != null 
+                       && compareTo != null 
+                       && woMaterial.ItemNo == compareTo.ItemNo && woMaterial.WoId == compareTo.WoId
+                       && e.Created > busEvent.Created;
+            });
+
         }
 
         private async Task<string> AttachTagDetails(string tagMessage)
