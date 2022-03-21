@@ -21,7 +21,7 @@
         SWCRSignature,
         PipingRevision,
         WoMaterial,
-        WoMilestone,
+        WorkOrderMilestone,
         Stock
     }
 }
