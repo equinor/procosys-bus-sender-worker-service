@@ -19,6 +19,11 @@
         WoChecklist,
         SWCR,
         SWCRSignature,
-        PipingRevision
+        PipingRevision,
+        Tag_Delete,
+        WoChecklist_Delete,
+        WoMaterial_Delete,
+        PunchListItem_Delete,
+        PipingRevision_Delete
     }
 }
