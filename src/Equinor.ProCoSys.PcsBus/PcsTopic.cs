@@ -25,5 +25,8 @@
         WoMaterial_Delete,
         PunchListItem_Delete,
         PipingRevision_Delete
+        WoMaterial,
+        WoMilestone,
+        Stock
     }
 }

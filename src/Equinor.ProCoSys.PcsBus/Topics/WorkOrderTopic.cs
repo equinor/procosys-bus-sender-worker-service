@@ -25,6 +25,8 @@ namespace Equinor.ProCoSys.PcsServiceBus.Topics
         public string AreaCode { get; set; }
         public string AreaDescription { get; set; }
         public string JobStatusCode { get; set; }
+        public string MaterialComments { get; set; }
+        public string ConstructionComments { get; set; }
         public string TypeOfWorkCode { get; set; }
         public string OnShoreOffShoreCode { get; set; }
         public string WoTypeCode { get; set; }
