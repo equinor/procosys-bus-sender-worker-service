@@ -28,12 +28,12 @@ namespace Equinor.ProCoSys.BusSenderWorker.Infrastructure.Repositories
             if (!result.HasRows)
             {
                 _logger.LogInformation($"Tag with id {tagId} did not have any tagDetails");
-                return null;
+                return "{}";
             }
 
             if (!await result.ReadAsync() || result[0] is DBNull)
             {
-                return "";
+                return "{}";
             }
 
             var tagDetails = (string)result[0];
