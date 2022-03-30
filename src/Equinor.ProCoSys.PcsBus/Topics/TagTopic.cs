@@ -30,6 +30,7 @@ namespace Equinor.ProCoSys.PcsServiceBus.Topics
         public string TagDetails { get; set; }
         public List<string> ProjectNames { get; set; }
         public string LastUpdated { get; set; }
+        public bool IsVoided  { get; set; }
         public const string TopicName = "tag";
     }
 }

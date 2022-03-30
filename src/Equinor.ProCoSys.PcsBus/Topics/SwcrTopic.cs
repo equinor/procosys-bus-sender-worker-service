@@ -14,6 +14,7 @@
         public string DueDate { get; set; }
         public string EstimatedHours { get; set; }
         public string Node { get; set; }
+        public bool IsVoided { get; set; }
 
         public const string TopicName = "swcr";
     }

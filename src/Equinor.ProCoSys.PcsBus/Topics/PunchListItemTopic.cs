@@ -9,7 +9,7 @@ namespace Equinor.ProCoSys.PcsServiceBus.Topics
         public string PlantName { get; set; }
         public string ProjectName { get; set; }
         public List<string> ProjectNames { get; set; }
-        public DateTime LastUpdated { get; set; }
+        public string LastUpdated { get; set; }
         public string PunchItemNo { get; set; }
         public string Description { get; set; }
         public string TagNo { get; set; }
