@@ -20,7 +20,7 @@ namespace Equinor.ProCoSys.PcsServiceBus.Topics
         public string Phase { get; set; }
         public string CommissioningIdentifier { get; set; }
         //public bool IsVoided { get; set; }
-        public bool Demolition { get; set; }
+        //public bool Demolition { get; set; }
         public string CreatedAt { get; set; }
         public string Priority1 { get; set; }
         public string Priority2 { get; set; }
