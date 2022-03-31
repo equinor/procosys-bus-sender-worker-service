@@ -22,9 +22,9 @@ namespace Equinor.ProCoSys.PcsServiceBus.Topics
         public string Discipline { get; set; }
         public string McStatus { get; set; }
         public List<string> ProjectNames { get; set; }
-        public string LastUpdated { get; set; }
+        //public string LastUpdated { get; set; }
         public string CreatedAt { get; set; }
-        public bool IsVoided { get; set; }
+        //public bool IsVoided { get; set; }
 
         public const string TopicName = "mcpkg";
     }
