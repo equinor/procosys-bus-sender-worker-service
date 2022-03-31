@@ -13,7 +13,7 @@ namespace Equinor.ProCoSys.PcsServiceBus
 
         public string ConnectionString { get; set; }
 
-        public bool UseDeadLetterQueue { get; set; }
+        public bool ReadFromDeadLetterQueue { get; set; }
         public PcsServiceBusConfig WithLeaderElector(string leaderElectorUri)
         {
             LeaderElectorUrl = new Uri(leaderElectorUri);
@@ -47,9 +47,9 @@ namespace Equinor.ProCoSys.PcsServiceBus
         /// <summary>
         /// If true, topic messages will be fetched from Dead Letter Queue instead of normal. This is for special cases, use with caution!
         /// </summary>
-        public PcsServiceBusConfig WithUseDeadLetterQueue(bool useDeadLetter)
+        public PcsServiceBusConfig WithReadFromDeadLetterQueue(bool readFromDeadLetterQueue)
         {
-            UseDeadLetterQueue = useDeadLetter;
+            ReadFromDeadLetterQueue = readFromDeadLetterQueue;
             return this;
         }
 
