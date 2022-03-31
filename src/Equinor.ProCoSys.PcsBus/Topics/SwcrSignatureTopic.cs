@@ -9,8 +9,8 @@ namespace Equinor.ProCoSys.PcsServiceBus.Topics
         public string SignatureRoleCode { get; set; }
         public string Sequence { get; set; }
         public string FunctionalRoleCode { get; set; }
-        public DateTime SignedDate { get; set; }
-        public DateTime SignedByAzureOid { get; set; }
+        public string SignedDate { get; set; }
+        public string SignedByAzureOid { get; set; }
 
         public const string TopicName = "swcrsignature";
     }

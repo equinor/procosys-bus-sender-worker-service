@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Equinor.ProCoSys.PcsServiceBus.Topics
 {
@@ -20,14 +19,14 @@ namespace Equinor.ProCoSys.PcsServiceBus.Topics
         public string AreaDescription { get; set; }
         public string Phase { get; set; }
         public string CommissioningIdentifier { get; set; }
-        public bool IsVoided { get; set; }
+        //public bool IsVoided { get; set; }
         public bool Demolition { get; set; }
-        public DateTime CreatedAt { get; set; }
+        public string CreatedAt { get; set; }
         public string Priority1 { get; set; }
         public string Priority2 { get; set; }
         public string Priority3 { get; set; }
         public List<string> ProjectNames { get; set; }
-        public DateTime LastUpdated { get; set; }
+        //public string LastUpdated { get; set; }
         public const string TopicName = "commpkg";
     }
 }

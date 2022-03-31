@@ -17,7 +17,7 @@
         public string AdditionalInformation { get; set; }
         public string RequiredDate { get; set; }
         public string EstimatedAvailableDate { get; set; }
-        public string Available { get; set; }
+        public bool Available { get; set; }
         public string MaterialStatus { get; set; }
         public string StockLocation { get; set; }
         public string LastUpdated { get; set; }
