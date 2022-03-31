@@ -12,9 +12,13 @@ namespace Equinor.ProCoSys.PcsServiceBus.Receiver
 
         private Func<IPcsSubscriptionClient, Message, CancellationToken, Task> _pcsHandler;
 
-        public PcsSubscriptionClient(string connectionString, PcsTopic pcsTopic, string topicPath, string subscriptionName )
-            : base(connectionString, string.IsNullOrWhiteSpace(topicPath)? pcsTopic.ToString() :topicPath, subscriptionName, ReceiveMode.PeekLock, RetryPolicy.Default) =>
+        public PcsSubscriptionClient(string connectionString, PcsTopic pcsTopic, string topicPath, string subscriptionName, bool useDeadLetterQueue = false)
+            : base(connectionString, string.IsNullOrWhiteSpace(topicPath) ? pcsTopic.ToString() : topicPath,
+                useDeadLetterQueue ? $"{subscriptionName}/$deadletterqueue" : subscriptionName, ReceiveMode.PeekLock, RetryPolicy.Default)
+        {
             PcsTopic = pcsTopic;
+        }
+           
 
         public void RegisterPcsMessageHandler(Func<IPcsSubscriptionClient, Message, CancellationToken, Task> handler, MessageHandlerOptions messageHandlerOptions)
         {

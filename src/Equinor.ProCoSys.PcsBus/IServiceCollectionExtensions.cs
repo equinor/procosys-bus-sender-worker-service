@@ -20,7 +20,7 @@ namespace Equinor.ProCoSys.PcsServiceBus
             optionsBuilder.Subscriptions.ForEach(
                 topicInfo => 
                     pcsSubscriptionClients.Add(
-                        new PcsSubscriptionClient(optionsBuilder.ConnectionString, topicInfo.pcsTopic, topicInfo.topicPath, topicInfo.subscrition)));
+                        new PcsSubscriptionClient(optionsBuilder.ConnectionString, topicInfo.pcsTopic, topicInfo.topicPath, topicInfo.subscrition, optionsBuilder.UseDeadLetterQueue)));
             services.AddSingleton<IPcsSubscriptionClients>(pcsSubscriptionClients);
 
             if (optionsBuilder.LeaderElectorUrl != null)
