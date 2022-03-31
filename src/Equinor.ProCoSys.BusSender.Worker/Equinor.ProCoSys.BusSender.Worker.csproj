@@ -2,7 +2,7 @@
 
   <PropertyGroup>
 
-    <VersionPrefix>1.5.35</VersionPrefix>
+    <VersionPrefix>1.5.36</VersionPrefix>
     <TargetFramework>net5.0</TargetFramework>
     <UserSecretsId>dotnet-BusSenderWorkerService-AB46807F-9F82-483F-B09B-E35626C31429</UserSecretsId>
     <!--<PublishSingleFile>true</PublishSingleFile>
