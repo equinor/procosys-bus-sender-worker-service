@@ -26,7 +26,7 @@ namespace Equinor.ProCoSys.PcsServiceBus.Topics
         public string Priority2 { get; set; }
         public string Priority3 { get; set; }
         public List<string> ProjectNames { get; set; }
-        //public string LastUpdated { get; set; }
+        public string LastUpdated { get; set; }
         public const string TopicName = "commpkg";
     }
 }

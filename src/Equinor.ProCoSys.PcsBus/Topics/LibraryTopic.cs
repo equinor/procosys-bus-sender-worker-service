@@ -1,5 +1,4 @@
-﻿using System;
-
+﻿
 namespace Equinor.ProCoSys.PcsServiceBus.Topics
 {
     public class LibraryTopic
