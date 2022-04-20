@@ -14,9 +14,10 @@ namespace Equinor.ProCoSys.PcsServiceBus.Topics
         public string Revision { get; set; }
         public string Responsible { get; set; }
         public string Status { get; set; }
-        public DateTime UpdatedAt { get; set; }
-        public DateTime SignedAt { get; set; }
-        public DateTime VerifiedAt { get; set; }
+        public string UpdatedAt { get; set; }
+        public string SignedAt { get; set; }
+        public string VerifiedAt { get; set; }
+
         public const string TopicName = "checklist";
     }
 }

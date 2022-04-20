@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
+﻿
 namespace Equinor.ProCoSys.PcsServiceBus.Topics
 {
     public class WorkOrderTopic
@@ -36,13 +34,13 @@ namespace Equinor.ProCoSys.PcsServiceBus.Topics
         public string ExpendedManHours { get; set; }
         public string EstimatedHours { get; set; }
         public string RemainingHours { get; set; }
-        public DateTime PlannedStartAtDate { get; set; }
-        public DateTime ActualStartAtDate { get; set; }
-        public DateTime PlannedFinishedAtDate { get; set; }
-        public DateTime ActualFinishedAtDate { get; set; }
-        public DateTime CreatedAt { get; set; }
+        public string PlannedStartAtDate { get; set; }
+        public string ActualStartAtDate { get; set; }
+        public string PlannedFinishedAtDate { get; set; }
+        public string ActualFinishedAtDate { get; set; }
+        public string CreatedAt { get; set; }
         public bool IsVoided { get; set; }
-        public DateTime LastUpdated { get; set; }
+        public string LastUpdated { get; set; }
 
         public const string TopicName = "wo";
     }

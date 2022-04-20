@@ -1,5 +1,4 @@
-﻿using System;
-
+﻿
 namespace Equinor.ProCoSys.PcsServiceBus.Topics
 {
     public class LibraryTopic
@@ -10,7 +9,7 @@ namespace Equinor.ProCoSys.PcsServiceBus.Topics
         public string Description { get; set; }
         public bool IsVoided { get; set; }
         public string Type { get; set; } //for now only triggers on FUNCTIONAL_ROLE type
-        public DateTime LastUpdated { get; set; }
+        public string LastUpdated { get; set; }
 
         public const string TopicName = "library";
     }
