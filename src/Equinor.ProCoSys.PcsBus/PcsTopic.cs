@@ -28,6 +28,7 @@
         WoMaterial,
         WoMilestone,
         Stock,
-        Document
+        Document,
+        CommpkgOperation
     }
 }
