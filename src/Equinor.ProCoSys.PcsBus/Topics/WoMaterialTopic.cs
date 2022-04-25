@@ -7,7 +7,7 @@
         public string WoNo { get; set; }
         public string WoId { get; set; }
         public string ItemNo { get; set; }
-        public string TagNo { get; set; } 
+        public string TagNo { get; set; }
         public string TagId { get; set; }
         public string TagRegisterId { get; set; }
         public string StockId { get; set; }

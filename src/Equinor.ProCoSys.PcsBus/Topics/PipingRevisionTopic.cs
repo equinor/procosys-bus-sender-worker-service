@@ -16,6 +16,6 @@
         public string CallOffNo { get; set; }
         public string LastUpdated { get; set; }
 
-        public const string TopicName = "pipingrevision";
+        public const string TopicName = "piperevision";
     }
 }

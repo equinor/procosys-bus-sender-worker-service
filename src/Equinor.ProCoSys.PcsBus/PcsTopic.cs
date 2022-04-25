@@ -27,6 +27,7 @@
         PipingRevision_Delete,
         WoMaterial,
         WoMilestone,
-        Stock
+        Stock,
+        Document
     }
 }
