@@ -17,6 +17,5 @@
         public bool CommissioningResp { get; set; }
         public string ValveBlindingList { get; set; }
         public string LastUpdated { get; set; }
-
     }
 }
