@@ -29,6 +29,7 @@
         WoMilestone,
         Stock,
         Document,
-        CommpkgOperation
+        CommPkgOperation,
+        PipingSpool
     }
 }
