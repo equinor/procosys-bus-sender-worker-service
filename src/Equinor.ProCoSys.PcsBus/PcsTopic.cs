@@ -30,6 +30,7 @@
         Stock,
         Document,
         CommPkgOperation,
-        PipingSpool
+        PipingSpool,
+        PipingSpool_Delete
     }
 }
