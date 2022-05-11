@@ -73,7 +73,7 @@ namespace Equinor.ProCoSys.BusSenderWorker.Core.Services
 
                     var message = JsonSerializer.Deserialize<BusEventMessage>(WashString(busEvent.Message));
 
-                    if (message!= null && string.IsNullOrWhiteSpace(message.ProjectName))
+                    if (message!= null && string.IsNullOrEmpty(message.ProjectName))
                     {
                         message.ProjectName = "_";
                     }
