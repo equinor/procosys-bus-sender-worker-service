@@ -124,7 +124,7 @@ namespace Equinor.ProCoSys.BusSenderWorker.Core.Services
 
         private void TrackMetric(BusEventMessage message) =>
             _telemetryClient.TrackMetric("BusSender Topic", 1, "Plant", "ProjectName", message.Plant[4..],
-                message.ProjectName?.Replace('$', '_'));
+                message.ProjectName?.Replace('$', '_') ?? "NoProject");
 
         private void TrackEvent(string eventType, BusEventMessage message)
         {
