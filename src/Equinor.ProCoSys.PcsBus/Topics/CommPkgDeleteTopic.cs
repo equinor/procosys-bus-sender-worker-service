@@ -5,8 +5,6 @@ namespace Equinor.ProCoSys.PcsServiceBus.Topics
     public class CommPkgDeleteTopic
     {
         public string Plant { get; set; }
-        public string ProjectName { get; set; }
-
         public string CommPkgNo { get; set; }
         public string CommPkgId { get; set; }
 
