@@ -1,5 +1,4 @@
-﻿
-namespace Equinor.ProCoSys.PcsServiceBus.Topics;
+﻿namespace Equinor.ProCoSys.PcsServiceBus.Topics;
 
 public class WoMaterialDeleteTopic
 {

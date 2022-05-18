@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Equinor.ProCoSys.PcsServiceBus.Topics;
+﻿namespace Equinor.ProCoSys.PcsServiceBus.Topics;
 
 public class ChecklistTopic
 {

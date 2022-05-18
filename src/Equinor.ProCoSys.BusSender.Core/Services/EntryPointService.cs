@@ -4,7 +4,6 @@ using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Equinor.ProCoSys.BusSenderWorker.Core.Services;
-
 public class EntryPointService : IEntryPointService
 {
     private readonly IServiceProvider _services;
