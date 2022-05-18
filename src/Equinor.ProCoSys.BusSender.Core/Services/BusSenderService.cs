@@ -73,7 +73,7 @@ namespace Equinor.ProCoSys.BusSenderWorker.Core.Services
 
                     var message = JsonSerializer.Deserialize<BusEventMessage>(WashString(busEvent.Message));
 
-                    if (message is { ProjectName: null })
+                    if (message!= null && string.IsNullOrEmpty(message.ProjectName))
                     {
                         message.ProjectName = "_";
                     }
@@ -124,7 +124,7 @@ namespace Equinor.ProCoSys.BusSenderWorker.Core.Services
 
         private void TrackMetric(BusEventMessage message) =>
             _telemetryClient.TrackMetric("BusSender Topic", 1, "Plant", "ProjectName", message.Plant[4..],
-                message.ProjectName?.Replace('$', '_'));
+                message.ProjectName?.Replace('$', '_') ?? "NoProject");
 
         private void TrackEvent(string eventType, BusEventMessage message)
         {
