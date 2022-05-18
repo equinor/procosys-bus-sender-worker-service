@@ -56,7 +56,7 @@ namespace Equinor.ProCoSys.BusSenderWorker.Infrastructure.Repositories
                     f.columnname as colName,
                     coalesce(
                     val.valuestring,
-                    to_char(val.valuedate, 'YYYY-MM-DD hh:mm:ss'),
+                    to_char(val.valuedate, 'yyyy-mm-dd hh24:mi:ss'),
                     to_char(val.valuenumber),
                     tag.tagno,
                     libval.code
