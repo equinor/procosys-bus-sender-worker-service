@@ -7,145 +7,144 @@ using Microsoft.Azure.ServiceBus;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace Equinor.ProCoSys.PcsServiceBus.Receiver
+namespace Equinor.ProCoSys.PcsServiceBus.Receiver;
+
+public class PcsBusReceiver : IHostedService
 {
-    public class PcsBusReceiver : IHostedService
+    private readonly ILogger<PcsBusReceiver> _logger;
+    private readonly IPcsSubscriptionClients _subscriptionClients;
+    private readonly IBusReceiverServiceFactory _busReceiverServiceFactory;
+    private readonly ILeaderElectorService _leaderElectorService;
+    private Timer _timer;
+    private readonly Guid _receiverId = Guid.NewGuid();
+
+    public PcsBusReceiver(
+        ILogger<PcsBusReceiver> logger,
+        IPcsSubscriptionClients subscriptionClients,
+        IBusReceiverServiceFactory busReceiverServiceFactory,
+        ILeaderElectorService leaderElectorService)
     {
-        private readonly ILogger<PcsBusReceiver> _logger;
-        private readonly IPcsSubscriptionClients _subscriptionClients;
-        private readonly IBusReceiverServiceFactory _busReceiverServiceFactory;
-        private readonly ILeaderElectorService _leaderElectorService;
-        private Timer _timer;
-        private readonly Guid _receiverId = Guid.NewGuid();
+        _logger = logger;
+        _subscriptionClients = subscriptionClients;
+        _busReceiverServiceFactory = busReceiverServiceFactory;
+        _leaderElectorService = leaderElectorService;
 
-        public PcsBusReceiver(
-            ILogger<PcsBusReceiver> logger,
-            IPcsSubscriptionClients subscriptionClients,
-            IBusReceiverServiceFactory busReceiverServiceFactory,
-            ILeaderElectorService leaderElectorService)
+        if (_subscriptionClients.RenewLeaseInterval == 0)
         {
-            _logger = logger;
-            _subscriptionClients = subscriptionClients;
-            _busReceiverServiceFactory = busReceiverServiceFactory;
-            _leaderElectorService = leaderElectorService;
-
-            if (_subscriptionClients.RenewLeaseInterval == 0)
-            {
-                throw new Exception("Lease interval must be a positive integer");
-            }
+            throw new Exception("Lease interval must be a positive integer");
         }
+    }
 
-        public Task StartAsync(CancellationToken cancellationToken)
+    public Task StartAsync(CancellationToken cancellationToken)
+    {
+        _timer = new Timer(CanProceedAsLeaderCheckAsync, null, 5000, Timeout.Infinite);
+
+        return Task.CompletedTask;
+    }
+
+    private async void CanProceedAsLeaderCheckAsync(object state)
+    {
+        try
         {
-            _timer = new Timer(CanProceedAsLeaderCheckAsync, null, 5000, Timeout.Infinite);
+            _logger.LogDebug($"CanProceedAsLeaderCheckAsync started do work at: {DateTimeOffset.Now}");
 
-            return Task.CompletedTask;
-        }
-
-        private async void CanProceedAsLeaderCheckAsync(object state)
-        {
-            try
+            if (IsLeader)
             {
-                _logger.LogDebug($"CanProceedAsLeaderCheckAsync started do work at: {DateTimeOffset.Now}");
-
-                if (IsLeader)
-                {
-                    await RenewLeaseAsync();
-                }
-                else
-                {
-                    await TryBecomeLeaderAsync();
-                }
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, $"CanProceedAsLeaderCheckAsync failed at: {DateTimeOffset.Now}");
-            }
-            finally
-            {
-                _timer.Change(_subscriptionClients.RenewLeaseInterval, Timeout.Infinite);
-            }
-        }
-
-        private async Task TryBecomeLeaderAsync()
-        {
-            var canProceedAsLeader = await _leaderElectorService.CanProceedAsLeader(_receiverId);
-
-            if (canProceedAsLeader)
-            {
-                _logger.LogInformation($"CanProceedAsLeaderCheckAsync, lease obtained at: {DateTimeOffset.Now}");
-                IsLeader = true;
-                StartMessageReceiving();
-            }
-        }
-
-        private async Task RenewLeaseAsync()
-        {
-            var canProceedAsLeader = await _leaderElectorService.CanProceedAsLeader(_receiverId);
-
-            if (!canProceedAsLeader)
-            {
-                // Suddenly lost role as leader for some strange reason. Leader elector could have restarted
-                _logger.LogWarning( $"CanProceedAsLeaderCheckAsync, lease lost at: {DateTimeOffset.Now}");
-                IsLeader = false;
-                StopMessageReceiving();
+                await RenewLeaseAsync();
             }
             else
             {
-                _logger.LogDebug($"CanProceedAsLeaderCheckAsync, lease renewed at: {DateTimeOffset.Now}");
+                await TryBecomeLeaderAsync();
             }
         }
-
-        private bool IsLeader { get; set; }
-
-        private void StartMessageReceiving()
+        catch (Exception e)
         {
-            var messageHandlerOptions = new MessageHandlerOptions(ExceptionReceivedHandler)
-            {
-                MaxConcurrentCalls = 1,
-                AutoComplete = false
-            };
-
-            _subscriptionClients.RegisterPcsMessageHandler(ProcessMessagesAsync, messageHandlerOptions);
+            _logger.LogError(e, $"CanProceedAsLeaderCheckAsync failed at: {DateTimeOffset.Now}");
         }
-
-        private void StopMessageReceiving() => _subscriptionClients.UnregisterPcsMessageHandler();
-
-        public async Task ProcessMessagesAsync(IPcsSubscriptionClient subscriptionClient, Message message, CancellationToken token)
+        finally
         {
-            try
-            {
-                var messageJson = Encoding.UTF8.GetString(message.Body);
-
-                var busReceiverService = _busReceiverServiceFactory.GetServiceInstance();
-
-                await busReceiverService.ProcessMessageAsync(subscriptionClient.PcsTopic, messageJson, token);
-
-                await subscriptionClient.CompleteAsync(message.SystemProperties.LockToken);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error processing message");
-            }
+            _timer.Change(_subscriptionClients.RenewLeaseInterval, Timeout.Infinite);
         }
+    }
 
-        public Task StopAsync(CancellationToken cancellationToken)
+    private async Task TryBecomeLeaderAsync()
+    {
+        var canProceedAsLeader = await _leaderElectorService.CanProceedAsLeader(_receiverId);
+
+        if (canProceedAsLeader)
         {
-            _subscriptionClients.CloseAllAsync();
-
-            return Task.CompletedTask;
+            _logger.LogInformation($"CanProceedAsLeaderCheckAsync, lease obtained at: {DateTimeOffset.Now}");
+            IsLeader = true;
+            StartMessageReceiving();
         }
+    }
 
-        // Use this handler to examine the exceptions received on the message pump.
-        private Task ExceptionReceivedHandler(ExceptionReceivedEventArgs exceptionReceivedEventArgs)
+    private async Task RenewLeaseAsync()
+    {
+        var canProceedAsLeader = await _leaderElectorService.CanProceedAsLeader(_receiverId);
+
+        if (!canProceedAsLeader)
         {
-            _logger.LogError($"Message handler encountered an exception {exceptionReceivedEventArgs.Exception}.");
-            var context = exceptionReceivedEventArgs.ExceptionReceivedContext;
-            _logger.LogError("Exception context for troubleshooting:");
-            _logger.LogError($"- Endpoint: {context.Endpoint}");
-            _logger.LogError($"- Entity Path: {context.EntityPath}");
-            _logger.LogError($"- Executing Action: {context.Action}");
-            return Task.CompletedTask;
+            // Suddenly lost role as leader for some strange reason. Leader elector could have restarted
+            _logger.LogWarning( $"CanProceedAsLeaderCheckAsync, lease lost at: {DateTimeOffset.Now}");
+            IsLeader = false;
+            StopMessageReceiving();
         }
+        else
+        {
+            _logger.LogDebug($"CanProceedAsLeaderCheckAsync, lease renewed at: {DateTimeOffset.Now}");
+        }
+    }
+
+    private bool IsLeader { get; set; }
+
+    private void StartMessageReceiving()
+    {
+        var messageHandlerOptions = new MessageHandlerOptions(ExceptionReceivedHandler)
+        {
+            MaxConcurrentCalls = 1,
+            AutoComplete = false
+        };
+
+        _subscriptionClients.RegisterPcsMessageHandler(ProcessMessagesAsync, messageHandlerOptions);
+    }
+
+    private void StopMessageReceiving() => _subscriptionClients.UnregisterPcsMessageHandler();
+
+    public async Task ProcessMessagesAsync(IPcsSubscriptionClient subscriptionClient, Message message, CancellationToken token)
+    {
+        try
+        {
+            var messageJson = Encoding.UTF8.GetString(message.Body);
+
+            var busReceiverService = _busReceiverServiceFactory.GetServiceInstance();
+
+            await busReceiverService.ProcessMessageAsync(subscriptionClient.PcsTopic, messageJson, token);
+
+            await subscriptionClient.CompleteAsync(message.SystemProperties.LockToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error processing message");
+        }
+    }
+
+    public Task StopAsync(CancellationToken cancellationToken)
+    {
+        _subscriptionClients.CloseAllAsync();
+
+        return Task.CompletedTask;
+    }
+
+    // Use this handler to examine the exceptions received on the message pump.
+    private Task ExceptionReceivedHandler(ExceptionReceivedEventArgs exceptionReceivedEventArgs)
+    {
+        _logger.LogError($"Message handler encountered an exception {exceptionReceivedEventArgs.Exception}.");
+        var context = exceptionReceivedEventArgs.ExceptionReceivedContext;
+        _logger.LogError("Exception context for troubleshooting:");
+        _logger.LogError($"- Endpoint: {context.Endpoint}");
+        _logger.LogError($"- Entity Path: {context.EntityPath}");
+        _logger.LogError($"- Executing Action: {context.Action}");
+        return Task.CompletedTask;
     }
 }

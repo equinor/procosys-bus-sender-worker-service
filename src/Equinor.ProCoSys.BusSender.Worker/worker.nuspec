@@ -8,7 +8,7 @@
     <authors>Equinor ASA</authors>
   </metadata>
   <files>
-    <file src="bin\Release\net5.0\win-x64\publish\Equinor.ProCoSys.BusSender.Worker.exe" target="lib\net5.0"></file>
-    <file src="bin\Release\net5.0\win-x64\appsettings.json"  target="lib\net5.0"></file>
+    <file src="bin\Release\net6.0\win-x64\publish\Equinor.ProCoSys.BusSender.Worker.exe" target="lib\net6.0"></file>
+    <file src="bin\Release\net6.0\win-x64\appsettings.json"  target="lib\net6.0"></file>
   </files>
 </package>

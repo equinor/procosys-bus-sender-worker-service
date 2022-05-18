@@ -5,49 +5,49 @@ using Equinor.ProCoSys.BusSenderWorker.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace Equinor.ProCoSys.BusSenderWorker.Infrastructure.Repositories
-{
-    public class TagDetailsRepository : ITagDetailsRepository
-    {
-        private readonly BusSenderServiceContext _context;
-        private readonly ILogger<TagDetailsRepository> _logger;
+namespace Equinor.ProCoSys.BusSenderWorker.Infrastructure.Repositories;
 
-        public TagDetailsRepository(BusSenderServiceContext context, ILogger<TagDetailsRepository> logger)
+public class TagDetailsRepository : ITagDetailsRepository
+{
+    private readonly BusSenderServiceContext _context;
+    private readonly ILogger<TagDetailsRepository> _logger;
+
+    public TagDetailsRepository(BusSenderServiceContext context, ILogger<TagDetailsRepository> logger)
+    {
+        _context = context;
+        _logger = logger;
+    }
+
+    public async Task<string> GetDetailsStringByTagId(long tagId)
+    {
+        await using var command = _context.Database.GetDbConnection().CreateCommand();
+        command.CommandText = GetTagDetailsQuery(tagId);
+        await _context.Database.OpenConnectionAsync();
+        await using var result = await command.ExecuteReaderAsync();
+
+        if (!result.HasRows)
         {
-            _context = context;
-            _logger = logger;
+            _logger.LogInformation($"Tag with id {tagId} did not have any tagDetails");
+            return "{}";
         }
 
-        public async Task<string> GetDetailsStringByTagId(long tagId)
+        if (!await result.ReadAsync() || result[0] is DBNull)
         {
-            await using var command = _context.Database.GetDbConnection().CreateCommand();
-            command.CommandText = GetTagDetailsQuery(tagId);
-            await _context.Database.OpenConnectionAsync();
-            await using var result = await command.ExecuteReaderAsync();
+            return "{}";
+        }
 
-            if (!result.HasRows)
-            {
-                _logger.LogInformation($"Tag with id {tagId} did not have any tagDetails");
-                return "{}";
-            }
-
-            if (!await result.ReadAsync() || result[0] is DBNull)
-            {
-                return "{}";
-            }
-
-            var tagDetails = (string)result[0];
+        var tagDetails = (string)result[0];
 
                 
-            if (await result.ReadAsync())
-            {
-                _logger.LogError("TagDetails returned more than 1 row, this should not happen.");
-            }
-
-            return "{"+ tagDetails +"}";
+        if (await result.ReadAsync())
+        {
+            _logger.LogError("TagDetails returned more than 1 row, this should not happen.");
         }
 
-        private static string GetTagDetailsQuery(long tagId) =>
+        return "{"+ tagDetails +"}";
+    }
+
+    private static string GetTagDetailsQuery(long tagId) =>
         @$"
         select listagg('""'|| colName ||'"":""'|| regexp_replace(val, '([""\])', '\\\1') ||'""', ',')
             within group (order by colName) as tagDetails 
@@ -76,5 +76,4 @@ namespace Equinor.ProCoSys.BusSenderWorker.Infrastructure.Repositories
                 and f.projectschema = t.projectschema
             order by def.sortkey nulls first
         )";
-    }
 }

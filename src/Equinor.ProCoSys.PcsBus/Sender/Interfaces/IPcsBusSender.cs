@@ -1,10 +1,9 @@
 ﻿using System.Threading.Tasks;
 
-namespace Equinor.ProCoSys.PcsServiceBus.Sender.Interfaces
+namespace Equinor.ProCoSys.PcsServiceBus.Sender.Interfaces;
+
+public interface IPcsBusSender
 {
-    public interface IPcsBusSender
-    {
-        Task SendAsync(string topic, string jsonMessage);
-        Task CloseAllAsync();
-    }
+    Task SendAsync(string topic, string jsonMessage);
+    Task CloseAllAsync();
 }

@@ -3,29 +3,28 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Equinor.ProCoSys.PcsServiceBus.Receiver.Interfaces;
 
-namespace Equinor.ProCoSys.PcsServiceBus.Receiver
+namespace Equinor.ProCoSys.PcsServiceBus.Receiver;
+
+public class LeaderElectorService : ILeaderElectorService
 {
-    public class LeaderElectorService : ILeaderElectorService
+    private readonly HttpClient _httpClient;
+    private readonly Uri _leaderElectorUri;
+
+    public LeaderElectorService(HttpClient httpClient,
+        Uri leaderElectorUri)
     {
-        private readonly HttpClient _httpClient;
-        private readonly Uri _leaderElectorUri;
+        _httpClient = httpClient;
+        _leaderElectorUri = leaderElectorUri;
+    }
 
-        public LeaderElectorService(HttpClient httpClient,
-            Uri leaderElectorUri)
-        {
-            _httpClient = httpClient;
-            _leaderElectorUri = leaderElectorUri;
-        }
+    public async Task<bool> CanProceedAsLeader(Guid id)
+    {
+        var response = await _httpClient.GetAsync(_leaderElectorUri + "ProceedAsLeader?caller=" + id);
+        response.EnsureSuccessStatusCode();
+        var responseBody = await response.Content.ReadAsStringAsync();
 
-        public async Task<bool> CanProceedAsLeader(Guid id)
-        {
-            var response = await _httpClient.GetAsync(_leaderElectorUri + "ProceedAsLeader?caller=" + id);
-            response.EnsureSuccessStatusCode();
-            var responseBody = await response.Content.ReadAsStringAsync();
+        var result = bool.Parse(responseBody);
 
-            var result = bool.Parse(responseBody);
-
-            return result;
-        }
+        return result;
     }
 }

@@ -1,12 +1,11 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Equinor.ProCoSys.BusSenderWorker.Infrastructure.Tests
-{
-    public abstract class RepositoryTestBase
-    {
-        protected ContextHelper ContextHelper;
+namespace Equinor.ProCoSys.BusSenderWorker.Infrastructure.Tests;
 
-        [TestInitialize]
-        public void RepositorySetup() => ContextHelper = new ContextHelper();
-    }
+public abstract class RepositoryTestBase
+{
+    protected ContextHelper ContextHelper;
+
+    [TestInitialize]
+    public void RepositorySetup() => ContextHelper = new ContextHelper();
 }

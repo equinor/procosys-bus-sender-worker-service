@@ -1,9 +1,8 @@
 ﻿using System.Threading.Tasks;
 
-namespace Equinor.ProCoSys.BusSenderWorker.Core.Interfaces
+namespace Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
+
+public interface IUnitOfWork
 {
-    public interface IUnitOfWork
-    {
-        Task<int> SaveChangesAsync();
-    }
+    Task<int> SaveChangesAsync();
 }
