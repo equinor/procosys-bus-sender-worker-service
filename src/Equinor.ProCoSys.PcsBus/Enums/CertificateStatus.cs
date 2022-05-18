@@ -1,10 +1,9 @@
-﻿namespace Equinor.ProCoSys.PcsServiceBus.Enums
+﻿namespace Equinor.ProCoSys.PcsServiceBus.Enums;
+
+public enum CertificateStatus
 {
-    public enum CertificateStatus
-    {
-        Accepted,
-        Rejected,
-        Sent,
-        NoCertificate
-    }
+    Accepted,
+    Rejected,
+    Sent,
+    NoCertificate
 }

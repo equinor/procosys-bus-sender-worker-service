@@ -2,10 +2,9 @@
 using System.Threading.Tasks;
 using Equinor.ProCoSys.BusSenderWorker.Core.Models;
 
-namespace Equinor.ProCoSys.BusSenderWorker.Core.Interfaces
+namespace Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
+
+public interface IBusEventRepository
 {
-    public interface IBusEventRepository
-    {
-        Task<List<BusEvent>> GetEarliestUnProcessedEventChunk();
-    }
+    Task<List<BusEvent>> GetEarliestUnProcessedEventChunk();
 }

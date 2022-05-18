@@ -1,12 +1,11 @@
-﻿namespace Equinor.ProCoSys.PcsServiceBus.Topics
-{
-    public class ProjectTopic
-    {
-        public string Plant { get; set; }
-        public string ProjectName { get; set; }
-        public string Description { get; set; }
-        public bool IsClosed { get; set; }
+﻿namespace Equinor.ProCoSys.PcsServiceBus.Topics;
 
-        public const string TopicName = "project";
-    }
+public class ProjectTopic
+{
+    public string Plant { get; set; }
+    public string ProjectName { get; set; }
+    public string Description { get; set; }
+    public bool IsClosed { get; set; }
+
+    public const string TopicName = "project";
 }
