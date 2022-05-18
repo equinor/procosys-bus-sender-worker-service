@@ -44,7 +44,7 @@ public class BusEventService : IBusEventService
             throw new Exception("Get documentId from message");
         }
 
-        return await _documentRepository.GetQueryMessage(documentId);
+        return WashString(await _documentRepository.GetQueryMessage(documentId));
     }
 
     public async Task<string> CreateDocumentMessage(string busEventMessage)
@@ -54,7 +54,7 @@ public class BusEventService : IBusEventService
             throw new Exception("Get documentId from message");
         }
 
-        return await _documentRepository.GetDocumentMessage(documentId);
+        return WashString(await _documentRepository.GetDocumentMessage(documentId));
     }
 
     public bool IsNotLatestMaterialEvent(IEnumerable<BusEvent> events, BusEvent busEvent)
