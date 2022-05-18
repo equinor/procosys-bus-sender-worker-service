@@ -1,12 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 
-namespace Equinor.ProCoSys.BusSenderWorker.Infrastructure.Repositories
+namespace Equinor.ProCoSys.BusSenderWorker.Infrastructure.Repositories;
+
+public class DocumentRepository : IDocumentRepository
 {
-    internal class DocumentRepository
+    public Task<string> GetQueryMessage(long documentId)
     {
+        throw new NotImplementedException();
+    }
+
+    public Task<string> GetDocumentMessage(long documentId)
+    {
+        throw new NotImplementedException();
     }
 }

@@ -8,64 +8,88 @@ using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 using Equinor.ProCoSys.BusSenderWorker.Core.Models;
 using Equinor.ProCoSys.PcsServiceBus.Topics;
 
-namespace Equinor.ProCoSys.BusSenderWorker.Core.Services
+namespace Equinor.ProCoSys.BusSenderWorker.Core.Services;
+
+public class BusEventService : IBusEventService
 {
-    public class BusEventService : IBusEventService
+    private readonly ITagDetailsRepository _tagDetailsRepository;
+    private readonly IDocumentRepository _documentRepository;
+    private readonly Regex _rx = new(@"[\a\e\f\n\r\t\v]", RegexOptions.Compiled);
+
+    public BusEventService(ITagDetailsRepository tagDetailsRepository
+        ,IDocumentRepository documentRepository)
     {
-        private readonly ITagDetailsRepository _tagDetailsRepository;
-        private readonly Regex _rx = new(@"[\a\e\f\n\r\t\v]", RegexOptions.Compiled);
+        _tagDetailsRepository = tagDetailsRepository;
+        _documentRepository = documentRepository;
+    }
 
-        public BusEventService(ITagDetailsRepository tagDetailsRepository)
+    public async Task<string> AttachTagDetails(string tagMessage)
+    {
+        var tagTopic = JsonSerializer.Deserialize<TagTopic>(WashString(tagMessage));
+
+        if (tagTopic?.TagId == null || !long.TryParse(tagTopic.TagId, out var tagId))
         {
-            _tagDetailsRepository = tagDetailsRepository;
+            throw new Exception("Could not deserialize TagTopic");
         }
 
+        tagTopic.TagDetails = WashString(await _tagDetailsRepository.GetDetailsStringByTagId(tagId));
+       
+        return JsonSerializer.Serialize(tagTopic);
+    }
 
-        public async Task<string> AttachTagDetails(string tagMessage)
+    public async Task<string> CreateQueryMessage(string busEventMessage)
+    {
+        if ( !long.TryParse(busEventMessage, out var documentId))
         {
-            var tagTopic = JsonSerializer.Deserialize<TagTopic>(WashString(tagMessage));
-
-            if (tagTopic?.TagId == null || !long.TryParse(tagTopic.TagId, out var tagId))
-            {
-                throw new Exception("Could not deserialize TagTopic");
-            }
-
-            tagTopic.TagDetails = await _tagDetailsRepository.GetDetailsStringByTagId(tagId);
-            return JsonSerializer.Serialize(tagTopic);
+            throw new Exception("Get documentId from message");
         }
 
-        public bool IsNotLatestMaterialEvent(IEnumerable<BusEvent> events, BusEvent busEvent)
-        {
-            var compareTo = JsonSerializer.Deserialize<WoMaterialIdentifier>(WashString(busEvent.Message));
+        return await _documentRepository.GetQueryMessage(documentId);
+    }
 
-            return events.Any(e =>
-            {
-                var woMaterial = JsonSerializer.Deserialize<WoMaterialIdentifier>(WashString(e.Message));
-                return woMaterial != null
-                       && compareTo != null
-                       && woMaterial.ItemNo == compareTo.ItemNo && woMaterial.WoId == compareTo.WoId
-                       && e.Created > busEvent.Created;
-            });
+    public async Task<string> CreateDocumentMessage(string busEventMessage)
+    {
+        if (!long.TryParse(busEventMessage, out var documentId))
+        {
+            throw new Exception("Get documentId from message");
         }
 
-        public string WashString(string busEventMessage)
+        return await _documentRepository.GetDocumentMessage(documentId);
+    }
+
+    public bool IsNotLatestMaterialEvent(IEnumerable<BusEvent> events, BusEvent busEvent)
+    {
+        var compareTo = JsonSerializer.Deserialize<WoMaterialIdentifier>(WashString(busEvent.Message));
+
+        return events.Any(e =>
         {
-            busEventMessage = busEventMessage.Replace("\r", "");
-            busEventMessage = busEventMessage.Replace("\n", "");
-            busEventMessage = busEventMessage.Replace("\t", "");
-            busEventMessage = busEventMessage.Replace("\f", "");
-            busEventMessage = _rx.Replace(busEventMessage, m => Regex.Escape(m.Value));
+            var woMaterial = JsonSerializer.Deserialize<WoMaterialIdentifier>(WashString(e.Message));
+            return woMaterial != null
+                   && compareTo != null
+                   && woMaterial.ItemNo == compareTo.ItemNo && woMaterial.WoId == compareTo.WoId
+                   && e.Created > busEvent.Created;
+        });
+    }
 
-            ////Removes non printable characters
-            const string Pattern = "[^ -~]+";
-            var regExp = new Regex(Pattern);
-            busEventMessage = regExp.Replace(busEventMessage, "");
-
+    public string WashString(string busEventMessage)
+    {
+        if (string.IsNullOrEmpty(busEventMessage))
+        {
             return busEventMessage;
         }
+        busEventMessage = busEventMessage.Replace("\r", "");
+        busEventMessage = busEventMessage.Replace("\n", "");
+        busEventMessage = busEventMessage.Replace("\t", "");
+        busEventMessage = busEventMessage.Replace("\f", "");
+        busEventMessage = _rx.Replace(busEventMessage, m => Regex.Escape(m.Value));
 
-        public Task<string> CreateQueryMessage(string busEventMessage) => throw new NotImplementedException();
+        ////Removes non printable characters
+        const string Pattern = "[^ -~]+";
+        var regExp = new Regex(Pattern);
+        busEventMessage = regExp.Replace(busEventMessage, "");
 
-        public Task<string> CreateDocumentMessage(string busEventMessage) => throw new NotImplementedException();
+        return busEventMessage;
     }
+
+
 }
