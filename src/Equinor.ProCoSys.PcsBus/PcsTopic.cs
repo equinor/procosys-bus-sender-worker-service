@@ -31,6 +31,9 @@
         Document,
         CommPkgOperation,
         PipingSpool,
-        PipingSpool_Delete
+        PipingSpool_Delete,
+        CommPkg_Delete,
+        SWCR_Delete,
+        McPkg_Delete
     }
 }
