@@ -1,8 +1,5 @@
 ﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
 	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=ArrangeConstructorOrDestructorBody/@EntryIndexedValue">WARNING</s:String>
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=3e7dfa24_002D802a_002D43b2_002Da2c2_002Db32a8dedc2ed/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="BusSenderServiceTests" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
-  &lt;TestAncestor&gt;&#xD;
-    &lt;TestId&gt;MSTest::2B0B4E2B-8005-4270-BB3C-A83B165F8787::net5.0::Equinor.ProCoSys.BusSenderWorker.Core.Tests.BusSenderServiceTests&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;MSTest::922E5D98-7B0B-42DB-8A1D-2B52E4E624DA::net5.0::Equinor.ProCoSys.PcsServiceBusTests.TopicTests.TagTopic&lt;/TestId&gt;&#xD;
-  &lt;/TestAncestor&gt;&#xD;
+  &lt;Project Location="C:\W\procosys-bus-sender-worker-service" Presentation="&amp;lt;Tests&amp;gt;" /&gt;&#xD;
 &lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>
