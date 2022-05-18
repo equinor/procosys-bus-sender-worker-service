@@ -1,7 +1,6 @@
-﻿namespace Equinor.ProCoSys.PcsServiceBus.Receiver.Interfaces
+﻿namespace Equinor.ProCoSys.PcsServiceBus.Receiver.Interfaces;
+
+public interface IBusReceiverServiceFactory
 {
-    public interface IBusReceiverServiceFactory
-    {
-        IBusReceiverService GetServiceInstance();
-    }
+    IBusReceiverService GetServiceInstance();
 }

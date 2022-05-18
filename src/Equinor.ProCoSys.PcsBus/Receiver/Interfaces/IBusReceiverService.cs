@@ -2,10 +2,9 @@
 using System.Threading.Tasks;
 using Microsoft.Azure.ServiceBus;
 
-namespace Equinor.ProCoSys.PcsServiceBus.Receiver.Interfaces
+namespace Equinor.ProCoSys.PcsServiceBus.Receiver.Interfaces;
+
+public interface IBusReceiverService
 {
-    public interface IBusReceiverService
-    {
-        Task ProcessMessageAsync(PcsTopic pcsTopic, string message, CancellationToken token);
-    }
+    Task ProcessMessageAsync(PcsTopic pcsTopic, string message, CancellationToken token);
 }

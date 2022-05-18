@@ -1,13 +1,12 @@
 ﻿using System;
 
-namespace Equinor.ProCoSys.BusSenderWorker.Core.Models
+namespace Equinor.ProCoSys.BusSenderWorker.Core.Models;
+
+public class BusEvent
 {
-    public class BusEvent
-    {
-        public long Id { get; set; }
-        public string Event { get; set; }
-        public string Message { get; set; }
-        public DateTime Created { get; set; }
-        public Status Sent { get; set; }
-    }
+    public long Id { get; set; }
+    public string Event { get; set; }
+    public string Message { get; set; }
+    public DateTime Created { get; set; }
+    public Status Sent { get; set; }
 }
