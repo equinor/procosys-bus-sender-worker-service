@@ -17,7 +17,7 @@ public class BusEventService : IBusEventService
     private readonly Regex _rx = new(@"[\a\e\f\n\r\t\v]", RegexOptions.Compiled);
 
     public BusEventService(ITagDetailsRepository tagDetailsRepository
-        ,IDocumentRepository documentRepository)
+        , IDocumentRepository documentRepository)
     {
         _tagDetailsRepository = tagDetailsRepository;
         _documentRepository = documentRepository;
@@ -33,13 +33,13 @@ public class BusEventService : IBusEventService
         }
 
         tagTopic.TagDetails = WashString(await _tagDetailsRepository.GetDetailsStringByTagId(tagId));
-       
+
         return JsonSerializer.Serialize(tagTopic);
     }
 
     public async Task<string> CreateQueryMessage(string busEventMessage)
     {
-        if ( !long.TryParse(busEventMessage, out var documentId))
+        if (!long.TryParse(busEventMessage, out var documentId))
         {
             throw new Exception("Get documentId from message");
         }

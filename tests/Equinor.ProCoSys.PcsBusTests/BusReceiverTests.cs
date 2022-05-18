@@ -1,14 +1,14 @@
-﻿using System;
-using System.Reflection;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using Equinor.ProCoSys.PcsServiceBus.Receiver;
+﻿using Equinor.ProCoSys.PcsServiceBus.Receiver;
 using Equinor.ProCoSys.PcsServiceBus.Receiver.Interfaces;
 using Microsoft.Azure.ServiceBus;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using System;
+using System.Reflection;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Equinor.ProCoSys.PcsServiceBusTests;
 
@@ -33,7 +33,7 @@ public class PcsBusReceiverTests
             => c.RegisterPcsMessageHandler(
                 It.IsAny<Func<IPcsSubscriptionClient, Message, CancellationToken, Task>>(),
                 It.IsAny<MessageHandlerOptions>())
-        ).Callback<Func<IPcsSubscriptionClient, Message, CancellationToken, Task> , MessageHandlerOptions>((_,options) => _options = options);
+        ).Callback<Func<IPcsSubscriptionClient, Message, CancellationToken, Task>, MessageHandlerOptions>((_, options) => _options = options);
 
         _busReceiverService = new Mock<IBusReceiverService>();
         _leaderElectorService = new Mock<ILeaderElectorService>();
@@ -47,7 +47,7 @@ public class PcsBusReceiverTests
     {
         _dut.StopAsync(new CancellationToken());
 
-        _clients.Verify(c => c.CloseAllAsync(), Times.Once );
+        _clients.Verify(c => c.CloseAllAsync(), Times.Once);
     }
 
     [TestMethod]
@@ -126,8 +126,8 @@ public class PcsBusReceiverTests
         var systemProperties = message.SystemProperties;
         var type = systemProperties.GetType();
         type.GetMethod("set_LockTokenGuid", BindingFlags.Instance | BindingFlags.NonPublic)
-            ?.Invoke(systemProperties, new object[] {lockToken});
+            ?.Invoke(systemProperties, new object[] { lockToken });
         type.GetMethod("set_SequenceNumber", BindingFlags.Instance | BindingFlags.NonPublic)
-            ?.Invoke(systemProperties, new object[] {0});
+            ?.Invoke(systemProperties, new object[] { 0 });
     }
 }

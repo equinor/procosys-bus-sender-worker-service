@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
+﻿using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 using Equinor.ProCoSys.BusSenderWorker.Core.Models;
 using Equinor.ProCoSys.BusSenderWorker.Core.Services;
 using Equinor.ProCoSys.BusSenderWorker.Core.Telemetry;
@@ -11,6 +7,10 @@ using Microsoft.Azure.ServiceBus;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Threading.Tasks;
 using Range = Moq.Range;
 
 namespace Equinor.ProCoSys.BusSenderWorker.Core.Tests;
@@ -66,7 +66,7 @@ public class BusSenderServiceTests
 
         _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk()).Returns(() => Task.FromResult(_busEvents));
         _dut = new BusSenderService(topicClients, _busEventRepository.Object, _iUnitOfWork.Object, new Mock<ILogger<BusSenderService>>().Object,
-            new Mock<ITelemetryClient>().Object,_tagDetailsRepositoryMock.Object);
+            new Mock<ITelemetryClient>().Object, _tagDetailsRepositoryMock.Object);
     }
 
     [TestMethod]
@@ -86,7 +86,7 @@ public class BusSenderServiceTests
         Assert.AreEqual(Status.UnProcessed, _busEvents[0].Sent);
 
         await _dut.SendMessageChunk();
-        _topicClientMock1.Verify(t => t.SendAsync(It.IsAny<Message>()),Times.Never);
+        _topicClientMock1.Verify(t => t.SendAsync(It.IsAny<Message>()), Times.Never);
         _topicClientMock2.Verify(t => t.SendAsync(It.IsAny<Message>()), Times.Once);
         _topicClientMock3.Verify(t => t.SendAsync(It.IsAny<Message>()), Times.Once);
         _topicClientMock4.Verify(t => t.SendAsync(It.IsAny<Message>()), Times.Never);
@@ -106,7 +106,7 @@ public class BusSenderServiceTests
         };
         var expectedWashedMessage = "{\"Plant\" : \"PCS$HF_LNG\",\"Parameter\":\"En streng\" }";
 
-        _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk()).Returns(() => Task.FromResult(new List<BusEvent>{uncleanedTestMessage}));
+        _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk()).Returns(() => Task.FromResult(new List<BusEvent> { uncleanedTestMessage }));
 
         await _dut.SendMessageChunk();
 
@@ -117,6 +117,6 @@ public class BusSenderServiceTests
     public async Task SendMessageChunk_ShouldSaveChangesAfterEachSend()
     {
         await _dut.SendMessageChunk();
-        _iUnitOfWork.Verify(t => t.SaveChangesAsync(), Times.Between(2,2,Range.Inclusive));
+        _iUnitOfWork.Verify(t => t.SaveChangesAsync(), Times.Between(2, 2, Range.Inclusive));
     }
 }

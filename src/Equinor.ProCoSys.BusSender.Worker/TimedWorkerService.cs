@@ -50,7 +50,7 @@ public class TimedWorkerService : IHostedService, IDisposable
 
     public Task StopAsync(CancellationToken cancellationToken)
     {
-        _logger.LogInformation($"TimedWorkerService stopping at: at: { DateTimeOffset.Now}");
+        _logger.LogInformation($"TimedWorkerService stopping at: at: {DateTimeOffset.Now}");
         _timer?.Change(Timeout.Infinite, 0);
         _entryPointService.StopService();
         return Task.CompletedTask;

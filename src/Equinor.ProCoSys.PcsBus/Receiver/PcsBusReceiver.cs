@@ -86,7 +86,7 @@ public class PcsBusReceiver : IHostedService
         if (!canProceedAsLeader)
         {
             // Suddenly lost role as leader for some strange reason. Leader elector could have restarted
-            _logger.LogWarning( $"CanProceedAsLeaderCheckAsync, lease lost at: {DateTimeOffset.Now}");
+            _logger.LogWarning($"CanProceedAsLeaderCheckAsync, lease lost at: {DateTimeOffset.Now}");
             IsLeader = false;
             StopMessageReceiving();
         }

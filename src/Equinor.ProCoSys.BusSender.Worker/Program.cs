@@ -16,7 +16,7 @@ public class Program
 {
     public IConfiguration Configuration { get; }
 
-    public Program(IConfiguration configuration) 
+    public Program(IConfiguration configuration)
         => Configuration = configuration;
 
     public static async Task Main(string[] args)
@@ -116,7 +116,7 @@ public class Program
                 Console.WriteLine("Created wallet file at: " + walletPath);
 
                 services.AddApplicationInsightsTelemetryWorkerService(hostContext.Configuration["ApplicationInsights:InstrumentationKey"]);
-                
+
                 var connectionString = hostContext.Configuration["ConnectionString"];
                 //var localConnectionString = hostContext.Configuration["ProcosysDb"]; //to be used when debugging
                 services.AddDbContext(connectionString);

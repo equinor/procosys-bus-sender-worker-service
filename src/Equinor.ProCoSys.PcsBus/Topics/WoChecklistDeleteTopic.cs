@@ -6,6 +6,6 @@ public class WoChecklistDeleteTopic
     public string ProjectName { get; set; }
     public string WoNo { get; set; }
     public string ChecklistId { get; set; }
- 
+
     public const string TopicName = "wochecklist_delete";
 }

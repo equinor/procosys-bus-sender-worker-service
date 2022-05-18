@@ -60,7 +60,7 @@ public class BusSenderService : IBusSenderService
 
                 if (busEvent.Event is "query")
                 {
-                        
+
                     busEvent.Message = await _service.CreateQueryMessage(busEvent.Message);
                 }
 
@@ -84,13 +84,13 @@ public class BusSenderService : IBusSenderService
 
                 var message = JsonSerializer.Deserialize<BusEventMessage>(_service.WashString(busEvent.Message));
 
-                if (message!= null && string.IsNullOrEmpty(message.ProjectName))
+                if (message != null && string.IsNullOrEmpty(message.ProjectName))
                 {
                     message.ProjectName = "_";
                 }
                 TrackMetric(message);
                 await _topicClients.SendAsync(busEvent.Event, _service.WashString(busEvent.Message));
-                    
+
                 TrackEvent(busEvent.Event, message);
                 busEvent.Sent = Status.Sent;
                 await _unitOfWork.SaveChangesAsync();

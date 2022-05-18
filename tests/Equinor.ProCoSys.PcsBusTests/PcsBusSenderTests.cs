@@ -1,9 +1,9 @@
-﻿using System;
-using System.Threading.Tasks;
-using Equinor.ProCoSys.PcsServiceBus.Sender;
+﻿using Equinor.ProCoSys.PcsServiceBus.Sender;
 using Microsoft.Azure.ServiceBus;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using System;
+using System.Threading.Tasks;
 
 namespace Equinor.ProCoSys.PcsServiceBusTests;
 
@@ -18,10 +18,10 @@ public class PcsBusSenderTests
     [TestInitialize]
     public void Setup()
     {
-        _topicClient1 =  new Mock<ITopicClient>();
+        _topicClient1 = new Mock<ITopicClient>();
         _topicClient2 = new Mock<ITopicClient>();
         _dut = new PcsBusSender();
-            
+
         _dut.Add(TopicName1, _topicClient1.Object);
         _dut.Add(TopicName2, _topicClient2.Object);
     }
