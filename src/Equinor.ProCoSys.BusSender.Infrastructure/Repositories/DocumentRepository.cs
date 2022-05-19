@@ -25,7 +25,6 @@ public class DocumentRepository : IDocumentRepository
     public async Task<string> GetDocumentMessage(long documentId)
         => await ExecuteDocumentQuery(GetDocumentQuery(documentId), documentId);
 
-
     public async Task<string> ExecuteDocumentQuery(string queryString, long documentId)
     {
         await using var command = _context.Database.GetDbConnection().CreateCommand();
@@ -45,15 +44,13 @@ public class DocumentRepository : IDocumentRepository
             return "{}";
         }
 
-        var tagDetails = (string)result[0];
-
+        var queryResult = (string)result[0];
 
         if (await result.ReadAsync())
         {
             _logger.LogError("Document returned more than 1 row, this should not happen.");
         }
-
-        return tagDetails;
+        return queryResult;
     }
 
     private static string GetQueryQuery(long documentId) =>
