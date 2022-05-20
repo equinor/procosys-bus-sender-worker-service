@@ -17,7 +17,7 @@ public class BusEventService : IBusEventService
     private readonly Regex _rx = new(@"[\a\e\f\n\r\t\v]", RegexOptions.Compiled);
 
     public BusEventService(ITagDetailsRepository tagDetailsRepository
-        , IDocumentRepository documentRepository)
+        ,IDocumentRepository documentRepository)
     {
         _tagDetailsRepository = tagDetailsRepository;
         _documentRepository = documentRepository;

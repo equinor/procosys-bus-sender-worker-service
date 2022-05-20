@@ -24,6 +24,8 @@ public class BusSenderServiceTests
     private List<BusEvent> _busEvents;
     private Mock<IBusEventRepository> _busEventRepository;
     private Mock<ITagDetailsRepository> _tagDetailsRepositoryMock;
+    private Mock<IDocumentRepository> _documentRepositoryMock;
+    private Mock<BusEventService> _busEventServiceMock;
     private string _messageBodyOnTopicClient4;
 
     [TestInitialize]
@@ -62,11 +64,14 @@ public class BusSenderServiceTests
         };
         _busEventRepository = new Mock<IBusEventRepository>();
         _tagDetailsRepositoryMock = new Mock<ITagDetailsRepository>();
+        _documentRepositoryMock = new Mock<IDocumentRepository>();
+        _busEventServiceMock = new Mock<BusEventService>(_tagDetailsRepositoryMock.Object, _documentRepositoryMock.Object) { CallBase = true };
         _iUnitOfWork = new Mock<IUnitOfWork>();
+
 
         _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk()).Returns(() => Task.FromResult(_busEvents));
         _dut = new BusSenderService(topicClients, _busEventRepository.Object, _iUnitOfWork.Object, new Mock<ILogger<BusSenderService>>().Object,
-            new Mock<ITelemetryClient>().Object, _tagDetailsRepositoryMock.Object);
+            new Mock<ITelemetryClient>().Object, _busEventServiceMock.Object);
     }
 
     [TestMethod]
