@@ -34,5 +34,8 @@ public enum PcsTopic
     PipingSpool_Delete,
     CommPkg_Delete,
     SWCR_Delete,
-    McPkg_Delete
+    McPkg_Delete,
+    LoopContent,
+    LoopContent_Delete,
+    Query
 }
