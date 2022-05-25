@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Equinor.ProCoSys.BusSenderWorker.Core;
+﻿using Equinor.ProCoSys.BusSenderWorker.Core;
 using Equinor.ProCoSys.BusSenderWorker.Core.Models;
 using Equinor.ProCoSys.BusSenderWorker.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +6,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MockQueryable.Moq;
 using Moq;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Equinor.ProCoSys.BusSenderWorker.Infrastructure.Tests;
 

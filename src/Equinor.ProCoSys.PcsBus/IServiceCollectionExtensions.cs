@@ -18,7 +18,7 @@ public static class IServiceCollectionExtensions
 
         var pcsSubscriptionClients = new PcsSubscriptionClients(optionsBuilder.RenewLeaseIntervalMilliSec);
         optionsBuilder.Subscriptions.ForEach(
-            topicInfo => 
+            topicInfo =>
                 pcsSubscriptionClients.Add(
                     new PcsSubscriptionClient(optionsBuilder.ConnectionString, topicInfo.pcsTopic, topicInfo.topicPath, topicInfo.subscrition, optionsBuilder.ReadFromDeadLetterQueue)));
         services.AddSingleton<IPcsSubscriptionClients>(pcsSubscriptionClients);

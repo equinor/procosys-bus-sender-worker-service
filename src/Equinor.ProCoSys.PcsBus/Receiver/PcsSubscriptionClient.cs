@@ -18,7 +18,7 @@ public class PcsSubscriptionClient : SubscriptionClient, IPcsSubscriptionClient
     {
         PcsTopic = pcsTopic;
     }
-           
+
 
     public void RegisterPcsMessageHandler(Func<IPcsSubscriptionClient, Message, CancellationToken, Task> handler, MessageHandlerOptions messageHandlerOptions)
     {

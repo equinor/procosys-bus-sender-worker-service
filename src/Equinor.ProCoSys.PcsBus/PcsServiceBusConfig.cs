@@ -36,9 +36,9 @@ public class PcsServiceBusConfig
         return this;
     }
 
-    public PcsServiceBusConfig WithSubscription(PcsTopic pcsTopic,string topicPath, string subscriptionName)
+    public PcsServiceBusConfig WithSubscription(PcsTopic pcsTopic, string topicPath, string subscriptionName)
     {
-        Subscriptions.Add(new ValueTuple<PcsTopic, string, string>(pcsTopic,topicPath, subscriptionName));
+        Subscriptions.Add(new ValueTuple<PcsTopic, string, string>(pcsTopic, topicPath, subscriptionName));
         return this;
     }
 
