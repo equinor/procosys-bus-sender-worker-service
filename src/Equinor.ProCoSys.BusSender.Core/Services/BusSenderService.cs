@@ -47,28 +47,24 @@ public class BusSenderService : IBusSenderService
                 _telemetryClient.TrackMetric("BusSender Chunk", events.Count);
             }
 
-            _logger.LogInformation($"BusSenderService found {events.Count} messages to process");
-
+            _logger.LogInformation("BusSenderService found {count} messages to process",events.Count);
 
             foreach (var busEvent in events)
             {
-
                 if (busEvent.Event == TagTopic.TopicName)
                 {
                     busEvent.Message = await _service.AttachTagDetails(busEvent.Message);
                 }
 
-                if (busEvent.Event is "query")
+                if (busEvent.Event is QueryTopic.TopicName)
                 {
-
                     busEvent.Message = await _service.CreateQueryMessage(busEvent.Message);
                 }
 
-                if (busEvent.Event is "document")
+                if (busEvent.Event is DocumentTopic.TopicName)
                 {
                     busEvent.Message = await _service.CreateDocumentMessage(busEvent.Message);
                 }
-
 
                 /***
                  * WO_MATERIAL gets several inserts when saving a material, resulting in multiple rows in the BUSEVENT table.

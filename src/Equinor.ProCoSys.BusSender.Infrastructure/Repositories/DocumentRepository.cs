@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data.Common;
 using System.Threading.Tasks;
 using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 using Equinor.ProCoSys.BusSenderWorker.Infrastructure.Data;
@@ -32,12 +33,18 @@ public class DocumentRepository : IDocumentRepository
         await _context.Database.OpenConnectionAsync();
         await using var result = await command.ExecuteReaderAsync();
 
+        return await ExtractQueryFromResult(documentId, result);
+    }
+
+    private async Task<string> ExtractQueryFromResult(long documentId, DbDataReader result)
+    {
         if (!result.HasRows)
         {
             _logger.LogError("Document with id {documentId} did not return anything", documentId);
             return "{}";
         }
 
+        //result.ReadAsync is expected to return true here, query for 1 documentId should return 1 and only 1 row. 
         if (!await result.ReadAsync() || result[0] is DBNull)
         {
             _logger.LogError("Document with id {documentId} did not return anything", documentId);
@@ -46,10 +53,12 @@ public class DocumentRepository : IDocumentRepository
 
         var queryResult = (string)result[0];
 
+        //result.ReadAsync is expected to be false here, this is because there should be no more rows to read.
         if (await result.ReadAsync())
         {
             _logger.LogError("Document returned more than 1 row, this should not happen.");
         }
+
         return queryResult;
     }
 

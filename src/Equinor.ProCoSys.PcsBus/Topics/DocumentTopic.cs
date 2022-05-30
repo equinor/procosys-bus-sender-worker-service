@@ -1,6 +1,6 @@
 ﻿namespace Equinor.ProCoSys.PcsServiceBus.Topics;
 
-public class Document
+public class DocumentTopic
 {
     public string Plant { get; set; }
     public string ProjectName { get; set; }

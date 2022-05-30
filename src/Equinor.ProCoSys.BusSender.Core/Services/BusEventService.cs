@@ -16,8 +16,8 @@ public class BusEventService : IBusEventService
     private readonly IDocumentRepository _documentRepository;
     private readonly Regex _rx = new(@"[\a\e\f\n\r\t\v]", RegexOptions.Compiled);
 
-    public BusEventService(ITagDetailsRepository tagDetailsRepository
-        ,IDocumentRepository documentRepository)
+    public BusEventService(ITagDetailsRepository tagDetailsRepository,
+        IDocumentRepository documentRepository)
     {
         _tagDetailsRepository = tagDetailsRepository;
         _documentRepository = documentRepository;
@@ -41,7 +41,7 @@ public class BusEventService : IBusEventService
     {
         if (!long.TryParse(busEventMessage, out var documentId))
         {
-            throw new Exception("Get documentId from message");
+            throw new Exception("Failed to extract documentId from message");
         }
 
         return WashString(await _documentRepository.GetQueryMessage(documentId));
@@ -51,7 +51,7 @@ public class BusEventService : IBusEventService
     {
         if (!long.TryParse(busEventMessage, out var documentId))
         {
-            throw new Exception("Get documentId from message");
+            throw new Exception("Failed to extract documentId from message");
         }
 
         return WashString(await _documentRepository.GetDocumentMessage(documentId));
