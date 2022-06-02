@@ -84,6 +84,7 @@ public class BusSenderService : IBusSenderService
                 {
                     message.ProjectName = "_";
                 }
+
                 TrackMetric(message);
                 await _topicClients.SendAsync(busEvent.Event, _service.WashString(busEvent.Message));
 

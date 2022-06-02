@@ -95,7 +95,7 @@ public class DocumentRepository : IDocumentRepository
         '""}}' as message
         from query q
             join document do ON do.document_id = q.document_id
-            join project p on p.project_id = do.project_id
+            left join project p on p.project_id = do.project_id
             join element e on e.element_id = do.document_id
             left join library dis on dis.library_id = do.discipline_id
             left join library qt on qt.library_id = q.QUERYTYPE_ID
@@ -125,7 +125,7 @@ public class DocumentRepository : IDocumentRepository
        '"", ""RevisionDate"" : ""' || TO_CHAR(d.Revisiondate, 'yyyy-mm-dd hh24:mi:ss') ||
        '""}}' as message
         from document d
-            join project p on p.project_id = d.project_id
+            left join project p on p.project_id = d.project_id
             left join library RT on RT.library_id = d.register_id
             left join library DT on DT.library_id = d.documenttype_id
             left join library apc on apc.library_id = d.acceptancecode_id
