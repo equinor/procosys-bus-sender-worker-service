@@ -58,12 +58,26 @@ public class BusSenderService : IBusSenderService
 
                 if (busEvent.Event is QueryTopic.TopicName)
                 {
-                    busEvent.Message = await _service.CreateQueryMessage(busEvent.Message);
+                    var queryMessage = await _service.CreateQueryMessage(busEvent.Message);
+                    if (queryMessage == null)
+                    {
+                        busEvent.Sent = Status.NotFound;
+                        await _unitOfWork.SaveChangesAsync();
+                        continue;
+                    }
+                    busEvent.Message = queryMessage;
                 }
 
                 if (busEvent.Event is DocumentTopic.TopicName)
                 {
-                    busEvent.Message = await _service.CreateDocumentMessage(busEvent.Message);
+                    var documentMessage = await _service.CreateDocumentMessage(busEvent.Message);
+                    if (documentMessage == null)
+                    {
+                        busEvent.Sent = Status.NotFound;
+                        await _unitOfWork.SaveChangesAsync();
+                        continue;
+                    }
+                    busEvent.Message = documentMessage;
                 }
 
                 /***
@@ -85,6 +99,7 @@ public class BusSenderService : IBusSenderService
                     message.ProjectName = "_";
                 }
 
+
                 TrackMetric(message);
                 await _topicClients.SendAsync(busEvent.Event, _service.WashString(busEvent.Message));
 
@@ -103,8 +118,8 @@ public class BusSenderService : IBusSenderService
     }
 
     private void TrackMetric(BusEventMessage message) =>
-        _telemetryClient.TrackMetric("BusSender Topic", 1, "Plant", "ProjectName", message.Plant[4..],
-            message.ProjectName?.Replace('$', '_') ?? "NoProject");
+        _telemetryClient.TrackMetric("BusSender Topic", 1, "Plant", "ProjectName", message?.Plant?[4..],
+            message?.ProjectName?.Replace('$', '_') ?? "NoProject");
 
     private void TrackEvent(string eventType, BusEventMessage message)
     {

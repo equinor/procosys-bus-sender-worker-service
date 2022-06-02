@@ -41,14 +41,14 @@ public class DocumentRepository : IDocumentRepository
         if (!result.HasRows)
         {
             _logger.LogError("Document with id {documentId} did not return anything", documentId);
-            return "{}";
+            return null;
         }
 
         //result.ReadAsync is expected to return true here, query for 1 documentId should return 1 and only 1 row. 
-        if (!await result.ReadAsync() || result[0] is DBNull)
+        if (!await result.ReadAsync() || result[0] is DBNull || result[0] is null)
         {
             _logger.LogError("Document with id {documentId} did not return anything", documentId);
-            return "{}";
+            return null;
         }
 
         var queryResult = (string)result[0];
