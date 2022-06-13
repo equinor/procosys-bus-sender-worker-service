@@ -37,5 +37,6 @@ public enum PcsTopic
     McPkg_Delete,
     LoopContent,
     LoopContent_Delete,
-    Query
+    Query,
+    QuerySignature
 }

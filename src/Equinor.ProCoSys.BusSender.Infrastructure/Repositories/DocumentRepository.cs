@@ -38,14 +38,8 @@ public class DocumentRepository : IDocumentRepository
 
     private async Task<string> ExtractQueryFromResult(long documentId, DbDataReader result)
     {
-        if (!result.HasRows)
-        {
-            _logger.LogError("Document with id {documentId} did not return anything", documentId);
-            return null;
-        }
-
         //result.ReadAsync is expected to return true here, query for 1 documentId should return 1 and only 1 row. 
-        if (!await result.ReadAsync() || result[0] is DBNull || result[0] is null)
+        if (!result.HasRows || !await result.ReadAsync() || result[0] is DBNull || result[0] is null)
         {
             _logger.LogError("Document with id {documentId} did not return anything", documentId);
             return null;
@@ -71,7 +65,7 @@ public class DocumentRepository : IDocumentRepository
         '"", ""Description"" : ""'|| regexp_replace(do.title , '([""\])', '\\\1') ||
         '"", ""Discipline"" : ""'|| dis.code ||
         '"", ""QueryType"" : ""'|| qt.code ||
-        '"", ""CostImpactId"" : ""'||  ci.code ||
+        '"", ""CostImpact"" : ""'||  ci.code ||
         '"", ""Consequence"" : ""'||  regexp_replace(q.CONSEQUENCE , '([""\])', '\\\1') ||
         '"", ""ProposedSolution"" : ""'|| regexp_replace(q.PROPOSEDSOLUTION , '([""\])', '\\\1') ||
         '"", ""EngineeringReply"" : ""'|| regexp_replace(q.Engineeringreply, '([""\])', '\\\1') ||
