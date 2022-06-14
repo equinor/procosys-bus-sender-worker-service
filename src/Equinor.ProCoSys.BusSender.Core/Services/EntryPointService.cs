@@ -10,17 +10,17 @@ public class EntryPointService : IEntryPointService
 
     public EntryPointService(IServiceProvider services) => _services = services;
 
-    public async Task SendMessageChunk()
+    public async Task DoWorkerJob()
     {
         using var scope = _services.CreateScope();
         var service = scope.ServiceProvider.GetRequiredService<IBusSenderService>();
-        await service.SendMessageChunk();
+        await service.HandleBusEvents();
     }
 
     public async Task StopService()
     {
         using var scope = _services.CreateScope();
         var service = scope.ServiceProvider.GetRequiredService<IBusSenderService>();
-        await service.StopService();
+        await service.CloseConnections();
     }
 }

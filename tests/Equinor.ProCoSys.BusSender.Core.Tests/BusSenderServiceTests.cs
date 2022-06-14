@@ -49,7 +49,7 @@ public class BusSenderServiceTests
             {
                 Created = DateTime.Now.AddMinutes(-10),
                 Event = "topic2",
-                Sent = Status.UnProcessed,
+                Status = Status.UnProcessed,
                 Id = 1,
                 Message = "{\"Plant\":\"NGPCS_TEST_BROWN\",\"ProjectName\":\"Message 10 minutes ago not sent\"}"
             },
@@ -57,7 +57,7 @@ public class BusSenderServiceTests
             {
                 Created = DateTime.Now.AddMinutes(-10),
                 Event = "topic3",
-                Sent = Status.UnProcessed,
+                Status = Status.UnProcessed,
                 Id = 1,
                 Message = "{\"Plant\" : \"PCS$HF_LNG\", \"Responsible\" : \"8460-E015\", \"Description\" : \"	Installere bonding til JBer ved V8 område\"}"
             }
@@ -77,7 +77,7 @@ public class BusSenderServiceTests
     [TestMethod]
     public async Task StopService_ShouldCloseOnAllTopicClients()
     {
-        await _dut.StopService();
+        await _dut.CloseConnections();
         _topicClientMock1.Verify(t => t.CloseAsync(), Times.Once);
         _topicClientMock2.Verify(t => t.CloseAsync(), Times.Once);
         _topicClientMock3.Verify(t => t.CloseAsync(), Times.Once);
@@ -87,17 +87,17 @@ public class BusSenderServiceTests
     [TestMethod]
     public async Task SendMessageChunk_ShouldSendOnCorrectTopicClients()
     {
-        Assert.AreEqual(Status.UnProcessed, _busEvents[0].Sent);
-        Assert.AreEqual(Status.UnProcessed, _busEvents[0].Sent);
+        Assert.AreEqual(Status.UnProcessed, _busEvents[0].Status);
+        Assert.AreEqual(Status.UnProcessed, _busEvents[0].Status);
 
-        await _dut.SendMessageChunk();
+        await _dut.HandleBusEvents();
         _topicClientMock1.Verify(t => t.SendAsync(It.IsAny<Message>()), Times.Never);
         _topicClientMock2.Verify(t => t.SendAsync(It.IsAny<Message>()), Times.Once);
         _topicClientMock3.Verify(t => t.SendAsync(It.IsAny<Message>()), Times.Once);
         _topicClientMock4.Verify(t => t.SendAsync(It.IsAny<Message>()), Times.Never);
 
-        Assert.AreEqual(Status.Sent, _busEvents[0].Sent);
-        Assert.AreEqual(Status.Sent, _busEvents[0].Sent);
+        Assert.AreEqual(Status.Sent, _busEvents[0].Status);
+        Assert.AreEqual(Status.Sent, _busEvents[0].Status);
     }
 
     [TestMethod]
@@ -113,7 +113,7 @@ public class BusSenderServiceTests
 
         _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk()).Returns(() => Task.FromResult(new List<BusEvent> { uncleanedTestMessage }));
 
-        await _dut.SendMessageChunk();
+        await _dut.HandleBusEvents();
 
         Assert.AreEqual(expectedWashedMessage, _messageBodyOnTopicClient4);
     }
@@ -121,7 +121,24 @@ public class BusSenderServiceTests
     [TestMethod]
     public async Task SendMessageChunk_ShouldSaveChangesAfterEachSend()
     {
-        await _dut.SendMessageChunk();
+        await _dut.HandleBusEvents();
         _iUnitOfWork.Verify(t => t.SaveChangesAsync(), Times.Between(2, 2, Range.Inclusive));
     }
+
+    [TestMethod]
+    public async Task SendMessageChunk_ShouldSetDuplicatesToSkipped()
+    {
+        var wo1 = new BusEvent { Event = "topic4", Message = "10000", Status = Status.UnProcessed};
+        var wo2 = new BusEvent { Event = "topic4", Message = "10000", Status = Status.UnProcessed };
+
+        _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk()).Returns(() => Task.FromResult(new List<BusEvent> { wo1,wo2 }));
+
+        await _dut.HandleBusEvents();
+
+        _topicClientMock4.Verify(t => t.SendAsync(It.IsAny<Message>()),Times.Once);
+
+    }
+
+
+
 }

@@ -8,6 +8,7 @@ using Equinor.ProCoSys.BusSenderWorker.Core.Models;
 using Equinor.ProCoSys.BusSenderWorker.Core.Telemetry;
 using Equinor.ProCoSys.PcsServiceBus.Sender.Interfaces;
 using Equinor.ProCoSys.PcsServiceBus.Topics;
+using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using Microsoft.Extensions.Logging;
 
 namespace Equinor.ProCoSys.BusSenderWorker.Core.Services;
@@ -36,85 +37,122 @@ public class BusSenderService : IBusSenderService
         _service = service;
     }
 
-    public async Task SendMessageChunk()
+    public async Task HandleBusEvents()
     {
         try
         {
-            _logger.LogInformation($"BusSenderService SendMessageChunk starting at: {DateTimeOffset.Now}");
+            _logger.LogInformation($"BusSenderService DoWorkerJob starting at: {DateTimeOffset.Now}");
             var events = await _busEventRepository.GetEarliestUnProcessedEventChunk();
             if (events.Any())
             {
                 _telemetryClient.TrackMetric("BusSender Chunk", events.Count);
             }
-
             _logger.LogInformation("BusSenderService found {count} messages to process",events.Count);
-
-            foreach (var busEvent in events)
-            {
-                if (busEvent.Event == TagTopic.TopicName)
-                {
-                    busEvent.Message = await _service.AttachTagDetails(busEvent.Message);
-                }
-
-                if (busEvent.Event is QueryTopic.TopicName)
-                {
-                    var queryMessage = await _service.CreateQueryMessage(busEvent.Message);
-                    if (queryMessage == null)
-                    {
-                        busEvent.Sent = Status.NotFound;
-                        await _unitOfWork.SaveChangesAsync();
-                        continue;
-                    }
-                    busEvent.Message = queryMessage;
-                }
-
-                if (busEvent.Event is DocumentTopic.TopicName)
-                {
-                    var documentMessage = await _service.CreateDocumentMessage(busEvent.Message);
-                    if (documentMessage == null)
-                    {
-                        busEvent.Sent = Status.NotFound;
-                        await _unitOfWork.SaveChangesAsync();
-                        continue;
-                    }
-                    busEvent.Message = documentMessage;
-                }
-
-                /***
-                 * WO_MATERIAL gets several inserts when saving a material, resulting in multiple rows in the BUSEVENT table.
-                 * here we filter out all but the latest material event for a records with the same id and set those to Status = Skipped.
-                 * This is to reduce spam on the bus.
-                 */
-                if (busEvent.Event == WoMaterialTopic.TopicName && _service.IsNotLatestMaterialEvent(events, busEvent))
-                {
-                    busEvent.Sent = Status.Skipped;
-                    await _unitOfWork.SaveChangesAsync();
-                    continue;
-                }
-
-                var message = JsonSerializer.Deserialize<BusEventMessage>(_service.WashString(busEvent.Message));
-
-                if (message != null && string.IsNullOrEmpty(message.ProjectName))
-                {
-                    message.ProjectName = "_";
-                }
-
-
-                TrackMetric(message);
-                await _topicClients.SendAsync(busEvent.Event, _service.WashString(busEvent.Message));
-
-                TrackEvent(busEvent.Event, message);
-                busEvent.Sent = Status.Sent;
-                await _unitOfWork.SaveChangesAsync();
-            }
+            await ProcessBusEvents(events);
         }
         catch (Exception exception)
         {
             _logger.LogError(exception, $"BusSenderService execute send failed at: {DateTimeOffset.Now}");
             throw;
         }
-        _logger.LogInformation($"BusSenderService SendMessageChunk finished at: {DateTimeOffset.Now}");
+        _logger.LogInformation($"BusSenderService DoWorkerJob finished at: {DateTimeOffset.Now}");
         _telemetryClient.Flush();
+    }
+
+    private static List<BusEvent> SetDuplicatesToSkipped(List<BusEvent> events)
+    {
+        var map = events.Where(e => long.TryParse(e.Message, out var id)).GroupBy(e => new { e.Event, id = long.Parse(e.Message)});
+        foreach (var group in map)
+        {
+            foreach (var busEvent in group.SkipLast(1))
+            {
+                busEvent.Status = Status.Skipped;
+            }
+        }
+
+        return events;
+    }
+
+    private async Task ProcessBusEvents(List<BusEvent> events)
+    {
+        events = SetDuplicatesToSkipped(events);
+
+        foreach (var busEvent in events.Where(busEvent => busEvent.Status == Status.UnProcessed))
+        {
+            var handledEvent = await UpdateEventBasedOnTopic(events, busEvent);
+
+            if (busEvent.Status != Status.UnProcessed)
+            {
+                continue;
+            }
+
+            var message =
+                JsonSerializer.Deserialize<BusEventMessage>(_service.WashString(handledEvent.Message));
+
+            if (message != null && string.IsNullOrEmpty(message.ProjectName))
+            {
+                message.ProjectName = "_";
+            }
+
+            TrackMetric(message);
+            await _topicClients.SendAsync(busEvent.Event, _service.WashString(handledEvent.Message));
+
+            TrackEvent(handledEvent.Event, message);
+            busEvent.Status = Status.Sent;
+        }
+        await _unitOfWork.SaveChangesAsync();
+    }
+
+    private async Task<BusEvent> UpdateEventBasedOnTopic(IEnumerable<BusEvent> events, BusEvent busEvent)
+    {
+        switch (busEvent.Event)
+        {
+            case TagTopic.TopicName:
+                {
+                    busEvent.Message = await _service.AttachTagDetails(busEvent.Message);
+                    break;
+                }
+            case QueryTopic.TopicName:
+                {
+                    var queryMessage = await _service.CreateQueryMessage(busEvent.Message);
+                    if (queryMessage == null)
+                    {
+                        busEvent.Status = Status.NotFound;
+                        return busEvent;
+                    }
+
+                    busEvent.Message = queryMessage;
+                    break;
+                }
+            case DocumentTopic.TopicName:
+                {
+                    var documentMessage = await _service.CreateDocumentMessage(busEvent.Message);
+                    if (documentMessage == null)
+                    {
+                        busEvent.Status = Status.NotFound;
+                        return busEvent;
+                    }
+                    busEvent.Message = documentMessage;
+                    break;
+                }
+            case WorkOrderTopic.TopicName:
+                {
+             
+                    break;
+                }
+                /***
+                 * WO_MATERIAL gets several inserts when saving a material, resulting in multiple rows in the BUSEVENT table.
+                 * here we filter out all but the latest material event for a records with the same id and set those to Status = Skipped.
+                 * This is to reduce spam on the bus.
+                 */
+            case WoMaterialTopic.TopicName when _service.IsNotLatestMaterialEvent(events, busEvent):
+                {
+                    busEvent.Status = Status.Skipped;
+                    return busEvent;
+                }
+        }
+
+        return busEvent;
     }
 
     private void TrackMetric(BusEventMessage message) =>
@@ -143,7 +181,7 @@ public class BusSenderService : IBusSenderService
             properties);
     }
 
-    public async Task StopService()
+    public async Task CloseConnections()
     {
         _logger.LogInformation($"BusSenderService stop reader at: {DateTimeOffset.Now}");
         await _topicClients.CloseAllAsync();
