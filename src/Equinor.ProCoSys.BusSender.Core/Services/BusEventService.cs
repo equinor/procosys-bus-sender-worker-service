@@ -61,7 +61,7 @@ public class BusEventService : IBusEventService
     {
         var compareTo = JsonSerializer.Deserialize<WoMaterialIdentifier>(WashString(busEvent.Message));
 
-        return events.Any(e =>
+        return events.Where(e => e.Event== WoMaterialTopic.TopicName).Any(e =>
         {
             var woMaterial = JsonSerializer.Deserialize<WoMaterialIdentifier>(WashString(e.Message));
             return woMaterial != null
