@@ -14,13 +14,15 @@ public class BusEventService : IBusEventService
 {
     private readonly ITagDetailsRepository _tagDetailsRepository;
     private readonly IDocumentRepository _documentRepository;
+    private readonly IWorkOrderRepository _workOrderRepository;
     private readonly Regex _rx = new(@"[\a\e\f\n\r\t\v]", RegexOptions.Compiled);
 
     public BusEventService(ITagDetailsRepository tagDetailsRepository,
-        IDocumentRepository documentRepository)
+        IDocumentRepository documentRepository, IWorkOrderRepository workOrderRepository)
     {
         _tagDetailsRepository = tagDetailsRepository;
         _documentRepository = documentRepository;
+        _workOrderRepository = workOrderRepository;
     }
 
     public async Task<string> AttachTagDetails(string tagMessage)
@@ -55,6 +57,16 @@ public class BusEventService : IBusEventService
         }
 
         return WashString(await _documentRepository.GetDocumentMessage(documentId));
+    }
+
+    public async Task<string> CreateWorkOrderMessage(string busEventMessage)
+    {
+        if (!long.TryParse(busEventMessage, out var workOrderId))
+        {
+            throw new Exception("Failed to extract workOrderId from message");
+        }
+
+        return WashString(await _workOrderRepository.GetWorkOrderMessage(workOrderId));
     }
 
     public bool IsNotLatestMaterialEvent(IEnumerable<BusEvent> events, BusEvent busEvent)

@@ -2,7 +2,7 @@
 
 namespace Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 
-public interface IDocumentRepository
+public interface IDocumentRepository : IRepository
 {
     Task<string> GetQueryMessage(long documentId);
 

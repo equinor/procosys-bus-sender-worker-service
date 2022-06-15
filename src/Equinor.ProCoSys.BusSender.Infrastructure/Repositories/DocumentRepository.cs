@@ -21,27 +21,27 @@ public class DocumentRepository : IDocumentRepository
     }
 
     public async Task<string> GetQueryMessage(long documentId)
-        => await ExecuteDocumentQuery(GetQueryQuery(documentId), documentId);
+        => await ExecuteQuery(GetQueryQuery(documentId), documentId);
 
     public async Task<string> GetDocumentMessage(long documentId)
-        => await ExecuteDocumentQuery(GetDocumentQuery(documentId), documentId);
+        => await ExecuteQuery(GetDocumentQuery(documentId), documentId);
 
-    public async Task<string> ExecuteDocumentQuery(string queryString, long documentId)
+    public async Task<string> ExecuteQuery(string queryString, long objectId)
     {
         await using var command = _context.Database.GetDbConnection().CreateCommand();
         command.CommandText = queryString;
         await _context.Database.OpenConnectionAsync();
         await using var result = await command.ExecuteReaderAsync();
 
-        return await ExtractQueryFromResult(documentId, result);
+        return await ExtractQueryFromResult(objectId, result);
     }
 
-    private async Task<string> ExtractQueryFromResult(long documentId, DbDataReader result)
+    private async Task<string> ExtractQueryFromResult(long objectId, DbDataReader result)
     {
-        //result.ReadAsync is expected to return true here, query for 1 documentId should return 1 and only 1 row. 
+        //result.ReadAsync is expected to return true here, query for 1 objectId should return 1 and only 1 row. 
         if (!result.HasRows || !await result.ReadAsync() || result[0] is DBNull || result[0] is null)
         {
-            _logger.LogError("Document with id {documentId} did not return anything", documentId);
+            _logger.LogError("Object/Entity with id {objectId} did not return anything", objectId);
             return null;
         }
 
@@ -50,7 +50,7 @@ public class DocumentRepository : IDocumentRepository
         //result.ReadAsync is expected to be false here, this is because there should be no more rows to read.
         if (await result.ReadAsync())
         {
-            _logger.LogError("Document returned more than 1 row, this should not happen.");
+            _logger.LogError("Object/Entity returned more than 1 row, this should not happen.");
         }
 
         return queryResult;

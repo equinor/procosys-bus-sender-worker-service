@@ -137,7 +137,15 @@ public class BusSenderService : IBusSenderService
                 }
             case WorkOrderTopic.TopicName:
                 {
-             
+                    var workOrderMessage = await _service.CreateWorkOrderMessage(busEvent.Message);
+                    if (workOrderMessage == null)
+                    {
+                        busEvent.Status = Status.NotFound;
+                        return busEvent;
+                    }
+                    busEvent.Message = workOrderMessage;
+
+
                     break;
                 }
                 /***
