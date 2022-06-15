@@ -1,11 +1,11 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-using Equinor.ProCoSys.PcsServiceBus.Receiver;
+﻿using Equinor.ProCoSys.PcsServiceBus.Receiver;
 using Equinor.ProCoSys.PcsServiceBus.Receiver.Interfaces;
 using Microsoft.Azure.ServiceBus;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Equinor.ProCoSys.PcsServiceBusTests;
 

@@ -51,10 +51,12 @@ public static class ServiceCollectionSetup
 
     public static IServiceCollection AddRepositories(this IServiceCollection services)
         => services.AddScoped<IBusEventRepository, BusEventRepository>()
-            .AddScoped<ITagDetailsRepository,TagDetailsRepository>();
+            .AddScoped<ITagDetailsRepository, TagDetailsRepository>()
+            .AddScoped<IDocumentRepository,DocumentRepository>();
 
     public static IServiceCollection AddServices(this IServiceCollection services)
         => services.AddSingleton<IEntryPointService, EntryPointService>()
             .AddScoped<ITelemetryClient, ApplicationInsightsTelemetryClient>()
-            .AddScoped<IBusSenderService, BusSenderService>();
+            .AddScoped<IBusSenderService, BusSenderService>()
+            .AddScoped<IBusEventService,BusEventService>();
 }

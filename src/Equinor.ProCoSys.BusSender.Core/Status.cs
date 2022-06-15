@@ -6,5 +6,6 @@ public enum Status
     Processing = 1,
     Failed = 2,
     Sent = 3,
-    Skipped = 4
+    Skipped = 4,
+    NotFound = 5,
 }
