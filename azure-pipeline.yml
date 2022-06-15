@@ -7,6 +7,7 @@ trigger:
  branches:
    include:
      - master
+     - dev
 
 name: $(date:yyyyMMdd)$(rev:.r)
 resources:  
@@ -120,6 +121,7 @@ stages:
 - stage: deploy_test
   displayName: 'Deploy to Test'
   dependsOn: 'deploy_dev'
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/dev'))
   variables:
     serviceConnection: '${{variables.nonProdServiceConnection}}'
     envName: 'test'
@@ -148,7 +150,8 @@ stages:
   # deploy_prod
 - stage: deploy_prod
   displayName: 'Deploy to Production'
-  dependsOn: 'deploy_test'
+  dependsOn: 'deploy_dev'
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
   variables:
     serviceConnection: '${{variables.prodServiceConnection}}'
     envName: 'prod'

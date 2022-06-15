@@ -61,8 +61,8 @@ public class DocumentRepository : IDocumentRepository
         '{{""Plant"" : ""' || q.projectschema ||
         '"", ""ProjectName"" : ""' || p.name ||
         '"", ""QueryId"" : ""'|| do.document_id ||
-        '"", ""QueryNo"" : ""'|| do.documentno ||
-        '"", ""Description"" : ""'|| regexp_replace(do.title , '([""\])', '\\\1') ||
+        '"", ""QueryNo"" : ""'|| regexp_replace(do.documentno, '([""\])', '\\\1') ||
+        '"", ""Title"" : ""'|| regexp_replace(do.title , '([""\])', '\\\1') ||
         '"", ""Discipline"" : ""'|| dis.code ||
         '"", ""QueryType"" : ""'|| qt.code ||
         '"", ""CostImpact"" : ""'||  ci.code ||
@@ -100,9 +100,9 @@ public class DocumentRepository : IDocumentRepository
         @$"select
        '{{""Plant"": ""' || d.projectschema ||
        '"", ""ProjectName"" : ""' || p.name ||
-       '"", ""DocumentId"" : ""' ||d.document_id ||
-       '"", ""DocumentNo"" : ""' || d.DocumentNo ||
-       '"", ""Title"" : ""' || p.name ||
+       '"", ""DocumentId"" : ""' || d.document_id ||
+       '"", ""DocumentNo"" : ""' || regexp_replace(d.documentno, '([""\])', '\\\1') ||
+       '"", ""Title"" : ""' || regexp_replace(d.title, '([""\])', '\\\1') ||
        '"", ""AcceptanceCode"" : ""' || apc.code ||
        '"", ""Archive"" : ""' || arc.code ||
        '"", ""AccessCode"" : ""' || acc.code ||
@@ -115,8 +115,8 @@ public class DocumentRepository : IDocumentRepository
        '"", ""RevisionNo"" : ""' || d.revisionno ||
        '"", ""RevisionStatus"" : ""' || rev.code ||
        '"", ""ResponsibleContractor"" : ""' || res.code ||
-       '"", ""LastUpdated"" : ""' || TO_CHAR(d.Last_Updated, 'yyyy-mm-dd hh24:mi:ss') ||
-       '"", ""RevisionDate"" : ""' || TO_CHAR(d.Revisiondate, 'yyyy-mm-dd hh24:mi:ss') ||
+       '"", ""LastUpdated"" : ""' || TO_CHAR(d.last_Updated, 'yyyy-mm-dd hh24:mi:ss') ||
+       '"", ""RevisionDate"" : ""' || TO_CHAR(d.revisiondate, 'yyyy-mm-dd hh24:mi:ss') ||
        '""}}' as message
         from document d
             left join project p on p.project_id = d.project_id
