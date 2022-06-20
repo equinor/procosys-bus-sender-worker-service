@@ -13,16 +13,14 @@ namespace Equinor.ProCoSys.BusSenderWorker.Core.Services;
 public class BusEventService : IBusEventService
 {
     private readonly ITagDetailsRepository _tagDetailsRepository;
-    private readonly IDocumentRepository _documentRepository;
-    private readonly IWorkOrderRepository _workOrderRepository;
+    private readonly IBusSenderMessageRepository _busSenderMessageRepository;
     private readonly Regex _rx = new(@"[\a\e\f\n\r\t\v]", RegexOptions.Compiled);
 
     public BusEventService(ITagDetailsRepository tagDetailsRepository,
-        IDocumentRepository documentRepository, IWorkOrderRepository workOrderRepository)
+        IBusSenderMessageRepository busSenderMessageRepository)
     {
         _tagDetailsRepository = tagDetailsRepository;
-        _documentRepository = documentRepository;
-        _workOrderRepository = workOrderRepository;
+        _busSenderMessageRepository = busSenderMessageRepository;
     }
 
     public async Task<string> AttachTagDetails(string tagMessage)
@@ -46,7 +44,7 @@ public class BusEventService : IBusEventService
             throw new Exception("Failed to extract documentId from message");
         }
 
-        return WashString(await _documentRepository.GetQueryMessage(documentId));
+        return WashString(await _busSenderMessageRepository.GetQueryMessage(documentId));
     }
 
     public async Task<string> CreateDocumentMessage(string busEventMessage)
@@ -56,7 +54,7 @@ public class BusEventService : IBusEventService
             throw new Exception("Failed to extract documentId from message");
         }
 
-        return WashString(await _documentRepository.GetDocumentMessage(documentId));
+        return WashString(await _busSenderMessageRepository.GetDocumentMessage(documentId));
     }
 
     public async Task<string> CreateWorkOrderMessage(string busEventMessage)
@@ -66,7 +64,16 @@ public class BusEventService : IBusEventService
             throw new Exception("Failed to extract workOrderId from message");
         }
 
-        return WashString(await _workOrderRepository.GetWorkOrderMessage(workOrderId));
+        return WashString(await _busSenderMessageRepository.GetWorkOrderMessage(workOrderId));
+    }
+
+    public async Task<string> CreateChecklistMessage(string busEventMessage)
+    {
+        if (!long.TryParse(busEventMessage, out var checkListId))
+        {
+            throw new Exception("Failed to extract checkListId from message");
+        }
+        return WashString(await _busSenderMessageRepository.GetCheckListMessage(checkListId));
     }
 
     public bool IsNotLatestMaterialEvent(IEnumerable<BusEvent> events, BusEvent busEvent)
@@ -102,6 +109,4 @@ public class BusEventService : IBusEventService
 
         return busEventMessage;
     }
-
-
 }

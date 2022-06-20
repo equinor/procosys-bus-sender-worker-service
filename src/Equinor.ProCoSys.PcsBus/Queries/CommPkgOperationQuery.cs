@@ -1,31 +1,58 @@
-﻿
+﻿using System;
+using System.Linq;
 
 namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 
 public class CommPkgOperationQuery
 {
-
-    internal static string GetQuery(string schema)
+    public static string GetQuery(long? commPkId, string plant = null)
     {
+        if (plant != null && plant.Any(char.IsWhiteSpace))
+        {
+            //To detect potential Sql injection 
+            throw new Exception("plant should not contain spaces");
+        }
+
+        var whereClause = CreateWhereClause(commPkId, plant);
+
         return $@"select   '{{""Plant"" : ""' || co.projectschema || '"",
-    ""ProjectName"" : ""' || p.NAME || '"",
-    ""CommPkgNo"" : ""' || c.commpkgno || '"",
-    ""InOperation"" : ' || decode(co.inoperation,'Y', 'true', 'N', 'false') || ',
-    ""ReadyForProduction"" : ' || decode(co.readyforproduction,'Y', 'true', 'N', 'false') || ',
-    ""MaintenanceProgram"" : ' || decode(co.maintenanceprog,'Y', 'true', 'N', 'false') || ',
-    ""YellowLine"" : ' || decode(co.yellowline,'Y', 'true', 'N', 'false') || ',
-    ""BlueLine"" : ' || decode(co.blueline,'Y', 'true', 'N', 'false') || ',
-    ""YellowLineStatus"" : ""' || regexp_replace(co.yellowlinestatus, '([""\])', '\\\1') || '"",
-    ""BlueLineStatus"" : ""' || regexp_replace(co.bluelinestatus, '([""\])', '\\\1') || '"",
-    ""TemperaryOperationEst"" : ' || decode(co.temporaryoperation_est,'Y', 'true', 'N', 'false') || ',
-    ""PmRoutine"" : ' || decode(co.pmroutine,'Y', 'true', 'N', 'false') || ',
-    ""CommissioningResp"" : ' ||  decode(co.commissioningresp,'Y', 'true', 'N', 'false') || ',
-    ""ValveBlindingList"" : ""' || decode(co.valveblindinglist,'Y', 'true', 'N', 'false') ||  '"", 
-    ""LastUpdated"" : ""' || TO_CHAR(co.LAST_UPDATED, 'yyyy-mm-dd hh24:mi:ss')  || '""
-    }}'
-    from commpkg_operation co
-        join commpkg c on c.commpkg_id = co.commpkg_id
-        join project p ON p.project_id = c.project_id
-    where co.projectschema  =  '{schema}'";
+            ""ProjectName"" : ""' || p.NAME || '"",
+            ""CommPkgNo"" : ""' || c.commpkgno || '"",
+            ""InOperation"" : ' || decode(co.inoperation,'Y', 'true', 'N', 'false') || ',
+            ""ReadyForProduction"" : ' || decode(co.readyforproduction,'Y', 'true', 'N', 'false') || ',
+            ""MaintenanceProgram"" : ' || decode(co.maintenanceprog,'Y', 'true', 'N', 'false') || ',
+            ""YellowLine"" : ' || decode(co.yellowline,'Y', 'true', 'N', 'false') || ',
+            ""BlueLine"" : ' || decode(co.blueline,'Y', 'true', 'N', 'false') || ',
+            ""YellowLineStatus"" : ""' || regexp_replace(co.yellowlinestatus, '([""\])', '\\\1') || '"",
+            ""BlueLineStatus"" : ""' || regexp_replace(co.bluelinestatus, '([""\])', '\\\1') || '"",
+            ""TemperaryOperationEst"" : ' || decode(co.temporaryoperation_est,'Y', 'true', 'N', 'false') || ',
+            ""PmRoutine"" : ' || decode(co.pmroutine,'Y', 'true', 'N', 'false') || ',
+            ""CommissioningResp"" : ' ||  decode(co.commissioningresp,'Y', 'true', 'N', 'false') || ',
+            ""ValveBlindingList"" : ""' || decode(co.valveblindinglist,'Y', 'true', 'N', 'false') ||  '"", 
+            ""LastUpdated"" : ""' || TO_CHAR(co.LAST_UPDATED, 'yyyy-mm-dd hh24:mi:ss')  || '""
+            }}'
+        from commpkg_operation co
+            join commpkg c on c.commpkg_id = co.commpkg_id
+            join project p ON p.project_id = c.project_id
+        {whereClause}";
+    }
+
+    private static string CreateWhereClause(long? commPkgId, string plant)
+    {
+        var whereClause = "";
+        if (commPkgId != null && plant != null)
+        {
+            whereClause = $"where co.projectschema = '{plant}' and co.commpkg_id = {commPkgId}";
+        }
+        else if (plant != null)
+        {
+            whereClause = $"where co.projectschema = '{plant}'";
+        }
+        else if (commPkgId != null)
+        {
+            whereClause = $"where co.commpkg_id = {commPkgId}";
+        }
+
+        return whereClause;
     }
 }

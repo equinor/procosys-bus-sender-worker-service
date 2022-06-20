@@ -95,7 +95,7 @@ public class BusSenderService : IBusSenderService
             }
 
             TrackMetric(message);
-            await _topicClients.SendAsync(busEvent.Event, _service.WashString(handledEvent.Message));
+           // await _topicClients.SendAsync(busEvent.Event, _service.WashString(handledEvent.Message));
 
             TrackEvent(handledEvent.Event, message);
             busEvent.Status = Status.Sent;
@@ -110,6 +110,18 @@ public class BusSenderService : IBusSenderService
             case TagTopic.TopicName:
                 {
                     busEvent.Message = await _service.AttachTagDetails(busEvent.Message);
+                    break;
+                }
+            case ChecklistTopic.TopicName:
+                {
+                    var checklistMessage = await _service.CreateChecklistMessage(busEvent.Message);
+                    if (checklistMessage == null)
+                    {
+                        busEvent.Status = Status.NotFound;
+                        return busEvent;
+                    }
+
+                    busEvent.Message = checklistMessage;
                     break;
                 }
             case QueryTopic.TopicName:

@@ -1,9 +1,24 @@
-﻿namespace Equinor.ProCoSys.PcsServiceBus.Queries;
+﻿using System;
+using System.Linq;
+
+namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 
 public class WorkOrderQuery
 {
-    public static string GetQuery(long workOrderId) =>
-        @$"select
+     /// <summary>
+     /// Call with either workOrderId, plantId or both. Not advised to call without either as result set could get very large
+     /// </summary>
+    public static string GetQuery(long? workOrderId = null, string plant = null)
+    {
+        if (plant != null && plant.Any(char.IsWhiteSpace))
+        {
+            //To detect potential Sql injection 
+            throw new Exception("plant should not contain spaces");
+        }
+
+        var whereClause = CreateWhereClause(workOrderId, plant);
+
+        return @$"select
          '{{""Plant"" : ""' || w.projectschema || 
          '"", ""PlantName"" : ""' || regexp_replace(ps.TITLE, '([""\])', '\\\1') ||          
          '"", ""ProjectName"" : ""' || p.NAME || 
@@ -60,7 +75,6 @@ public class WorkOrderQuery
          ', ""LastUpdated"" : ""' || TO_CHAR(w.LAST_UPDATED, 'yyyy-mm-dd hh24:mi:ss') ||        
          '""}}' as message
          from WO w
-            join projectschema ps on ps.projectschema = w.projectschema
             join project p on p.project_id = w.project_id
             join element e on E.ELEMENT_ID = w.wo_ID
             left join commpkg c on c.commpkg_id = w.commpkg_id
@@ -76,5 +90,25 @@ public class WorkOrderQuery
             left join library tow on tow.library_id = w.typeofwork_id
             left join library osos on osos.library_id = w.onshoreoffshore_id
             left join library woc on woc.library_id = w.wo_id
-         where w.workorder_id = {workOrderId}";
+         {whereClause}";
+    }
+
+     private static string CreateWhereClause(long? workOrderId, string plant)
+     {
+         var whereClause = "";
+         if (workOrderId != null && plant != null)
+         {
+             whereClause = $"where w.projectschema = '{plant}' and w.workorder_id = {workOrderId}";
+         }
+         else if (plant != null)
+         {
+             whereClause = $"where w.projectschema = '{plant}'";
+         }
+         else if (workOrderId != null)
+         {
+             whereClause = $"where w.workorder_id = {workOrderId}";
+         }
+
+         return whereClause;
+     }
 }

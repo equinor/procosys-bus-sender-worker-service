@@ -1,9 +1,20 @@
-﻿namespace Equinor.ProCoSys.PcsServiceBus.Queries;
+﻿using System;
+using System.Linq;
 
-internal class ChecklistQuery
+namespace Equinor.ProCoSys.PcsServiceBus.Queries;
+
+public class ChecklistQuery
 {
-    internal static string GetQuery(string schema)
+    public static string GetQuery(long? tagCheckId, string plant = null)
     {
+        if (plant != null && plant.Any(char.IsWhiteSpace))
+        {
+            //To detect potential Sql injection 
+            throw new Exception("plant should not contain spaces");
+        }
+
+        var whereClause = CreateWhereClause(tagCheckId, plant);
+
         return @$"select
         '{{""Plant"" : ""' || tc.projectschema || 
         '"", ""PlantName"" : ""' || regexp_replace(ps.TITLE, '([""\])', '\\\1') ||
@@ -13,8 +24,11 @@ internal class ChecklistQuery
         '"", ""TagRegisterId"" : ""' ||  t.register_id ||
         '"", ""ChecklistId"" : ""' || tc.tagcheck_id ||
         '"", ""TagCategory"" : ""' || reg.code ||
+        '"", ""SheetNo"" : ""' || tft.sheetno ||
+        '"", ""SubSheetNo"" : ""' || tft.sheetno ||
         '"", ""FormularType"" : ""' || ft.formulartype ||
         '"", ""FormularGroup"" : ""' || ft.formulargroup ||
+        '"", ""SystemModule"" : ""' || fg.systemmodule ||
         '"", ""FormularDiscipline"" : ""' || mccr_disc.code ||
         '"", ""Revision"" : ""' || pir.testrevisionno ||
         '"", ""PipingRevisionMcPkNo"" : ""' || prm.mcpkgno ||
@@ -30,6 +44,7 @@ internal class ChecklistQuery
             join tagformulartype tft on tft.tagformulartype_id = tc.tagformulartype_id
             join tag t on t.tag_id = tft.tag_id
             join formulartype ft on ft.formulartype_id = tft.formulartype_id
+            join formulargroup fg on fg.formulargroup = ft.formulargroup
             join library mccr_disc on mccr_disc.library_id = ft.discipline_id
             left join pipingrevision pir on pir.pipingrevision_id = tft.pipingrevision_id
             left join mcpkg prm on prm.mcpkg_id = pir.mcpkg_id 
@@ -37,6 +52,25 @@ internal class ChecklistQuery
             left join library reg on reg.library_id = t.register_id
             left join responsible r on r.responsible_id = tc.responsible_id
             left join library status on status.library_id = tc.status_id
-        where tc.projectschema = '{schema}'";
+        {whereClause}";
+    }
+
+    private static string CreateWhereClause(long? tagCheckId, string plant)
+    {
+        var whereClause = "";
+        if (tagCheckId != null && plant != null)
+        {
+            whereClause = $"where tc.projectschema = '{plant}' and tc.tagcheck_id = {tagCheckId}";
+        }
+        else if (plant != null)
+        {
+            whereClause = $"where tc.projectschema = '{plant}'";
+        }
+        else if (tagCheckId != null)
+        {
+            whereClause = $"where tc.tagcheck_id = {tagCheckId}";
+        }
+
+        return whereClause;
     }
 }

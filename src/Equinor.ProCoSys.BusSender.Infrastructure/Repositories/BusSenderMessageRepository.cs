@@ -1,27 +1,37 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data.Common;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 using Equinor.ProCoSys.BusSenderWorker.Infrastructure.Data;
+using Equinor.ProCoSys.PcsServiceBus.Queries;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace Equinor.ProCoSys.BusSenderWorker.Infrastructure.Repositories;
 
-public class BusSenderRepository
+public class BusSenderMessageRepository : IBusSenderMessageRepository
 {
     private readonly BusSenderServiceContext _context;
-    private readonly ILogger<BusSenderRepository> _logger;
-
-    public BusSenderRepository(BusSenderServiceContext context, ILogger<BusSenderRepository> logger)
+    private readonly ILogger<BusSenderMessageRepository> _logger;
+    public BusSenderMessageRepository(BusSenderServiceContext context, ILogger<BusSenderMessageRepository> logger)
     {
         _context = context;
         _logger = logger;
     }
 
-    public async Task<string> ExecuteQuery(string queryString, long objectId)
+    public async Task<string> GetWorkOrderMessage(long workOrderId)
+        => await ExecuteQuery(WorkOrderQuery.GetQuery(workOrderId), workOrderId);
+
+    public async Task<string> GetQueryMessage(long documentId)
+        => await ExecuteQuery(QueryQuery.GetQuery(documentId), documentId);
+
+    public async Task<string> GetDocumentMessage(long documentId)
+        => await ExecuteQuery(DocumentQuery.GetQuery(documentId), documentId);
+
+    public async Task<string> GetCheckListMessage(long checkListId)
+        => await ExecuteQuery(ChecklistQuery.GetQuery(checkListId), checkListId);
+
+    private async Task<string> ExecuteQuery(string queryString, long objectId)
     {
         await using var command = _context.Database.GetDbConnection().CreateCommand();
         command.CommandText = queryString;
@@ -47,7 +57,6 @@ public class BusSenderRepository
         {
             _logger.LogError("Object/Entity returned more than 1 row, this should not happen.");
         }
-
         return queryResult;
     }
 }
