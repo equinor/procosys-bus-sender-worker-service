@@ -8,7 +8,6 @@ using Equinor.ProCoSys.BusSenderWorker.Core.Models;
 using Equinor.ProCoSys.BusSenderWorker.Core.Telemetry;
 using Equinor.ProCoSys.PcsServiceBus.Sender.Interfaces;
 using Equinor.ProCoSys.PcsServiceBus.Topics;
-using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using Microsoft.Extensions.Logging;
 
 namespace Equinor.ProCoSys.BusSenderWorker.Core.Services;
@@ -77,6 +76,11 @@ public class BusSenderService : IBusSenderService
     {
         events = SetDuplicatesToSkipped(events);
 
+        if (events.Any(e => e.Status != Status.UnProcessed))
+        {
+            await _unitOfWork.SaveChangesAsync();
+        }
+
         foreach (var busEvent in events.Where(busEvent => busEvent.Status == Status.UnProcessed))
         {
             var handledEvent = await UpdateEventBasedOnTopic(events, busEvent);
@@ -95,12 +99,13 @@ public class BusSenderService : IBusSenderService
             }
 
             TrackMetric(message);
-           // await _topicClients.SendAsync(busEvent.Event, _service.WashString(handledEvent.Message));
+            await _topicClients.SendAsync(busEvent.Event, _service.WashString(handledEvent.Message));
 
             TrackEvent(handledEvent.Event, message);
             busEvent.Status = Status.Sent;
+            await _unitOfWork.SaveChangesAsync();
         }
-        await _unitOfWork.SaveChangesAsync();
+        
     }
 
     private async Task<BusEvent> UpdateEventBasedOnTopic(IEnumerable<BusEvent> events, BusEvent busEvent)
