@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using static Equinor.ProCoSys.PcsServiceBus.Queries.QueryHelper;
 
 namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 
@@ -7,11 +6,7 @@ public class CommPkgOperationQuery
 {
     public static string GetQuery(long? commPkId, string plant = null)
     {
-        if (plant != null && plant.Any(char.IsWhiteSpace))
-        {
-            //To detect potential Sql injection 
-            throw new Exception("plant should not contain spaces");
-        }
+        DetectFaultyPlantInput(plant);
 
         var whereClause = CreateWhereClause(commPkId, plant);
 
@@ -36,6 +31,7 @@ public class CommPkgOperationQuery
             join project p ON p.project_id = c.project_id
         {whereClause}";
     }
+
 
     private static string CreateWhereClause(long? commPkgId, string plant)
     {

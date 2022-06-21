@@ -40,7 +40,7 @@ public class BusSenderService : IBusSenderService
     {
         try
         {
-            _logger.LogInformation($"BusSenderService DoWorkerJob starting at: {DateTimeOffset.Now}");
+            _logger.LogInformation("BusSenderService DoWorkerJob starting at: {now}", DateTimeOffset.Now);
             var events = await _busEventRepository.GetEarliestUnProcessedEventChunk();
             if (events.Any())
             {
@@ -51,26 +51,45 @@ public class BusSenderService : IBusSenderService
         }
         catch (Exception exception)
         {
-            _logger.LogError(exception, $"BusSenderService execute send failed at: {DateTimeOffset.Now}");
+            _logger.LogError(exception, "BusSenderService execute send failed at: {now}", DateTimeOffset.Now);
             throw;
         }
-        _logger.LogInformation($"BusSenderService DoWorkerJob finished at: {DateTimeOffset.Now}");
+        _logger.LogInformation("BusSenderService DoWorkerJob finished at: {now}", DateTimeOffset.Now);
         _telemetryClient.Flush();
+    }
+
+    public async Task CloseConnections()
+    {
+        _logger.LogInformation("BusSenderService stop reader at: {now}", DateTimeOffset.Now);
+        await _topicClients.CloseAllAsync();
     }
 
     private static List<BusEvent> SetDuplicatesToSkipped(List<BusEvent> events)
     {
-        var map = events.Where(e => long.TryParse(e.Message, out var id)).GroupBy(e => new { e.Event, id = long.Parse(e.Message)});
-        foreach (var group in map)
+        var duplicateGroupings = FilterOnSimpleMessagesAndGroupDuplicates(events);
+        foreach (var group in duplicateGroupings)
         {
-            foreach (var busEvent in group.SkipLast(1))
-            {
-                busEvent.Status = Status.Skipped;
-            }
+            SetAllButOneEventToSkipped(group);
         }
-
         return events;
     }
+
+    private static void SetAllButOneEventToSkipped(IGrouping<(string, long), BusEvent> group)
+    {
+        foreach (var busEvent in group.SkipLast(1))
+        {
+            busEvent.Status = Status.Skipped;
+        }
+    }
+
+    /// <summary>
+    /// Removes all events that have Message = more than just a simple Id that can be converted to a long.
+    /// Then groups the events into bulks based on Id and Event type.
+    /// </summary>
+    /// <param name="events"></param>
+    /// <returns></returns>
+    private static IEnumerable<IGrouping<(string,long),BusEvent>> FilterOnSimpleMessagesAndGroupDuplicates(IEnumerable<BusEvent> events) => events.Where(e => long.TryParse(e.Message, out var id))
+        .GroupBy(e => (e.Event,  long.Parse(e.Message)));
 
     private async Task ProcessBusEvents(List<BusEvent> events)
     {
@@ -105,7 +124,6 @@ public class BusSenderService : IBusSenderService
             busEvent.Status = Status.Sent;
             await _unitOfWork.SaveChangesAsync();
         }
-        
     }
 
     private async Task<BusEvent> UpdateEventBasedOnTopic(IEnumerable<BusEvent> events, BusEvent busEvent)
@@ -125,7 +143,6 @@ public class BusSenderService : IBusSenderService
                         busEvent.Status = Status.NotFound;
                         return busEvent;
                     }
-
                     busEvent.Message = checklistMessage;
                     break;
                 }
@@ -137,7 +154,6 @@ public class BusSenderService : IBusSenderService
                         busEvent.Status = Status.NotFound;
                         return busEvent;
                     }
-
                     busEvent.Message = queryMessage;
                     break;
                 }
@@ -162,7 +178,6 @@ public class BusSenderService : IBusSenderService
                     }
                     busEvent.Message = workOrderMessage;
 
-
                     break;
                 }
                 /***
@@ -176,7 +191,6 @@ public class BusSenderService : IBusSenderService
                     return busEvent;
                 }
         }
-
         return busEvent;
     }
 
@@ -204,11 +218,5 @@ public class BusSenderService : IBusSenderService
 
         _telemetryClient.TrackEvent("BusSender Send",
             properties);
-    }
-
-    public async Task CloseConnections()
-    {
-        _logger.LogInformation($"BusSenderService stop reader at: {DateTimeOffset.Now}");
-        await _topicClients.CloseAllAsync();
     }
 }

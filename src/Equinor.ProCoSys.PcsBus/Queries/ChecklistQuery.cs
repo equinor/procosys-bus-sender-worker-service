@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using static Equinor.ProCoSys.PcsServiceBus.Queries.QueryHelper;
 
 namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 
@@ -7,11 +6,7 @@ public class ChecklistQuery
 {
     public static string GetQuery(long? tagCheckId, string plant = null)
     {
-        if (plant != null && plant.Any(char.IsWhiteSpace))
-        {
-            //To detect potential Sql injection 
-            throw new Exception("plant should not contain spaces");
-        }
+        DetectFaultyPlantInput(plant);
 
         var whereClause = CreateWhereClause(tagCheckId, plant);
 
