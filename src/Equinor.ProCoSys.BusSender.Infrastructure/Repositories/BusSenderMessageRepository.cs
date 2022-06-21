@@ -38,10 +38,10 @@ public class BusSenderMessageRepository : IBusSenderMessageRepository
         await _context.Database.OpenConnectionAsync();
         await using var result = await command.ExecuteReaderAsync();
 
-        return await ExtractQueryFromResult(objectId, result);
+        return await ExtractMessageFromResult(objectId, result);
     }
 
-    private async Task<string> ExtractQueryFromResult(long objectId, DbDataReader result)
+    private async Task<string> ExtractMessageFromResult(long objectId, DbDataReader result)
     {
         //result.ReadAsync is expected to return true here, query for 1 objectId should return 1 and only 1 row. 
         if (!result.HasRows || !await result.ReadAsync() || result[0] is DBNull || result[0] is null)

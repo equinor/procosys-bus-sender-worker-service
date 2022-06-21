@@ -74,7 +74,7 @@ public class BusSenderService : IBusSenderService
         return events;
     }
 
-    private static void SetAllButOneEventToSkipped(IGrouping<(string, long), BusEvent> group)
+    private static void SetAllButOneEventToSkipped(IEnumerable<BusEvent> group)
     {
         foreach (var busEvent in group.SkipLast(1))
         {
@@ -95,7 +95,7 @@ public class BusSenderService : IBusSenderService
     {
         events = SetDuplicatesToSkipped(events);
 
-        if (events.Any(e => e.Status != Status.UnProcessed))
+        if (HasUnsavedChanges(events))
         {
             await _unitOfWork.SaveChangesAsync();
         }
@@ -125,6 +125,8 @@ public class BusSenderService : IBusSenderService
             await _unitOfWork.SaveChangesAsync();
         }
     }
+
+    private static bool HasUnsavedChanges(List<BusEvent> events) => events.Any(e => e.Status != Status.UnProcessed);
 
     private async Task<BusEvent> UpdateEventBasedOnTopic(IEnumerable<BusEvent> events, BusEvent busEvent)
     {
