@@ -1,8 +1,8 @@
 ﻿namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 
-internal class TagQuery
+public class TagQuery
 {
-    internal static string GetQuery(string schema)
+    public static string GetQuery(string schema)
     {
         return @$"select
               '{{'||

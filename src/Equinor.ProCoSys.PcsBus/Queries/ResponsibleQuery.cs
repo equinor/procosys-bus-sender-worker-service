@@ -4,7 +4,7 @@ namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 
 public class ResponsibleQuery
 {
-    internal static string GetQuery(string schema)
+    public static string GetQuery(string schema)
     {
         return @$"select
             '{{""Plant"" : ""' || r.projectschema || 

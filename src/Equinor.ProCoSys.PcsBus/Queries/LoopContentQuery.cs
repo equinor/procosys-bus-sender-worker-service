@@ -1,8 +1,8 @@
 ﻿namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 
-internal class LoopContentQuery
+public class LoopContentQuery
 {
-    internal static string GetQuery(string schema)
+    public static string GetQuery(string schema)
     {
         return @$"select
         '{{""Plant"" : ""' || lt.projectschema ||

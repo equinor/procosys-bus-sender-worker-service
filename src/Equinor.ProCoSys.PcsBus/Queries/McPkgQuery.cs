@@ -2,7 +2,7 @@
 
 public static class McPkgQuery
 {
-    internal static string GetQuery(string schema)
+    public static string GetQuery(string schema)
     {
         return @$"select
     '{{""Plant"" : ""' || e.projectschema || 

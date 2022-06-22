@@ -1,8 +1,8 @@
 ﻿namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 
-internal class LibraryQuery
+public class LibraryQuery
 {
-    internal static string GetQuery(string schema)
+    public static string GetQuery(string schema)
     {
         return @$"select
             '{{""Plant"" : ""' || l.projectschema ||

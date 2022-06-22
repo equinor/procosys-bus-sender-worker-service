@@ -1,8 +1,8 @@
 ﻿namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 
-internal class PunchListItemQuery
+public class PunchListItemQuery
 {
-    internal static string GetQuery(string schema)
+    public static string GetQuery(string schema)
     {
         return @$"select
       '{{""Plant"" : ""' || pl.projectschema ||                  

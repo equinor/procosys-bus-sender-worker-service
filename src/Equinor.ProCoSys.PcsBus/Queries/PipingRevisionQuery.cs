@@ -3,7 +3,7 @@
 public static class PipingRevisionQuery
 {
 
-    internal static string GetQuery(string schema)
+    public static string GetQuery(string schema)
     {
            return @$"select
               '{{""Plant"" : ""' || pr.projectschema || 

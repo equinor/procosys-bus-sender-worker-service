@@ -1,8 +1,8 @@
 ﻿namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 
-internal class SwcrSignatureQuery
+public class SwcrSignatureQuery
 {
-    internal static string GetQuery(string schema)
+    public static string GetQuery(string schema)
     {
         return @$"select
     '{{""Plant"" : ""' || sign.projectschema ||

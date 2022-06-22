@@ -2,7 +2,7 @@
 
 public class StockQuery
 {
-    internal static string GetQuery(string schema)
+    public static string GetQuery(string schema)
     {
         return @$"select
             '{{""Plant"" : ""' || s.projectschema || 

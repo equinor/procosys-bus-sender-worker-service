@@ -2,7 +2,7 @@
 
 internal class WorkOrderCutoffQuery
 {
-    internal static string GetQuery(string schema, string month)
+    public static string GetQuery(string schema, string month)
     {
         return @$"select
         '{{""Plant"" : ""' || wc.projectschema ||
