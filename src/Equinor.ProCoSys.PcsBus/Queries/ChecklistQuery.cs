@@ -12,7 +12,6 @@ public class ChecklistQuery
 
         return @$"select
         '{{""Plant"" : ""' || tc.projectschema || 
-        '"", ""PlantName"" : ""' || regexp_replace(ps.TITLE, '([""\])', '\\\1') ||
         '"", ""ProjectName"" : ""' || p.name ||
         '"", ""TagNo"" : ""' ||  regexp_replace(t.tagno, '([""\])', '\\\1') ||
         '"", ""TagId"" : ""' ||  t.tag_id ||
@@ -35,7 +34,6 @@ public class ChecklistQuery
         '"", ""VerifiedAt"" : ""' || TO_CHAR(tc.verifiedat, 'yyyy-mm-dd hh24:mi:ss') ||
         '""}}' as message
         from tagcheck tc
-            join projectschema ps on ps.projectschema = tc.projectschema
             join tagformulartype tft on tft.tagformulartype_id = tc.tagformulartype_id
             join tag t on t.tag_id = tft.tag_id
             join formulartype ft on ft.formulartype_id = tft.formulartype_id
