@@ -36,85 +36,164 @@ public class BusSenderService : IBusSenderService
         _service = service;
     }
 
-    public async Task SendMessageChunk()
+    public async Task HandleBusEvents()
     {
         try
         {
-            _logger.LogInformation($"BusSenderService SendMessageChunk starting at: {DateTimeOffset.Now}");
+            _logger.LogInformation("BusSenderService DoWorkerJob starting at: {now}", DateTimeOffset.Now);
             var events = await _busEventRepository.GetEarliestUnProcessedEventChunk();
             if (events.Any())
             {
                 _telemetryClient.TrackMetric("BusSender Chunk", events.Count);
             }
-
             _logger.LogInformation("BusSenderService found {count} messages to process",events.Count);
+            await ProcessBusEvents(events);
+        }
+        catch (Exception exception)
+        {
+            _logger.LogError(exception, "BusSenderService execute send failed at: {now}", DateTimeOffset.Now);
+            throw;
+        }
+        _logger.LogInformation("BusSenderService DoWorkerJob finished at: {now}", DateTimeOffset.Now);
+        _telemetryClient.Flush();
+    }
 
-            foreach (var busEvent in events)
+    public async Task CloseConnections()
+    {
+        _logger.LogInformation("BusSenderService stop reader at: {now}", DateTimeOffset.Now);
+        await _topicClients.CloseAllAsync();
+    }
+
+    private static List<BusEvent> SetDuplicatesToSkipped(List<BusEvent> events)
+    {
+        var duplicateGroupings = FilterOnSimpleMessagesAndGroupDuplicates(events);
+        foreach (var group in duplicateGroupings)
+        {
+            SetAllButOneEventToSkipped(group);
+        }
+        return events;
+    }
+
+    private static void SetAllButOneEventToSkipped(IEnumerable<BusEvent> group)
+    {
+        foreach (var busEvent in group.SkipLast(1))
+        {
+            busEvent.Status = Status.Skipped;
+        }
+    }
+
+    /// <summary>
+    /// Removes all events that have Message = more than just a simple Id that can be converted to a long.
+    /// Then groups the events into bulks based on Id and Event type.
+    /// </summary>
+    /// <param name="events"></param>
+    /// <returns></returns>
+    private static IEnumerable<IGrouping<(string,long),BusEvent>> FilterOnSimpleMessagesAndGroupDuplicates(IEnumerable<BusEvent> events) => events.Where(e => long.TryParse(e.Message, out var id))
+        .GroupBy(e => (e.Event,  long.Parse(e.Message)));
+
+    private async Task ProcessBusEvents(List<BusEvent> events)
+    {
+        events = SetDuplicatesToSkipped(events);
+
+        if (HasUnsavedChanges(events))
+        {
+            await _unitOfWork.SaveChangesAsync();
+        }
+
+        foreach (var busEvent in events.Where(busEvent => busEvent.Status == Status.UnProcessed))
+        {
+            var handledEvent = await UpdateEventBasedOnTopic(events, busEvent);
+
+            if (busEvent.Status != Status.UnProcessed)
             {
-                if (busEvent.Event == TagTopic.TopicName)
+                continue;
+            }
+
+            var message =
+                JsonSerializer.Deserialize<BusEventMessage>(_service.WashString(handledEvent.Message));
+
+            if (message != null && string.IsNullOrEmpty(message.ProjectName))
+            {
+                message.ProjectName = "_";
+            }
+
+            TrackMetric(message);
+            await _topicClients.SendAsync(busEvent.Event, _service.WashString(handledEvent.Message));
+
+            TrackEvent(handledEvent.Event, message);
+            busEvent.Status = Status.Sent;
+            await _unitOfWork.SaveChangesAsync();
+        }
+    }
+
+    private static bool HasUnsavedChanges(List<BusEvent> events) => events.Any(e => e.Status != Status.UnProcessed);
+
+    private async Task<BusEvent> UpdateEventBasedOnTopic(IEnumerable<BusEvent> events, BusEvent busEvent)
+    {
+        switch (busEvent.Event)
+        {
+            case TagTopic.TopicName:
                 {
                     busEvent.Message = await _service.AttachTagDetails(busEvent.Message);
+                    break;
                 }
-
-                if (busEvent.Event is QueryTopic.TopicName)
+            case ChecklistTopic.TopicName:
+                {
+                    var checklistMessage = await _service.CreateChecklistMessage(busEvent.Message);
+                    if (checklistMessage == null)
+                    {
+                        busEvent.Status = Status.NotFound;
+                        return busEvent;
+                    }
+                    busEvent.Message = checklistMessage;
+                    break;
+                }
+            case QueryTopic.TopicName:
                 {
                     var queryMessage = await _service.CreateQueryMessage(busEvent.Message);
                     if (queryMessage == null)
                     {
-                        busEvent.Sent = Status.NotFound;
-                        await _unitOfWork.SaveChangesAsync();
-                        continue;
+                        busEvent.Status = Status.NotFound;
+                        return busEvent;
                     }
                     busEvent.Message = queryMessage;
+                    break;
                 }
-
-                if (busEvent.Event is DocumentTopic.TopicName)
+            case DocumentTopic.TopicName:
                 {
                     var documentMessage = await _service.CreateDocumentMessage(busEvent.Message);
                     if (documentMessage == null)
                     {
-                        busEvent.Sent = Status.NotFound;
-                        await _unitOfWork.SaveChangesAsync();
-                        continue;
+                        busEvent.Status = Status.NotFound;
+                        return busEvent;
                     }
                     busEvent.Message = documentMessage;
+                    break;
                 }
+            case WorkOrderTopic.TopicName:
+                {
+                    var workOrderMessage = await _service.CreateWorkOrderMessage(busEvent.Message);
+                    if (workOrderMessage == null)
+                    {
+                        busEvent.Status = Status.NotFound;
+                        return busEvent;
+                    }
+                    busEvent.Message = workOrderMessage;
 
+                    break;
+                }
                 /***
                  * WO_MATERIAL gets several inserts when saving a material, resulting in multiple rows in the BUSEVENT table.
                  * here we filter out all but the latest material event for a records with the same id and set those to Status = Skipped.
                  * This is to reduce spam on the bus.
                  */
-                if (busEvent.Event == WoMaterialTopic.TopicName && _service.IsNotLatestMaterialEvent(events, busEvent))
+            case WoMaterialTopic.TopicName when _service.IsNotLatestMaterialEvent(events, busEvent):
                 {
-                    busEvent.Sent = Status.Skipped;
-                    await _unitOfWork.SaveChangesAsync();
-                    continue;
+                    busEvent.Status = Status.Skipped;
+                    return busEvent;
                 }
-
-                var message = JsonSerializer.Deserialize<BusEventMessage>(_service.WashString(busEvent.Message));
-
-                if (message != null && string.IsNullOrEmpty(message.ProjectName))
-                {
-                    message.ProjectName = "_";
-                }
-
-
-                TrackMetric(message);
-                await _topicClients.SendAsync(busEvent.Event, _service.WashString(busEvent.Message));
-
-                TrackEvent(busEvent.Event, message);
-                busEvent.Sent = Status.Sent;
-                await _unitOfWork.SaveChangesAsync();
-            }
         }
-        catch (Exception exception)
-        {
-            _logger.LogError(exception, $"BusSenderService execute send failed at: {DateTimeOffset.Now}");
-            throw;
-        }
-        _logger.LogInformation($"BusSenderService SendMessageChunk finished at: {DateTimeOffset.Now}");
-        _telemetryClient.Flush();
+        return busEvent;
     }
 
     private void TrackMetric(BusEventMessage message) =>
@@ -141,11 +220,5 @@ public class BusSenderService : IBusSenderService
 
         _telemetryClient.TrackEvent("BusSender Send",
             properties);
-    }
-
-    public async Task StopService()
-    {
-        _logger.LogInformation($"BusSenderService stop reader at: {DateTimeOffset.Now}");
-        await _topicClients.CloseAllAsync();
     }
 }

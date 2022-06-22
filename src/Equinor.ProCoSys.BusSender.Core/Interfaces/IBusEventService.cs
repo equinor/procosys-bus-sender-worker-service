@@ -11,4 +11,6 @@ public interface IBusEventService
     string WashString(string busEventMessage);
     Task<string> CreateQueryMessage(string busEventMessage);
     Task<string> CreateDocumentMessage(string busEventMessage);
+    Task<string> CreateWorkOrderMessage(string busEventMessage);
+    Task<string> CreateChecklistMessage(string busEventMessage);
 }

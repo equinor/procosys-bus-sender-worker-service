@@ -36,7 +36,7 @@ public class TimedWorkerService : IHostedService, IDisposable
         try
         {
             _logger.LogInformation($"TimedWorkerService started do work at: {DateTimeOffset.Now}");
-            await _entryPointService.SendMessageChunk();
+            await _entryPointService.DoWorkerJob();
         }
         catch (Exception e)
         {

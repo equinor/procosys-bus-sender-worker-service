@@ -118,7 +118,7 @@ public class Program
                 services.AddApplicationInsightsTelemetryWorkerService(hostContext.Configuration["ApplicationInsights:InstrumentationKey"]);
 
                 var connectionString = hostContext.Configuration["ConnectionString"];
-                //var localConnectionString = hostContext.Configuration["ProcosysDb"]; //to be used when debugging
+                // var localConnectionString = hostContext.Configuration["ProcosysDb"]; //to be used when debugging
                 services.AddDbContext(connectionString);
                 services.AddTopicClients(
                     hostContext.Configuration["ServiceBusConnectionString"],

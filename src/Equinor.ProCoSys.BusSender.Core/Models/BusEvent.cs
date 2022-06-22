@@ -8,5 +8,5 @@ public class BusEvent
     public string Event { get; set; }
     public string Message { get; set; }
     public DateTime Created { get; set; }
-    public Status Sent { get; set; }
+    public Status Status { get; set; }
 }
