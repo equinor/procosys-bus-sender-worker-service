@@ -93,7 +93,7 @@ public class WorkOrderQuery
          var whereClause = "";
          if (workOrderId != null && plant != null)
          {
-             whereClause = $"where w.projectschema = '{plant}' and w.workorder_id = {workOrderId}";
+             whereClause = $"where w.projectschema = '{plant}' and w.wo_id = {workOrderId}";
          }
          else if (plant != null)
          {
@@ -101,7 +101,7 @@ public class WorkOrderQuery
          }
          else if (workOrderId != null)
          {
-             whereClause = $"where w.workorder_id = {workOrderId}";
+             whereClause = $"where w.wo_id = {workOrderId}";
          }
 
          return whereClause;
