@@ -2,7 +2,7 @@
 
   <PropertyGroup>
 
-    <VersionPrefix>1.9.6</VersionPrefix>
+    <VersionPrefix>1.9.7</VersionPrefix>
     <TargetFramework>net6.0</TargetFramework>
     <UserSecretsId>dotnet-BusSenderWorkerService-AB46807F-9F82-483F-B09B-E35626C31429</UserSecretsId>
     <Nullable>enable</Nullable>

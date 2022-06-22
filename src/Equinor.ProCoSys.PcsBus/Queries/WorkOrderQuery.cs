@@ -14,8 +14,7 @@ public class WorkOrderQuery
         var whereClause = CreateWhereClause(workOrderId, plant);
 
         return @$"select
-         '{{""Plant"" : ""' || w.projectschema || 
-         '"", ""PlantName"" : ""' || regexp_replace(ps.TITLE, '([""\])', '\\\1') ||          
+         '{{""Plant"" : ""' || w.projectschema ||            
          '"", ""ProjectName"" : ""' || p.NAME || 
          '"", ""WoNo"" : ""' || regexp_replace(w.wono, '([""\])', '\\\1') ||
          '"", ""WoId"" : ""' || w.WO_ID ||
