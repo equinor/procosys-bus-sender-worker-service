@@ -1,6 +1,6 @@
 ﻿namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 
-internal class WorkOrderCutoffQuery
+public class WorkOrderCutoffQuery
 {
     public static string GetQuery(string schema, string month)
     {
