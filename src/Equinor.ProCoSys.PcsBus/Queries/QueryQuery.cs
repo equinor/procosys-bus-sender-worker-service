@@ -20,7 +20,7 @@ public class QueryQuery
         '"", ""QueryId"" : ""'|| do.document_id ||
         '"", ""QueryNo"" : ""'|| regexp_replace(do.documentno, '([""\])', '\\\1') ||
         '"", ""Title"" : ""'|| regexp_replace(do.title , '([""\])', '\\\1') ||
-        '"", ""Discipline"" : ""'|| dis.code ||
+        '"", ""DisciplineCode"" : ""'|| dis.code ||
         '"", ""QueryType"" : ""'|| qt.code ||
         '"", ""CostImpact"" : ""'||  ci.code ||
         '"", ""Consequence"" : ""'||  regexp_replace(q.CONSEQUENCE , '([""\])', '\\\1') ||
