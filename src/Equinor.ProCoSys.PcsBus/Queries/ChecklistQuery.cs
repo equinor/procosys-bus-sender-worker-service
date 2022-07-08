@@ -11,7 +11,7 @@ public class ChecklistQuery
         var whereClause = CreateWhereClause(tagCheckId, plant);
 
         return @$"select
-        '{{""Plant"" : ""' || tc.projectschema || 
+        '{{""Plant"" : ""' || tc.projectschema ||
         '"", ""ProjectName"" : ""' || p.name ||
         '"", ""TagNo"" : ""' ||  regexp_replace(t.tagno, '([""\])', '\\\1') ||
         '"", ""TagId"" : ""' ||  t.tag_id ||
@@ -19,7 +19,7 @@ public class ChecklistQuery
         '"", ""ChecklistId"" : ""' || tc.tagcheck_id ||
         '"", ""TagCategory"" : ""' || reg.code ||
         '"", ""SheetNo"" : ""' || tft.sheetno ||
-        '"", ""SubSheetNo"" : ""' || tft.sheetno ||
+        '"", ""SubSheetNo"" : ""' || tft.subsheetno ||
         '"", ""FormularType"" : ""' || ft.formulartype ||
         '"", ""FormularGroup"" : ""' || ft.formulargroup ||
         '"", ""SystemModule"" : ""' || fg.systemmodule ||
@@ -40,7 +40,7 @@ public class ChecklistQuery
             join formulargroup fg on fg.formulargroup = ft.formulargroup
             join library mccr_disc on mccr_disc.library_id = ft.discipline_id
             left join pipingrevision pir on pir.pipingrevision_id = tft.pipingrevision_id
-            left join mcpkg prm on prm.mcpkg_id = pir.mcpkg_id 
+            left join mcpkg prm on prm.mcpkg_id = pir.mcpkg_id
             join project p on p.project_id = t.project_id
             left join library reg on reg.library_id = t.register_id
             left join responsible r on r.responsible_id = tc.responsible_id
