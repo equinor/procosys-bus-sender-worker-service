@@ -5,9 +5,9 @@ public class PunchListItemQuery
     public static string GetQuery(string schema)
     {
         return @$"select
-      '{{""Plant"" : ""' || pl.projectschema ||                  
+      '{{""Plant"" : ""' || pl.projectschema ||
       '"", ""ProjectName"" : ""' || p.name ||
-      '"", ""LastUpdated"" : ""' || TO_CHAR(pl.LAST_UPDATED, 'yyyy-mm-dd hh24:mi:ss') ||                                           
+      '"", ""LastUpdated"" : ""' || TO_CHAR(pl.LAST_UPDATED, 'yyyy-mm-dd hh24:mi:ss') ||
       '"", ""PunchItemNo"" : ""' || pl.PunchListItem_Id ||
       '"", ""Description"" : ""' || regexp_replace(pl.Description, '([""\])', '\\\1') ||
       '"", ""ChecklistId"" : ""' || pl.tagcheck_id ||
@@ -31,7 +31,8 @@ public class PunchListItemQuery
       '"", ""ClearedAt"" : ""' || TO_CHAR(pl.clearedat, 'yyyy-mm-dd hh24:mi:ss') ||
       '"", ""RejectedAt"" : ""' || TO_CHAR(pl.rejectedat, 'yyyy-mm-dd hh24:mi:ss') ||
       '"", ""VerifiedAt"" : ""' || TO_CHAR(pl.verifiedat, 'yyyy-mm-dd hh24:mi:ss') ||
-      '""}}' as message 
+      '"", ""CreatedAt"" : ""' || TO_CHAR(pl.createdat, 'yyyy-mm-dd hh24:mi:ss') ||
+      '""}}' as message
        from punchlistitem pl
            join tagcheck tc on tc.tagcheck_id = pl.tagcheck_id
            left join Responsible r ON tc.Responsible_id = r.Responsible_Id
