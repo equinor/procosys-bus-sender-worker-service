@@ -2,8 +2,12 @@
 
 public class PipingSpoolQuery
 {
-    public static string GetQuery(string schema)
+    public static string GetQuery(long? pipingSpoolId,string schema = null)
     {
+        DetectFaultyPlantInput(schema);
+
+        var whereClause = CreateWhereClause(pipingSpoolId, schema, "ps", "pipingspool_id");
+
         return @$"select
             '{{""Plant"" : ""' || ps.projectschema || '"",
             ""ProjectName"" : ""' ||  regexp_replace(p.name, '([""\])', '\\\1') || '"",
@@ -32,6 +36,6 @@ public class PipingSpoolQuery
                 join project p on p.project_id = m.project_id
                 left join document iso on iso.document_id = ps.document_id
                 join tag t on t.tag_id = ps.tag_id
-            where ps.projectschema = '{schema}'";
+            {whereClause}";
     }
 }

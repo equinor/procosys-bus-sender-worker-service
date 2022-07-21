@@ -31,6 +31,9 @@ public class BusSenderMessageRepository : IBusSenderMessageRepository
     public async Task<string> GetCheckListMessage(long checkListId)
         => await ExecuteQuery(ChecklistQuery.GetQuery(checkListId), checkListId);
 
+    public async Task<string> GetCallOffMessage(long callOffId)
+        => await ExecuteQuery(CallOffQuery.GetQuery(callOffId), callOffId);
+
     private async Task<string> ExecuteQuery(string queryString, long objectId)
     {
         await using var command = _context.Database.GetDbConnection().CreateCommand();

@@ -1,19 +1,13 @@
-﻿using System;
-using System.Linq;
-
-namespace Equinor.ProCoSys.PcsServiceBus.Queries;
+﻿namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 
 public class QueryQuery
 {
     public static string GetQuery(long? documentId, string plant = null)
     {
-        if (plant != null && plant.Any(char.IsWhiteSpace))
-        {
-            //To detect potential Sql injection 
-            throw new Exception("plant should not contain spaces");
-        }
+        DetectFaultyPlantInput(plant);
 
-        var whereClause = CreateWhereClause(documentId, plant);
+        var whereClause = CreateWhereClause(documentId, plant, "q","document_id");
+
         return @$"select
         '{{""Plant"" : ""' || q.projectschema ||
         '"", ""ProjectName"" : ""' || p.name ||
@@ -52,25 +46,5 @@ public class QueryQuery
             left join library qt on qt.library_id = q.QUERYTYPE_ID
             left join library ci ON ci.library_id = q.COSTIMPACT_ID
          {whereClause}";
-
-    }
-
-    private static string CreateWhereClause(long? documentId, string plant)
-    {
-        var whereClause = "";
-        if (documentId != null && plant != null)
-        {
-            whereClause = $"where q.projectschema = '{plant}' and q.document_id = {documentId}";
-        }
-        else if (plant != null)
-        {
-            whereClause = $"where q.projectschema = '{plant}'";
-        }
-        else if (documentId != null)
-        {
-            whereClause = $"where q.document_id = {documentId}";
-        }
-
-        return whereClause;
     }
 }

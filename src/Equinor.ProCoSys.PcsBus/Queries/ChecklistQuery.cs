@@ -1,6 +1,4 @@
-﻿using static Equinor.ProCoSys.PcsServiceBus.Queries.QueryHelper;
-
-namespace Equinor.ProCoSys.PcsServiceBus.Queries;
+﻿namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 
 public class ChecklistQuery
 {

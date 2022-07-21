@@ -9,4 +9,5 @@ public interface IBusSenderMessageRepository
     Task<string> GetQueryMessage(long documentId);
     Task<string> GetDocumentMessage(long documentId);
     Task<string> GetCheckListMessage(long checkListId);
+    Task<string> GetCallOffMessage(long callOffId);
 }

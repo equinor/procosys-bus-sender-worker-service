@@ -2,8 +2,12 @@
 
 public class QuerySignature
 {
-    public static string GetQuery(string schema)
+    public static string GetQuery(long? queryId,string schema = null)
     {
+        DetectFaultyPlantInput(schema);
+
+        var whereClause = CreateWhereClause(queryId, schema, "q", "id");
+
         return @$"select
           '{{""Plant"" : ""' || q.projectschema
         ||'"", ""PlantName"" : ""' || regexp_replace(ps.TITLE, '([""\])', '\\\1')
@@ -27,6 +31,6 @@ public class QuerySignature
         join library sr ON sr.library_id = q.signaturerole_id
         left join person p ON p.person_id = q.signedby_id
         left join library fr On fr.library_id = q.functionalrole_id
-     where q.projectschema = '{schema}'";
+     {whereClause}";
     }
 }

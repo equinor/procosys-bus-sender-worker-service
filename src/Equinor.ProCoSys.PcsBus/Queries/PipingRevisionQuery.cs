@@ -3,9 +3,13 @@
 public static class PipingRevisionQuery
 {
 
-    public static string GetQuery(string schema)
+    public static string GetQuery(long? pipeRevId,string schema = null)
     {
-           return @$"select
+        DetectFaultyPlantInput(schema);
+
+        var whereClause = CreateWhereClause(pipeRevId, schema, "pr", "pipingrevision_id");
+
+        return @$"select
               '{{""Plant"" : ""' || pr.projectschema || 
               '"", ""PipingRevisionId"" : ""' || pr.pipingrevision_id ||
               '"", ""Revision"" : ""' || pr.testrevisionno || 
@@ -26,7 +30,6 @@ public static class PipingRevisionQuery
                     left join document ti on ti.document_id = pr.document_id
                     left join purchaseorder po on po.package_id = pr.package_id
                     left join calloff co on co.calloff_id = pr.calloff_id
-                where pr.projectschema = '{schema}'";
-
+                {whereClause}";
     }
 }

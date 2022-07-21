@@ -19,8 +19,8 @@ public class CommPkgQuery
          '"", ""AreaDescription"" : ""' || CASE WHEN l.CODE IS NOT NULL THEN regexp_replace(l.DESCRIPTION, '([""\])', '\\\1') ELSE '' END ||  
          '"", ""Phase"" : ""' || phase.code ||
          '"", ""CommissioningIdentifier"" : ""' || identifier.code ||
-         '"", ""IsVoided"" : ' || decode(e.isVoided,'Y', 'true', 'N', 'false') || 
-         ', ""Demolition"" : ' || decode(c.DEMOLITION,'Y', 'true', 'N', 'false') ||
+         '"", ""IsVoided"" : ' || decode(e.isVoided,'Y', 'true', 'N', 'false') ||
+         ', ""Demolition"" : ' || decode(c.DEMOLITION,'Y', 'true', 'false') ||
          ', ""CreatedAt"" : ""' || TO_CHAR(e.CREATEDAT, 'yyyy-mm-dd hh24:mi:ss') ||
          '"", ""Priority1"" : ""' || pri1.code  ||
          '"", ""Priority2"" : ""' || pri2.code  ||

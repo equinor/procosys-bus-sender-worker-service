@@ -182,11 +182,22 @@ public class BusSenderService : IBusSenderService
 
                     break;
                 }
-                /***
-                 * WO_MATERIAL gets several inserts when saving a material, resulting in multiple rows in the BUSEVENT table.
-                 * here we filter out all but the latest material event for a records with the same id and set those to Status = Skipped.
-                 * This is to reduce spam on the bus.
-                 */
+            case CallOffTopic.TopicName:
+                {
+                    var callOffMessage = await _service.CreateCallOffMessage(busEvent.Message);
+                    if (callOffMessage == null)
+                    {
+                        busEvent.Status = Status.NotFound;
+                        return busEvent;
+                    }
+                    busEvent.Message = callOffMessage;
+                    break;
+                }
+            /***
+             * WO_MATERIAL gets several inserts when saving a material, resulting in multiple rows in the BUSEVENT table.
+             * here we filter out all but the latest material event for a records with the same id and set those to Status = Skipped.
+             * This is to reduce spam on the bus.
+             */
             case WoMaterialTopic.TopicName when _service.IsNotLatestMaterialEvent(events, busEvent):
                 {
                     busEvent.Status = Status.Skipped;

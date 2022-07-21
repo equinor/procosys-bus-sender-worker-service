@@ -13,4 +13,23 @@ public  static class QueryHelper
             throw new Exception("plant should not contain spaces");
         }
     }
+
+    public static string CreateWhereClause(long? loopTagId, string plant, string shortHand, string idColumn)
+    {
+        var whereClause = "";
+        if (loopTagId != null && plant != null)
+        {
+            whereClause = $"where {shortHand}.projectschema = '{plant}' and {shortHand}.{idColumn} = {loopTagId}";
+        }
+        else if (plant != null)
+        {
+            whereClause = $"where {shortHand}.projectschema = '{plant}'";
+        }
+        else if (loopTagId != null)
+        {
+            whereClause = $"where {shortHand}.{idColumn} = {loopTagId}";
+        }
+
+        return whereClause;
+    }
 }

@@ -38,5 +38,6 @@ public enum PcsTopic
     LoopContent,
     LoopContent_Delete,
     Query,
-    QuerySignature
+    QuerySignature,
+    CallOff
 }

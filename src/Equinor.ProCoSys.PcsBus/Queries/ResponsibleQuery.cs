@@ -1,12 +1,9 @@
-﻿
-
-namespace Equinor.ProCoSys.PcsServiceBus.Queries;
+﻿namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 
 public class ResponsibleQuery
 {
-    public static string GetQuery(string schema)
-    {
-        return @$"select
+    public static string GetQuery(string schema) =>
+        @$"select
             '{{""Plant"" : ""' || r.projectschema || 
             '"", ""ResponsibleId"" : ""' || r.responsible_id || 
             '"", ""Code"" : ""' || regexp_replace(r.code, '([""\])', '\\\1') ||
@@ -17,5 +14,4 @@ public class ResponsibleQuery
             '""}}'  as message
             from responsible r
             where r.projectschema = '{schema}'";
-    }
 }

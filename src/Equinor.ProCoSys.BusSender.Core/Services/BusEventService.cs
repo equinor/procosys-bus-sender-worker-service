@@ -76,6 +76,15 @@ public class BusEventService : IBusEventService
         return WashString(await _busSenderMessageRepository.GetCheckListMessage(checkListId));
     }
 
+    public async Task<string> CreateCallOffMessage(string busEventMessage)
+    {
+        if (!long.TryParse(busEventMessage, out var callOffId))
+        {
+            throw new Exception("Failed to extract callOffId from message");
+        }
+        return WashString(await _busSenderMessageRepository.GetCallOffMessage(callOffId));
+    }
+
     public bool IsNotLatestMaterialEvent(IEnumerable<BusEvent> events, BusEvent busEvent)
     {
         var compareTo = JsonSerializer.Deserialize<WoMaterialIdentifier>(WashString(busEvent.Message));
