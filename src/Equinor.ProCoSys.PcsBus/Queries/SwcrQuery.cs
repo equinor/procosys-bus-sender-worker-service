@@ -2,11 +2,11 @@
 
 public class SwcrQuery
 {
-    public static string GetQuery(long? swcrId,string plant)
+    public static string GetQuery(long? swcrId, string plant)
     {
         DetectFaultyPlantInput(plant);
 
-        var whereClause = CreateWhereClause(swcrId, plant, "s", "id");
+        var whereClause = CreateWhereClause(swcrId, plant, "sw", "swcr_id");
 
         return @$"select
             '{{""Plant"" : ""' || sw.projectschema ||
@@ -23,7 +23,7 @@ public class SwcrQuery
             '"", ""Contract"" : ""' || con.code ||
             '"", ""Supplier"" : ""' || sup.code ||
             '"", ""Node"" : ""' ||  regexp_replace(n.NODENO, '([""\])', '\\\1') ||
-            '"", ""Status"" : ""' ||  STATUSFORSWCR(sw.swcr_ID) || 
+            '"", ""Status"" : ""' ||  STATUSFORSWCR(sw.swcr_id) || 
             '"", ""CreatedAt"" : ""' || TO_CHAR(e.createdat, 'yyyy-mm-dd hh24:mi:ss')  ||
             '"", ""IsVoided"" : ""' || decode(e.IsVoided,'Y', 'true', 'N', 'false')  ||
             '"", ""LastUpdated"" : ""' || TO_CHAR(sw.LAST_UPDATED, 'yyyy-mm-dd hh24:mi:ss')  ||

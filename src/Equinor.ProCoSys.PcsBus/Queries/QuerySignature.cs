@@ -32,5 +32,6 @@ public class QuerySignature
         left join person p ON p.person_id = q.signedby_id
         left join library fr On fr.library_id = q.functionalrole_id
      {whereClause}";
+
     }
 }

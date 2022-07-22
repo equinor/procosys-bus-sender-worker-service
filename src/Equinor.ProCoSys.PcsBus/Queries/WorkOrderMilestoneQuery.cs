@@ -4,6 +4,10 @@ namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 
 public class WorkOrderMilestoneQuery
 {
+    /// <summary>
+    /// Call with either, plantId, wo and milestone id, or all 3. Not advised to call without either as result set could get very large
+    /// Both Id columns needed for single match
+    /// </summary>
     public static string GetQuery(long? woId,long? milestoneId,string plant)
     {
         DetectFaultyPlantInput(plant);
