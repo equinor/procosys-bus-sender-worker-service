@@ -2,7 +2,6 @@
 
 public static class PipingRevisionQuery
 {
-
     public static string GetQuery(long? pipeRevId,string schema = null)
     {
         DetectFaultyPlantInput(schema);

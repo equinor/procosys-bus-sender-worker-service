@@ -5,8 +5,7 @@ public class DocumentQuery
     public static string GetQuery(long? documentId, string plant= null)
     {
         DetectFaultyPlantInput(plant);
-
-        var whereClause = CreateWhereClause(documentId, plant);
+        var whereClause = CreateWhereClause(documentId, plant, "d", "document_id");
 
         return @$"select
        '{{""Plant"": ""' || d.projectschema ||
@@ -45,22 +44,4 @@ public class DocumentQuery
         {whereClause}";
     }
 
-    private static string CreateWhereClause(long? documentId, string plant)
-    {
-        var whereClause = "";
-        if (documentId != null && plant != null)
-        {
-            whereClause = $"where d.projectschema = '{plant}' and d.document_id = {documentId}";
-        }
-        else if (plant != null)
-        {
-            whereClause = $"where d.projectschema = '{plant}'";
-        }
-        else if (documentId != null)
-        {
-            whereClause = $"where d.document_id = {documentId}";
-        }
-
-        return whereClause;
-    }
 }

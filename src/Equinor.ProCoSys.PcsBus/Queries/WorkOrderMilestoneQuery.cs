@@ -35,7 +35,7 @@ public class WorkOrderMilestoneQuery
         var whereClause = "";
         if (milestoneId != null && woId != null && plant != null)
         {
-            whereClause = $"where emd.projectschema = '{plant}' and emd.wo_id = {woId} and emd.milestone_id = {milestoneId}";
+            whereClause = $"where emd.projectschema = '{plant}' and emd.element_id = {woId} and emd.milestone_id = {milestoneId}";
         }
         else if (plant != null)
         {

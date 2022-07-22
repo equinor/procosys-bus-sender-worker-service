@@ -7,7 +7,7 @@ public class CallOffQuery
     {
         DetectFaultyPlantInput(plant);
 
-        var whereClause = CreateWhereClause(tagCheckId, plant);
+        var whereClause = CreateWhereClause(tagCheckId, plant, "co", "calloff_id");
 
         return @$"select
         '{{""Plant"" : ""' || co.projectschema ||
@@ -37,26 +37,6 @@ public class CallOffQuery
             left join responsible r on r.responsible_id = co.responsible_id
             left join library contractor on contractor.library_id = co.contractor_id
             left join library supplier on supplier.library_id = co.supplier_id
-     
         {whereClause}";
-    }
-
-    private static string CreateWhereClause(long? callOffId, string plant)
-    {
-        var whereClause = "";
-        if (callOffId != null && plant != null)
-        {
-            whereClause = $"where co.projectschema = '{plant}' and co.calloff_id = {callOffId}";
-        }
-        else if (plant != null)
-        {
-            whereClause = $"where co.projectschema = '{plant}'";
-        }
-        else if (callOffId != null)
-        {
-            whereClause = $"where co.calloff_id = {callOffId}";
-        }
-
-        return whereClause;
     }
 }

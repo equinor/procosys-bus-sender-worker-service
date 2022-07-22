@@ -14,20 +14,20 @@ public  static class QueryHelper
         }
     }
 
-    public static string CreateWhereClause(long? loopTagId, string plant, string shortHand, string idColumn)
+    public static string CreateWhereClause(long? id, string plant, string shortHand, string idColumn)
     {
         var whereClause = "";
-        if (loopTagId != null && plant != null)
+        if (id != null && plant != null)
         {
-            whereClause = $"where {shortHand}.projectschema = '{plant}' and {shortHand}.{idColumn} = {loopTagId}";
+            whereClause = $"where {shortHand}.projectschema = '{plant}' and {shortHand}.{idColumn} = {id}";
         }
         else if (plant != null)
         {
             whereClause = $"where {shortHand}.projectschema = '{plant}'";
         }
-        else if (loopTagId != null)
+        else if (id != null)
         {
-            whereClause = $"where {shortHand}.{idColumn} = {loopTagId}";
+            whereClause = $"where {shortHand}.{idColumn} = {id}";
         }
 
         return whereClause;
