@@ -2,10 +2,9 @@
 
 public class SwcrSignatureQuery
 {
-    public static string GetQuery(long swcrSignatureId, string plant)
+    public static string GetQuery(long swcrSignatureId, string plant = null)
     {
         DetectFaultyPlantInput(plant);
-
         var whereClause = CreateWhereClause(swcrSignatureId, plant, "sign", "swcrsignature_id");
 
         return @$"select

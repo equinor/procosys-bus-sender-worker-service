@@ -7,7 +7,6 @@ public class MilestonesQuery
     public static string GetQuery(long? milestoneId,long elementId, string plant = null)
     {
         DetectFaultyPlantInput(plant);
-
         var whereClause = CreateWhereClause(milestoneId, elementId, plant);
 
         return @$"select
@@ -33,7 +32,7 @@ public class MilestonesQuery
         {whereClause}";
     }
 
-    public static string CreateWhereClause(long? milestoneId, long? element, string plant)
+    private static string CreateWhereClause(long? milestoneId, long? element, string plant)
     {
         var whereClause = "";
         if (milestoneId != null && element != null && plant != null)

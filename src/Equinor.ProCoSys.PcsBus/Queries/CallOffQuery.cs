@@ -6,7 +6,6 @@ public class CallOffQuery
     public static string GetQuery(long? tagCheckId, string plant = null)
     {
         DetectFaultyPlantInput(plant);
-
         var whereClause = CreateWhereClause(tagCheckId, plant, "co", "calloff_id");
 
         return @$"select

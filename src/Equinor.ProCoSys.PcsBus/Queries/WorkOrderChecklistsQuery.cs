@@ -5,8 +5,7 @@ public class WorkOrderChecklistsQuery
     public static string GetQuery(long? tagCheckId, long? woId, string plant)
     {
         DetectFaultyPlantInput(plant);
-
-        var whereClause = CreateWhereClause(tagCheckId,woId, plant);
+        var whereClause = CreateWhereClause(tagCheckId, woId, plant);
 
         return @$"select
             '{{""Plant"" : ""' || wotc.projectschema ||
@@ -22,7 +21,7 @@ public class WorkOrderChecklistsQuery
     }
 
 
-    public static string CreateWhereClause(long? tagCheckId, long? woId, string plant)
+    private static string CreateWhereClause(long? tagCheckId, long? woId, string plant)
     {
         var whereClause = "";
         if (tagCheckId != null && woId != null && plant != null)

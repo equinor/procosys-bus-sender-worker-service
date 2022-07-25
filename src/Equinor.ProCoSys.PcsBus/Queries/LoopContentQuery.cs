@@ -5,7 +5,6 @@ public class LoopContentQuery
     public static string GetQuery(long? loopTagId, string plant = null)
     {
         DetectFaultyPlantInput(plant);
-
         var whereClause = CreateWhereClause(loopTagId, plant, "lt", "tag_id");
 
         return @$"select

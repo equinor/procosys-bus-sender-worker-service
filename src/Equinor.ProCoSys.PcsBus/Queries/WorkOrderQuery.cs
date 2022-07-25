@@ -8,7 +8,6 @@ public class WorkOrderQuery
     public static string GetQuery(long? workOrderId = null, string plant = null)
     {
         DetectFaultyPlantInput(plant);
-
         var whereClause = CreateWhereClause(workOrderId, plant, "w", "wo_id");
 
         return @$"select

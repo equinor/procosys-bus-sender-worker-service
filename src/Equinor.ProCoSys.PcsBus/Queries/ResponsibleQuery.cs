@@ -2,8 +2,12 @@
 
 public class ResponsibleQuery
 {
-    public static string GetQuery(string schema) =>
-        @$"select
+    public static string GetQuery(long? responsibleId, string plant = null)
+    {
+        DetectFaultyPlantInput(plant);
+        var whereClause = CreateWhereClause(responsibleId, plant, "r", "responsible_id");
+
+        return @$"select
             '{{""Plant"" : ""' || r.projectschema || 
             '"", ""ResponsibleId"" : ""' || r.responsible_id || 
             '"", ""Code"" : ""' || regexp_replace(r.code, '([""\])', '\\\1') ||
@@ -12,6 +16,7 @@ public class ResponsibleQuery
             '"", ""IsVoided"" : ""' || decode(r.isVoided,'Y', 'true', 'N', 'false') ||
             '"", ""LastUpdated"" : ""' || TO_CHAR(r.LAST_UPDATED, 'yyyy-mm-dd hh24:mi:ss') ||
             '""}}'  as message
-            from responsible r
-            where r.projectschema = '{schema}'";
+        from responsible r
+        {whereClause}";
+    }
 }

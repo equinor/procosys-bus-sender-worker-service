@@ -2,8 +2,11 @@
 
 public class CommPkgQuery
 {
-    public static string GetQuery(string schema)
+    public static string GetQuery(long? commPkgId, string plant = null)
     {
+        DetectFaultyPlantInput(plant);
+        var whereClause = CreateWhereClause(commPkgId, plant, "c", "commpkg_id");
+
         return @$"select
         '{{""Plant"" : ""' || c.projectschema || 
          '"", ""PlantName"" : ""' || regexp_replace(ps.TITLE, '([""\])', '\\\1') ||
@@ -42,6 +45,6 @@ public class CommPkgQuery
             left join library commStatus on commStatus.library_id = c.COMMSTATUS_ID
             left join library dcStatus on dcStatus.library_id = c.DCSTATUS_ID
             left join library identifier on identifier.library_id = c.IDENTIFIER_ID
-        where c.projectschema ='{schema}'";
+        {whereClause}";
     }
 }

@@ -2,10 +2,9 @@
 
 public class SwcrQuery
 {
-    public static string GetQuery(long? swcrId, string plant)
+    public static string GetQuery(long? swcrId, string plant = null)
     {
         DetectFaultyPlantInput(plant);
-
         var whereClause = CreateWhereClause(swcrId, plant, "sw", "swcr_id");
 
         return @$"select
