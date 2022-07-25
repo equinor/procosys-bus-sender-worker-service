@@ -34,6 +34,7 @@ public class PunchListItemQuery
             '"", ""ClearedAt"" : ""' || TO_CHAR(pl.clearedat, 'yyyy-mm-dd hh24:mi:ss') ||
             '"", ""RejectedAt"" : ""' || TO_CHAR(pl.rejectedat, 'yyyy-mm-dd hh24:mi:ss') ||
             '"", ""VerifiedAt"" : ""' || TO_CHAR(pl.verifiedat, 'yyyy-mm-dd hh24:mi:ss') ||
+            '"", ""CreatedAt"" : ""' || TO_CHAR(pl.createdat, 'yyyy-mm-dd hh24:mi:ss') ||
             '""}}' as message
         from punchlistitem pl
             join tagcheck tc on tc.tagcheck_id = pl.tagcheck_id
