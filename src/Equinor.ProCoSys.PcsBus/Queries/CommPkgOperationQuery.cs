@@ -17,7 +17,7 @@ public class CommPkgOperationQuery
             ""BlueLine"" : ' || decode(co.blueline,'Y', 'true', 'N', 'false') || ',
             ""YellowLineStatus"" : ""' || regexp_replace(co.yellowlinestatus, '([""\])', '\\\1') || '"",
             ""BlueLineStatus"" : ""' || regexp_replace(co.bluelinestatus, '([""\])', '\\\1') || '"",
-            ""TemperaryOperationEst"" : ' || decode(co.temporaryoperation_est,'Y', 'true', 'N', 'false') || ',
+            ""TemporaryOperationEst"" : ' || decode(co.temporaryoperation_est,'Y', 'true', 'N', 'false') || ',
             ""PmRoutine"" : ' || decode(co.pmroutine,'Y', 'true', 'N', 'false') || ',
             ""CommissioningResp"" : ' ||  decode(co.commissioningresp,'Y', 'true', 'N', 'false') || ',
             ""ValveBlindingList"" : ""' || decode(co.valveblindinglist,'Y', 'true', 'N', 'false') ||  '"", 

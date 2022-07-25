@@ -4,7 +4,7 @@ namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 
 public class MilestonesQuery
 {
-    public static string GetQuery(long? milestoneId,long elementId, string plant = null)
+    public static string GetQuery(long? elementId,long? milestoneId, string plant = null)
     {
         DetectFaultyPlantInput(plant);
         var whereClause = CreateWhereClause(milestoneId, elementId, plant);

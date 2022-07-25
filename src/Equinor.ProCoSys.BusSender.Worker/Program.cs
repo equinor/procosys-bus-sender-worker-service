@@ -115,10 +115,13 @@ public class Program
                 rep.Download(hostContext.Configuration["BlobStorage:WalletFileName"], walletPath + "\\cwallet.sso");
                 Console.WriteLine("Created wallet file at: " + walletPath);
 
-                services.AddApplicationInsightsTelemetryWorkerService(hostContext.Configuration["ApplicationInsights:InstrumentationKey"]);
+                services.AddApplicationInsightsTelemetryWorkerService(o=> 
+                    o.ConnectionString = hostContext.Configuration["ApplicationInsights:InstrumentationKey"]);
 
-                var connectionString = hostContext.Configuration["ConnectionString"];
-                // var localConnectionString = hostContext.Configuration["ProcosysDb"]; //to be used when debugging
+                var connectionString = hostContext.Configuration["EnvironmentName"] == "Development" 
+                    ? hostContext.Configuration["ProcosysDb"]
+                    : hostContext.Configuration["ConnectionString"];
+                
                 services.AddDbContext(connectionString);
                 services.AddTopicClients(
                     hostContext.Configuration["ServiceBusConnectionString"],
