@@ -5,7 +5,7 @@ public class WorkOrderCutoffQuery
     /// <summary>
     /// Call with either workOrderId and cutoffweek, plantId  or all 3. Not advised to call without either as result set could get very large
     /// </summary>
-    public static string GetQuery(long? woId, string cutoffWeek, string plant, string month)
+    public static string GetQuery(long? woId, string cutoffWeek, string plant = null, string month = null)
     {
 
         DetectFaultyPlantInput(plant);

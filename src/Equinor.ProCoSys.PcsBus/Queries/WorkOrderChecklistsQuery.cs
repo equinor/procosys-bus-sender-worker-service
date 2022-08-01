@@ -2,7 +2,7 @@
 
 public class WorkOrderChecklistsQuery
 {
-    public static string GetQuery(long? tagCheckId, long? woId, string plant)
+    public static string GetQuery(long? tagCheckId, long? woId, string plant = null)
     {
         DetectFaultyPlantInput(plant);
         var whereClause = CreateWhereClause(tagCheckId, woId, plant);
@@ -10,8 +10,10 @@ public class WorkOrderChecklistsQuery
         return @$"select
             '{{""Plant"" : ""' || wotc.projectschema ||
             '"", ""ProjectName"" : ""' || p.NAME ||
-            '"", ""WoNo"" : ""' || regexp_replace(wo.wono, '([""\])', '\\\1') ||
             '"", ""ChecklistId"" : ""' || wotc.tagcheck_id ||
+            '"", ""WoId"" : ""' || wotc.wo_id ||
+            '"", ""WoNo"" : ""' || regexp_replace(wo.wono, '([""\])', '\\\1') ||
+            
             '""}}'
         FROM wo_tagcheck wotc
             join element e on E.ELEMENT_ID = wotc.wo_ID
@@ -19,7 +21,6 @@ public class WorkOrderChecklistsQuery
             join project p ON p.project_id = wo.project_id
         {whereClause}";
     }
-
 
     private static string CreateWhereClause(long? tagCheckId, long? woId, string plant)
     {
@@ -39,5 +40,4 @@ public class WorkOrderChecklistsQuery
 
         return whereClause;
     }
-
 }

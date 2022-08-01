@@ -1,6 +1,6 @@
 ﻿namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 
-public class QuerySignature
+public class QuerySignatureQuery
 {
     public static string GetQuery(long? queryId, string plant = null)
     {
@@ -11,6 +11,7 @@ public class QuerySignature
               '{{""Plant"" : ""' || q.projectschema
             ||'"", ""PlantName"" : ""' || regexp_replace(ps.TITLE, '([""\])', '\\\1')
             ||'"", ""ProjectName"" : ""' || p.NAME
+            ||'"", ""QuerySignatureId"": ""'|| q.id
             ||'"", ""QueryId"": ""'|| do.document_id
             ||'"", ""QueryNo"": ""'|| do.documentno
             ||'"", ""SignatureRoleCode"": ""' || regexp_replace(sr.code, '([""\])', '\\\1')

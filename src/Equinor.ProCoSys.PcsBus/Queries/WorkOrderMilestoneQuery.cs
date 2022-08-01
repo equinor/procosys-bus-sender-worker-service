@@ -8,18 +8,19 @@ public class WorkOrderMilestoneQuery
     /// Call with either, plantId, wo and milestone id, or all 3. Not advised to call without either as result set could get very large
     /// Both Id columns needed for single match
     /// </summary>
-    public static string GetQuery(long? woId,long? milestoneId,string plant)
+    public static string GetQuery(long? woId,long? milestoneId,string plant = null)
     {
         DetectFaultyPlantInput(plant);
         var whereClause = CreateWhereClause(milestoneId,woId, plant);
 
         return @$"select
             '{{""Plant"" : ""' || emd.projectschema || 
-            '"", ""ProjectName"" : ""' || p.NAME || 
-            '"", ""WoNo"" : ""' || regexp_replace(w.wono, '([""\])', '\\\1') ||
-            '"", ""Code"" : ""' || milestone.code || 
+            '"", ""ProjectName"" : ""' || p.NAME ||
+            '"", ""WoId"" : ""' || wo.wo_id || 
+            '"", ""WoNo"" : ""' || regexp_replace(wo.wono, '([""\])', '\\\1') ||
+            '"", ""Code"" : ""' || regexp_replace(milestone.code, '([""\])', '\\\1') || 
             '"", ""MilestoneDate"" : ""' || TO_CHAR(emd.milestonedate, 'yyyy-mm-dd hh24:mi:ss') ||
-            '"", ""SignedByAzureOid"" : ""' || p.azure_oid ||
+            '"", ""SignedByAzureOid"" : ""' ||  regexp_replace(p.azure_oid, '([""\])', '\\\1') ||
             '"", ""LastUpdated"" : ""' || TO_CHAR(emd.last_updated, 'yyyy-mm-dd hh24:mi:ss') ||        
             '""}}' as message
         from elementmilestonedate emd
@@ -30,7 +31,7 @@ public class WorkOrderMilestoneQuery
         {whereClause}";
     }
 
-    public static string CreateWhereClause(long? milestoneId, long? woId, string plant)
+    private static string CreateWhereClause(long? milestoneId, long? woId, string plant)
     {
         var whereClause = "";
         if (milestoneId != null && woId != null && plant != null)
@@ -43,7 +44,7 @@ public class WorkOrderMilestoneQuery
         }
         else if (milestoneId != null && woId != null)
         {
-            whereClause = $"where emd.wo_id = {woId} and emd.milestone_id = {milestoneId}";
+            whereClause = $"where emd.element_id = {woId} and emd.milestone_id = {milestoneId}";
         }
         else if (milestoneId != null || woId != null)
         {

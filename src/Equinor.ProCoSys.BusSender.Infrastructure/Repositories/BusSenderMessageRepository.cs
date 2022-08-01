@@ -13,28 +13,59 @@ public class BusSenderMessageRepository : IBusSenderMessageRepository
 {
     private readonly BusSenderServiceContext _context;
     private readonly ILogger<BusSenderMessageRepository> _logger;
+
     public BusSenderMessageRepository(BusSenderServiceContext context, ILogger<BusSenderMessageRepository> logger)
     {
         _context = context;
         _logger = logger;
     }
 
-    public async Task<string> GetWorkOrderMessage(long workOrderId)
-        => await ExecuteQuery(WorkOrderQuery.GetQuery(workOrderId), workOrderId);
+    public async Task<string> GetCallOffMessage(long callOffId) => 
+        await ExecuteQuery(CallOffQuery.GetQuery(callOffId), callOffId.ToString());
 
-    public async Task<string> GetQueryMessage(long documentId)
-        => await ExecuteQuery(QueryQuery.GetQuery(documentId), documentId);
+    public async Task<string> GetCheckListMessage(long checkListId) => 
+        await ExecuteQuery(ChecklistQuery.GetQuery(checkListId), checkListId.ToString());
 
-    public async Task<string> GetDocumentMessage(long documentId)
-        => await ExecuteQuery(DocumentQuery.GetQuery(documentId), documentId);
+    public async Task<string> GetDocumentMessage(long documentId) =>
+        await ExecuteQuery(DocumentQuery.GetQuery(documentId), documentId.ToString());
 
-    public async Task<string> GetCheckListMessage(long checkListId)
-        => await ExecuteQuery(ChecklistQuery.GetQuery(checkListId), checkListId);
+    public async Task<string> GetLoopContentMessage(long loopContentId) => 
+        await ExecuteQuery(LoopContentQuery.GetQuery(loopContentId),loopContentId.ToString());
 
-    public async Task<string> GetCallOffMessage(long callOffId)
-        => await ExecuteQuery(CallOffQuery.GetQuery(callOffId), callOffId);
+    public async Task<string> GetPipingRevisionMessage(long pipeRevisionId) =>
+        await ExecuteQuery(PipingRevisionQuery.GetQuery(pipeRevisionId), pipeRevisionId.ToString());
 
-    private async Task<string> ExecuteQuery(string queryString, long objectId)
+    public async Task<string> GetPipingSpoolMessage(long pipingSpoolId) =>
+        await ExecuteQuery(PipingSpoolQuery.GetQuery(pipingSpoolId), pipingSpoolId.ToString());
+
+    public async Task<string> GetQueryMessage(long documentId) =>
+        await ExecuteQuery(QueryQuery.GetQuery(documentId), documentId.ToString());
+
+    public async Task<string> GetQuerySignatureMessage(long querySignatureId) =>
+        await ExecuteQuery(QuerySignatureQuery.GetQuery(querySignatureId), querySignatureId.ToString());
+
+    public async Task<string> GetStockMessage(long stockId) =>
+        await ExecuteQuery(StockQuery.GetQuery(stockId), stockId.ToString());
+
+    public async Task<string> GetSwcrMessage(long swcrId) =>
+        await ExecuteQuery(SwcrQuery.GetQuery(swcrId), swcrId.ToString());
+
+    public async Task<string> GetSwcrSignatureMessage(long swcrSignatureId) =>
+        await ExecuteQuery(SwcrSignatureQuery.GetQuery(swcrSignatureId), swcrSignatureId.ToString());
+
+    public async Task<string> GetWorkOrderChecklistMessage(long tagCheckId, long woId) =>
+        await ExecuteQuery(WorkOrderChecklistsQuery.GetQuery(tagCheckId, woId), $"{tagCheckId},{woId}");
+
+    public async Task<string> GetWorkOrderMaterialMessage(long woId) =>
+        await ExecuteQuery(WorkOrderMaterialQuery.GetQuery(woId), woId.ToString());
+
+    public async Task<string> GetWorkOrderMessage(long workOrderId) =>
+        await ExecuteQuery(WorkOrderQuery.GetQuery(workOrderId), workOrderId.ToString());
+
+    public async Task<string> GetWorkOrderMilestoneMessage(long woId, long milestoneId) =>
+        await ExecuteQuery(WorkOrderMilestoneQuery.GetQuery(woId, milestoneId), $"{woId},{milestoneId}");
+
+    private async Task<string> ExecuteQuery(string queryString, string objectId)
     {
         await using var command = _context.Database.GetDbConnection().CreateCommand();
         command.CommandText = queryString;
@@ -43,8 +74,7 @@ public class BusSenderMessageRepository : IBusSenderMessageRepository
 
         return await ExtractMessageFromResult(objectId, result);
     }
-
-    private async Task<string> ExtractMessageFromResult(long objectId, DbDataReader result)
+    private async Task<string> ExtractMessageFromResult(string objectId, DbDataReader result)
     {
         //result.ReadAsync is expected to return true here, query for 1 objectId should return 1 and only 1 row. 
         if (!result.HasRows || !await result.ReadAsync() || result[0] is DBNull || result[0] is null)
