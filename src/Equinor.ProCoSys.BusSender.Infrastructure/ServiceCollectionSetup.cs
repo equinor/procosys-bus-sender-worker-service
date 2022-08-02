@@ -1,11 +1,11 @@
-﻿using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
+﻿using Azure.Messaging.ServiceBus;
+using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 using Equinor.ProCoSys.BusSenderWorker.Core.Services;
 using Equinor.ProCoSys.BusSenderWorker.Core.Telemetry;
 using Equinor.ProCoSys.BusSenderWorker.Infrastructure.Data;
 using Equinor.ProCoSys.BusSenderWorker.Infrastructure.Repositories;
 using Equinor.ProCoSys.PcsServiceBus.Sender;
 using Equinor.ProCoSys.PcsServiceBus.Sender.Interfaces;
-using Microsoft.Azure.ServiceBus;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -36,14 +36,16 @@ public static class ServiceCollectionSetup
             options.EnableSensitiveDataLogging();
         }).AddScoped<IUnitOfWork>(serviceProvider => serviceProvider.GetRequiredService<BusSenderServiceContext>());
 
-    public static void AddTopicClients(this IServiceCollection services, string serviceBusConnectionString, string topicNames)
+    public static async void AddTopicClients(this IServiceCollection services, string serviceBusConnectionString, string topicNames)
     {
         var topics = topicNames.Split(',');
         var pcsBusSender = new PcsBusSender();
+        var options = new ServiceBusClientOptions { EnableCrossEntityTransactions = true };
+        await using var client = new ServiceBusClient(serviceBusConnectionString, options);
         foreach (var topicName in topics)
         {
-            var topicClient = new TopicClient(serviceBusConnectionString, topicName);
-            pcsBusSender.Add(topicName, topicClient);
+            var serviceBusSender = client.CreateSender(topicName);
+            pcsBusSender.Add(topicName, serviceBusSender);
         }
 
         services.AddSingleton<IPcsBusSender>(pcsBusSender);

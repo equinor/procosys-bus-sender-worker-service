@@ -1,27 +1,42 @@
 ﻿using System;
 using System.Net.Http;
+using System.Threading.Tasks;
+using Azure.Messaging.ServiceBus;
 using Equinor.ProCoSys.PcsServiceBus.Receiver;
 using Equinor.ProCoSys.PcsServiceBus.Receiver.Interfaces;
 using Equinor.ProCoSys.PcsServiceBus.Sender;
 using Equinor.ProCoSys.PcsServiceBus.Sender.Interfaces;
-using Microsoft.Azure.ServiceBus;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Equinor.ProCoSys.PcsServiceBus;
 
 public static class IServiceCollectionExtensions
 {
-    public static IServiceCollection AddPcsServiceBusIntegration(this IServiceCollection services, Action<PcsServiceBusConfig> options)
+    public static async Task<IServiceCollection> AddPcsServiceBusIntegration(this IServiceCollection services, Action<PcsServiceBusConfig> options)
     {
         var optionsBuilder = new PcsServiceBusConfig();
         options(optionsBuilder);
 
-        var pcsSubscriptionClients = new PcsSubscriptionClients(optionsBuilder.RenewLeaseIntervalMilliSec);
+        var pcsSubscriptionClients = new PcsServiceBusProcessors(optionsBuilder.RenewLeaseIntervalMilliSec);
+
+        await using var client = new ServiceBusClient(optionsBuilder.ConnectionString);
+        var processorOptions = new ServiceBusProcessorOptions()
+        {
+            // interesting options here
+        };
+
         optionsBuilder.Subscriptions.ForEach(
             topicInfo =>
+            {
+                var topicInfoTopicPath = string.IsNullOrWhiteSpace(topicInfo.topicPath)
+                    ? topicInfo.pcsTopic.ToString()
+                    : topicInfo.topicPath;
+
+                var subscriptionName = "";
                 pcsSubscriptionClients.Add(
-                    new PcsSubscriptionClient(optionsBuilder.ConnectionString, topicInfo.pcsTopic, topicInfo.topicPath, topicInfo.subscrition, optionsBuilder.ReadFromDeadLetterQueue)));
-        services.AddSingleton<IPcsSubscriptionClients>(pcsSubscriptionClients);
+                    client.CreateProcessor(topicInfoTopicPath,subscriptionName,processorOptions));
+            });
+        services.AddSingleton<IPcsServiceBusProcessors>(pcsSubscriptionClients);
 
         if (optionsBuilder.LeaderElectorUrl != null)
         {
@@ -37,16 +52,18 @@ public static class IServiceCollectionExtensions
         return services;
     }
 
-    public static void AddTopicClients(this IServiceCollection services, string serviceBusConnectionString, string topicNames)
+    public static async void AddTopicClients(this IServiceCollection services, string serviceBusConnectionString, string topicNames)
     {
         var topics = topicNames.Split(',');
         var pcsBusSender = new PcsBusSender();
+        var options = new ServiceBusClientOptions { EnableCrossEntityTransactions = true };
+        await using var client = new ServiceBusClient(serviceBusConnectionString, options);
         foreach (var topicName in topics)
         {
             if (!string.IsNullOrWhiteSpace(topicName))
             {
-                var topicClient = new TopicClient(serviceBusConnectionString, topicName);
-                pcsBusSender.Add(topicName, topicClient);
+                var serviceBusSender = client.CreateSender(topicName);
+                pcsBusSender.Add(topicName, serviceBusSender);
             }
         }
 

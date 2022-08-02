@@ -16,7 +16,7 @@ namespace Equinor.ProCoSys.PcsServiceBusTests;
 public class PcsBusReceiverTests
 {
     private PcsBusReceiver _dut;
-    private Mock<IPcsSubscriptionClients> _clients;
+    private Mock<IPcsServiceBusProcessors> _clients;
     MessageHandlerOptions _options;
     private Mock<ILogger<PcsBusReceiver>> _logger;
     private Mock<IBusReceiverService> _busReceiverService;
@@ -27,13 +27,13 @@ public class PcsBusReceiverTests
     {
         _logger = new Mock<ILogger<PcsBusReceiver>>();
 
-        _clients = new Mock<IPcsSubscriptionClients>();
+        _clients = new Mock<IPcsServiceBusProcessors>();
         _clients.Setup(c => c.RenewLeaseInterval).Returns(10000);
         _clients.Setup(c
             => c.RegisterPcsMessageHandler(
-                It.IsAny<Func<IPcsSubscriptionClient, Message, CancellationToken, Task>>(),
+                It.IsAny<Func<IPcsServiceBusProcessor, Message, CancellationToken, Task>>(),
                 It.IsAny<MessageHandlerOptions>())
-        ).Callback<Func<IPcsSubscriptionClient, Message, CancellationToken, Task>, MessageHandlerOptions>((_, options) => _options = options);
+        ).Callback<Func<IPcsServiceBusProcessor, Message, CancellationToken, Task>, MessageHandlerOptions>((_, options) => _options = options);
 
         _busReceiverService = new Mock<IBusReceiverService>();
         _leaderElectorService = new Mock<ILeaderElectorService>();
@@ -55,7 +55,7 @@ public class PcsBusReceiverTests
     {
         _dut.StartAsync(new CancellationToken());
 
-        _clients.Verify(c => c.RegisterPcsMessageHandler(It.IsAny<Func<IPcsSubscriptionClient, Message, CancellationToken, Task>>(), It.IsAny<MessageHandlerOptions>()), Times.Never);
+        _clients.Verify(c => c.RegisterPcsMessageHandler(It.IsAny<Func<IPcsServiceBusProcessor, Message, CancellationToken, Task>>(), It.IsAny<MessageHandlerOptions>()), Times.Never);
         Assert.IsNull(_options);
     }
 
@@ -65,7 +65,7 @@ public class PcsBusReceiverTests
         _dut.StartAsync(new CancellationToken());
 
         Thread.Sleep(7000);
-        _clients.Verify(c => c.RegisterPcsMessageHandler(It.IsAny<Func<IPcsSubscriptionClient, Message, CancellationToken, Task>>(), It.IsAny<MessageHandlerOptions>()), Times.Once);
+        _clients.Verify(c => c.RegisterPcsMessageHandler(It.IsAny<Func<IPcsServiceBusProcessor, Message, CancellationToken, Task>>(), It.IsAny<MessageHandlerOptions>()), Times.Once);
         Assert.IsNotNull(_options);
     }
 
@@ -76,7 +76,7 @@ public class PcsBusReceiverTests
         _dut.StartAsync(new CancellationToken());
 
         Thread.Sleep(7000);
-        _clients.Verify(c => c.RegisterPcsMessageHandler(It.IsAny<Func<IPcsSubscriptionClient, Message, CancellationToken, Task>>(), It.IsAny<MessageHandlerOptions>()), Times.Never);
+        _clients.Verify(c => c.RegisterPcsMessageHandler(It.IsAny<Func<IPcsServiceBusProcessor, Message, CancellationToken, Task>>(), It.IsAny<MessageHandlerOptions>()), Times.Never);
         Assert.IsNull(_options);
     }
 
@@ -102,14 +102,14 @@ public class PcsBusReceiverTests
 
         Thread.Sleep(7000);
 
-        _clients.Verify(c => c.RegisterPcsMessageHandler(It.IsAny<Func<IPcsSubscriptionClient, Message, CancellationToken, Task>>(), It.IsAny<MessageHandlerOptions>()), Times.Once);
+        _clients.Verify(c => c.RegisterPcsMessageHandler(It.IsAny<Func<IPcsServiceBusProcessor, Message, CancellationToken, Task>>(), It.IsAny<MessageHandlerOptions>()), Times.Once);
         Assert.AreEqual(1, _options.MaxConcurrentCalls);
     }
 
     [TestMethod]
     public async Task ProcessMessageAsync_ShouldCallProcessMessageAsync()
     {
-        var client = new Mock<IPcsSubscriptionClient>();
+        var client = new Mock<IPcsServiceBusProcessor>();
         var message = new Message(Encoding.UTF8.GetBytes($"{{\"Plant\" : \"asdf\", \"ProjectName\" : \"ew2f\", \"Description\" : \"sdf\"}}"));
 
         var lockToken = Guid.NewGuid();

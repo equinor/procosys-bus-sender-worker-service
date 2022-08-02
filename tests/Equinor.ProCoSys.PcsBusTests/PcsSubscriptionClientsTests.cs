@@ -1,11 +1,11 @@
 ﻿using Equinor.ProCoSys.PcsServiceBus.Receiver;
 using Equinor.ProCoSys.PcsServiceBus.Receiver.Interfaces;
-using Microsoft.Azure.ServiceBus;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Azure.Messaging.ServiceBus;
 
 namespace Equinor.ProCoSys.PcsServiceBusTests;
 
@@ -13,15 +13,15 @@ namespace Equinor.ProCoSys.PcsServiceBusTests;
 public class PcsSubscriptionClientsTests
 {
     private PcsSubscriptionClients _dut;
-    private Mock<IPcsSubscriptionClient> _client1;
-    private Mock<IPcsSubscriptionClient> _client2;
+    private Mock<IPcsServiceBusProcessor> _client1;
+    private Mock<IPcsServiceBusProcessor> _client2;
 
     [TestInitialize]
     public void Setup()
     {
         _dut = new PcsSubscriptionClients(1000);
-        _client1 = new Mock<IPcsSubscriptionClient>();
-        _client2 = new Mock<IPcsSubscriptionClient>();
+        _client1 = new Mock<IPcsServiceBusProcessor>();
+        _client2 = new Mock<IPcsServiceBusProcessor>();
 
         _dut.Add(_client1.Object);
         _dut.Add(_client2.Object);
@@ -39,8 +39,8 @@ public class PcsSubscriptionClientsTests
     public async Task AllMethodsWorkWithoutFailureOnEmpty()
     {
         var emptyClients = new PcsSubscriptionClients(1000);
-        var handler = new Mock<Func<IPcsSubscriptionClient, Message, CancellationToken, Task>>();
-        var options = new MessageHandlerOptions(Test);
+        var handler = new Mock<Func<IPcsServiceBusProcessor, ServiceBusMessage, CancellationToken, Task>>();
+        var options = new ServiceBusProcessorOptions();
         await emptyClients.CloseAllAsync();
         emptyClients.RegisterPcsMessageHandler(handler.Object, options);
     }

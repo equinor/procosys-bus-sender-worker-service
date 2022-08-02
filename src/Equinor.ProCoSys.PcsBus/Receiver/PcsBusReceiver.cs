@@ -2,8 +2,8 @@
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Azure.Messaging.ServiceBus;
 using Equinor.ProCoSys.PcsServiceBus.Receiver.Interfaces;
-using Microsoft.Azure.ServiceBus;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -12,7 +12,7 @@ namespace Equinor.ProCoSys.PcsServiceBus.Receiver;
 public class PcsBusReceiver : IHostedService
 {
     private readonly ILogger<PcsBusReceiver> _logger;
-    private readonly IPcsSubscriptionClients _subscriptionClients;
+    private readonly IPcsServiceBusProcessors _serviceBusProcessors;
     private readonly IBusReceiverServiceFactory _busReceiverServiceFactory;
     private readonly ILeaderElectorService _leaderElectorService;
     private Timer _timer;
@@ -20,16 +20,16 @@ public class PcsBusReceiver : IHostedService
 
     public PcsBusReceiver(
         ILogger<PcsBusReceiver> logger,
-        IPcsSubscriptionClients subscriptionClients,
+        IPcsServiceBusProcessors serviceBusProcessors,
         IBusReceiverServiceFactory busReceiverServiceFactory,
         ILeaderElectorService leaderElectorService)
     {
         _logger = logger;
-        _subscriptionClients = subscriptionClients;
+        _serviceBusProcessors = serviceBusProcessors;
         _busReceiverServiceFactory = busReceiverServiceFactory;
         _leaderElectorService = leaderElectorService;
 
-        if (_subscriptionClients.RenewLeaseInterval == 0)
+        if (_serviceBusProcessors.RenewLeaseInterval == 0)
         {
             throw new Exception("Lease interval must be a positive integer");
         }
@@ -63,7 +63,7 @@ public class PcsBusReceiver : IHostedService
         }
         finally
         {
-            _timer.Change(_subscriptionClients.RenewLeaseInterval, Timeout.Infinite);
+            _timer.Change(_serviceBusProcessors.RenewLeaseInterval, Timeout.Infinite);
         }
     }
 
@@ -100,28 +100,26 @@ public class PcsBusReceiver : IHostedService
 
     private void StartMessageReceiving()
     {
-        var messageHandlerOptions = new MessageHandlerOptions(ExceptionReceivedHandler)
+        var messageHandlerOptions = new ServiceBusProcessorOptions
         {
             MaxConcurrentCalls = 1,
-            AutoComplete = false
+            AutoCompleteMessages = false
         };
 
-        _subscriptionClients.RegisterPcsMessageHandler(ProcessMessagesAsync, messageHandlerOptions);
+        _serviceBusProcessors.RegisterPcsMessageHandler(ProcessMessagesAsync);
     }
 
-    private void StopMessageReceiving() => _subscriptionClients.UnregisterPcsMessageHandler();
+    private void StopMessageReceiving() => _serviceBusProcessors.UnRegisterPcsMessageHandler();
 
-    public async Task ProcessMessagesAsync(IPcsSubscriptionClient subscriptionClient, Message message, CancellationToken token)
+    public async Task ProcessMessagesAsync(ProcessMessageEventArgs args)
     {
         try
         {
-            var messageJson = Encoding.UTF8.GetString(message.Body);
+            var messageJson = Encoding.UTF8.GetString(args.Message.Body);
 
             var busReceiverService = _busReceiverServiceFactory.GetServiceInstance();
-
             await busReceiverService.ProcessMessageAsync(subscriptionClient.PcsTopic, messageJson, token);
-
-            await subscriptionClient.CompleteAsync(message.SystemProperties.LockToken);
+            await args.CompleteMessageAsync(args.Message);
         }
         catch (Exception ex)
         {
@@ -131,20 +129,18 @@ public class PcsBusReceiver : IHostedService
 
     public Task StopAsync(CancellationToken cancellationToken)
     {
-        _subscriptionClients.CloseAllAsync();
+        _serviceBusProcessors.CloseAllAsync();
 
         return Task.CompletedTask;
     }
 
     // Use this handler to examine the exceptions received on the message pump.
-    private Task ExceptionReceivedHandler(ExceptionReceivedEventArgs exceptionReceivedEventArgs)
+    private Task ExceptionReceivedHandler(ProcessErrorEventArgs exceptionReceivedEventArgs)
     {
-        _logger.LogError($"Message handler encountered an exception {exceptionReceivedEventArgs.Exception}.");
-        var context = exceptionReceivedEventArgs.ExceptionReceivedContext;
-        _logger.LogError("Exception context for troubleshooting:");
-        _logger.LogError($"- Endpoint: {context.Endpoint}");
-        _logger.LogError($"- Entity Path: {context.EntityPath}");
-        _logger.LogError($"- Executing Action: {context.Action}");
+        _logger.LogError($"Message handler encountered an exception {exceptionReceivedEventArgs.Exception}");
+        _logger.LogError($"- Fully Qualified namespace: {exceptionReceivedEventArgs.FullyQualifiedNamespace}");
+        _logger.LogError($"- Entity Path: {exceptionReceivedEventArgs.EntityPath}");
+        _logger.LogError($"- Error Source: {exceptionReceivedEventArgs.ErrorSource}");
         return Task.CompletedTask;
     }
 }

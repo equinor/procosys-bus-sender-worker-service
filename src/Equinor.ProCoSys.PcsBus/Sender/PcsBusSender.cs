@@ -3,33 +3,37 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Transactions;
+using Azure.Messaging.ServiceBus;
 using Equinor.ProCoSys.PcsServiceBus.Sender.Interfaces;
-using Microsoft.Azure.ServiceBus;
 
 namespace Equinor.ProCoSys.PcsServiceBus.Sender;
 
 public class PcsBusSender : IPcsBusSender
 {
-    private readonly IList<KeyValuePair<string, ITopicClient>> _topicClients;
+    private readonly IList<KeyValuePair<string, ServiceBusSender>> _busSenders;
 
-    public PcsBusSender() => _topicClients = new List<KeyValuePair<string, ITopicClient>>();
+    public PcsBusSender() => _busSenders = new List<KeyValuePair<string, ServiceBusSender>>();
 
-    public void Add(string topicName, ITopicClient topicClient) => _topicClients.Add(new KeyValuePair<string, ITopicClient>(topicName, topicClient));
+    public void Add(string topicName, ServiceBusSender sender) => _busSenders.Add(new KeyValuePair<string, ServiceBusSender>(topicName, sender));
 
-    public Task SendAsync(string topic, string jsonMessage)
+    public async Task SendAsync(string topic, string jsonMessage)
     {
-        var message = new Message(Encoding.UTF8.GetBytes(jsonMessage));
-        var topicClient = _topicClients.SingleOrDefault(t => t.Key == topic).Value;
-        if (topicClient == null)
+        var message = new ServiceBusMessage(Encoding.UTF8.GetBytes(jsonMessage));
+        var sender = _busSenders.SingleOrDefault(t => t.Key == topic).Value;
+        if (sender == null)
         {
             throw new Exception($"Unable to find TopicClient for topic: {topic}");
         }
-        return topicClient.SendAsync(message);
+
+        using var ts = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+        await sender.SendMessageAsync(message);
+        ts.Complete();
     }
 
     public async Task CloseAllAsync()
     {
-        foreach (var topicClient in _topicClients)
+        foreach (var topicClient in _busSenders)
         {
             await topicClient.Value.CloseAsync();
         }
