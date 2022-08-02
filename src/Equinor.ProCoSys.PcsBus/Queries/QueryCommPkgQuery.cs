@@ -14,7 +14,7 @@ public class QueryCommPkgQuery
         '"", ""CommPkgId"" : ""' || c.commpkg_id ||
         '"", ""CommPkgNo"" : ""' || c.commpkgno ||
         '"", ""DocumentId"" : ""' || d.document_id ||
-        '"", ""QueryPlaceHolderId"" : ""' || 'c.placeholderId'  ||
+        '"", ""QueryPlaceHolderId"" : ""' || 'q/d.placeholderId'  ||
         '"", ""QueryNo"" : ""' || d.documentno ||
         '"", ""LastUpdated"" : ""' || TO_CHAR(co.last_updated, 'yyyy-mm-dd hh24:mi:ss') ||
         '""}}' as message

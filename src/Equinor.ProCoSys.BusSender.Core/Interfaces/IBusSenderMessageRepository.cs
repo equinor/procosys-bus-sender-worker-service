@@ -6,6 +6,7 @@ public interface IBusSenderMessageRepository
 {
     Task<string> GetCallOffMessage(long callOffId);
     Task<string> GetCheckListMessage(long checkListId);
+    Task<string> GetCommPkgQueryMessage(long commPkgId, long documentId);
     Task<string> GetDocumentMessage(long documentId);
     Task<string> GetLoopContentMessage(long loopContentId);
     Task<string> GetPipingRevisionMessage(long pipeRevisionId);
