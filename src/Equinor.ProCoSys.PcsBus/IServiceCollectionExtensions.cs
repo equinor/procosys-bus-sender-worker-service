@@ -42,7 +42,8 @@ public static class IServiceCollectionExtensions
         var processorOptions = new ServiceBusProcessorOptions
         {
             MaxConcurrentCalls = 1,
-            AutoCompleteMessages = false
+            AutoCompleteMessages = false,
+            ReceiveMode = ServiceBusReceiveMode.PeekLock
         };
 
         options.Subscriptions.ForEach(
