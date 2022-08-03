@@ -17,32 +17,9 @@ public static class IServiceCollectionExtensions
         var optionsBuilder = new PcsServiceBusConfig();
         options(optionsBuilder);
 
-        var pcsSubscriptionClients = new PcsServiceBusProcessors(optionsBuilder.RenewLeaseIntervalMilliSec);
+        var pcsSubscriptionProcessors = await CreateSubscriptionProcessors(optionsBuilder);
 
-        await using var client = new ServiceBusClient(optionsBuilder.ConnectionString);
-        var processorOptions = new ServiceBusProcessorOptions()
-        {
-            MaxConcurrentCalls = 1,
-            AutoCompleteMessages = false
-        };
-        
-        optionsBuilder.Subscriptions.ForEach(
-            topicInfo =>
-            {
-                var topicInfoTopicPath = string.IsNullOrWhiteSpace(topicInfo.topicPath)
-                    ? topicInfo.pcsTopic.ToString()
-                    : topicInfo.topicPath;
-
-                var subscriptionName = "";
-                pcsSubscriptionClients.Add(
-                    new PcsServiceBusProcessor(client,topicInfoTopicPath,subscriptionName,processorOptions, topicInfo.pcsTopic));
-            });
-
-
-
-
-
-        services.AddSingleton<IPcsServiceBusProcessors>(pcsSubscriptionClients);
+        services.AddSingleton<IPcsServiceBusProcessors>(pcsSubscriptionProcessors);
 
         if (optionsBuilder.LeaderElectorUrl != null)
         {
@@ -56,6 +33,33 @@ public static class IServiceCollectionExtensions
         services.AddHostedService<PcsBusReceiver>();
 
         return services;
+    }
+
+    private static async Task<PcsServiceBusProcessors> CreateSubscriptionProcessors(PcsServiceBusConfig options)
+    {
+        var pcsProcessors = new PcsServiceBusProcessors(options.RenewLeaseIntervalMilliSec);
+        await using var client = new ServiceBusClient(options.ConnectionString);
+        var processorOptions = new ServiceBusProcessorOptions
+        {
+            MaxConcurrentCalls = 1,
+            AutoCompleteMessages = false
+        };
+
+        options.Subscriptions.ForEach(
+            topicInfo =>
+            {
+                var topicInfoTopicPath = string.IsNullOrWhiteSpace(topicInfo.topicPath)
+                    ? topicInfo.pcsTopic.ToString()
+                    : topicInfo.topicPath;
+                var subscriptionName = options.ReadFromDeadLetterQueue
+                    ? $"{topicInfo.subscrition}/$deadletterqueue"
+                    : topicInfo.subscrition;
+
+                pcsProcessors.Add(
+                    new PcsServiceBusProcessor(client, topicInfoTopicPath, subscriptionName, processorOptions,
+                        topicInfo.pcsTopic));
+            });
+        return pcsProcessors;
     }
 
     public static async void AddTopicClients(this IServiceCollection services, string serviceBusConnectionString, string topicNames)
