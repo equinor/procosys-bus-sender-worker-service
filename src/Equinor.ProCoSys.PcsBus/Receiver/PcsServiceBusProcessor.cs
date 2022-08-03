@@ -9,20 +9,21 @@ public class PcsServiceBusProcessor : ServiceBusProcessor, IPcsServiceBusProcess
 {
     public PcsTopic PcsTopic { get; }
 
-    private Func<IPcsServiceBusProcessor, ServiceBusMessage, CancellationToken, Task> _pcsHandler;
+    private Func<IPcsServiceBusProcessor,ProcessMessageEventArgs, Task>  _pcsHandler;
 
+    public PcsServiceBusProcessor(ServiceBusClient client,string topicName, string subscriptionName,ServiceBusProcessorOptions options, PcsTopic pcsTopic) 
+        : base(client,topicName,subscriptionName,options) =>
+        PcsTopic = pcsTopic;
 
-    public void RegisterPcsMessageHandler(Func<IPcsServiceBusProcessor, ServiceBusMessage, CancellationToken, Task> handler, ServiceBusProcessorOptions messageHandlerOptions)
+    public void RegisterPcsMessageHandler(Func<IPcsServiceBusProcessor, ProcessMessageEventArgs, Task> handler)
     {
         _pcsHandler = handler;
-        base.ProcessMessageAsync(HandleMessage, messageHandlerOptions);
+        ProcessMessageAsync += HandleMessage;
     }
 
-    public Task CompleteAsync(string token) => throw new NotImplementedException();
+    public Task StopProcessingAsync() => base.StopProcessingAsync();
 
-    public Task CloseAsync() => throw new NotImplementedException();
+    public Task StartProcessingAsync() => base.StartProcessingAsync();
 
-    public void UnRegisterPcsMessageHandler() => base.UnregisterMessageHandlerAsync(TimeSpan.FromSeconds(10));
-
-    private Task HandleMessage(ServiceBusMessage message, CancellationToken token) => _pcsHandler.Invoke(this, message, token);
+    private Task HandleMessage(ProcessMessageEventArgs events) => _pcsHandler.Invoke(this,events);
 }

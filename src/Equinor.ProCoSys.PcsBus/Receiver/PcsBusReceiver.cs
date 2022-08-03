@@ -75,6 +75,7 @@ public class PcsBusReceiver : IHostedService
         {
             _logger.LogInformation($"CanProceedAsLeaderCheckAsync, lease obtained at: {DateTimeOffset.Now}");
             IsLeader = true;
+            _serviceBusProcessors.RegisterPcsMessageHandler(ProcessMessagesAsync);
             StartMessageReceiving();
         }
     }
@@ -98,27 +99,18 @@ public class PcsBusReceiver : IHostedService
 
     private bool IsLeader { get; set; }
 
-    private void StartMessageReceiving()
-    {
-        var messageHandlerOptions = new ServiceBusProcessorOptions
-        {
-            MaxConcurrentCalls = 1,
-            AutoCompleteMessages = false
-        };
-
-        _serviceBusProcessors.RegisterPcsMessageHandler(ProcessMessagesAsync);
-    }
+    private void StartMessageReceiving() => _serviceBusProcessors.StartProcessingAsync();
 
     private void StopMessageReceiving() => _serviceBusProcessors.UnRegisterPcsMessageHandler();
 
-    public async Task ProcessMessagesAsync(ProcessMessageEventArgs args)
+    public async Task ProcessMessagesAsync(IPcsServiceBusProcessor processor,ProcessMessageEventArgs args)
     {
         try
         {
             var messageJson = Encoding.UTF8.GetString(args.Message.Body);
 
             var busReceiverService = _busReceiverServiceFactory.GetServiceInstance();
-            await busReceiverService.ProcessMessageAsync(subscriptionClient.PcsTopic, messageJson, token);
+            await busReceiverService.ProcessMessageAsync(processor.PcsTopic, messageJson, args.CancellationToken);
             await args.CompleteMessageAsync(args.Message);
         }
         catch (Exception ex)

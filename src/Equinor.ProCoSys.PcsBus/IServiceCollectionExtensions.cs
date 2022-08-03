@@ -22,9 +22,10 @@ public static class IServiceCollectionExtensions
         await using var client = new ServiceBusClient(optionsBuilder.ConnectionString);
         var processorOptions = new ServiceBusProcessorOptions()
         {
-            // interesting options here
+            MaxConcurrentCalls = 1,
+            AutoCompleteMessages = false
         };
-
+        
         optionsBuilder.Subscriptions.ForEach(
             topicInfo =>
             {
@@ -34,8 +35,13 @@ public static class IServiceCollectionExtensions
 
                 var subscriptionName = "";
                 pcsSubscriptionClients.Add(
-                    client.CreateProcessor(topicInfoTopicPath,subscriptionName,processorOptions));
+                    new PcsServiceBusProcessor(client,topicInfoTopicPath,subscriptionName,processorOptions, topicInfo.pcsTopic));
             });
+
+
+
+
+
         services.AddSingleton<IPcsServiceBusProcessors>(pcsSubscriptionClients);
 
         if (optionsBuilder.LeaderElectorUrl != null)
