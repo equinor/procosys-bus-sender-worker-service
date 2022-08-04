@@ -1,0 +1,10 @@
+version: '3.4'
+
+services:
+  equinor.procosys.bussender.worker:
+    image: ${DOCKER_REGISTRY-}equinorprocosysbussenderworker
+    build:
+      context: .
+      dockerfile: src/Equinor.ProCoSys.BusSender.Worker/Dockerfile
+    volumes:
+      - C:\Users\tordj\AppData\Roaming\Microsoft\UserSecrets\:/.microsoft/usersecrets/ 

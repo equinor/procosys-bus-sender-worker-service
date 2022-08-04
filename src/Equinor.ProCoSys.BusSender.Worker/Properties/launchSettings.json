@@ -1,9 +1,16 @@
-﻿{
+{
   "profiles": {
     "BusSenderWorkerService": {
       "commandName": "Project",
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "Development"
+
+      }
+    },
+    "Docker": {
+      "commandName": "Docker",
+      "environmentVariables": {
+        "IsLocal": "True"
       }
     }
   }
