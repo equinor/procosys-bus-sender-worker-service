@@ -60,7 +60,7 @@ public class TagQuery
             join element e on e.element_id = t.tag_id
             join projectschema ps on ps.projectschema = t.projectschema
             left join mcpkg on mcpkg.mcpkg_id=t.mcpkg_id
-            left join commpkg on commpkg.commpkg_id=mcpkg.commpkg_id
+            left join commpkg on commpkg.commpkg_id= COALESCE(mcpkg.commpkg_id,t.commpkg_id)
             left join project p on p.project_id=t.project_id
             left join tagfunction tf on tf.tagfunction_id = t.tagfunction_id
             left join library area on area.library_id=t.area_id
