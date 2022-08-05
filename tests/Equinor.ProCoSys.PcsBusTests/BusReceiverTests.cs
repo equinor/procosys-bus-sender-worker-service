@@ -1,6 +1,5 @@
 ﻿using Equinor.ProCoSys.PcsServiceBus.Receiver;
 using Equinor.ProCoSys.PcsServiceBus.Receiver.Interfaces;
-
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -20,7 +19,6 @@ public class PcsBusReceiverTests
 {
     private PcsBusReceiver _dut;
     private Mock<IPcsServiceBusProcessors> _processors;
-    ServiceBusProcessorOptions _options;
     private Mock<ILogger<PcsBusReceiver>> _logger;
     private Mock<IBusReceiverService> _busReceiverService;
     private Mock<ILeaderElectorService> _leaderElectorService;
@@ -33,8 +31,8 @@ public class PcsBusReceiverTests
         _processors = new Mock<IPcsServiceBusProcessors>();
         _processors.Setup(c => c.RenewLeaseInterval).Returns(10000);
         _processors.Setup(c
-            => c.RegisterPcsMessageHandler(
-                It.IsAny<Func<IPcsServiceBusProcessor, ProcessMessageEventArgs, Task>>())
+            => c.RegisterPcsEventHandlers(
+                It.IsAny<Func<IPcsServiceBusProcessor, ProcessMessageEventArgs, Task>>(), It.IsAny<Func<ProcessErrorEventArgs, Task>>())
         );
 
         _busReceiverService = new Mock<IBusReceiverService>();
@@ -64,9 +62,8 @@ public class PcsBusReceiverTests
     public void StartAsync_ShouldVerifyRegisterPcsMessageHandlerWasNotCalledOnStartAsync()
     {
         _dut.StartAsync(new CancellationToken());
-
-        _processors.Verify(c => c.RegisterPcsMessageHandler(It.IsAny<Func<IPcsServiceBusProcessor, ProcessMessageEventArgs,  Task>>()), Times.Never);
-        Assert.IsNull(_options);
+        _processors.Verify(c => c.RegisterPcsEventHandlers(It.IsAny<Func<IPcsServiceBusProcessor, ProcessMessageEventArgs, Task>>(),
+            It.IsAny<Func<ProcessErrorEventArgs, Task>>()), Times.Never);
     }
 
     [TestMethod]
@@ -75,8 +72,11 @@ public class PcsBusReceiverTests
         _dut.StartAsync(new CancellationToken());
 
         Thread.Sleep(7000);
-        _processors.Verify(c => c.RegisterPcsMessageHandler(It.IsAny<Func<IPcsServiceBusProcessor, ProcessMessageEventArgs, Task>>()), Times.Once);
-       // Assert.IsNotNull(_options);
+        _processors.Verify(c
+            => c.RegisterPcsEventHandlers(
+                It.IsAny<Func<IPcsServiceBusProcessor, ProcessMessageEventArgs, Task>>(),
+                It.IsAny<Func<ProcessErrorEventArgs, Task>>()),
+            Times.Once);
     }
 
     [TestMethod]
@@ -86,8 +86,8 @@ public class PcsBusReceiverTests
         _dut.StartAsync(new CancellationToken());
 
         Thread.Sleep(7000);
-        _processors.Verify(c => c.RegisterPcsMessageHandler(It.IsAny<Func<IPcsServiceBusProcessor, ProcessMessageEventArgs,Task>>()), Times.Never);
-        Assert.IsNull(_options);
+        _processors.Verify(c
+            => c.RegisterPcsEventHandlers(It.IsAny<Func<IPcsServiceBusProcessor, ProcessMessageEventArgs, Task>>(), It.IsAny<Func<ProcessErrorEventArgs, Task>>()), Times.Never);
     }
 
     [TestMethod]
@@ -112,8 +112,10 @@ public class PcsBusReceiverTests
 
         Thread.Sleep(7000);
 
-        _processors.Verify(c => c.RegisterPcsMessageHandler(It.IsAny<Func<IPcsServiceBusProcessor, ProcessMessageEventArgs, Task>>()), Times.Once);
-       // Assert.AreEqual(1, _options.MaxConcurrentCalls);
+        _processors.Verify(c
+            => c.RegisterPcsEventHandlers(
+                It.IsAny<Func<IPcsServiceBusProcessor, ProcessMessageEventArgs, Task>>(),
+                It.IsAny<Func<ProcessErrorEventArgs, Task>>()), Times.Once);
     }
 
     [TestMethod]
@@ -121,13 +123,13 @@ public class PcsBusReceiverTests
     {
         var pcsProcessor = new Mock<IPcsServiceBusProcessor>();
         var processor = new Mock<ServiceBusReceiver>();
-        
+
         // mock
-        var rootOperationId = "operation-id-123";
-        var parentId = "parent-id-123";
-        var applicationProperties = new Dictionary<string, object>();
-         applicationProperties.Add("OperationId", rootOperationId);
-         applicationProperties.Add("ParentId", parentId);
+        var applicationProperties = new Dictionary<string, object>
+        {
+            { "OperationId", "operation-id-123" },
+            { "ParentId", "parent-id-123" }
+        };
         var serviceBusReceivedMessage = ServiceBusModelFactory.ServiceBusReceivedMessage(
             body: BinaryData.FromString($"{{\"Plant\" : \"asdf\", \"ProjectName\" : \"ew2f\", \"Description\" : \"sdf\"}}"),
             properties: applicationProperties,
@@ -138,7 +140,7 @@ public class PcsBusReceiverTests
 
         SetLockToken(messageEventArgs, lockToken);
         await _dut.ProcessMessagesAsync(pcsProcessor.Object, messageEventArgs);
-        
+
         _busReceiverService.Verify(b => b.ProcessMessageAsync(pcsProcessor.Object.PcsTopic, Encoding.UTF8.GetString(messageEventArgs.Message.Body), It.IsAny<CancellationToken>()), Times.Once);
     }
 

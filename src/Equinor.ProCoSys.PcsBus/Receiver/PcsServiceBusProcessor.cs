@@ -15,10 +15,11 @@ public class PcsServiceBusProcessor : ServiceBusProcessor, IPcsServiceBusProcess
         : base(client,topicName,subscriptionName,options) =>
         PcsTopic = pcsTopic;
 
-    public void RegisterPcsMessageHandler(Func<IPcsServiceBusProcessor, ProcessMessageEventArgs, Task> handler)
+    public void RegisterPcsEventHandlers(Func<IPcsServiceBusProcessor, ProcessMessageEventArgs, Task> handler,Func<ProcessErrorEventArgs,Task> errorHandler)
     {
         _pcsHandler = handler;
         ProcessMessageAsync += HandleMessage;
+        ProcessErrorAsync += errorHandler;
     }
 
     public Task StopProcessingAsync() => base.StopProcessingAsync();

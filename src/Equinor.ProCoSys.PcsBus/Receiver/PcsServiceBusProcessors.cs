@@ -33,11 +33,10 @@ public class PcsServiceBusProcessors : IPcsServiceBusProcessors
         }
     }
 
-    public void RegisterPcsMessageHandler(
-        Func<IPcsServiceBusProcessor,ProcessMessageEventArgs, Task> handler) =>
+    public void RegisterPcsEventHandlers(Func<IPcsServiceBusProcessor, ProcessMessageEventArgs, Task> messageHandler, Func<ProcessErrorEventArgs, Task> errorHandler) =>
         _serviceBusProcessors.ForEach(s =>
         {
-            s.RegisterPcsMessageHandler(handler);
+            s.RegisterPcsEventHandlers(messageHandler,errorHandler);
         });
 
     public async void StartProcessingAsync()

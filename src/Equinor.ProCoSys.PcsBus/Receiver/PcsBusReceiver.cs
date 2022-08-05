@@ -75,7 +75,7 @@ public class PcsBusReceiver : IHostedService
         {
             _logger.LogInformation($"CanProceedAsLeaderCheckAsync, lease obtained at: {DateTimeOffset.Now}");
             IsLeader = true;
-            _serviceBusProcessors.RegisterPcsMessageHandler(ProcessMessagesAsync);
+            _serviceBusProcessors.RegisterPcsEventHandlers(ProcessMessagesAsync, ExceptionReceivedHandler);
             StartMessageReceiving();
         }
     }

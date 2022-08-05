@@ -40,9 +40,10 @@ public class PcsSubscriptionClientsTests
     {
         var emptyClients = new PcsServiceBusProcessors(1000);
         var handler = new Mock<Func<IPcsServiceBusProcessor, ProcessMessageEventArgs, Task>>();
+        var errorHandler = new Mock<Func<ProcessErrorEventArgs, Task>>();
         var options = new ServiceBusProcessorOptions();
         await emptyClients.CloseAllAsync();
-        emptyClients.RegisterPcsMessageHandler(handler.Object);
+        emptyClients.RegisterPcsEventHandlers(handler.Object,errorHandler.Object);
     }
 
     private Task Test(ProcessErrorEventArgs arg) => Task.CompletedTask;

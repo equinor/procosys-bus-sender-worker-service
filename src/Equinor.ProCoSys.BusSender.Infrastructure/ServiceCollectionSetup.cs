@@ -36,12 +36,12 @@ public static class ServiceCollectionSetup
             options.EnableSensitiveDataLogging();
         }).AddScoped<IUnitOfWork>(serviceProvider => serviceProvider.GetRequiredService<BusSenderServiceContext>());
 
-    public static async void AddTopicClients(this IServiceCollection services, string serviceBusConnectionString, string topicNames)
+    public static void AddTopicClients(this IServiceCollection services, string serviceBusConnectionString, string topicNames)
     {
         var topics = topicNames.Split(',');
         var pcsBusSender = new PcsBusSender();
         var options = new ServiceBusClientOptions { EnableCrossEntityTransactions = true };
-        await using var client = new ServiceBusClient(serviceBusConnectionString, options);
+        var client = new ServiceBusClient(serviceBusConnectionString, options);
         foreach (var topicName in topics)
         {
             var serviceBusSender = client.CreateSender(topicName);

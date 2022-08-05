@@ -12,12 +12,12 @@ namespace Equinor.ProCoSys.PcsServiceBus;
 
 public static class IServiceCollectionExtensions
 {
-    public static async Task<IServiceCollection> AddPcsServiceBusIntegration(this IServiceCollection services, Action<PcsServiceBusConfig> options)
+    public static IServiceCollection AddPcsServiceBusIntegration(this IServiceCollection services, Action<PcsServiceBusConfig> options)
     {
         var optionsBuilder = new PcsServiceBusConfig();
         options(optionsBuilder);
 
-        var pcsSubscriptionProcessors = await CreateSubscriptionProcessors(optionsBuilder);
+        var pcsSubscriptionProcessors =  CreateSubscriptionProcessors(optionsBuilder);
 
         services.AddSingleton<IPcsServiceBusProcessors>(pcsSubscriptionProcessors);
 
@@ -35,10 +35,10 @@ public static class IServiceCollectionExtensions
         return services;
     }
 
-    private static async Task<PcsServiceBusProcessors> CreateSubscriptionProcessors(PcsServiceBusConfig options)
+    private static  PcsServiceBusProcessors CreateSubscriptionProcessors(PcsServiceBusConfig options)
     {
         var pcsProcessors = new PcsServiceBusProcessors(options.RenewLeaseIntervalMilliSec);
-        await using var client = new ServiceBusClient(options.ConnectionString);
+        var client = new ServiceBusClient(options.ConnectionString);
         var processorOptions = new ServiceBusProcessorOptions
         {
             MaxConcurrentCalls = 1,
