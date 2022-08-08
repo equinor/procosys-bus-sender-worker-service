@@ -51,10 +51,10 @@ public class PcsBusReceiverTests
     }
 
     [TestMethod]
-    public async void StartAsync_ShouldCallStartProcessAsyncOnce()
+    public async Task StartAsync_ShouldCallStartProcessAsyncOnce()
     {
         await _dut.StartAsync(new CancellationToken());
-
+        Thread.Sleep(7000);
         _processors.Verify(c => c.StartProcessingAsync(), Times.Once);
     }
 
