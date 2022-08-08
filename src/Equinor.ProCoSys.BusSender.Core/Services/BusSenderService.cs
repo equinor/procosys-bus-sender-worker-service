@@ -45,9 +45,10 @@ public class BusSenderService : IBusSenderService
             if (events.Any())
             {
                 _telemetryClient.TrackMetric("BusSender Chunk", events.Count);
+                _logger.LogInformation("BusSenderService found {count} messages to process", events.Count);
+                await ProcessBusEvents(events);
             }
-            _logger.LogInformation("BusSenderService found {count} messages to process",events.Count);
-            await ProcessBusEvents(events);
+
         }
         catch (Exception exception)
         {
@@ -88,8 +89,9 @@ public class BusSenderService : IBusSenderService
     /// </summary>
     /// <param name="events"></param>
     /// <returns></returns>
-    private static IEnumerable<IGrouping<(string,long),BusEvent>> FilterOnSimpleMessagesAndGroupDuplicates(IEnumerable<BusEvent> events) => events.Where(e => long.TryParse(e.Message, out var id))
-        .GroupBy(e => (e.Event,  long.Parse(e.Message)));
+    private static IEnumerable<IGrouping<(string, long), BusEvent>> FilterOnSimpleMessagesAndGroupDuplicates(IEnumerable<BusEvent> events)
+        => events.Where(e => long.TryParse(e.Message, out var id))
+        .GroupBy(e => (e.Event, long.Parse(e.Message)));
 
     private async Task ProcessBusEvents(List<BusEvent> events)
     {
@@ -143,9 +145,11 @@ public class BusSenderService : IBusSenderService
                     if (checklistMessage == null)
                     {
                         busEvent.Status = Status.NotFound;
-                        return busEvent;
                     }
-                    busEvent.Message = checklistMessage;
+                    else
+                    {
+                        busEvent.Message = checklistMessage;
+                    }
                     break;
                 }
             case QueryTopic.TopicName:
@@ -154,9 +158,11 @@ public class BusSenderService : IBusSenderService
                     if (queryMessage == null)
                     {
                         busEvent.Status = Status.NotFound;
-                        return busEvent;
                     }
-                    busEvent.Message = queryMessage;
+                    else
+                    {
+                        busEvent.Message = queryMessage;
+                    }
                     break;
                 }
             case DocumentTopic.TopicName:
@@ -165,9 +171,11 @@ public class BusSenderService : IBusSenderService
                     if (documentMessage == null)
                     {
                         busEvent.Status = Status.NotFound;
-                        return busEvent;
                     }
-                    busEvent.Message = documentMessage;
+                    else
+                    {
+                        busEvent.Message = documentMessage;
+                    }
                     break;
                 }
             case WorkOrderTopic.TopicName:
@@ -176,21 +184,76 @@ public class BusSenderService : IBusSenderService
                     if (workOrderMessage == null)
                     {
                         busEvent.Status = Status.NotFound;
-                        return busEvent;
                     }
-                    busEvent.Message = workOrderMessage;
+                    else
+                    {
+                        busEvent.Message = workOrderMessage;
+                    }
 
                     break;
                 }
-                /***
-                 * WO_MATERIAL gets several inserts when saving a material, resulting in multiple rows in the BUSEVENT table.
-                 * here we filter out all but the latest material event for a records with the same id and set those to Status = Skipped.
-                 * This is to reduce spam on the bus.
-                 */
-            case WoMaterialTopic.TopicName when _service.IsNotLatestMaterialEvent(events, busEvent):
+            case CallOffTopic.TopicName:
                 {
-                    busEvent.Status = Status.Skipped;
-                    return busEvent;
+                    var callOffMessage = await _service.CreateCallOffMessage(busEvent.Message);
+                    if (callOffMessage == null)
+                    {
+                        busEvent.Status = Status.NotFound;
+                    }
+                    else
+                    {
+                        busEvent.Message = callOffMessage;
+                    }
+                    break;
+                }
+            case WoChecklistTopic.TopicName:
+                {
+                    var woChecklistMessage = await _service.CreateWoChecklistMessage(busEvent.Message);
+                    if (woChecklistMessage == null)
+                    {
+                        busEvent.Status = Status.NotFound;
+                    }
+                    else
+                    {
+                        busEvent.Message = woChecklistMessage;
+                    }
+                    break;
+                }
+            case WoMilestoneTopic.TopicName:
+                {
+                    var woMilestoneMessage = await _service.CreateWoMilestoneMessage(busEvent.Message);
+                    if (woMilestoneMessage == null)
+                    {
+                        busEvent.Status = Status.NotFound;
+                    }
+                    else
+                    {
+                        busEvent.Message = woMilestoneMessage;
+                    }
+                    break;
+                }
+            /***
+             * WO_MATERIAL gets several inserts when saving a material, resulting in multiple rows in the BUSEVENT table.
+             * here we filter out all but the latest material event for a records with the same id and set those to Status = Skipped.
+             * This is to reduce spam on the bus.
+             */
+            case WoMaterialTopic.TopicName:
+                {
+                    if (_service.IsNotLatestMaterialEvent(events, busEvent))
+                    {
+                        busEvent.Status = Status.Skipped;
+                        break;
+                    }
+
+                    var woMaterialMessage = await _service.CreateWoMaterialMessage(busEvent.Message);
+                    if (woMaterialMessage == null)
+                    {
+                        busEvent.Status = Status.NotFound;
+                    }
+                    else
+                    {
+                        busEvent.Message = woMaterialMessage;
+                    }
+                    break;
                 }
         }
         return busEvent;

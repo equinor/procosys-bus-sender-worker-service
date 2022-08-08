@@ -1,11 +1,12 @@
-﻿
-
-namespace Equinor.ProCoSys.PcsServiceBus.Queries;
+﻿namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 
 public class ResponsibleQuery
 {
-    public static string GetQuery(string schema)
+    public static string GetQuery(long? responsibleId, string plant = null)
     {
+        DetectFaultyPlantInput(plant);
+        var whereClause = CreateWhereClause(responsibleId, plant, "r", "responsible_id");
+
         return @$"select
             '{{""Plant"" : ""' || r.projectschema || 
             '"", ""ResponsibleId"" : ""' || r.responsible_id || 
@@ -15,7 +16,7 @@ public class ResponsibleQuery
             '"", ""IsVoided"" : ""' || decode(r.isVoided,'Y', 'true', 'N', 'false') ||
             '"", ""LastUpdated"" : ""' || TO_CHAR(r.LAST_UPDATED, 'yyyy-mm-dd hh24:mi:ss') ||
             '""}}'  as message
-            from responsible r
-            where r.projectschema = '{schema}'";
+        from responsible r
+        {whereClause}";
     }
 }

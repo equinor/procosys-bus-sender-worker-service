@@ -2,8 +2,11 @@
 
 public class StockQuery
 {
-    public static string GetQuery(string schema)
+    public static string GetQuery(long? stockId, string plant = null)
     {
+        DetectFaultyPlantInput(plant);
+        var whereClause = CreateWhereClause(stockId, plant, "s", "id");
+
         return @$"select
             '{{""Plant"" : ""' || s.projectschema || 
             '"", ""StockId"" : ""' || s.id || 
@@ -11,7 +14,7 @@ public class StockQuery
             '"", ""Description"" : ""' || regexp_replace(s.description, '([""\])', '\\\1') || 
             '"", ""LastUpdated"" : ""' || TO_CHAR(s.LAST_UPDATED, 'yyyy-mm-dd hh24:mi:ss')  ||
             '""}}'  as message
-            from stock s
-            where s.projectschema = '{schema}'";
+        from stock s
+        {whereClause}";
     }
 }
