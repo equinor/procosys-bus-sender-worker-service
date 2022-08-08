@@ -20,6 +20,7 @@ public class QueryCommPkgQuery
         '""}}' as message
         from elementreference er
             join commpkg c on c.commpkg_id = er.fromelement_id
+            join project p on p.project_id = c.project_id
             left join document d on d.document_id = er.toelement_id
         {whereClause}";
     }
