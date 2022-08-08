@@ -90,7 +90,7 @@ public class BusEventService : IBusEventService
             ? WashString(await _busSenderMessageRepository.GetSwcrMessage(swcrId))
             : throw new Exception("Failed to extract swcrId from message");
 
-    public async Task<string> CreateSwcrSignatureTaskMessage(string busEventMessage) =>
+    public async Task<string> CreateSwcrSignatureMessage(string busEventMessage) =>
         long.TryParse(busEventMessage, out var swcrSignatureId)
             ? WashString(await _busSenderMessageRepository.GetSwcrSignatureMessage(swcrSignatureId))
             : throw new Exception("Failed to extract swcrSignatureId from message");

@@ -8,7 +8,7 @@ public class QueryCommPkgQuery
         var whereClause = CreateWhereClause(commPkgId,documentId, plant);
 
         return @$"select
-        '{{""Plant"" : ""' || co.projectschema ||
+        '{{""Plant"" : ""' || er.projectschema ||
         '"", ""ProjectName"" : ""' || p.name ||
         '"", ""CommPkgPlaceHolderId"" : ""' || 'c.placeholderId' ||
         '"", ""CommPkgId"" : ""' || c.commpkg_id ||
