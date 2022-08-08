@@ -65,12 +65,12 @@ public class Program
                             {
                                 kv.SetCredential(new DefaultAzureCredential());
                             })
-                            .ConfigureRefresh(options =>
+                            .ConfigureRefresh(opt =>
                             {
-                                options.Register("Sentinel", true);
-                                options.SetCacheExpiration(TimeSpan.FromMinutes(5));
+                                opt.Register("Sentinel", true);
+                                opt.SetCacheExpiration(TimeSpan.FromMinutes(5));
                             })
-                            .Select(KeyFilter.Any, LabelFilter.Null)
+                            .Select(KeyFilter.Any)
                             .Select(KeyFilter.Any, settings["Azure:AppConfigLabelFilter"]);
                     });
                 }
@@ -86,12 +86,12 @@ public class Program
                             {
                                 kv.SetCredential(new DefaultAzureCredential());
                             })
-                            .ConfigureRefresh(options =>
+                            .ConfigureRefresh(opt =>
                             {
-                                options.Register("Sentinel", true);
-                                options.SetCacheExpiration(TimeSpan.FromMinutes(5));
+                                opt.Register("Sentinel", true);
+                                opt.SetCacheExpiration(TimeSpan.FromMinutes(5));
                             })
-                            .Select(KeyFilter.Any, LabelFilter.Null)
+                            .Select(KeyFilter.Any)
                             .Select(KeyFilter.Any, settings["Azure:AppConfigLabelFilter"]);
                     });
                 }
@@ -101,7 +101,8 @@ public class Program
         {
             logging.ClearProviders();
             logging.AddConsole();
-            logging.AddApplicationInsightsWebJobs(c => c.InstrumentationKey = context.Configuration["ApplicationInsights:InstrumentationKey"]);
+            logging.AddApplicationInsightsWebJobs(c 
+                => c.ConnectionString = context.Configuration["ApplicationInsights:ConnectionString"]);
         });
 
         builder.UseContentRoot(Directory.GetCurrentDirectory())
@@ -121,7 +122,8 @@ public class Program
                     Console.WriteLine("Created wallet file at: " + walletPath);
                     var connectionString = hostContext.Configuration["ConnectionString"];
                     services.AddDbContext(connectionString);
-                    services.AddApplicationInsightsTelemetryWorkerService(hostContext.Configuration["ApplicationInsights:InstrumentationKey"]);
+                    services.AddApplicationInsightsTelemetryWorkerService(o =>
+                        o.ConnectionString = hostContext.Configuration["ApplicationInsights:ConnectionString"]);
                 }
            
 

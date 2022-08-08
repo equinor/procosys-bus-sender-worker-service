@@ -19,7 +19,7 @@ public class ApplicationInsightsTelemetryClient : ITelemetryClient
         _ai = new TelemetryClient(telemetryConfiguration)
         {
             // The InstrumentationKey isn't set through the configuration object. Setting it explicitly works.
-            InstrumentationKey = telemetryConfiguration.InstrumentationKey
+            TelemetryConfiguration = { ConnectionString = telemetryConfiguration.ConnectionString}
         };
     }
 

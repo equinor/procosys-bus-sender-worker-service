@@ -45,15 +45,16 @@ public class BusSenderService : IBusSenderService
             if (events.Any())
             {
                 _telemetryClient.TrackMetric("BusSender Chunk", events.Count);
+                _logger.LogInformation("BusSenderService found {count} messages to process", events.Count);
+                await ProcessBusEvents(events);
             }
-            _logger.LogInformation("BusSenderService found {count} messages to process",events.Count);
-            await ProcessBusEvents(events);
         }
         catch (Exception exception)
         {
             _logger.LogError(exception, "BusSenderService execute send failed at: {now}", DateTimeOffset.Now);
             throw;
         }
+
         _logger.LogInformation("BusSenderService DoWorkerJob finished at: {now}", DateTimeOffset.Now);
         _telemetryClient.Flush();
     }
@@ -71,6 +72,7 @@ public class BusSenderService : IBusSenderService
         {
             SetAllButOneEventToSkipped(group);
         }
+
         return events;
     }
 
@@ -83,13 +85,15 @@ public class BusSenderService : IBusSenderService
     }
 
     /// <summary>
-    /// Removes all events that have Message = more than just a simple Id that can be converted to a long.
-    /// Then groups the events into bulks based on Id and Event type.
+    ///     Removes all events that have Message = more than just a simple Id that can be converted to a long.
+    ///     Then groups the events into bulks based on Id and Event type.
     /// </summary>
     /// <param name="events"></param>
     /// <returns></returns>
-    private static IEnumerable<IGrouping<(string,long),BusEvent>> FilterOnSimpleMessagesAndGroupDuplicates(IEnumerable<BusEvent> events) => events.Where(e => long.TryParse(e.Message, out var id))
-        .GroupBy(e => (e.Event,  long.Parse(e.Message)));
+    private static IEnumerable<IGrouping<(string, long), BusEvent>> FilterOnSimpleMessagesAndGroupDuplicates(
+        IEnumerable<BusEvent> events)
+        => events.Where(e => long.TryParse(e.Message, out var id))
+            .GroupBy(e => (e.Event, long.Parse(e.Message)));
 
     private async Task ProcessBusEvents(List<BusEvent> events)
     {
@@ -126,7 +130,7 @@ public class BusSenderService : IBusSenderService
         }
     }
 
-    private static bool HasUnsavedChanges(List<BusEvent> events) => events.Any(e => e.Status != Status.UnProcessed);
+    private static bool HasUnsavedChanges(IEnumerable<BusEvent> events) => events.Any(e => e.Status != Status.UnProcessed);
 
     private async Task<BusEvent> UpdateEventBasedOnTopic(IEnumerable<BusEvent> events, BusEvent busEvent)
     {
@@ -139,61 +143,115 @@ public class BusSenderService : IBusSenderService
                 }
             case ChecklistTopic.TopicName:
                 {
-                    var checklistMessage = await _service.CreateChecklistMessage(busEvent.Message);
-                    if (checklistMessage == null)
-                    {
-                        busEvent.Status = Status.NotFound;
-                        return busEvent;
-                    }
-                    busEvent.Message = checklistMessage;
+                    await CreateAndSetMessage(busEvent, _service.CreateChecklistMessage);
+                    break;
+                }
+            case CommPkgQueryTopic.TopicName:
+                {
+                    await CreateAndSetMessage(busEvent, _service.CreateCommPkgQueryMessage);
                     break;
                 }
             case QueryTopic.TopicName:
                 {
-                    var queryMessage = await _service.CreateQueryMessage(busEvent.Message);
-                    if (queryMessage == null)
-                    {
-                        busEvent.Status = Status.NotFound;
-                        return busEvent;
-                    }
-                    busEvent.Message = queryMessage;
+                    await CreateAndSetMessage(busEvent, _service.CreateQueryMessage);
+                    break;
+                }
+            case QuerySignatureTopic.TopicName:
+                {
+                    await CreateAndSetMessage(busEvent, _service.CreateQuerySignatureMessage);
                     break;
                 }
             case DocumentTopic.TopicName:
                 {
-                    var documentMessage = await _service.CreateDocumentMessage(busEvent.Message);
-                    if (documentMessage == null)
-                    {
-                        busEvent.Status = Status.NotFound;
-                        return busEvent;
-                    }
-                    busEvent.Message = documentMessage;
+                    await CreateAndSetMessage(busEvent, _service.CreateDocumentMessage);
                     break;
                 }
             case WorkOrderTopic.TopicName:
                 {
-                    var workOrderMessage = await _service.CreateWorkOrderMessage(busEvent.Message);
-                    if (workOrderMessage == null)
-                    {
-                        busEvent.Status = Status.NotFound;
-                        return busEvent;
-                    }
-                    busEvent.Message = workOrderMessage;
+                    await CreateAndSetMessage(busEvent, _service.CreateWorkOrderMessage);
 
                     break;
                 }
-                /***
-                 * WO_MATERIAL gets several inserts when saving a material, resulting in multiple rows in the BUSEVENT table.
-                 * here we filter out all but the latest material event for a records with the same id and set those to Status = Skipped.
-                 * This is to reduce spam on the bus.
-                 */
-            case WoMaterialTopic.TopicName when _service.IsNotLatestMaterialEvent(events, busEvent):
+            case CallOffTopic.TopicName:
                 {
-                    busEvent.Status = Status.Skipped;
-                    return busEvent;
+                    await CreateAndSetMessage(busEvent, _service.CreateCallOffMessage);
+                    break;
+                }
+            case WoChecklistTopic.TopicName:
+                {
+                    await CreateAndSetMessage(busEvent, _service.CreateWoChecklistMessage);
+                    break;
+                }
+            case WoMilestoneTopic.TopicName:
+                {
+                    await CreateAndSetMessage(busEvent, _service.CreateWoMilestoneMessage);
+                    break;
+                }
+            case SwcrTopic.TopicName:
+                {
+                    await CreateAndSetMessage(busEvent, _service.CreateSwcrMessage);
+                    break;
+                }
+            case SwcrSignatureTopic.TopicName:
+                {
+                    await CreateAndSetMessage(busEvent, _service.CreateSwcrSignatureMessage);
+                    break;
+                }
+            case LoopContentTopic.TopicName:
+                {
+                    await CreateAndSetMessage(busEvent, _service.CreateLoopContentMessage);
+                    break;
+                }
+            case StockTopic.TopicName:
+                {
+                    await CreateAndSetMessage(busEvent, _service.CreateStockMessage);
+                    break;
+                }
+            case PipingRevisionTopic.TopicName:
+                {
+                    await CreateAndSetMessage(busEvent, _service.CreatePipingRevisionMessage);
+                    break;
+                }
+            case PipingSpoolTopic.TopicName:
+                {
+                    await CreateAndSetMessage(busEvent, _service.CreatePipingSpoolMessage);
+                    break;
+                }
+            /***
+             * WO_MATERIAL gets several inserts when saving a material, resulting in multiple rows in the BUSEVENT table.
+             * here we filter out all but the latest material event for a records with the same id and set those to Status = Skipped.
+             * This is to reduce spam on the bus.
+             */
+            case WoMaterialTopic.TopicName:
+                {
+                    if (_service.IsNotLatestMaterialEvent(events, busEvent))
+                    {
+                        busEvent.Status = Status.Skipped;
+                        break;
+                    }
+
+                    await CreateAndSetMessage(busEvent, _service.CreateWoMaterialMessage);
+                    break;
                 }
         }
+
         return busEvent;
+    }
+
+    /***
+     * Takes a function to create a message, caller needs to make sure that event has the correct topic for the function.
+     */
+    private static async Task CreateAndSetMessage(BusEvent busEvent, Func<string, Task<string>> createMessageFunction)
+    {
+        var message = await createMessageFunction(busEvent.Message);
+        if (message == null)
+        {
+            busEvent.Status = Status.NotFound;
+        }
+        else
+        {
+            busEvent.Message = message;
+        }
     }
 
     private void TrackMetric(BusEventMessage message) =>
@@ -204,9 +262,9 @@ public class BusSenderService : IBusSenderService
     {
         var properties = new Dictionary<string, string>
         {
-            {"Event", eventType},
-            {"Plant", message.Plant[4..]},
-            {"ProjectName", message.ProjectName?.Replace('$', '_')}
+            { "Event", eventType },
+            { "Plant", message.Plant[4..] },
+            { "ProjectName", message.ProjectName?.Replace('$', '_') }
         };
         if (!string.IsNullOrWhiteSpace(message.McPkgNo))
         {

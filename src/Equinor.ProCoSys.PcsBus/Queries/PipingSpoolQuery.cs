@@ -2,8 +2,11 @@
 
 public class PipingSpoolQuery
 {
-    public static string GetQuery(string schema)
+    public static string GetQuery(long? pipingSpoolId, string plant = null)
     {
+        DetectFaultyPlantInput(plant);
+        var whereClause = CreateWhereClause(pipingSpoolId, plant, "ps", "pipingspool_id");
+
         return @$"select
             '{{""Plant"" : ""' || ps.projectschema || '"",
             ""ProjectName"" : ""' ||  regexp_replace(p.name, '([""\])', '\\\1') || '"",
@@ -26,12 +29,12 @@ public class PipingSpoolQuery
             ""Painted"" : ""' || decode(ps.painted,'Y', 'true', 'N', 'false') || '"",
             ""LastUpdated"" : ""' || TO_CHAR(ps.LAST_UPDATED, 'yyyy-mm-dd hh24:mi:ss') || '""
             }}' as message
-            from pipingspool ps
-                join pipingrevision pr on pr.pipingrevision_id = ps.pipingrevision_id
-                join mcpkg m on m.mcpkg_id = pr.mcpkg_id
-                join project p on p.project_id = m.project_id
-                left join document iso on iso.document_id = ps.document_id
-                join tag t on t.tag_id = ps.tag_id
-            where ps.projectschema = '{schema}'";
+        from pipingspool ps
+            join pipingrevision pr on pr.pipingrevision_id = ps.pipingrevision_id
+            join mcpkg m on m.mcpkg_id = pr.mcpkg_id
+            join project p on p.project_id = m.project_id
+            left join document iso on iso.document_id = ps.document_id
+            join tag t on t.tag_id = ps.tag_id
+        {whereClause}";
     }
 }

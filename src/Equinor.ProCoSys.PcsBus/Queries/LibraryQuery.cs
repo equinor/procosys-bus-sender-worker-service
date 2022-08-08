@@ -2,8 +2,11 @@
 
 public class LibraryQuery
 {
-    public static string GetQuery(string schema)
+    public static string GetQuery(long? libraryId, string plant = null)
     {
+        DetectFaultyPlantInput(plant);
+        var whereClause = CreateWhereClause(libraryId, plant, "l", "library_id");
+
         return @$"select
             '{{""Plant"" : ""' || l.projectschema ||
             '"", ""LibraryId"" : ""' || l.library_id ||
@@ -15,6 +18,6 @@ public class LibraryQuery
             '"", ""LastUpdated"" : ""' || TO_CHAR(l.LAST_UPDATED, 'yyyy-mm-dd hh24:mi:ss') ||
             '""}}'  as message
             from library l
-            where l.projectschema = '{schema}'";
+            {whereClause}";
     }
 }

@@ -1,38 +1,35 @@
-﻿using static Equinor.ProCoSys.PcsServiceBus.Queries.QueryHelper;
-
-namespace Equinor.ProCoSys.PcsServiceBus.Queries;
+﻿namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 
 public class ChecklistQuery
 {
     public static string GetQuery(long? tagCheckId, string plant = null)
     {
         DetectFaultyPlantInput(plant);
-
-        var whereClause = CreateWhereClause(tagCheckId, plant);
+        var whereClause = CreateWhereClause(tagCheckId, plant, "tc","tagcheck_id");
 
         return @$"select
-        '{{""Plant"" : ""' || tc.projectschema ||
-        '"", ""ProjectName"" : ""' || p.name ||
-        '"", ""TagNo"" : ""' ||  regexp_replace(t.tagno, '([""\])', '\\\1') ||
-        '"", ""TagId"" : ""' ||  t.tag_id ||
-        '"", ""TagRegisterId"" : ""' ||  t.register_id ||
-        '"", ""ChecklistId"" : ""' || tc.tagcheck_id ||
-        '"", ""TagCategory"" : ""' || reg.code ||
-        '"", ""SheetNo"" : ""' || tft.sheetno ||
-        '"", ""SubSheetNo"" : ""' || tft.subsheetno ||
-        '"", ""FormularType"" : ""' || ft.formulartype ||
-        '"", ""FormularGroup"" : ""' || ft.formulargroup ||
-        '"", ""SystemModule"" : ""' || fg.systemmodule ||
-        '"", ""FormularDiscipline"" : ""' || mccr_disc.code ||
-        '"", ""Revision"" : ""' || pir.testrevisionno ||
-        '"", ""PipingRevisionMcPkNo"" : ""' || prm.mcpkgno ||
-        '"", ""Responsible"" : ""' || r.code ||
-        '"", ""Status"" : ""' || status.code ||
-        '"", ""UpdatedAt"" : ""' || TO_CHAR(tc.updatedat, 'yyyy-mm-dd hh24:mi:ss') ||
-        '"", ""CreatedAt"" : ""' || TO_CHAR(tc.createdat, 'yyyy-mm-dd hh24:mi:ss') ||
-        '"", ""SignedAt"" : ""' || TO_CHAR(tc.signedat, 'yyyy-mm-dd hh24:mi:ss') ||
-        '"", ""VerifiedAt"" : ""' || TO_CHAR(tc.verifiedat, 'yyyy-mm-dd hh24:mi:ss') ||
-        '""}}' as message
+            '{{""Plant"" : ""' || tc.projectschema ||
+            '"", ""ProjectName"" : ""' || p.name ||
+            '"", ""TagNo"" : ""' ||  regexp_replace(t.tagno, '([""\])', '\\\1') ||
+            '"", ""TagId"" : ""' ||  t.tag_id ||
+            '"", ""TagRegisterId"" : ""' ||  t.register_id ||
+            '"", ""ChecklistId"" : ""' || tc.tagcheck_id ||
+            '"", ""TagCategory"" : ""' || reg.code ||
+            '"", ""SheetNo"" : ""' || tft.sheetno ||
+            '"", ""SubSheetNo"" : ""' || tft.subsheetno ||
+            '"", ""FormularType"" : ""' || ft.formulartype ||
+            '"", ""FormularGroup"" : ""' || ft.formulargroup ||
+            '"", ""SystemModule"" : ""' || fg.systemmodule ||
+            '"", ""FormularDiscipline"" : ""' || mccr_disc.code ||
+            '"", ""Revision"" : ""' || pir.testrevisionno ||
+            '"", ""PipingRevisionMcPkNo"" : ""' || prm.mcpkgno ||
+            '"", ""Responsible"" : ""' || r.code ||
+            '"", ""Status"" : ""' || status.code ||
+            '"", ""UpdatedAt"" : ""' || TO_CHAR(tc.updatedat, 'yyyy-mm-dd hh24:mi:ss') ||
+            '"", ""CreatedAt"" : ""' || TO_CHAR(tc.createdat, 'yyyy-mm-dd hh24:mi:ss') ||
+            '"", ""SignedAt"" : ""' || TO_CHAR(tc.signedat, 'yyyy-mm-dd hh24:mi:ss') ||
+            '"", ""VerifiedAt"" : ""' || TO_CHAR(tc.verifiedat, 'yyyy-mm-dd hh24:mi:ss') ||
+            '""}}' as message
         from tagcheck tc
             join tagformulartype tft on tft.tagformulartype_id = tc.tagformulartype_id
             join tag t on t.tag_id = tft.tag_id
@@ -46,24 +43,5 @@ public class ChecklistQuery
             left join responsible r on r.responsible_id = tc.responsible_id
             left join library status on status.library_id = tc.status_id
         {whereClause}";
-    }
-
-    private static string CreateWhereClause(long? tagCheckId, string plant)
-    {
-        var whereClause = "";
-        if (tagCheckId != null && plant != null)
-        {
-            whereClause = $"where tc.projectschema = '{plant}' and tc.tagcheck_id = {tagCheckId}";
-        }
-        else if (plant != null)
-        {
-            whereClause = $"where tc.projectschema = '{plant}'";
-        }
-        else if (tagCheckId != null)
-        {
-            whereClause = $"where tc.tagcheck_id = {tagCheckId}";
-        }
-
-        return whereClause;
     }
 }

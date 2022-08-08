@@ -1,14 +1,11 @@
-﻿using static Equinor.ProCoSys.PcsServiceBus.Queries.QueryHelper;
-
-namespace Equinor.ProCoSys.PcsServiceBus.Queries;
+﻿namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 
 public class CommPkgOperationQuery
 {
     public static string GetQuery(long? commPkId, string plant = null)
     {
         DetectFaultyPlantInput(plant);
-
-        var whereClause = CreateWhereClause(commPkId, plant);
+        var whereClause = CreateWhereClause(commPkId, plant, "co","commpkg_id");
 
         return $@"select   '{{""Plant"" : ""' || co.projectschema || '"",
             ""ProjectName"" : ""' || p.NAME || '"",
@@ -20,7 +17,7 @@ public class CommPkgOperationQuery
             ""BlueLine"" : ' || decode(co.blueline,'Y', 'true', 'N', 'false') || ',
             ""YellowLineStatus"" : ""' || regexp_replace(co.yellowlinestatus, '([""\])', '\\\1') || '"",
             ""BlueLineStatus"" : ""' || regexp_replace(co.bluelinestatus, '([""\])', '\\\1') || '"",
-            ""TemperaryOperationEst"" : ' || decode(co.temporaryoperation_est,'Y', 'true', 'N', 'false') || ',
+            ""TemporaryOperationEst"" : ' || decode(co.temporaryoperation_est,'Y', 'true', 'N', 'false') || ',
             ""PmRoutine"" : ' || decode(co.pmroutine,'Y', 'true', 'N', 'false') || ',
             ""CommissioningResp"" : ' ||  decode(co.commissioningresp,'Y', 'true', 'N', 'false') || ',
             ""ValveBlindingList"" : ""' || decode(co.valveblindinglist,'Y', 'true', 'N', 'false') ||  '"", 
@@ -30,25 +27,5 @@ public class CommPkgOperationQuery
             join commpkg c on c.commpkg_id = co.commpkg_id
             join project p ON p.project_id = c.project_id
         {whereClause}";
-    }
-
-
-    private static string CreateWhereClause(long? commPkgId, string plant)
-    {
-        var whereClause = "";
-        if (commPkgId != null && plant != null)
-        {
-            whereClause = $"where co.projectschema = '{plant}' and co.commpkg_id = {commPkgId}";
-        }
-        else if (plant != null)
-        {
-            whereClause = $"where co.projectschema = '{plant}'";
-        }
-        else if (commPkgId != null)
-        {
-            whereClause = $"where co.commpkg_id = {commPkgId}";
-        }
-
-        return whereClause;
     }
 }
