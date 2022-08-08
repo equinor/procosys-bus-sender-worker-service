@@ -20,8 +20,9 @@ public interface IBusEventService
     Task<string> CreateWoMaterialMessage(string busEventMessage);
     Task<string> CreateStockMessage(string busEventMessage);
     Task<string> CreateSwcrMessage(string busEventMessage);
-    Task<string> CreateSwcrSignatureTaskMessage(string busEventMessage);
+    Task<string> CreateSwcrSignatureMessage(string busEventMessage);
     Task<string> CreatePipingRevisionMessage(string busEventMessage);
     Task<string> CreatePipingSpoolMessage(string busEventMessage);
     Task<string> CreateLoopContentMessage(string busEventMessage);
+    Task<string> CreateCommPkgQueryMessage(string busEventMessage);
 }
