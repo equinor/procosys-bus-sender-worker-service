@@ -16,7 +16,7 @@ public class QueryCommPkgQuery
         '"", ""DocumentId"" : ""' || d.document_id ||
         '"", ""QueryPlaceHolderId"" : ""' || 'q/d.placeholderId'  ||
         '"", ""QueryNo"" : ""' || d.documentno ||
-        '"", ""LastUpdated"" : ""' || TO_CHAR(co.last_updated, 'yyyy-mm-dd hh24:mi:ss') ||
+        '"", ""LastUpdated"" : ""' || TO_CHAR(er.last_updated, 'yyyy-mm-dd hh24:mi:ss') ||
         '""}}' as message
         from elementreference er
             join commpkg c on c.commpkg_id = er.fromelement_id
