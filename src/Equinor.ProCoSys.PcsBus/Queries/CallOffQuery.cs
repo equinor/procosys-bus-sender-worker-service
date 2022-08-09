@@ -26,7 +26,7 @@ public class CallOffQuery
         '"", ""PackageActualDelivery"" : ""' || TO_CHAR(co.package_actualdelivery, 'yyyy-mm-dd hh24:mi:ss') ||
         '"", ""PackageClosed"" : ""' || TO_CHAR(co.package_closed, 'yyyy-mm-dd hh24:mi:ss') ||
         '"", ""McDossierSent"" : ""' || TO_CHAR(co.mcdossier_sent, 'yyyy-mm-dd hh24:mi:ss') ||
-        '"", ""McDossierRecived"" : ""' || TO_CHAR(co.mcdossier_recived, 'yyyy-mm-dd hh24:mi:ss') ||
+        '"", ""McDossierReceived"" : ""' || TO_CHAR(co.mcdossier_recived, 'yyyy-mm-dd hh24:mi:ss') ||
         '"", ""LastUpdated"" : ""' || TO_CHAR(co.last_updated, 'yyyy-mm-dd hh24:mi:ss') ||
         '"", ""IsVoided"" : ' || decode(co.isVoided,'Y', 'true', 'N', 'false') ||
         ', ""CreatedAt"" : ""' || TO_CHAR(co.createdat, 'yyyy-mm-dd hh24:mi:ss') ||

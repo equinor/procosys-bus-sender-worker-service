@@ -39,5 +39,7 @@ public enum PcsTopic
     LoopContent_Delete,
     Query,
     QuerySignature,
-    CallOff
+    CallOff,
+    CommPkgQuery,
+    CommPkgQuery_Delete
 }
