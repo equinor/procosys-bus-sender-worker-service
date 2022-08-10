@@ -115,20 +115,6 @@ public class BusEventService : IBusEventService
             ? WashString(await _busSenderMessageRepository.GetWorkOrderMessage(workOrderId))
             : throw new Exception("Failed to extract workOrderId from message");
 
-    public bool IsNotLatestMaterialEvent(IEnumerable<BusEvent> events, BusEvent busEvent)
-    {
-        var compareTo = JsonSerializer.Deserialize<WoMaterialIdentifier>(WashString(busEvent.Message));
-
-        return events.Where(e => e.Event == WoMaterialTopic.TopicName).Any(e =>
-        {
-            var woMaterial = JsonSerializer.Deserialize<WoMaterialIdentifier>(WashString(e.Message));
-            return woMaterial != null
-                   && compareTo != null
-                   && woMaterial.ItemNo == compareTo.ItemNo && woMaterial.WoId == compareTo.WoId
-                   && e.Created > busEvent.Created;
-        });
-    }
-
     public string WashString(string busEventMessage)
     {
         if (string.IsNullOrEmpty(busEventMessage))

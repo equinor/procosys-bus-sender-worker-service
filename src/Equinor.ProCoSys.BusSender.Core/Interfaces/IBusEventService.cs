@@ -6,7 +6,6 @@ namespace Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 
 public interface IBusEventService
 {
-    bool IsNotLatestMaterialEvent(IEnumerable<BusEvent> events, BusEvent busEvent);
     Task<string> AttachTagDetails(string tagMessage);
     string WashString(string message);
     Task<string> CreateQueryMessage(string busEventMessage);
