@@ -10,7 +10,6 @@ public class CallOffQuery
 
         return @$"select
         '{{""Plant"" : ""' || co.projectschema ||
-        '"", ""ProjectName"" : ""' || p.name ||
         '"", ""CallOffId"" : ""' || co.calloff_id ||
         '"", ""CallOffNo"" : ""' || regexp_replace(co.calloffno, '([""\])', '\\\1') ||
         '"", ""PurchaseOrderNo"" : ""' || regexp_replace(po.packageno, '([""\])', '\\\1') ||
@@ -33,6 +32,7 @@ public class CallOffQuery
         '""}}' as message
         from calloff co
             join purchaseorder po on po.package_id = co.package_id
+            
             left join responsible r on r.responsible_id = co.responsible_id
             left join library contractor on contractor.library_id = co.contractor_id
             left join library supplier on supplier.library_id = co.supplier_id
