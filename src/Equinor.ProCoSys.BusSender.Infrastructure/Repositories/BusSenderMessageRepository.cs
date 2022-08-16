@@ -65,6 +65,9 @@ public class BusSenderMessageRepository : IBusSenderMessageRepository
     public async Task<string> GetWorkOrderMessage(long workOrderId) =>
         await ExecuteQuery(WorkOrderQuery.GetQuery(workOrderId), workOrderId.ToString());
 
+    public async Task<string> GetWorkOrderCutOffMessage(long workOrderId, string cutoffWeek) =>
+        await ExecuteQuery(WorkOrderCutoffQuery.GetQuery(workOrderId, cutoffWeek ), $"{workOrderId},{cutoffWeek}");
+
     public async Task<string> GetWorkOrderMilestoneMessage(long woId, long milestoneId) =>
         await ExecuteQuery(WorkOrderMilestoneQuery.GetQuery(woId, milestoneId), $"{woId},{milestoneId}");
 

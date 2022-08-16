@@ -24,4 +24,5 @@ public interface IBusEventService
     Task<string> CreatePipingSpoolMessage(string busEventMessage);
     Task<string> CreateLoopContentMessage(string busEventMessage);
     Task<string> CreateCommPkgQueryMessage(string busEventMessage);
+    Task<string> CreateWorkOrderCutOffMessage(string message);
 }
