@@ -115,18 +115,17 @@ public class BusEventService : IBusEventService
             ? WashString(await _busSenderMessageRepository.GetWorkOrderMessage(workOrderId))
             : throw new Exception("Failed to extract workOrderId from message");
 
-    public bool IsNotLatestMaterialEvent(IEnumerable<BusEvent> events, BusEvent busEvent)
+    public async Task<string> CreateWorkOrderCutOffMessage(string message)
     {
-        var compareTo = JsonSerializer.Deserialize<WoMaterialIdentifier>(WashString(busEvent.Message));
-
-        return events.Where(e => e.Event == WoMaterialTopic.TopicName).Any(e =>
+        var  woInfo = message.Split(","); // woId,cutoffweek
+        if (woInfo.Length != 2)
         {
-            var woMaterial = JsonSerializer.Deserialize<WoMaterialIdentifier>(WashString(e.Message));
-            return woMaterial != null
-                   && compareTo != null
-                   && woMaterial.ItemNo == compareTo.ItemNo && woMaterial.WoId == compareTo.WoId
-                   && e.Created > busEvent.Created;
-        });
+            throw new Exception("Failed to extract workOrderId and cutoffweek from message");
+        }
+        return long.TryParse(woInfo[0], out var workOrderId)
+            ? WashString(await _busSenderMessageRepository.GetWorkOrderCutOffMessage(workOrderId, woInfo[1]))
+            : throw new Exception("Failed to extract workOrderId from message");
+        
     }
 
     public string WashString(string busEventMessage)
@@ -158,4 +157,6 @@ public class BusEventService : IBusEventService
                && long.TryParse(array[0], out id1)
                && long.TryParse(array[1], out id2);
     }
+
+
 }

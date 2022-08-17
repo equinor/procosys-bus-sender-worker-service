@@ -10,7 +10,6 @@ public class CallOffQuery
 
         return @$"select
         '{{""Plant"" : ""' || co.projectschema ||
-        '"", ""ProjectName"" : ""' || p.name ||
         '"", ""CallOffId"" : ""' || co.calloff_id ||
         '"", ""CallOffNo"" : ""' || regexp_replace(co.calloffno, '([""\])', '\\\1') ||
         '"", ""PurchaseOrderNo"" : ""' || regexp_replace(po.packageno, '([""\])', '\\\1') ||
@@ -26,13 +25,14 @@ public class CallOffQuery
         '"", ""PackageActualDelivery"" : ""' || TO_CHAR(co.package_actualdelivery, 'yyyy-mm-dd hh24:mi:ss') ||
         '"", ""PackageClosed"" : ""' || TO_CHAR(co.package_closed, 'yyyy-mm-dd hh24:mi:ss') ||
         '"", ""McDossierSent"" : ""' || TO_CHAR(co.mcdossier_sent, 'yyyy-mm-dd hh24:mi:ss') ||
-        '"", ""McDossierReceived"" : ""' || TO_CHAR(co.mcdossier_recived, 'yyyy-mm-dd hh24:mi:ss') ||
+        '"", ""McDossierReceived"" : ""' || TO_CHAR(co.mcdossier_received, 'yyyy-mm-dd hh24:mi:ss') ||
         '"", ""LastUpdated"" : ""' || TO_CHAR(co.last_updated, 'yyyy-mm-dd hh24:mi:ss') ||
         '"", ""IsVoided"" : ' || decode(co.isVoided,'Y', 'true', 'N', 'false') ||
         ', ""CreatedAt"" : ""' || TO_CHAR(co.createdat, 'yyyy-mm-dd hh24:mi:ss') ||
         '""}}' as message
         from calloff co
             join purchaseorder po on po.package_id = co.package_id
+            
             left join responsible r on r.responsible_id = co.responsible_id
             left join library contractor on contractor.library_id = co.contractor_id
             left join library supplier on supplier.library_id = co.supplier_id

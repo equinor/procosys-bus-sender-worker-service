@@ -172,6 +172,11 @@ public class BusSenderService : IBusSenderService
 
                     break;
                 }
+            case WorkOrderCutoffTopic.TopicName:
+                {
+                    await CreateAndSetMessage(busEvent, _service.CreateWorkOrderCutOffMessage);
+                    break;
+                }
             case CallOffTopic.TopicName:
                 {
                     await CreateAndSetMessage(busEvent, _service.CreateCallOffMessage);
@@ -217,24 +222,12 @@ public class BusSenderService : IBusSenderService
                     await CreateAndSetMessage(busEvent, _service.CreatePipingSpoolMessage);
                     break;
                 }
-            /***
-             * WO_MATERIAL gets several inserts when saving a material, resulting in multiple rows in the BUSEVENT table.
-             * here we filter out all but the latest material event for a records with the same id and set those to Status = Skipped.
-             * This is to reduce spam on the bus.
-             */
             case WoMaterialTopic.TopicName:
                 {
-                    if (_service.IsNotLatestMaterialEvent(events, busEvent))
-                    {
-                        busEvent.Status = Status.Skipped;
-                        break;
-                    }
-
                     await CreateAndSetMessage(busEvent, _service.CreateWoMaterialMessage);
                     break;
                 }
         }
-
         return busEvent;
     }
 

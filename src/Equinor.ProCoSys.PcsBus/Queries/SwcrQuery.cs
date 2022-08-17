@@ -27,7 +27,7 @@ public class SwcrQuery
             '"", ""IsVoided"" : ""' || decode(e.IsVoided,'Y', 'true', 'N', 'false')  ||
             '"", ""LastUpdated"" : ""' || TO_CHAR(sw.LAST_UPDATED, 'yyyy-mm-dd hh24:mi:ss')  ||
             '"", ""DueDate"" : ""' || TO_CHAR(sw.plannedfinishdate, 'yyyy-mm-dd hh24:mi:ss')  ||
-            '"", ""EstimatedHours"" : ""' || sw.estimatedmhrs  ||
+            '"", ""EstimatedManHours"" : ""' || sw.estimatedmhrs  ||
             '""}}' as message
         from swcr sw
             join element e on  E.ELEMENT_ID = sw.swcr_ID
@@ -39,6 +39,7 @@ public class SwcrQuery
             left join library con ON con.library_id =sw.contract_id
             left join library cs ON cs.library_id = sw.controlsystem_id
             left join library sup ON sup.library_id = sw.supplier_id
+            left join library act On act.library_id = sw.action_id 
             left join node n ON n.node_id = sw.node_id
         {whereClause}";
     }

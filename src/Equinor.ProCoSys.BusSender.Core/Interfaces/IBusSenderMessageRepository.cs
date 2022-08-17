@@ -20,4 +20,5 @@ public interface IBusSenderMessageRepository
     Task<string> GetWorkOrderMaterialMessage(long workOrderId);
     Task<string> GetWorkOrderMessage(long workOrderId);
     Task<string> GetWorkOrderMilestoneMessage(long woId, long milestoneId);
+    Task<string> GetWorkOrderCutOffMessage(long workOrderId, string cutoffWeek);
 }
