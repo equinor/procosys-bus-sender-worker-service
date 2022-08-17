@@ -108,22 +108,27 @@ public class Program
         builder.UseContentRoot(Directory.GetCurrentDirectory())
             .ConfigureServices((hostContext, services) =>
             {
-                var rep = new BlobRepository(hostContext.Configuration["BlobStorage:ConnectionString"], hostContext.Configuration["BlobStorage:ContainerName"]);
+                if (hostContext.Configuration["IsLocal"] == "True")
+                {
+                    var localConnectionString = hostContext.Configuration["ProcosysDb"]; 
+                    services.AddDbContext(localConnectionString);
+                }
+                else
+                {
+                    var rep = new BlobRepository(hostContext.Configuration["BlobStorage:ConnectionString"], hostContext.Configuration["BlobStorage:ContainerName"]);
+                    var walletPath = hostContext.Configuration["WalletFileDir"];
+                    Directory.CreateDirectory(walletPath);
+                    rep.Download(hostContext.Configuration["BlobStorage:WalletFileName"], walletPath + "\\cwallet.sso");
+                    Console.WriteLine("Created wallet file at: " + walletPath);
+                    var connectionString = hostContext.Configuration["ConnectionString"];
+                    services.AddDbContext(connectionString);
+                    services.AddApplicationInsightsTelemetryWorkerService(o =>
+                        o.ConnectionString = hostContext.Configuration["ApplicationInsights:ConnectionString"]);
+                }
+           
 
-                var walletPath = hostContext.Configuration["WalletFileDir"];
-                Directory.CreateDirectory(walletPath);
+               
 
-                rep.Download(hostContext.Configuration["BlobStorage:WalletFileName"], walletPath + "\\cwallet.sso");
-                Console.WriteLine("Created wallet file at: " + walletPath);
-
-                services.AddApplicationInsightsTelemetryWorkerService(o=> 
-                    o.ConnectionString = hostContext.Configuration["ApplicationInsights:ConnectionString"]); 
-
-                var connectionString = hostContext.Configuration["EnvironmentName"] == "Development" 
-                    ? hostContext.Configuration["ProcosysDb"]
-                    : hostContext.Configuration["ConnectionString"];
-                
-                services.AddDbContext(connectionString);
                 services.AddTopicClients(
                     hostContext.Configuration["ServiceBusConnectionString"],
                     hostContext.Configuration["TopicNames"]);

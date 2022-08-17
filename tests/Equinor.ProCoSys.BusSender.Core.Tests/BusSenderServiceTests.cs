@@ -3,14 +3,15 @@ using Equinor.ProCoSys.BusSenderWorker.Core.Models;
 using Equinor.ProCoSys.BusSenderWorker.Core.Services;
 using Equinor.ProCoSys.BusSenderWorker.Core.Telemetry;
 using Equinor.ProCoSys.PcsServiceBus.Sender;
-using Microsoft.Azure.ServiceBus;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using Azure.Messaging.ServiceBus;
 using Equinor.ProCoSys.PcsServiceBus.Topics;
 using Range = Moq.Range;
 
@@ -21,7 +22,7 @@ public class BusSenderServiceTests
 {
     private BusSenderService _dut;
     private Mock<IUnitOfWork> _iUnitOfWork;
-    private Mock<ITopicClient> _topicClientMock1, _topicClientMock2, _topicClientMock3, _topicClientMock4, _topicClientMockWo;
+    private Mock<ServiceBusSender> _topicClientMock1, _topicClientMock2, _topicClientMock3, _topicClientMock4, _topicClientMockWo;
     private List<BusEvent> _busEvents;
     private Mock<IBusEventRepository> _busEventRepository;
     private Mock<ITagDetailsRepository> _tagDetailsRepositoryMock;
@@ -32,19 +33,19 @@ public class BusSenderServiceTests
     [TestInitialize]
     public void Setup()
     {
-        var topicClients = new PcsBusSender();
-        _topicClientMock1 = new Mock<ITopicClient>();
-        _topicClientMock2 = new Mock<ITopicClient>();
-        _topicClientMock3 = new Mock<ITopicClient>();
-        _topicClientMock4 = new Mock<ITopicClient>();
-        _topicClientMockWo = new Mock<ITopicClient>();
-        _topicClientMock4.Setup(t => t.SendAsync(It.IsAny<Message>()))
-            .Callback<Message>(m => _messageBodyOnTopicClient4 = Encoding.UTF8.GetString(m.Body));
-        topicClients.Add("topic1", _topicClientMock1.Object);
-        topicClients.Add("topic2", _topicClientMock2.Object);
-        topicClients.Add("topic3", _topicClientMock3.Object);
-        topicClients.Add("topic4", _topicClientMock4.Object);
-        topicClients.Add(WorkOrderTopic.TopicName, _topicClientMockWo.Object);
+        var busSender = new PcsBusSender();
+        _topicClientMock1 = new Mock<ServiceBusSender>();
+        _topicClientMock2 = new Mock<ServiceBusSender>();
+        _topicClientMock3 = new Mock<ServiceBusSender>();
+        _topicClientMock4 = new Mock<ServiceBusSender>();
+        _topicClientMockWo = new Mock<ServiceBusSender>();
+        _topicClientMock4.Setup(t => t.SendMessageAsync(It.IsAny<ServiceBusMessage>(), It.IsAny<CancellationToken>()))
+            .Callback<ServiceBusMessage,CancellationToken>((m,c) => _messageBodyOnTopicClient4 = Encoding.UTF8.GetString(m.Body));
+        busSender.Add("topic1", _topicClientMock1.Object);
+        busSender.Add("topic2", _topicClientMock2.Object);
+        busSender.Add("topic3", _topicClientMock3.Object);
+        busSender.Add("topic4", _topicClientMock4.Object);
+        busSender.Add(WorkOrderTopic.TopicName, _topicClientMockWo.Object);
 
         _busEvents = new List<BusEvent>
         {
@@ -73,7 +74,7 @@ public class BusSenderServiceTests
         _iUnitOfWork = new Mock<IUnitOfWork>();
 
         _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk()).Returns(() => Task.FromResult(_busEvents));
-        _dut = new BusSenderService(topicClients, _busEventRepository.Object, _iUnitOfWork.Object, new Mock<ILogger<BusSenderService>>().Object,
+        _dut = new BusSenderService(busSender, _busEventRepository.Object, _iUnitOfWork.Object, new Mock<ILogger<BusSenderService>>().Object,
             new Mock<ITelemetryClient>().Object, _busEventServiceMock.Object);
     }
 
@@ -81,10 +82,10 @@ public class BusSenderServiceTests
     public async Task StopService_ShouldCloseOnAllTopicClients()
     {
         await _dut.CloseConnections();
-        _topicClientMock1.Verify(t => t.CloseAsync(), Times.Once);
-        _topicClientMock2.Verify(t => t.CloseAsync(), Times.Once);
-        _topicClientMock3.Verify(t => t.CloseAsync(), Times.Once);
-        _topicClientMock4.Verify(t => t.CloseAsync(), Times.Once);
+        _topicClientMock1.Verify(t => t.CloseAsync(It.IsAny<CancellationToken>()), Times.Once);
+        _topicClientMock2.Verify(t => t.CloseAsync(It.IsAny<CancellationToken>()), Times.Once);
+        _topicClientMock3.Verify(t => t.CloseAsync(It.IsAny<CancellationToken>()), Times.Once);
+        _topicClientMock4.Verify(t => t.CloseAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [TestMethod]
@@ -94,10 +95,10 @@ public class BusSenderServiceTests
         Assert.AreEqual(Status.UnProcessed, _busEvents[0].Status);
 
         await _dut.HandleBusEvents();
-        _topicClientMock1.Verify(t => t.SendAsync(It.IsAny<Message>()), Times.Never);
-        _topicClientMock2.Verify(t => t.SendAsync(It.IsAny<Message>()), Times.Once);
-        _topicClientMock3.Verify(t => t.SendAsync(It.IsAny<Message>()), Times.Once);
-        _topicClientMock4.Verify(t => t.SendAsync(It.IsAny<Message>()), Times.Never);
+        _topicClientMock1.Verify(t => t.SendMessageAsync(It.IsAny<ServiceBusMessage>(), It.IsAny<CancellationToken>()), Times.Never);
+        _topicClientMock2.Verify(t => t.SendMessageAsync(It.IsAny<ServiceBusMessage>(), It.IsAny<CancellationToken>()), Times.Once);
+        _topicClientMock3.Verify(t => t.SendMessageAsync(It.IsAny<ServiceBusMessage>(), It.IsAny<CancellationToken>()), Times.Once);
+        _topicClientMock4.Verify(t => t.SendMessageAsync(It.IsAny<ServiceBusMessage>(), It.IsAny<CancellationToken>()), Times.Never);
 
         Assert.AreEqual(Status.Sent, _busEvents[0].Status);
         Assert.AreEqual(Status.Sent, _busEvents[0].Status);
@@ -149,7 +150,7 @@ public class BusSenderServiceTests
         await _dut.HandleBusEvents();
 
         //Assert
-        _topicClientMockWo.Verify(t => t.SendAsync(It.IsAny<Message>()), Times.Once);
+        _topicClientMockWo.Verify(t => t.SendMessageAsync(It.IsAny<ServiceBusMessage>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [TestMethod]
@@ -174,6 +175,6 @@ public class BusSenderServiceTests
         await _dut.HandleBusEvents();
 
         //Assert
-        _topicClientMockWo.Verify(t => t.SendAsync(It.IsAny<Message>()), Times.Exactly(2));
+        _topicClientMockWo.Verify(t => t.SendMessageAsync(It.IsAny<ServiceBusMessage>(), It.IsAny<CancellationToken>()), Times.Exactly(2));
     }
 }
