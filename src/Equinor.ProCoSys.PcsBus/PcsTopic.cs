@@ -41,5 +41,7 @@ public enum PcsTopic
     QuerySignature,
     CallOff,
     CommPkgQuery,
-    CommPkgQuery_Delete
+    CommPkgQuery_Delete,
+    Checklist_Delete,
+    Wo_Delete
 }
