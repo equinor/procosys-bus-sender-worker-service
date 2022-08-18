@@ -107,8 +107,17 @@ stages:
           "##vso[task.setvariable variable=$variableName;isOutput=true]$($version)"
           Write-Host "Setting variable named $variableName with value $($version)" # Use as prefix in variale referenace
 
-    - script: dotnet pack src/Equinor.ProCoSys.PcsBus/Equinor.ProCoSys.PcsServiceBus.csproj -p:NuspecFile=Equinor.ProCoSys.PcsServiceBus.nuspec -p:NuspecProperties=version=$(getVersion.packageVersion) -c $(buildConfiguration) -o $(Build.ArtifactStagingDirectory)\packages\releases
-      displayName: 'Create NuGet Package - Release Version'
+    #- script: dotnet pack src/Equinor.ProCoSys.PcsBus/Equinor.ProCoSys.PcsServiceBus.csproj -p:NuspecFile=Equinor.ProCoSys.PcsServiceBus.nuspec -p:NuspecProperties=version=$(getVersion.packageVersion) -c $(buildConfiguration) -o $(Build.ArtifactStagingDirectory)\packages\releases
+    #  displayName: 'Create NuGet Package - Release Version'
+
+    - task: DotNetCoreCLI@2
+      displayName: 'NuGet pack'
+      inputs:
+        command: pack
+        packagesToPack: 'src/Equinor.ProCoSys.PcsBus/Equinor.ProCoSys.PcsServiceBus.csproj'
+        packDestination: '$(Build.ArtifactStagingDirectory)\packages\releases'
+        includeReferencedProjects: true
+        version: $(getVersion.packageVersion)
 
     - publish: '$(Build.ArtifactStagingDirectory)'
       artifact: 'packages'

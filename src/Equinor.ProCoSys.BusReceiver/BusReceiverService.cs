@@ -6,17 +6,10 @@ namespace Equinor.ProCoSys.BusReceiver;
 
 public class BusReceiverService : IBusReceiverService
 {
-    public async Task ProcessMessageAsync(PcsTopic pcsTopic, string message, CancellationToken token)
-    {
-
-        await DoSmt();
-
-
-        throw new NotImplementedException();
-    }
-
-    private async Task DoSmt()
+    public  Task ProcessMessageAsync(PcsTopic pcsTopic, string message, CancellationToken token)
     {
         throw new NotImplementedException();
     }
+
+    
 }
