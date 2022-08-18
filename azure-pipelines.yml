@@ -79,7 +79,7 @@ stages:
         projects: '**/*.csproj' 
           
     - task: PowerShell@2
-      name: getVersion2 # Name of the pipeline variable used as prefix in referenace. Example $(getVersion.packageVersion)
+      name: getVersion # Name of the pipeline variable used as prefix in referenace. Example $(getVersion.packageVersion)
       displayName: 'get version from Equinor.ProCoSys.PcsServiceBus.csproj'
       inputs:
         targetType: inline
