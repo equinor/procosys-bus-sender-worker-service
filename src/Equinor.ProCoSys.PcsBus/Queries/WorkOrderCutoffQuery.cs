@@ -16,7 +16,7 @@ public class WorkOrderCutoffQuery
         {
             whereClause += $"and cutoffweek = {cutoffWeek}";
         }
-        else
+        else if (month != null)
         {
             whereClause += $"and TO_CHAR(wc.CUTOFFDATE, 'YYYY-MM-DD') like '%-{month}-%'";
         }
@@ -25,7 +25,7 @@ public class WorkOrderCutoffQuery
             '{{""Plant"" : ""' || wc.projectschema ||
             '"", ""PlantName"" : ""' || regexp_replace(ps.TITLE, '([""\])', '\\\1') ||   
             '"", ""ProjectName"" : ""' || p.NAME ||
-            '"", ""WoNo"" : ""' || wo.WONO ||
+            '"", ""WoNo"" : ""' || regexp_replace(wo.wono, '([""\])', '\\\1') ||
             '"", ""JobStatusCode"" : ""' || regexp_replace(jsc.CODE, '([""\])', '\\\1') ||
             '"", ""MaterialStatusCode"" : ""' || regexp_replace(msc.CODE, '([""\])', '\\\1') ||
             '"", ""DisciplineCode"" : ""' || regexp_replace(dc.CODE, '([""\])', '\\\1') ||
