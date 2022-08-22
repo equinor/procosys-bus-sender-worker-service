@@ -21,4 +21,5 @@ public interface IBusSenderMessageRepository
     Task<string> GetWorkOrderMessage(long workOrderId);
     Task<string> GetWorkOrderMilestoneMessage(long woId, long milestoneId);
     Task<string> GetWorkOrderCutOffMessage(long workOrderId, string cutoffWeek);
+    Task<string> GetMilestoneMessage(long elementId, long milestoneId);
 }

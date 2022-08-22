@@ -54,6 +54,10 @@ public class BusEventService : IBusEventService
             ? WashString(await _busSenderMessageRepository.GetDocumentMessage(documentId))
             : throw new Exception("Failed to extract documentId from message");
 
+    public async Task<string> CreateMilestoneMessage(string message) =>
+        CanGetTwoIdsFromMessage(message.Split(","), out var elementId, out var milestoneId)
+            ? WashString(await _busSenderMessageRepository.GetMilestoneMessage(elementId, milestoneId))
+            : throw new Exception("Failed to extract element xor milestone Id from message");
     public async Task<string> CreateLoopContentMessage(string busEventMessage)
         => long.TryParse(busEventMessage, out var loopContentId)
             ? WashString(await _busSenderMessageRepository.GetLoopContentMessage(loopContentId))
@@ -123,7 +127,7 @@ public class BusEventService : IBusEventService
             throw new Exception("Failed to extract workOrderId and cutoffweek from message");
         }
         return long.TryParse(woInfo[0], out var workOrderId)
-            ? WashString(await _busSenderMessageRepository.GetWorkOrderCutOffMessage(workOrderId, woInfo[1]))
+            ? WashString(await _busSenderMessageRepository.GetWorkOrderCutOffMessage(workOrderId,woInfo[1]))
             : throw new Exception("Failed to extract workOrderId from message");
         
     }
