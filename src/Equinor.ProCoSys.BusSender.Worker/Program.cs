@@ -125,10 +125,7 @@ public class Program
                     services.AddApplicationInsightsTelemetryWorkerService(o =>
                         o.ConnectionString = hostContext.Configuration["ApplicationInsights:ConnectionString"]);
                 }
-           
-
-               
-
+                
                 services.AddTopicClients(
                     hostContext.Configuration["ServiceBusConnectionString"],
                     hostContext.Configuration["TopicNames"]);

@@ -166,6 +166,11 @@ public class BusSenderService : IBusSenderService
                     await CreateAndSetMessage(busEvent, _service.CreateDocumentMessage);
                     break;
                 }
+            case MilestoneTopic.TopicName:
+                {
+                    await CreateAndSetMessage(busEvent, _service.CreateMilestoneMessage);
+                    break;
+                }
             case WorkOrderTopic.TopicName:
                 {
                     await CreateAndSetMessage(busEvent, _service.CreateWorkOrderMessage);
