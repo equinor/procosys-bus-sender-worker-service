@@ -7,7 +7,6 @@ public class WorkOrderCutoffQuery
     /// </summary>
     public static string GetQuery(long? woId, string cutoffWeek, string plant = null, string month = null)
     {
-
         DetectFaultyPlantInput(plant);
 
         var whereClause = CreateWhereClause(woId, plant, "wc", "wo_id");
@@ -41,8 +40,8 @@ public class WorkOrderCutoffQuery
             '"", ""PlannedStartAtDate"" : ""' || TO_CHAR(wc.WOPLANNEDSTARTUPDATE, 'yyyy-mm-dd hh24:mi:ss')  ||
             '"", ""PlannedFinishedAtDate"" : ""' || TO_CHAR(wc.WOPLANNEDCOMPLETIONDATE, 'yyyy-mm-dd hh24:mi:ss')  ||
             '"", ""ExpendedManHours"" : ""' || wc.EXPENDED_MHRS ||
-            '"", ""ManhoursEarned"" : ""' || wc.EARNED_MHRS  ||
-            '"", ""EstimatedHours"" : ""' || wc.ESTIMATED_MHRS  ||
+            '"", ""ManhoursEarned"" : ""' || wc.EARNED_MHRS ||
+            '"", ""EstimatedHours"" : ""' || wc.ESTIMATED_MHRS ||
             '"", ""ManhoursExpendedLastWeek"" : ""' ||wc.EXPENDED_LW ||
             '"", ""ManhoursEarnedLastWeek"" : ""' || wc.EARNED_LW  ||
             '"", ""ProjectProgress"" : ""' || wc.PROJECTPROGRESS ||
