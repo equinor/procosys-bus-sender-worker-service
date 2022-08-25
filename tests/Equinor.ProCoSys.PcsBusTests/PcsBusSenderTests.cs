@@ -24,8 +24,8 @@ public class PcsBusSenderTests
         _topicClient2 = new Mock<ServiceBusSender>();
         _dut = new PcsBusSender();
 
-        _dut.Add(TopicName1, _topicClient1.Object);
-        _dut.Add(TopicName2, _topicClient2.Object);
+        _dut.AddServiceBusSender(TopicName1, _topicClient1.Object);
+        _dut.AddServiceBusSender(TopicName2, _topicClient2.Object);
     }
 
     [TestMethod]

@@ -1,4 +1,5 @@
-﻿using Azure.Messaging.ServiceBus;
+﻿using System.Linq;
+using Azure.Messaging.ServiceBus;
 using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 using Equinor.ProCoSys.BusSenderWorker.Core.Services;
 using Equinor.ProCoSys.BusSenderWorker.Core.Telemetry;
@@ -38,15 +39,10 @@ public static class ServiceCollectionSetup
 
     public static void AddTopicClients(this IServiceCollection services, string serviceBusConnectionString, string topicNames)
     {
-        var topics = topicNames.Split(',');
-        var pcsBusSender = new PcsBusSender();
+        var topics = topicNames.Split(',').ToList();
         var options = new ServiceBusClientOptions { EnableCrossEntityTransactions = true };
         var client = new ServiceBusClient(serviceBusConnectionString, options);
-        foreach (var topicName in topics)
-        {
-            var serviceBusSender = client.CreateSender(topicName);
-            pcsBusSender.Add(topicName, serviceBusSender);
-        }
+        var pcsBusSender = new PcsBusSender(client,topics);
 
         services.AddSingleton<IPcsBusSender>(pcsBusSender);
     }

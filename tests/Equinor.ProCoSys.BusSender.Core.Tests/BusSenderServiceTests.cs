@@ -41,11 +41,11 @@ public class BusSenderServiceTests
         _topicClientMockWo = new Mock<ServiceBusSender>();
         _topicClientMock4.Setup(t => t.SendMessageAsync(It.IsAny<ServiceBusMessage>(), It.IsAny<CancellationToken>()))
             .Callback<ServiceBusMessage,CancellationToken>((m,c) => _messageBodyOnTopicClient4 = Encoding.UTF8.GetString(m.Body));
-        busSender.Add("topic1", _topicClientMock1.Object);
-        busSender.Add("topic2", _topicClientMock2.Object);
-        busSender.Add("topic3", _topicClientMock3.Object);
-        busSender.Add("topic4", _topicClientMock4.Object);
-        busSender.Add(WorkOrderTopic.TopicName, _topicClientMockWo.Object);
+        busSender.AddServiceBusSender("topic1", _topicClientMock1.Object);
+        busSender.AddServiceBusSender("topic2", _topicClientMock2.Object);
+        busSender.AddServiceBusSender("topic3", _topicClientMock3.Object);
+        busSender.AddServiceBusSender("topic4", _topicClientMock4.Object);
+        busSender.AddServiceBusSender(WorkOrderTopic.TopicName, _topicClientMockWo.Object);
 
         _busEvents = new List<BusEvent>
         {

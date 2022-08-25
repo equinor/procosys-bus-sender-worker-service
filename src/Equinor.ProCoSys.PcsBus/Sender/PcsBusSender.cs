@@ -12,10 +12,21 @@ namespace Equinor.ProCoSys.PcsServiceBus.Sender;
 public class PcsBusSender : IPcsBusSender
 {
     private readonly IList<KeyValuePair<string, ServiceBusSender>> _busSenders;
+    private readonly ServiceBusClient _serviceBusClient;
 
-    public PcsBusSender() => _busSenders = new List<KeyValuePair<string, ServiceBusSender>>();
+    public PcsBusSender(string connectionString, List<string> topics)
+    {
+        _busSenders = new List<KeyValuePair<string, ServiceBusSender>>();
+        var options = new ServiceBusClientOptions { EnableCrossEntityTransactions = true };
+        _serviceBusClient = new ServiceBusClient(connectionString, options);
+        topics.ForEach(AddServiceBusSender);
+    }
 
-    public void Add(string topicName, ServiceBusSender sender) => _busSenders.Add(new KeyValuePair<string, ServiceBusSender>(topicName, sender));
+    public void AddServiceBusSender(string topicName)
+    {
+        var serviceBusSender = _serviceBusClient.CreateSender(topicName);
+        _busSenders.Add(new KeyValuePair<string, ServiceBusSender>(topicName, serviceBusSender));
+    }
 
     public async Task SendAsync(string topic, string jsonMessage)
     {
@@ -33,9 +44,10 @@ public class PcsBusSender : IPcsBusSender
 
     public async Task CloseAllAsync()
     {
-        foreach (var topicClient in _busSenders)
+        foreach (var senders in _busSenders)
         {
-            await topicClient.Value.CloseAsync();
+            await senders.Value.CloseAsync();
         }
+        await _serviceBusClient.DisposeAsync();
     }
 }
