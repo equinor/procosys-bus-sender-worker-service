@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Net.Http;
-using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
 using Equinor.ProCoSys.PcsServiceBus.Receiver;
 using Equinor.ProCoSys.PcsServiceBus.Receiver.Interfaces;
@@ -16,9 +15,7 @@ public static class IServiceCollectionExtensions
     {
         var optionsBuilder = new PcsServiceBusConfig();
         options(optionsBuilder);
-
-        var pcsSubscriptionProcessors =  CreateSubscriptionProcessors(optionsBuilder);
-
+        var pcsSubscriptionProcessors = CreateSubscriptionProcessors(optionsBuilder);
         services.AddSingleton<IPcsServiceBusProcessors>(pcsSubscriptionProcessors);
 
         if (optionsBuilder.LeaderElectorUrl != null)
@@ -31,11 +28,10 @@ public static class IServiceCollectionExtensions
         }
 
         services.AddHostedService<PcsBusReceiver>();
-
         return services;
     }
 
-    private static  PcsServiceBusProcessors CreateSubscriptionProcessors(PcsServiceBusConfig options)
+    private static PcsServiceBusProcessors CreateSubscriptionProcessors(PcsServiceBusConfig options)
     {
         var pcsProcessors = new PcsServiceBusProcessors(options.RenewLeaseIntervalMilliSec);
         var client = new ServiceBusClient(options.ConnectionString);
@@ -63,12 +59,12 @@ public static class IServiceCollectionExtensions
         return pcsProcessors;
     }
 
-    public static async void AddTopicClients(this IServiceCollection services, string serviceBusConnectionString, string topicNames)
+    public static void AddTopicClients(this IServiceCollection services, string serviceBusConnectionString, string topicNames)
     {
         var topics = topicNames.Split(',');
         var pcsBusSender = new PcsBusSender();
         var options = new ServiceBusClientOptions { EnableCrossEntityTransactions = true };
-        await using var client = new ServiceBusClient(serviceBusConnectionString, options);
+        var client = new ServiceBusClient(serviceBusConnectionString, options);
         foreach (var topicName in topics)
         {
             if (!string.IsNullOrWhiteSpace(topicName))
@@ -77,7 +73,6 @@ public static class IServiceCollectionExtensions
                 pcsBusSender.Add(topicName, serviceBusSender);
             }
         }
-
         services.AddSingleton<IPcsBusSender>(pcsBusSender);
     }
 }

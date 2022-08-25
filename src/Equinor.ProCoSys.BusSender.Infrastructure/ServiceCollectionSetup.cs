@@ -1,11 +1,8 @@
-﻿using Azure.Messaging.ServiceBus;
-using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
+﻿using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 using Equinor.ProCoSys.BusSenderWorker.Core.Services;
 using Equinor.ProCoSys.BusSenderWorker.Core.Telemetry;
 using Equinor.ProCoSys.BusSenderWorker.Infrastructure.Data;
 using Equinor.ProCoSys.BusSenderWorker.Infrastructure.Repositories;
-using Equinor.ProCoSys.PcsServiceBus.Sender;
-using Equinor.ProCoSys.PcsServiceBus.Sender.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -20,10 +17,10 @@ public static class ServiceCollectionSetup
          * the amount of entities updated. The default seems to be 200, but we're setting it explicitly anyway
          * in case the default changes in the future. This is to avoid ORA-01000: maximum open cursors exceeded.
          **/
-    private const int MAX_OPEN_CURSORS = 200;
+    private const int MaxOpenCursors = 200;
 
     public static readonly LoggerFactory LoggerFactory =
-        new LoggerFactory(new[]
+        new(new[]
         {
             new Microsoft.Extensions.Logging.Debug.DebugLoggerProvider()
         });
@@ -31,25 +28,10 @@ public static class ServiceCollectionSetup
     public static IServiceCollection AddDbContext(this IServiceCollection services, string connectionString)
         => services.AddDbContext<BusSenderServiceContext>(options =>
         {
-            options.UseOracle(connectionString, b => b.MaxBatchSize(MAX_OPEN_CURSORS));
+            options.UseOracle(connectionString, b => b.MaxBatchSize(MaxOpenCursors));
             options.UseLoggerFactory(LoggerFactory);
             options.EnableSensitiveDataLogging();
         }).AddScoped<IUnitOfWork>(serviceProvider => serviceProvider.GetRequiredService<BusSenderServiceContext>());
-
-    public static void AddTopicClients(this IServiceCollection services, string serviceBusConnectionString, string topicNames)
-    {
-        var topics = topicNames.Split(',');
-        var pcsBusSender = new PcsBusSender();
-        var options = new ServiceBusClientOptions { EnableCrossEntityTransactions = true };
-        var client = new ServiceBusClient(serviceBusConnectionString, options);
-        foreach (var topicName in topics)
-        {
-            var serviceBusSender = client.CreateSender(topicName);
-            pcsBusSender.Add(topicName, serviceBusSender);
-        }
-
-        services.AddSingleton<IPcsBusSender>(pcsBusSender);
-    }
 
     public static IServiceCollection AddRepositories(this IServiceCollection services)
         => services.AddScoped<IBusEventRepository, BusEventRepository>()
