@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -20,6 +21,7 @@ public class BusSenderService : IBusSenderService
     private readonly ILogger<BusSenderService> _logger;
     private readonly ITelemetryClient _telemetryClient;
     private readonly IBusEventService _service;
+    private readonly Stopwatch _sw;
 
     public BusSenderService(IPcsBusSender topicClients,
         IBusEventRepository busEventRepository,
@@ -34,34 +36,40 @@ public class BusSenderService : IBusSenderService
         _logger = logger;
         _telemetryClient = telemetryClient;
         _service = service;
+        _sw = new Stopwatch();
     }
 
     public async Task HandleBusEvents()
     {
         try
         {
-            _logger.LogInformation("BusSenderService DoWorkerJob starting at: {now}", DateTimeOffset.Now);
+            _sw.Start();
+            _logger.LogDebug("BusSenderService HandleBusEvents starting");
             var events = await _busEventRepository.GetEarliestUnProcessedEventChunk();
             if (events.Any())
             {
                 _telemetryClient.TrackMetric("BusSender Chunk", events.Count);
-                _logger.LogInformation("BusSenderService found {count} messages to process", events.Count);
+                _logger.LogInformation("BusSenderService found {count} messages to process after {sw} ms", events.Count, _sw.ElapsedMilliseconds);
+                
                 await ProcessBusEvents(events);
+                _logger.LogInformation("BusSenderService ProcessBusEvents used {sw} ms", _sw.ElapsedMilliseconds);
+                
             }
+            _sw.Reset();
         }
         catch (Exception exception)
         {
-            _logger.LogError(exception, "BusSenderService execute send failed at: {now}", DateTimeOffset.Now);
+            _logger.LogError(exception, "BusSenderService execute send failed");
             throw;
         }
 
-        _logger.LogInformation("BusSenderService DoWorkerJob finished at: {now}", DateTimeOffset.Now);
+        _logger.LogInformation("BusSenderService DoWorkerJob finished ");
         _telemetryClient.Flush();
     }
 
     public async Task CloseConnections()
     {
-        _logger.LogInformation("BusSenderService stop reader at: {now}", DateTimeOffset.Now);
+        _logger.LogInformation("BusSenderService stop reader and close all connections");
         await _topicClients.CloseAllAsync();
     }
 
@@ -97,16 +105,23 @@ public class BusSenderService : IBusSenderService
 
     private async Task ProcessBusEvents(List<BusEvent> events)
     {
+
         events = SetDuplicatesToSkipped(events);
+        _logger.LogInformation("SetDuplicatesToSkipped after {sw} ms", _sw.ElapsedMilliseconds);
 
         if (HasUnsavedChanges(events))
         {
             await _unitOfWork.SaveChangesAsync();
+            _logger.LogInformation("HasUnsavedChanges saving {sw} ms", _sw.ElapsedMilliseconds);
         }
+       
+
 
         foreach (var busEvent in events.Where(busEvent => busEvent.Status == Status.UnProcessed))
         {
+
             var handledEvent = await UpdateEventBasedOnTopic(events, busEvent);
+            _logger.LogDebug("Update event {event} at {sw} ms", busEvent.Event, _sw.ElapsedMilliseconds);
 
             if (busEvent.Status != Status.UnProcessed)
             {
@@ -127,6 +142,8 @@ public class BusSenderService : IBusSenderService
             TrackEvent(handledEvent.Event, message);
             busEvent.Status = Status.Sent;
             await _unitOfWork.SaveChangesAsync();
+
+            _logger.LogDebug("done saving event: {event} at {sw} ms", busEvent.Event, _sw.ElapsedMilliseconds);
         }
     }
 
