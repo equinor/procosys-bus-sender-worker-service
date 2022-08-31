@@ -128,8 +128,9 @@ public class BusSenderService : IBusSenderService
             // _logger.LogDebug("Update event {event} at {sw} ms", busEvent.Event, _sw.ElapsedMilliseconds);
 
 
+            var busEventMessageToSend = busEvent.MessageToSend ?? busEvent.Message;
             var message =
-                JsonSerializer.Deserialize<BusEventMessage>(_service.WashString(busEvent.Message));
+                JsonSerializer.Deserialize<BusEventMessage>(_service.WashString(busEventMessageToSend));
 
             if (message != null && string.IsNullOrEmpty(message.ProjectName))
             {
@@ -137,7 +138,7 @@ public class BusSenderService : IBusSenderService
             }
 
             TrackMetric(message);
-            await _topicClients.SendAsync(busEvent.Event, _service.WashString(busEvent.MessageToSend ?? busEvent.Message));
+            await _topicClients.SendAsync(busEvent.Event, _service.WashString(busEventMessageToSend));
 
             TrackEvent(busEvent.Event, message);
             busEvent.Status = Status.Sent;
