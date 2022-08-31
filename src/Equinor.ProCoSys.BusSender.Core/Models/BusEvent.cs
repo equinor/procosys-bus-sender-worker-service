@@ -9,4 +9,7 @@ public class BusEvent
     public string Message { get; set; }
     public DateTime Created { get; set; }
     public Status Status { get; set; }
+
+    //untracked
+    public string MessageToSend { get; set; }
 }

@@ -137,7 +137,7 @@ public class BusSenderService : IBusSenderService
             }
 
             TrackMetric(message);
-            await _topicClients.SendAsync(busEvent.Event, _service.WashString(busEvent.Message));
+            await _topicClients.SendAsync(busEvent.Event, _service.WashString(busEvent.MessageToSend ?? busEvent.Message));
 
             TrackEvent(busEvent.Event, message);
             busEvent.Status = Status.Sent;
@@ -263,7 +263,7 @@ public class BusSenderService : IBusSenderService
         }
         else
         {
-            busEvent.Message = message;
+            busEvent.MessageToSend = message;
         }
     }
 
