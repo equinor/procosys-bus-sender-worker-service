@@ -22,7 +22,7 @@ public class SwcrSignatureQuery
             '"", ""LastUpdated"" : ""' || TO_CHAR(sign.last_updated, 'yyyy-mm-dd hh24:mi:ss') ||
             '""}}' as message
         from swcrsignature  sign
-            join  swcr s on  s.swcr_id = sign.swcr_id
+            join swcr s on  s.swcr_id = sign.swcr_id
             join projectschema ps ON ps.projectschema = sign.projectschema
             join project p ON p.project_id = s.project_id
             join library sr ON sr.library_id = sign.signaturerole_id

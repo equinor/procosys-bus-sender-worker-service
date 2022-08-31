@@ -50,10 +50,10 @@ public class BusSenderService : IBusSenderService
             {
                 _telemetryClient.TrackMetric("BusSender Chunk", events.Count);
                 _logger.LogInformation("BusSenderService found {count} messages to process after {sw} ms", events.Count, _sw.ElapsedMilliseconds);
-                
+
                 await ProcessBusEvents(events);
                 _logger.LogInformation("BusSenderService ProcessBusEvents used {sw} ms", _sw.ElapsedMilliseconds);
-                
+
             }
             _sw.Reset();
         }
@@ -83,7 +83,6 @@ public class BusSenderService : IBusSenderService
 
         return events;
     }
-
     private static void SetAllButOneEventToSkipped(IEnumerable<BusEvent> group)
     {
         foreach (var busEvent in group.SkipLast(1))
@@ -105,31 +104,32 @@ public class BusSenderService : IBusSenderService
 
     private async Task ProcessBusEvents(List<BusEvent> events)
     {
-
         events = SetDuplicatesToSkipped(events);
         _logger.LogInformation("SetDuplicatesToSkipped after {sw} ms", _sw.ElapsedMilliseconds);
 
-        if (HasUnsavedChanges(events))
-        {
-            await _unitOfWork.SaveChangesAsync();
-            _logger.LogInformation("HasUnsavedChanges saving {sw} ms", _sw.ElapsedMilliseconds);
-        }
-       
+        var listOfTasks = events.Where(busEvent => busEvent.Status == Status.UnProcessed)
+            .Select(UpdateEventBasedOnTopic)
+            .Cast<Task>()
+            .ToList();
 
+        await Task.WhenAll(listOfTasks);
+         _logger.LogDebug("Updated events at {sw} ms",  _sw.ElapsedMilliseconds);
+
+         if (HasUnsavedChanges(events))
+         {
+             await _unitOfWork.SaveChangesAsync();
+             _logger.LogDebug("HasUnsavedChanges after {sw} ms",  _sw.ElapsedMilliseconds);
+        }
 
         foreach (var busEvent in events.Where(busEvent => busEvent.Status == Status.UnProcessed))
         {
 
-            var handledEvent = await UpdateEventBasedOnTopic(events, busEvent);
-            _logger.LogDebug("Update event {event} at {sw} ms", busEvent.Event, _sw.ElapsedMilliseconds);
+            // var handledEvent = await UpdateEventBasedOnTopic(busEvent);
+            // _logger.LogDebug("Update event {event} at {sw} ms", busEvent.Event, _sw.ElapsedMilliseconds);
 
-            if (busEvent.Status != Status.UnProcessed)
-            {
-                continue;
-            }
 
             var message =
-                JsonSerializer.Deserialize<BusEventMessage>(_service.WashString(handledEvent.Message));
+                JsonSerializer.Deserialize<BusEventMessage>(_service.WashString(busEvent.Message));
 
             if (message != null && string.IsNullOrEmpty(message.ProjectName))
             {
@@ -137,19 +137,17 @@ public class BusSenderService : IBusSenderService
             }
 
             TrackMetric(message);
-            await _topicClients.SendAsync(busEvent.Event, _service.WashString(handledEvent.Message));
+            await _topicClients.SendAsync(busEvent.Event, _service.WashString(busEvent.Message));
 
-            TrackEvent(handledEvent.Event, message);
+            TrackEvent(busEvent.Event, message);
             busEvent.Status = Status.Sent;
             await _unitOfWork.SaveChangesAsync();
-
-            _logger.LogDebug("done saving event: {event} at {sw} ms", busEvent.Event, _sw.ElapsedMilliseconds);
         }
     }
 
     private static bool HasUnsavedChanges(IEnumerable<BusEvent> events) => events.Any(e => e.Status != Status.UnProcessed);
 
-    private async Task<BusEvent> UpdateEventBasedOnTopic(IEnumerable<BusEvent> events, BusEvent busEvent)
+    private async Task<BusEvent> UpdateEventBasedOnTopic(BusEvent busEvent)
     {
         switch (busEvent.Event)
         {

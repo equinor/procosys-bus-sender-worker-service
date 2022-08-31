@@ -7,7 +7,8 @@ trigger:
  branches:
    include:
      - master
-     - dev
+     - tryAsyncForFamEvents
+
 
 name: $(date:yyyyMMdd)$(rev:.r)
 resources:  
@@ -122,7 +123,7 @@ stages:
 - stage: deploy_test
   displayName: 'Deploy to Test'
   dependsOn: 'deploy_dev'
-  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/dev'))
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/tryAsyncForFamEvents'))
   variables:
     serviceConnection: '${{variables.nonProdServiceConnection}}'
     envName: 'test'
