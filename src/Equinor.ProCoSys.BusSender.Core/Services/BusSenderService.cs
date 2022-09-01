@@ -44,12 +44,12 @@ public class BusSenderService : IBusSenderService
         try
         {
             _sw.Start();
-            _logger.LogDebug("BusSenderService HandleBusEvents starting");
             var events = await _busEventRepository.GetEarliestUnProcessedEventChunk();
             if (events.Any())
             {
-                _telemetryClient.TrackMetric("BusSender Chunk", events.Count);
                 _logger.LogInformation("BusSenderService found {count} messages to process after {sw} ms", events.Count, _sw.ElapsedMilliseconds);
+                _telemetryClient.TrackMetric("BusSender Chunk", events.Count);
+               _logger.LogDebug("First Track after {ms} ms", _sw.ElapsedMilliseconds);
 
                 await ProcessBusEvents(events);
                 _logger.LogInformation("BusSenderService ProcessBusEvents used {sw} ms", _sw.ElapsedMilliseconds);
@@ -73,14 +73,17 @@ public class BusSenderService : IBusSenderService
         await _topicClients.CloseAllAsync();
     }
 
-    private static List<BusEvent> SetDuplicatesToSkipped(List<BusEvent> events)
+    private List<BusEvent> SetDuplicatesToSkipped(List<BusEvent> events)
     {
         var duplicateGroupings = FilterOnSimpleMessagesAndGroupDuplicates(events);
+        var amount = 0; //TODO remove, when not needed anymore
         foreach (var group in duplicateGroupings)
         {
+            amount += group.Count() - 1;
+            
             SetAllButOneEventToSkipped(group);
         }
-
+        _logger.LogDebug("skipped {amount} of messages", amount);
         return events;
     }
     private static void SetAllButOneEventToSkipped(IEnumerable<BusEvent> group)
@@ -104,45 +107,58 @@ public class BusSenderService : IBusSenderService
 
     private async Task ProcessBusEvents(List<BusEvent> events)
     {
+        var dsw = Stopwatch.StartNew();
         events = SetDuplicatesToSkipped(events);
-        _logger.LogInformation("SetDuplicatesToSkipped after {sw} ms", _sw.ElapsedMilliseconds);
+        _logger.LogDebug("SetDuplicatesToSkipped took {sw} ms", dsw.ElapsedMilliseconds);
 
+
+        dsw.Restart();
         var listOfTasks = events.Where(busEvent => busEvent.Status == Status.UnProcessed)
             .Select(UpdateEventBasedOnTopic)
             .Cast<Task>()
             .ToList();
+        _logger.LogDebug("Update loop finished at at {sw} ms", dsw.ElapsedMilliseconds);
 
         await Task.WhenAll(listOfTasks);
-         _logger.LogDebug("Updated events at {sw} ms",  _sw.ElapsedMilliseconds);
+         _logger.LogDebug("Updated events at {sw} ms",  dsw.ElapsedMilliseconds);
+        
 
-         if (HasUnsavedChanges(events))
-         {
-             await _unitOfWork.SaveChangesAsync();
-             _logger.LogDebug("HasUnsavedChanges after {sw} ms",  _sw.ElapsedMilliseconds);
+        if (HasUnsavedChanges(events))
+        {
+            dsw.Restart();
+            await _unitOfWork.SaveChangesAsync();
+            _logger.LogDebug("HasUnsavedChanges after {sw} ms",  dsw.ElapsedMilliseconds);
+             
         }
 
         foreach (var busEvent in events.Where(busEvent => busEvent.Status == Status.UnProcessed))
         {
-
-            // var handledEvent = await UpdateEventBasedOnTopic(busEvent);
-            // _logger.LogDebug("Update event {event} at {sw} ms", busEvent.Event, _sw.ElapsedMilliseconds);
-
-
+            dsw.Restart();
             var busEventMessageToSend = busEvent.MessageToSend ?? busEvent.Message;
             var message =
                 JsonSerializer.Deserialize<BusEventMessage>(_service.WashString(busEventMessageToSend));
-
             if (message != null && string.IsNullOrEmpty(message.ProjectName))
             {
                 message.ProjectName = "_";
             }
+            _logger.LogDebug("deserialize takes {sw} ms", dsw.ElapsedMilliseconds);
 
+            dsw.Restart();
             TrackMetric(message);
-            await _topicClients.SendAsync(busEvent.Event, _service.WashString(busEventMessageToSend));
+            _logger.LogDebug("TrackMetric takes {sw} ms", dsw.ElapsedMilliseconds);
+            dsw.Restart();
 
+            await _topicClients.SendAsync(busEvent.Event, _service.WashString(busEventMessageToSend));
+            _logger.LogDebug("send takes {sw} ms", dsw.ElapsedMilliseconds);
+
+            dsw.Restart();
             TrackEvent(busEvent.Event, message);
+            _logger.LogDebug("TrackEvent takes {sw} ms", dsw.ElapsedMilliseconds);
+
+            dsw.Restart();
             busEvent.Status = Status.Sent;
             await _unitOfWork.SaveChangesAsync();
+            _logger.LogDebug("Save in loop takes {sw} ms", dsw.ElapsedMilliseconds);
         }
     }
 
@@ -150,6 +166,8 @@ public class BusSenderService : IBusSenderService
 
     private async Task<BusEvent> UpdateEventBasedOnTopic(BusEvent busEvent)
     {
+        _logger.LogDebug("Started update for {event}", busEvent.Event);
+        var sw = Stopwatch.StartNew();
         switch (busEvent.Event)
         {
             case TagTopic.TopicName:
@@ -249,6 +267,9 @@ public class BusSenderService : IBusSenderService
                     break;
                 }
         }
+
+        _logger.LogDebug("Update for  {event} took {ms}", busEvent.Event, sw.ElapsedMilliseconds);
+        sw.Stop();
         return busEvent;
     }
 

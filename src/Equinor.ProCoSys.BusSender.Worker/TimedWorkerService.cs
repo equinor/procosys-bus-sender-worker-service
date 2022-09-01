@@ -37,6 +37,7 @@ public class TimedWorkerService : IHostedService, IDisposable
         {
             _logger.LogInformation($"TimedWorkerService started do work");
             await _entryPointService.DoWorkerJob();
+            _logger.LogInformation($"TimedWorkerService finished do work");
         }
         catch (Exception e)
         {
