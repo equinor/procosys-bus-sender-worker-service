@@ -38,4 +38,18 @@ public class PcsBusSender : IPcsBusSender
             await topicClient.Value.CloseAsync();
         }
     }
+
+    public ValueTask<ServiceBusMessageBatch> CreateMessageBatchAsync(string topic)
+    {
+        var sender = _busSenders.SingleOrDefault(t => t.Key == topic).Value;
+
+        return sender.CreateMessageBatchAsync();
+    }
+
+    public async Task SendMessagesAsync(ServiceBusMessageBatch messageBatch, string topic)
+    {
+        var sender = _busSenders.SingleOrDefault(t => t.Key == topic).Value;
+
+        await sender.SendMessagesAsync(messageBatch);
+    }
 }
