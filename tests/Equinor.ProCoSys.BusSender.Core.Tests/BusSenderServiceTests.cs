@@ -127,7 +127,7 @@ public class BusSenderServiceTests
     public async Task SendMessageChunk_ShouldSaveChangesAfterEachSend()
     {
         await _dut.HandleBusEvents();
-        _iUnitOfWork.Verify(t => t.SaveChangesAsync(), Times.Between(2, 2, Range.Inclusive));
+        _iUnitOfWork.Verify(t => t.SaveChangesAsync(), Times.Between(2, 3, Range.Inclusive));
     }
 
     [TestMethod]
