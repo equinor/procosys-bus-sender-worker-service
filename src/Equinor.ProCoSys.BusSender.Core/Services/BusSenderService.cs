@@ -105,21 +105,20 @@ public class BusSenderService : IBusSenderService
 
     private async Task ProcessBusEvents(List<BusEvent> events)
     {
-
         events = SetDuplicatesToSkipped(events);
-        _logger.LogInformation("SetDuplicatesToSkipped after {sw} ms", _sw.ElapsedMilliseconds);
+        _logger.LogDebug("SetDuplicatesToSkipped after {sw} ms", _sw.ElapsedMilliseconds);
 
         if (HasUnsavedChanges(events))
         {
             await _unitOfWork.SaveChangesAsync();
-            _logger.LogInformation("HasUnsavedChanges saving {sw} ms", _sw.ElapsedMilliseconds);
+            _logger.LogDebug("HasUnsavedChanges saving {sw} ms", _sw.ElapsedMilliseconds);
         }
-       
 
+        var unProcessedEvents = events.Where(busEvent => busEvent.Status == Status.UnProcessed).ToList();
 
-        foreach (var busEvent in events.Where(busEvent => busEvent.Status == Status.UnProcessed))
+        _logger.LogInformation("Processing {nonSkipped} events after {sw} ms",unProcessedEvents.Count, _sw.ElapsedMilliseconds);
+        foreach (var busEvent in unProcessedEvents)
         {
-
             var handledEvent = await UpdateEventBasedOnTopic(events, busEvent);
             _logger.LogDebug("Update event {event} at {sw} ms", busEvent.Event, _sw.ElapsedMilliseconds);
 
