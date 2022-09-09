@@ -43,5 +43,9 @@ public enum PcsTopic
     CommPkgQuery,
     CommPkgQuery_Delete,
     Checklist_Delete,
-    Wo_Delete
+    Wo_Delete,
+    HeatTrace,
+    HeatTrace_Delete,
+    PipeTest,
+    PipeTest_Delete
 }
