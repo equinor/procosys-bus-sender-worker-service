@@ -136,6 +136,11 @@ public class BusSenderService : IBusSenderService
     {
         switch (busEvent.Event)
         {
+            case HeatTraceTopic.TopicName:
+                {
+                    await CreateAndSetMessage(busEvent, _service.CreateHeatTraceMessage);
+                    break;
+                }
             case TagTopic.TopicName:
                 {
                     busEvent.Message = await _service.AttachTagDetails(busEvent.Message);
@@ -225,6 +230,11 @@ public class BusSenderService : IBusSenderService
             case PipingSpoolTopic.TopicName:
                 {
                     await CreateAndSetMessage(busEvent, _service.CreatePipingSpoolMessage);
+                    break;
+                }
+            case PipeTestTopic.TopicName:
+                {
+                    await CreateAndSetMessage(busEvent, _service.CreatePipeTestMessage);
                     break;
                 }
             case WoMaterialTopic.TopicName:
