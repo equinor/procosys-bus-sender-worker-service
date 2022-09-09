@@ -29,6 +29,9 @@ public class BusSenderMessageRepository : IBusSenderMessageRepository
     public async Task<string> GetCommPkgQueryMessage(long commPkgId, long documentId) =>
         await ExecuteQuery(QueryCommPkgQuery.GetQuery(commPkgId,documentId), commPkgId+","+documentId);
 
+    public async Task<string> GetCommPkgOperationMessage(long commPkgId) =>
+        await ExecuteQuery(CommPkgOperationQuery.GetQuery(commPkgId), commPkgId.ToString());
+
     public async Task<string> GetDocumentMessage(long documentId) =>
         await ExecuteQuery(DocumentQuery.GetQuery(documentId), documentId.ToString());
 

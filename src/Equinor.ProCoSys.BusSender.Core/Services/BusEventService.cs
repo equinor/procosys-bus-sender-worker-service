@@ -49,6 +49,11 @@ public class BusEventService : IBusEventService
             ? WashString(await _busSenderMessageRepository.GetCommPkgQueryMessage(commPkgId,documentId))
             : throw new Exception("Failed to extract checkListId from message");
 
+    public async Task<string> CreateCommPkgOperationMessage(string busEventMessage) =>
+        long.TryParse(busEventMessage, out var commPkgId)
+            ? WashString(await _busSenderMessageRepository.GetCommPkgOperationMessage(commPkgId))
+            : throw new Exception("Failed to extract commPkgId from message");
+
     public async Task<string> CreateDocumentMessage(string busEventMessage) =>
         long.TryParse(busEventMessage, out var documentId)
             ? WashString(await _busSenderMessageRepository.GetDocumentMessage(documentId))

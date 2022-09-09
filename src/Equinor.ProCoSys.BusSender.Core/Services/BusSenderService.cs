@@ -167,6 +167,11 @@ public class BusSenderService : IBusSenderService
                     await CreateAndSetMessage(busEvent, _service.CreateCommPkgQueryMessage);
                     break;
                 }
+            case CommPkgOperationTopic.TopicName:
+                {
+                    await CreateAndSetMessage(busEvent, _service.CreateCommPkgOperationMessage);
+                    break;
+                }
             case QueryTopic.TopicName:
                 {
                     await CreateAndSetMessage(busEvent, _service.CreateQueryMessage);

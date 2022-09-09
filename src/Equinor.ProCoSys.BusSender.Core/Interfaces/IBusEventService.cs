@@ -26,4 +26,5 @@ public interface IBusEventService
     Task<string> CreateCommPkgQueryMessage(string busEventMessage);
     Task<string> CreateWorkOrderCutOffMessage(string message);
     Task<string> CreateMilestoneMessage(string message);
+    Task<string> CreateCommPkgOperationMessage(string busEventMessage);
 }
