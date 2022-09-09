@@ -45,7 +45,7 @@ public enum PcsTopic
     Checklist_Delete,
     Wo_Delete,
     HeatTrace,
-    HeatTraceDelete,
+    HeatTrace_Delete,
     PipeTest,
     PipeTest_Delete
 }
