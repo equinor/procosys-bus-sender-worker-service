@@ -15,6 +15,7 @@ public class HeatTraceQuery
 
         return @$"select
         '{{""Plant"" : ""' || ht.projectschema ||
+        '"", ""HeatTraceId"" : ""' || ht.id ||
         '"", ""CableId"" : ""' || ht.cable_id ||
         '"", ""TagId"" : ""' || ht.tag_id ||
         '"", ""SpoolNo"" : ""' || ht.spoolno ||
