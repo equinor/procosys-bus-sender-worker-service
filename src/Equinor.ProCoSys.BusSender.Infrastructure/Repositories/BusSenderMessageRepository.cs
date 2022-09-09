@@ -41,6 +41,12 @@ public class BusSenderMessageRepository : IBusSenderMessageRepository
     public async Task<string> GetPipingRevisionMessage(long pipeRevisionId) =>
         await ExecuteQuery(PipingRevisionQuery.GetQuery(pipeRevisionId), pipeRevisionId.ToString());
 
+    public async Task<string> GetPipeTestMessage(long pipeRevisionId,long pipeTestLibraryId) =>
+        await ExecuteQuery(PipeTestQuery.GetQuery(pipeRevisionId,pipeTestLibraryId), pipeRevisionId+","+pipeTestLibraryId);
+
+    public async Task<string> GetHeatTraceMessage(long id) =>
+        await ExecuteQuery(HeatTraceQuery.GetQuery(id), id.ToString());
+
     public async Task<string> GetPipingSpoolMessage(long pipingSpoolId) =>
         await ExecuteQuery(PipingSpoolQuery.GetQuery(pipingSpoolId), pipingSpoolId.ToString());
 
