@@ -13,11 +13,11 @@ public class WorkOrderCutoffQuery
 
         if (cutoffWeek != null)
         {
-            whereClause += $"and cutoffweek = {cutoffWeek}";
+            whereClause += $" and cutoffweek = '{cutoffWeek}'";
         }
         else if (month != null)
         {
-            whereClause += $"and TO_CHAR(wc.CUTOFFDATE, 'YYYY-MM-DD') like '%-{month}-%'";
+            whereClause += $" and TO_CHAR(wc.CUTOFFDATE, 'YYYY-MM-DD') like '%-{month}-%'";
         }
 
         return @$"select
