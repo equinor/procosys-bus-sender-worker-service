@@ -55,7 +55,7 @@ public class BusEventService : IBusEventService
     public async Task<string> CreateMilestoneMessage(string message) =>
         CanGetTwoIdsFromMessage(message.Split(","), out var elementId, out var milestoneId)
             ? WashString(await _busSenderMessageRepository.GetMilestoneMessage(elementId, milestoneId))
-            : throw new Exception("Failed to extract element xor milestone Id from message");
+            : throw new Exception("Failed to extract element or milestone Id from message");
     public async Task<string> CreateLoopContentMessage(string busEventMessage)
         => long.TryParse(busEventMessage, out var loopContentId)
             ? WashString(await _busSenderMessageRepository.GetLoopContentMessage(loopContentId))
@@ -69,7 +69,7 @@ public class BusEventService : IBusEventService
     public async Task<string> CreatePipeTestMessage(string busEventMessage)
         => CanGetTwoIdsFromMessage(busEventMessage.Split(","), out var pipingRevisionId, out var pipeTestLibId)
             ? WashString(await _busSenderMessageRepository.GetPipeTestMessage(pipingRevisionId, pipeTestLibId))
-            : throw new Exception("Failed to extract pipingRevisionId xor pipeTestLibraryId from message");
+            : throw new Exception("Failed to extract pipingRevisionId or pipeTestLibraryId from message");
 
     public async Task<string> CreateHeatTraceMessage(string busEventMessage)
         => long.TryParse(busEventMessage, out var heatTraceId)
@@ -110,7 +110,7 @@ public class BusEventService : IBusEventService
     public async Task<string> CreateWoChecklistMessage(string busEventMessage) =>
         CanGetTwoIdsFromMessage(busEventMessage.Split(","), out var tagCheckId, out var woId)
             ? WashString(await _busSenderMessageRepository.GetWorkOrderChecklistMessage(tagCheckId, woId))
-            : throw new Exception("Failed to extract Wo xor Checklist Id from message");
+            : throw new Exception("Failed to extract Wo or Checklist Id from message");
 
     public async Task<string> CreateWoMaterialMessage(string busEventMessage) =>
         long.TryParse(busEventMessage, out var workOrderId)
@@ -120,7 +120,7 @@ public class BusEventService : IBusEventService
     public async Task<string> CreateWoMilestoneMessage(string message) =>
         CanGetTwoIdsFromMessage(message.Split(","), out var workOrderId, out var milestoneId)
             ? WashString(await _busSenderMessageRepository.GetWorkOrderMilestoneMessage(workOrderId, milestoneId))
-            : throw new Exception("Failed to extract WorkOrder xor Milestone Id from message");
+            : throw new Exception("Failed to extract WorkOrder or Milestone Id from message");
 
     public async Task<string> CreateWorkOrderMessage(string busEventMessage) =>
         long.TryParse(busEventMessage, out var workOrderId)
