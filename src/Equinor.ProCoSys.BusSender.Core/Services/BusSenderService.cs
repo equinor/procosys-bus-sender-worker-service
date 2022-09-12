@@ -52,8 +52,6 @@ public class BusSenderService : IBusSenderService
             {
                 _logger.LogInformation("BusSenderService found {count} messages to process after {sw} ms", events.Count, _sw.ElapsedMilliseconds);
                 _telemetryClient.TrackMetric("BusSender Chunk", events.Count);
-                _logger.LogDebug("First Track after {ms} ms", _sw.ElapsedMilliseconds);
-
                 await ProcessBusEvents(events);
                 _logger.LogInformation("BusSenderService ProcessBusEvents used {sw} ms", _sw.ElapsedMilliseconds);
 
@@ -84,13 +82,13 @@ public class BusSenderService : IBusSenderService
 
         var unProcessedEvents = events.Where(busEvent => busEvent.Status == Status.UnProcessed).ToList();
         _logger.LogInformation("Amount of messages to process: {count} ", unProcessedEvents.Count);
-        // await unProcessedEvents
-        //     .ForEachAsync(50, async e => await UpdateEventBasedOnTopic(e));
+        await unProcessedEvents
+            .ForEachAsync(4, async e => await UpdateEventBasedOnTopic(e));
         
-        foreach (var e in unProcessedEvents)
-        {
-           await UpdateEventBasedOnTopic(e);
-        }
+        // foreach (var e in unProcessedEvents)
+        // {
+        //    await UpdateEventBasedOnTopic(e);
+        // }
         _logger.LogDebug("Update loop finished at at {sw} ms", dsw.ElapsedMilliseconds);
         await _unitOfWork.SaveChangesAsync();
         
@@ -145,9 +143,10 @@ public class BusSenderService : IBusSenderService
                     m.Status = Status.Sent;
                     TrackMessage(m);
                 }
-
+                _logger.LogDebug("Sending amount: {count} after {ms} ms", messageBatch.Count, _sw.ElapsedMilliseconds);
                 await _pcsBusSender.SendMessagesAsync(messageBatch, topic);
                 await _unitOfWork.SaveChangesAsync();
+                _logger.LogDebug("done sending and save after {ms} ms", _sw.ElapsedMilliseconds);
             }
         });
 
