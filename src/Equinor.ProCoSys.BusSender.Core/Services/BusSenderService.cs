@@ -52,7 +52,7 @@ public class BusSenderService : IBusSenderService
             {
                 _logger.LogInformation("BusSenderService found {count} messages to process after {sw} ms", events.Count, _sw.ElapsedMilliseconds);
                 _telemetryClient.TrackMetric("BusSender Chunk", events.Count);
-               _logger.LogDebug("First Track after {ms} ms", _sw.ElapsedMilliseconds);
+                _logger.LogDebug("First Track after {ms} ms", _sw.ElapsedMilliseconds);
 
                 await ProcessBusEvents(events);
                 _logger.LogInformation("BusSenderService ProcessBusEvents used {sw} ms", _sw.ElapsedMilliseconds);
@@ -76,17 +76,81 @@ public class BusSenderService : IBusSenderService
         await _pcsBusSender.CloseAllAsync();
     }
 
-    private List<BusEvent> SetDuplicatesToSkipped(List<BusEvent> events)
+
+    private async Task ProcessBusEvents(List<BusEvent> events)
+    {
+        events = SetDuplicatesToSkipped(events);
+        var dsw = Stopwatch.StartNew();
+
+        var unProcessedEvents = events.Where(busEvent => busEvent.Status == Status.UnProcessed).ToList();
+        _logger.LogInformation("Amount of un skipped messages: {count} ms", unProcessedEvents.Count);
+        await unProcessedEvents
+            .ForEachAsync(50, async e => await UpdateEventBasedOnTopic(e));
+        _logger.LogDebug("Update loop finished at at {sw} ms", dsw.ElapsedMilliseconds);
+        await _unitOfWork.SaveChangesAsync();
+        _logger.LogDebug("After First save {sw} ms", dsw.ElapsedMilliseconds);
+
+        /***
+         * Group by topic and then create a queue of messages per topic
+         */
+        var eventGroups = events.Where(busEvent => busEvent.Status == Status.UnProcessed)
+            .GroupBy(e => e.Event).Select(group =>
+            {
+                Queue<BusEvent> messages = new();
+                group.ToList().ForEach(be => messages.Enqueue(be));
+                return (group.Key, messages);
+            }).ToList();
+
+        await eventGroups.ForEachAsync(10, async group =>
+        {
+            /***
+            * group messages into batches, and fail before sending if message exceeds size limit
+            * Pattern taken from:
+            * https://github.com/Azure/azure-sdk-for-net/blob/main/sdk/servicebus/Azure.Messaging.ServiceBus/MigrationGuide.md
+            */
+            var messages = group.messages;
+            var messageCount = messages.Count;
+            var topic = group.Key;
+            while (messages.Count > 0)
+            {
+                using var messageBatch = await _pcsBusSender.CreateMessageBatchAsync(topic);
+                // add first unsent message to batch
+                if (messageBatch.TryAddMessage(
+                        new ServiceBusMessage(messages.Peek().MessageToSend ?? messages.Peek().Message)))
+                {
+                    var m = messages.Dequeue();
+                    m.Status = Status.Sent;
+                    TrackMessage(m);
+                }
+                else
+                {
+                    // if the first message can't fit, then it is too large for the batch
+                    throw new Exception($"Message {messageCount - messages.Count} is too large and cannot be sent.");
+                }
+
+                // add as many messages as possible to the current batch
+                while (messages.Count > 0 &&
+                       messageBatch.TryAddMessage(
+                           new ServiceBusMessage(messages.Peek().MessageToSend ?? messages.Peek().Message)))
+                {
+                    var m = messages.Dequeue();
+                    m.Status = Status.Sent;
+                    TrackMessage(m);
+                }
+
+                await _pcsBusSender.SendMessagesAsync(messageBatch, topic);
+                await _unitOfWork.SaveChangesAsync();
+            }
+        });
+    }
+
+    private static List<BusEvent> SetDuplicatesToSkipped(List<BusEvent> events)
     {
         var duplicateGroupings = FilterOnSimpleMessagesAndGroupDuplicates(events);
-        var amount = 0; //TODO remove, when not needed anymore
         foreach (var group in duplicateGroupings)
         {
-            amount += group.Count() - 1;
-            
             SetAllButOneEventToSkipped(group);
         }
-        _logger.LogDebug("skipped {amount} of messages", amount);
         return events;
     }
     private static void SetAllButOneEventToSkipped(IEnumerable<BusEvent> group)
@@ -108,104 +172,21 @@ public class BusSenderService : IBusSenderService
         => events.Where(e => long.TryParse(e.Message, out var id))
             .GroupBy(e => (e.Event, long.Parse(e.Message)));
 
-    private async Task ProcessBusEvents(List<BusEvent> events)
+
+    private void TrackMessage(BusEvent busEvent)
     {
-        events = SetDuplicatesToSkipped(events);
-        var dsw = Stopwatch.StartNew();
-
-        await events.Where(busEvent => busEvent.Status == Status.UnProcessed)
-            .ForEachAsync(20, async e => await UpdateEventBasedOnTopic(e));
-       _logger.LogDebug("Update loop finished at at {sw} ms", dsw.ElapsedMilliseconds);
-        //
-        // var listOfTasks = events.Where(busEvent => busEvent.Status == Status.UnProcessed)
-        //     // .AsParallel().
-        //     // .AsOrdered()
-        //     .Select(async e => await UpdateEventBasedOnTopic(e))
-        //     .ToList();
-
-        // await Task.WhenAll(listOfTasks);
-        // _logger.LogDebug("Updated events at {sw} ms",  dsw.ElapsedMilliseconds);
-
-        await _unitOfWork.SaveChangesAsync(); 
-        _logger.LogDebug("After First save {sw} ms",  dsw.ElapsedMilliseconds);
-
-
-        // /***
-        // * group messages into batches, and fail before sending if message exceeds size limit
-        // *
-        // * Pattern taken from:
-        // * https://github.com/Azure/azure-sdk-for-net/blob/main/sdk/servicebus/Azure.Messaging.ServiceBus/MigrationGuide.md
-        // */
-        //
-        // Queue<BusEvent> messages = new();
-        // events.ForEach(e => messages.Enqueue(e));
-        // var messageCount = messages.Count;
-        //
-        // while (messages.Count > 0)
-        // {
-        //     using var messageBatch = await _pcsBusSender.CreateMessageBatchAsync();
-        //     // add first unsent message to batch
-        //     if (messageBatch.TryAddMessage(new ServiceBusMessage(messages.Peek().MessageToSend ?? messages.Peek().Message)))
-        //     {
-        //        var m = messages.Dequeue();
-        //         TrackMessage(m);
-        //     }
-        //     else
-        //     {
-        //         // if the first message can't fit, then it is too large for the batch
-        //         throw new Exception($"Message {messageCount - messages.Count} is too large and cannot be sent.");
-        //     }
-        //
-        //     // add as many messages as possible to the current batch
-        //     while (messages.Count > 0 && messageBatch.TryAddMessage(new ServiceBusMessage(messages.Peek().MessageToSend ?? messages.Peek().Message)))
-        //     {
-        //         var m = messages.Dequeue();
-        //         TrackMessage(m);
-        //     }
-        //     await _pcsBusSender.SendMessagesAsync(messageBatch);
-        //     
-        // }
-        //
-        //
-        // private void TrackMessage(BusEvent busEvent)
-        // {
-        //     var busEventMessageToSend = busEvent.MessageToSend ?? busEvent.Message;
-        //     var message = JsonSerializer.Deserialize<BusEventMessage>(_service.WashString(busEventMessageToSend));
-        //     if (message != null && string.IsNullOrEmpty(message.ProjectName))
-        //     {
-        //         message.ProjectName = "_";
-        //     }
-        //
-        //     TrackMetric(message);
-        //
-        // }
-
-        foreach (var busEvent in events.Where(busEvent => busEvent.Status == Status.UnProcessed))
+        var busEventMessageToSend = busEvent.MessageToSend ?? busEvent.Message;
+        var message = JsonSerializer.Deserialize<BusEventMessage>(_service.WashString(busEventMessageToSend));
+        if (message != null && string.IsNullOrEmpty(message.ProjectName))
         {
-            var busEventMessageToSend = busEvent.MessageToSend ?? busEvent.Message;
-            var message = JsonSerializer.Deserialize<BusEventMessage>(_service.WashString(busEventMessageToSend));
-            if (message != null && string.IsNullOrEmpty(message.ProjectName))
-            {
-                message.ProjectName = "_";
-            }
-
-            TrackMetric(message);
-
-            await _pcsBusSender.SendAsync(busEvent.Event, _service.WashString(busEventMessageToSend));
-            _logger.LogDebug("send takes {sw} ms", dsw.ElapsedMilliseconds);
-            
-            TrackEvent(busEvent.Event, message);
-            
-            dsw.Restart();
-            busEvent.Status = Status.Sent;
-            await _unitOfWork.SaveChangesAsync();
-            _logger.LogDebug("Save in batch takes {sw} ms", dsw.ElapsedMilliseconds);
+            message.ProjectName = "_";
         }
+
+        TrackMetric(message);
+
     }
 
-    private static bool HasUnsavedChanges(IEnumerable<BusEvent> events) => events.Any(e => e.Status != Status.UnProcessed);
-
-    private async Task<BusEvent> UpdateEventBasedOnTopic(BusEvent busEvent)
+    private async Task UpdateEventBasedOnTopic(BusEvent busEvent)
     {
         _logger.LogDebug("Started update for {event}", busEvent.Event);
         var sw = Stopwatch.StartNew();
@@ -259,7 +240,6 @@ public class BusSenderService : IBusSenderService
             case WorkOrderTopic.TopicName:
                 {
                     await CreateAndSetMessage(busEvent, _service.CreateWorkOrderMessage);
-
                     break;
                 }
             case WorkOrderCutoffTopic.TopicName:
@@ -326,7 +306,6 @@ public class BusSenderService : IBusSenderService
 
         _logger.LogDebug("Update for  {event} took {ms}", busEvent.Event, sw.ElapsedMilliseconds);
         sw.Stop();
-        return busEvent;
     }
 
     /***
@@ -348,30 +327,4 @@ public class BusSenderService : IBusSenderService
     private void TrackMetric(BusEventMessage message) =>
         _telemetryClient.TrackMetric("BusSender Topic", 1, "Plant", "ProjectName", message?.Plant?[4..],
             message?.ProjectName?.Replace('$', '_') ?? "NoProject");
-
-    private void TrackEvent(string eventType, BusEventMessage message)
-    {
-        var properties = new Dictionary<string, string>
-        {
-            { "Event", eventType },
-            { "Plant", message.Plant[4..] },
-            { "ProjectName", message.ProjectName?.Replace('$', '_') }
-        };
-        if (!string.IsNullOrWhiteSpace(message.McPkgNo))
-        {
-            properties.Add("McPkgNo", message.McPkgNo);
-        }
-
-        if (!string.IsNullOrWhiteSpace(message.CommPkgNo))
-        {
-            properties.Add("CommPkgNo", message.CommPkgNo);
-        }
-
-        _telemetryClient.TrackEvent("BusSender Send",
-            properties);
-    }
-
-
-
-
 }
