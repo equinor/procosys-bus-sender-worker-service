@@ -84,12 +84,16 @@ public class BusSenderService : IBusSenderService
 
         var unProcessedEvents = events.Where(busEvent => busEvent.Status == Status.UnProcessed).ToList();
         _logger.LogInformation("Amount of messages to process: {count} ", unProcessedEvents.Count);
-        await unProcessedEvents
-            .ForEachAsync(50, async e => await UpdateEventBasedOnTopic(e));
+        // await unProcessedEvents
+        //     .ForEachAsync(50, async e => await UpdateEventBasedOnTopic(e));
+        
+        foreach (var e in unProcessedEvents)
+        {
+           await UpdateEventBasedOnTopic(e);
+        }
         _logger.LogDebug("Update loop finished at at {sw} ms", dsw.ElapsedMilliseconds);
         await _unitOfWork.SaveChangesAsync();
-        _logger.LogDebug("After First save {sw} ms", dsw.ElapsedMilliseconds);
-
+        
         /***
          * Group by topic and then create a queue of messages per topic
          */
