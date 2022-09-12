@@ -16,7 +16,6 @@ public class WorkOrderChecklistsQuery
             
             '""}}'
         FROM wo_tagcheck wotc
-            join element e on E.ELEMENT_ID = wotc.wo_ID
             join wo on wo.wo_id = wotc.wo_id
             join project p ON p.project_id = wo.project_id
         {whereClause}";

@@ -106,7 +106,7 @@ public class BusSenderMessageRepository : IBusSenderMessageRepository
         //result.ReadAsync is expected to be false here, this is because there should be no more rows to read.
         if (await result.ReadAsync())
         {
-            _logger.LogError("Object/Entity returned more than 1 row, this should not happen.");
+            _logger.LogError("Object/Entity: {object} returned more than 1 row, this should not happen. : {result}", objectId, (string)result[1] );
         }
         return queryResult;
     }
