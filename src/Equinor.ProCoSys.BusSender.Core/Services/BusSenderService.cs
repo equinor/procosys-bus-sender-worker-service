@@ -93,14 +93,18 @@ public class BusSenderService : IBusSenderService
         /***
          * Group by topic and then create a queue of messages per topic
          */
-        var eventGroups = events.Where(busEvent => busEvent.Status == Status.UnProcessed)
+        var topicQueues = events.Where(busEvent => busEvent.Status == Status.UnProcessed)
             .GroupBy(e => e.Event).Select(group =>
             {
                 Queue<BusEvent> messages = new();
                 group.ToList().ForEach(be => messages.Enqueue(be));
                 return (group.Key, messages);
-            }).ToList();
+            });
 
+        await BatchAndSendPerTopic(topicQueues);
+    }
+
+    private async Task BatchAndSendPerTopic(IEnumerable<(string Key, Queue<BusEvent> messages)> eventGroups) =>
         await eventGroups.ForEachAsync(10, async group =>
         {
             /***
@@ -116,7 +120,7 @@ public class BusSenderService : IBusSenderService
                 using var messageBatch = await _pcsBusSender.CreateMessageBatchAsync(topic);
                 // add first unsent message to batch
                 if (messageBatch.TryAddMessage(
-                        new ServiceBusMessage(messages.Peek().MessageToSend ?? messages.Peek().Message)))
+                        new ServiceBusMessage(_service.WashString(messages.Peek().MessageToSend ?? messages.Peek().Message))))
                 {
                     var m = messages.Dequeue();
                     m.Status = Status.Sent;
@@ -131,7 +135,7 @@ public class BusSenderService : IBusSenderService
                 // add as many messages as possible to the current batch
                 while (messages.Count > 0 &&
                        messageBatch.TryAddMessage(
-                           new ServiceBusMessage(messages.Peek().MessageToSend ?? messages.Peek().Message)))
+                           new ServiceBusMessage(_service.WashString(messages.Peek().MessageToSend ?? messages.Peek().Message))))
                 {
                     var m = messages.Dequeue();
                     m.Status = Status.Sent;
@@ -142,7 +146,6 @@ public class BusSenderService : IBusSenderService
                 await _unitOfWork.SaveChangesAsync();
             }
         });
-    }
 
     private static List<BusEvent> SetDuplicatesToSkipped(List<BusEvent> events)
     {
@@ -181,9 +184,7 @@ public class BusSenderService : IBusSenderService
         {
             message.ProjectName = "_";
         }
-
         TrackMetric(message);
-
     }
 
     private async Task UpdateEventBasedOnTopic(BusEvent busEvent)
