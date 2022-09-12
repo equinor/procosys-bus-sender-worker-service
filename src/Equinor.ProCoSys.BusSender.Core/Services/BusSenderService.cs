@@ -83,7 +83,7 @@ public class BusSenderService : IBusSenderService
         var dsw = Stopwatch.StartNew();
 
         var unProcessedEvents = events.Where(busEvent => busEvent.Status == Status.UnProcessed).ToList();
-        _logger.LogInformation("Amount of un skipped messages: {count} ms", unProcessedEvents.Count);
+        _logger.LogInformation("Amount of messages to process: {count} ", unProcessedEvents.Count);
         await unProcessedEvents
             .ForEachAsync(50, async e => await UpdateEventBasedOnTopic(e));
         _logger.LogDebug("Update loop finished at at {sw} ms", dsw.ElapsedMilliseconds);
@@ -305,7 +305,7 @@ public class BusSenderService : IBusSenderService
                 }
         }
 
-        _logger.LogDebug("Update for  {event} took {ms}", busEvent.Event, sw.ElapsedMilliseconds);
+        _logger.LogDebug("Update for  {event} took {ms} ms", busEvent.Event, sw.ElapsedMilliseconds);
         sw.Stop();
     }
 
