@@ -29,6 +29,9 @@ public class BusSenderMessageRepository : IBusSenderMessageRepository
     public async Task<string> GetCommPkgQueryMessage(long commPkgId, long documentId) =>
         await ExecuteQuery(QueryCommPkgQuery.GetQuery(commPkgId,documentId), commPkgId+","+documentId);
 
+    public async Task<string> GetCommPkgOperationMessage(long commPkgId) =>
+        await ExecuteQuery(CommPkgOperationQuery.GetQuery(commPkgId), commPkgId.ToString());
+
     public async Task<string> GetDocumentMessage(long documentId) =>
         await ExecuteQuery(DocumentQuery.GetQuery(documentId), documentId.ToString());
 
@@ -40,6 +43,12 @@ public class BusSenderMessageRepository : IBusSenderMessageRepository
 
     public async Task<string> GetPipingRevisionMessage(long pipeRevisionId) =>
         await ExecuteQuery(PipingRevisionQuery.GetQuery(pipeRevisionId), pipeRevisionId.ToString());
+
+    public async Task<string> GetPipeTestMessage(long pipeRevisionId,long pipeTestLibraryId) =>
+        await ExecuteQuery(PipeTestQuery.GetQuery(pipeRevisionId,pipeTestLibraryId), pipeRevisionId+","+pipeTestLibraryId);
+
+    public async Task<string> GetHeatTraceMessage(long id) =>
+        await ExecuteQuery(HeatTraceQuery.GetQuery(id), id.ToString());
 
     public async Task<string> GetPipingSpoolMessage(long pipingSpoolId) =>
         await ExecuteQuery(PipingSpoolQuery.GetQuery(pipingSpoolId), pipingSpoolId.ToString());
@@ -97,7 +106,7 @@ public class BusSenderMessageRepository : IBusSenderMessageRepository
         //result.ReadAsync is expected to be false here, this is because there should be no more rows to read.
         if (await result.ReadAsync())
         {
-            _logger.LogError("Object/Entity {objectId} returned more than 1 row, this should not happen.", objectId);
+            _logger.LogError("Object/Entity: {object} returned more than 1 row, this should not happen. : {result}", objectId, (string)result[1] );
         }
         return queryResult;
     }

@@ -16,8 +16,8 @@ public static class PipingRevisionQuery
             '"", ""MaxDesignPressure"" : ""' || pr.maxdesignpressure || 
             '"", ""MaxTestPressure"" : ""' || pr.maxtestpressure || 
             '"", ""Comments"" : ""' || regexp_replace(pr.comments, '([""\])', '\\\1') ||
-            '"", ""TestISODocumentNo"" : ""' || ti.documentno ||
-            '"", ""TestISORevision"" : ""' || pr.TEST_ISO_REVISIONNO ||
+            '"", ""TestISODocumentNo"" : ""' ||  regexp_replace(ti.documentno, '([""\])', '\\\1') ||
+            '"", ""TestISORevision"" : ""' ||  regexp_replace(pr.TEST_ISO_REVISIONNO, '([""\])', '\\\1') ||
             '"", ""PurchaseOrderNo"" : ""' || po.packageno || 
             '"", ""CallOffNo"" : ""' || co.calloffno ||
             '"", ""LastUpdated"" : ""' || TO_CHAR(pr.LAST_UPDATED, 'yyyy-mm-dd hh24:mi:ss') || 

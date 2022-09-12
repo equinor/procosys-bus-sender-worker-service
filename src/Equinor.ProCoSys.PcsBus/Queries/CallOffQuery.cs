@@ -2,7 +2,6 @@
 
 public class CallOffQuery
 {
-
     public static string GetQuery(long? tagCheckId, string plant = null)
     {
         DetectFaultyPlantInput(plant);

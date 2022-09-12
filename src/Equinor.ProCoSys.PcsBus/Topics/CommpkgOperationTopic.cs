@@ -19,5 +19,4 @@ public class CommPkgOperationTopic
     public string LastUpdated { get; set; }
 
     public const string TopicName = "commpkgoperation";
-
 }

@@ -211,6 +211,11 @@ public class BusSenderService : IBusSenderService
         var sw = Stopwatch.StartNew();
         switch (busEvent.Event)
         {
+            case HeatTraceTopic.TopicName:
+                {
+                    await CreateAndSetMessage(busEvent, _service.CreateHeatTraceMessage);
+                    break;
+                }
             case TagTopic.TopicName:
                 {
                     busEvent.Message = await _service.AttachTagDetails(busEvent.Message);
@@ -224,6 +229,11 @@ public class BusSenderService : IBusSenderService
             case CommPkgQueryTopic.TopicName:
                 {
                     await CreateAndSetMessage(busEvent, _service.CreateCommPkgQueryMessage);
+                    break;
+                }
+            case CommPkgOperationTopic.TopicName:
+                {
+                    await CreateAndSetMessage(busEvent, _service.CreateCommPkgOperationMessage);
                     break;
                 }
             case QueryTopic.TopicName:
@@ -300,6 +310,11 @@ public class BusSenderService : IBusSenderService
             case PipingSpoolTopic.TopicName:
                 {
                     await CreateAndSetMessage(busEvent, _service.CreatePipingSpoolMessage);
+                    break;
+                }
+            case PipeTestTopic.TopicName:
+                {
+                    await CreateAndSetMessage(busEvent, _service.CreatePipeTestMessage);
                     break;
                 }
             case WoMaterialTopic.TopicName:
