@@ -83,7 +83,7 @@ public class BusSenderService : IBusSenderService
         var unProcessedEvents = events.Where(busEvent => busEvent.Status == Status.UnProcessed).ToList();
         _logger.LogInformation("Amount of messages to process: {count} ", unProcessedEvents.Count);
         await unProcessedEvents
-            .ForEachAsync(4, async e => await UpdateEventBasedOnTopic(e));
+            .ForEachAsync(50, async e => await UpdateEventBasedOnTopic(e));
         
         // foreach (var e in unProcessedEvents)
         // {
@@ -317,7 +317,7 @@ public class BusSenderService : IBusSenderService
      */
     private static async Task CreateAndSetMessage(BusEvent busEvent, Func<string, Task<string>> createMessageFunction)
     {
-        var message = await createMessageFunction(busEvent.Message);
+        var message = await createMessageFunction(busEvent);
         if (message == null)
         {
             busEvent.Status = Status.NotFound;

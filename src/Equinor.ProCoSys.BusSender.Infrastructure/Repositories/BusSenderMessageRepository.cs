@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data;
 using System.Data.Common;
 using System.Threading.Tasks;
 using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
@@ -88,9 +89,16 @@ public class BusSenderMessageRepository : IBusSenderMessageRepository
         await using var command = _context.Database.GetDbConnection().CreateCommand();
         command.CommandText = queryString;
         await _context.Database.OpenConnectionAsync();
-        await using var result = await command.ExecuteReaderAsync();
 
-        return await ExtractMessageFromResult(objectId, result);
+        var result = (string)await command.ExecuteScalarAsync();
+
+        if (result is null)
+        {
+            _logger.LogError("Object/Entity with id {objectId} did not return anything", objectId);
+            return null;
+        }
+
+        return result;
     }
     private async Task<string> ExtractMessageFromResult(string objectId, DbDataReader result)
     {
