@@ -88,7 +88,10 @@ public class BusSenderMessageRepository : IBusSenderMessageRepository
     {
         await using var command = _context.Database.GetDbConnection().CreateCommand();
         command.CommandText = queryString;
-        await _context.Database.OpenConnectionAsync();
+        if( _context.Database.GetDbConnection().State != ConnectionState.Open)
+        {
+            await _context.Database.OpenConnectionAsync();
+        }
 
         var result = (string)await command.ExecuteScalarAsync();
 

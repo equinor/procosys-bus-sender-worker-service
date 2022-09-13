@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -82,14 +81,14 @@ public class BusSenderService : IBusSenderService
 
         var unProcessedEvents = events.Where(busEvent => busEvent.Status == Status.UnProcessed).ToList();
         _logger.LogInformation("Amount of messages to process: {count} ", unProcessedEvents.Count);
-        await unProcessedEvents
-            .ForEachAsync(50, async e => await UpdateEventBasedOnTopic(e));
+        // await unProcessedEvents
+        //     .ForEachAsync(50, async e => await UpdateEventBasedOnTopic(e));
         
-        // foreach (var e in unProcessedEvents)
-        // {
-        //    await UpdateEventBasedOnTopic(e);
-        // }
-        _logger.LogDebug("Update loop finished at at {sw} ms", dsw.ElapsedMilliseconds);
+        foreach (var e in unProcessedEvents)
+        {
+           await UpdateEventBasedOnTopic(e);
+        }
+        _logger.LogInformation("Update loop finished at at {sw} ms", dsw.ElapsedMilliseconds);
         await _unitOfWork.SaveChangesAsync();
         
         /***
@@ -317,7 +316,7 @@ public class BusSenderService : IBusSenderService
      */
     private static async Task CreateAndSetMessage(BusEvent busEvent, Func<string, Task<string>> createMessageFunction)
     {
-        var message = await createMessageFunction(busEvent);
+        var message = await createMessageFunction(busEvent.Message);
         if (message == null)
         {
             busEvent.Status = Status.NotFound;
