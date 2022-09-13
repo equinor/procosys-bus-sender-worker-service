@@ -9,7 +9,6 @@ trigger:
      - master
      - dev
 
-
 name: $(date:yyyyMMdd)$(rev:.r)
 resources:  
   repositories:

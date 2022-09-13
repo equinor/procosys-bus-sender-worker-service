@@ -73,7 +73,6 @@ public class BusSenderService : IBusSenderService
         await _pcsBusSender.CloseAllAsync();
     }
 
-
     private async Task ProcessBusEvents(List<BusEvent> events)
     {
         events = SetDuplicatesToSkipped(events);
