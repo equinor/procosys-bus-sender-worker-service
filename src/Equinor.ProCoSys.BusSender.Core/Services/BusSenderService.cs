@@ -24,6 +24,7 @@ public class BusSenderService : IBusSenderService
     private readonly ITelemetryClient _telemetryClient;
     private readonly IBusEventService _service;
     private readonly Stopwatch _sw;
+    private const int AmountOfBatchesInParallel = 15;
 
     public BusSenderService(IPcsBusSender pcsBusSender,
         IBusEventRepository busEventRepository,
@@ -80,9 +81,7 @@ public class BusSenderService : IBusSenderService
 
         var unProcessedEvents = events.Where(busEvent => busEvent.Status == Status.UnProcessed).ToList();
         _logger.LogInformation("Amount of messages to process: {count} ", unProcessedEvents.Count);
-        // await unProcessedEvents
-        //     .ForEachAsync(50, async e => await UpdateEventBasedOnTopic(e));
-        
+
         foreach (var e in unProcessedEvents)
         {
            await UpdateEventBasedOnTopic(e);
@@ -105,7 +104,7 @@ public class BusSenderService : IBusSenderService
     }
 
     private async Task BatchAndSendPerTopic(IEnumerable<(string Key, Queue<BusEvent> messages)> eventGroups) =>
-        await eventGroups.ForEachAsync(10, async group =>
+        await eventGroups.ForEachAsync(AmountOfBatchesInParallel, async group =>
         {
             /***
             * group messages into batches, and fail before sending if message exceeds size limit
@@ -120,7 +119,8 @@ public class BusSenderService : IBusSenderService
                 using var messageBatch = await _pcsBusSender.CreateMessageBatchAsync(topic);
                 // add first unsent message to batch
                 if (messageBatch.TryAddMessage(
-                        new ServiceBusMessage(_service.WashString(messages.Peek().MessageToSend ?? messages.Peek().Message))))
+                        new ServiceBusMessage(
+                            _service.WashString(messages.Peek().MessageToSend ?? messages.Peek().Message))))
                 {
                     var m = messages.Dequeue();
                     m.Status = Status.Sent;
@@ -135,12 +135,14 @@ public class BusSenderService : IBusSenderService
                 // add as many messages as possible to the current batch
                 while (messages.Count > 0 &&
                        messageBatch.TryAddMessage(
-                           new ServiceBusMessage(_service.WashString(messages.Peek().MessageToSend ?? messages.Peek().Message))))
+                           new ServiceBusMessage(
+                               _service.WashString(messages.Peek().MessageToSend ?? messages.Peek().Message))))
                 {
                     var m = messages.Dequeue();
                     m.Status = Status.Sent;
                     TrackMessage(m);
                 }
+
                 _logger.LogDebug("Sending amount: {count} after {ms} ms", messageBatch.Count, _sw.ElapsedMilliseconds);
                 await _pcsBusSender.SendMessagesAsync(messageBatch, topic);
                 await _unitOfWork.SaveChangesAsync();

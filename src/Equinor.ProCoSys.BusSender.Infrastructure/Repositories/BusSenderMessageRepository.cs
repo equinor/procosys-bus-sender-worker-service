@@ -100,25 +100,6 @@ public class BusSenderMessageRepository : IBusSenderMessageRepository
             _logger.LogError("Object/Entity with id {objectId} did not return anything", objectId);
             return null;
         }
-
         return result;
-    }
-    private async Task<string> ExtractMessageFromResult(string objectId, DbDataReader result)
-    {
-        //result.ReadAsync is expected to return true here, query for 1 objectId should return 1 and only 1 row. 
-        if (!result.HasRows || !await result.ReadAsync() || result[0] is DBNull || result[0] is null)
-        {
-            _logger.LogError("Object/Entity with id {objectId} did not return anything", objectId);
-            return null;
-        }
-
-        var queryResult = (string)result[0];
-
-        //result.ReadAsync is expected to be false here, this is because there should be no more rows to read.
-        if (await result.ReadAsync())
-        {
-            _logger.LogError("Object/Entity: {object} returned more than 1 row, this should not happen. : {result}", objectId, (string)result[1] );
-        }
-        return queryResult;
     }
 }

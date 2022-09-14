@@ -42,6 +42,10 @@ public class PcsBusSender : IPcsBusSender
     public async ValueTask<ServiceBusMessageBatch> CreateMessageBatchAsync(string topic)
     {
         var sender = _busSenders.SingleOrDefault(t => t.Key == topic).Value;
+        if (sender == null)
+        {
+            throw new Exception($"Unable to find TopicClient for topic: {topic}");
+        }
         var serviceBusMessageBatch = await sender.CreateMessageBatchAsync();
         return serviceBusMessageBatch;
     }
@@ -49,6 +53,10 @@ public class PcsBusSender : IPcsBusSender
     public async Task SendMessagesAsync(ServiceBusMessageBatch messageBatch, string topic)
     {
         var sender = _busSenders.SingleOrDefault(t => t.Key == topic).Value;
+        if (sender == null)
+        {
+            throw new Exception($"Unable to find TopicClient for topic: {topic}");
+        }
 
         await sender.SendMessagesAsync(messageBatch);
     }
