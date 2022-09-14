@@ -35,7 +35,7 @@ public class PipeTestQuery
         }
         else if (revisionId is not null & pipeTestLibraryId is not null)
         {
-            whereClause = $"where and pt.pipingrevision_id = {revisionId} and pt.pipetestlibrary_id = {pipeTestLibraryId}";
+            whereClause = $"where pt.pipingrevision_id = {revisionId} and pt.pipetestlibrary_id = {pipeTestLibraryId}";
         }
         else if (revisionId is not null ^ pipeTestLibraryId is not null)
         {
