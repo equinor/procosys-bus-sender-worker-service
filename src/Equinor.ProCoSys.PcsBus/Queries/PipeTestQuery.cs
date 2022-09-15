@@ -25,7 +25,7 @@ public class PipeTestQuery
     private static string CreateWhereClause(long? revisionId, long? pipeTestLibraryId, string plant)
     {
         var whereClause = "";
-        if (revisionId is not null & pipeTestLibraryId is not null & plant is not null)
+        if (revisionId is not null && pipeTestLibraryId is not null && plant is not null)
         {
             whereClause = $"where pt.projectschema = '{plant}' and pt.pipingrevision_id = {revisionId} and pt.pipetestlibrary_id = {pipeTestLibraryId}";
         }
@@ -33,9 +33,9 @@ public class PipeTestQuery
         {
             whereClause = $"where pt.projectschema = '{plant}'";
         }
-        else if (revisionId is not null & pipeTestLibraryId is not null)
+        else if (revisionId is not null && pipeTestLibraryId is not null)
         {
-            whereClause = $"where and pt.pipingrevision_id = {revisionId} and pt.pipetestlibrary_id = {pipeTestLibraryId}";
+            whereClause = $"where pt.pipingrevision_id = {revisionId} and pt.pipetestlibrary_id = {pipeTestLibraryId}";
         }
         else if (revisionId is not null ^ pipeTestLibraryId is not null)
         {
