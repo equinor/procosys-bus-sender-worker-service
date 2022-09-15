@@ -49,7 +49,7 @@ public class MilestonesQuery
         {
             whereClause = $"where e.element_id = {element} and e.milestone_id = {milestoneId}";
         }
-        else if (milestoneId != null || element != null)
+        else if (milestoneId != null ^ element != null)
         {
             throw new Exception("Message can not contain partial id match, need both milestone and element id to find correct db entry");
         }
