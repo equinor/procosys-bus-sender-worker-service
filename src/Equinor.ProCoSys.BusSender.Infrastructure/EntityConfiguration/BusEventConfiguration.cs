@@ -14,5 +14,6 @@ public class BusEventConfiguration : IEntityTypeConfiguration<BusEvent>
         builder.Property(p => p.Event).HasColumnName("EVENT");
         builder.Property(p => p.Message).HasColumnName("MESSAGE");
         builder.Property(p => p.Status).HasColumnName("SENT");
+        builder.Ignore(p => p.MessageToSend);
     }
 }

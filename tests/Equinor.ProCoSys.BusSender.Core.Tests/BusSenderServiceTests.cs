@@ -28,19 +28,28 @@ public class BusSenderServiceTests
     private Mock<ITagDetailsRepository> _tagDetailsRepositoryMock;
     private Mock<IBusSenderMessageRepository> _busSenderMessageRepositoryMock;
     private Mock<BusEventService> _busEventServiceMock;
-    private string _messageBodyOnTopicClient4;
+    private List<ServiceBusMessage> _messagesInTopicClient4;
 
     [TestInitialize]
     public void Setup()
     {
         var busSender = new PcsBusSender();
         _topicClientMock1 = new Mock<ServiceBusSender>();
+        _topicClientMock1.Setup(t => t.CreateMessageBatchAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(() => ServiceBusModelFactory.ServiceBusMessageBatch(1000, new List<ServiceBusMessage>()));
         _topicClientMock2 = new Mock<ServiceBusSender>();
+        _topicClientMock2.Setup(t => t.CreateMessageBatchAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(() => ServiceBusModelFactory.ServiceBusMessageBatch(1000, new List<ServiceBusMessage>()));
         _topicClientMock3 = new Mock<ServiceBusSender>();
+        _topicClientMock3.Setup(t => t.CreateMessageBatchAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(() => ServiceBusModelFactory.ServiceBusMessageBatch(1000, new List<ServiceBusMessage>()));
         _topicClientMock4 = new Mock<ServiceBusSender>();
         _topicClientMockWo = new Mock<ServiceBusSender>();
-        _topicClientMock4.Setup(t => t.SendMessageAsync(It.IsAny<ServiceBusMessage>(), It.IsAny<CancellationToken>()))
-            .Callback<ServiceBusMessage,CancellationToken>((m,c) => _messageBodyOnTopicClient4 = Encoding.UTF8.GetString(m.Body));
+        _messagesInTopicClient4  = new List<ServiceBusMessage>();
+        _topicClientMockWo.Setup(t => t.CreateMessageBatchAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(() => ServiceBusModelFactory.ServiceBusMessageBatch(1000, new List<ServiceBusMessage>()));
+        _topicClientMock4.Setup(t => t.CreateMessageBatchAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(()=> ServiceBusModelFactory.ServiceBusMessageBatch(1000, _messagesInTopicClient4));
         busSender.Add("topic1", _topicClientMock1.Object);
         busSender.Add("topic2", _topicClientMock2.Object);
         busSender.Add("topic3", _topicClientMock3.Object);
@@ -95,10 +104,10 @@ public class BusSenderServiceTests
         Assert.AreEqual(Status.UnProcessed, _busEvents[0].Status);
 
         await _dut.HandleBusEvents();
-        _topicClientMock1.Verify(t => t.SendMessageAsync(It.IsAny<ServiceBusMessage>(), It.IsAny<CancellationToken>()), Times.Never);
-        _topicClientMock2.Verify(t => t.SendMessageAsync(It.IsAny<ServiceBusMessage>(), It.IsAny<CancellationToken>()), Times.Once);
-        _topicClientMock3.Verify(t => t.SendMessageAsync(It.IsAny<ServiceBusMessage>(), It.IsAny<CancellationToken>()), Times.Once);
-        _topicClientMock4.Verify(t => t.SendMessageAsync(It.IsAny<ServiceBusMessage>(), It.IsAny<CancellationToken>()), Times.Never);
+        _topicClientMock1.Verify(t => t.SendMessagesAsync(It.IsAny<ServiceBusMessageBatch>(), It.IsAny<CancellationToken>()), Times.Never);
+        _topicClientMock2.Verify(t => t.SendMessagesAsync(It.IsAny<ServiceBusMessageBatch>(), It.IsAny<CancellationToken>()), Times.Once);
+        _topicClientMock3.Verify(t => t.SendMessagesAsync(It.IsAny<ServiceBusMessageBatch>(), It.IsAny<CancellationToken>()), Times.Once);
+        _topicClientMock4.Verify(t => t.SendMessagesAsync(It.IsAny<ServiceBusMessageBatch>(), It.IsAny<CancellationToken>()), Times.Never);
 
         Assert.AreEqual(Status.Sent, _busEvents[0].Status);
         Assert.AreEqual(Status.Sent, _busEvents[0].Status);
@@ -120,14 +129,14 @@ public class BusSenderServiceTests
 
         await _dut.HandleBusEvents();
 
-        Assert.AreEqual(expectedWashedMessage, _messageBodyOnTopicClient4);
+        Assert.AreEqual(expectedWashedMessage, Encoding.UTF8.GetString(_messagesInTopicClient4[0].Body));
     }
 
     [TestMethod]
     public async Task SendMessageChunk_ShouldSaveChangesAfterEachSend()
     {
         await _dut.HandleBusEvents();
-        _iUnitOfWork.Verify(t => t.SaveChangesAsync(), Times.Between(2, 2, Range.Inclusive));
+        _iUnitOfWork.Verify(t => t.SaveChangesAsync(), Times.Between(2, 3, Range.Inclusive));
     }
 
     [TestMethod]
@@ -150,7 +159,7 @@ public class BusSenderServiceTests
         await _dut.HandleBusEvents();
 
         //Assert
-        _topicClientMockWo.Verify(t => t.SendMessageAsync(It.IsAny<ServiceBusMessage>(), It.IsAny<CancellationToken>()), Times.Once);
+        _topicClientMockWo.Verify(t => t.SendMessagesAsync(It.IsAny<ServiceBusMessageBatch>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [TestMethod]
@@ -175,6 +184,6 @@ public class BusSenderServiceTests
         await _dut.HandleBusEvents();
 
         //Assert
-        _topicClientMockWo.Verify(t => t.SendMessageAsync(It.IsAny<ServiceBusMessage>(), It.IsAny<CancellationToken>()), Times.Exactly(2));
+        _topicClientMockWo.Verify(t => t.SendMessagesAsync(It.IsAny<ServiceBusMessageBatch>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
     }
 }

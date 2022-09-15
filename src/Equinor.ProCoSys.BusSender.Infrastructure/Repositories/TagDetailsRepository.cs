@@ -38,7 +38,6 @@ public class TagDetailsRepository : ITagDetailsRepository
 
         var tagDetails = (string)result[0];
 
-
         if (await result.ReadAsync())
         {
             _logger.LogError("TagDetails returned more than 1 row, this should not happen.");
