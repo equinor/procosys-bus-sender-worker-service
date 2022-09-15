@@ -64,7 +64,7 @@ public class BusSenderService : IBusSenderService
             throw;
         }
 
-        _logger.LogInformation("BusSenderService DoWorkerJob finished ");
+        _logger.LogDebug("BusSenderService DoWorkerJob finished");
         _telemetryClient.Flush();
     }
 
