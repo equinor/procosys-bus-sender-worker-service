@@ -35,7 +35,7 @@ public static class McPkgQuery
             left join library discipline on discipline.library_id = m.discipline_id
             left join library area on area.library_id = m.area_id
             left join library mcstatus on mcstatus.library_id = m.mcstatus_id
-            left join library phase on phase.library_id = m.mcphase_id
+            left join library phase on phase.library_id = m.mcpkgphase_id
             left join responsible resp on resp.responsible_id = m.responsible_id
         {whereClause}";
     }
