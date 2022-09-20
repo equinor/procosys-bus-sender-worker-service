@@ -24,7 +24,7 @@ public class BusSenderService : IBusSenderService
     private readonly ITelemetryClient _telemetryClient;
     private readonly IBusEventService _service;
     private readonly Stopwatch _sw;
-    private const int AmountOfBatchesInParallel = 15;
+    private const int AmountOfBatchesInParallel = 1;
 
     public BusSenderService(IPcsBusSender pcsBusSender,
         IBusEventRepository busEventRepository,
@@ -98,24 +98,23 @@ public class BusSenderService : IBusSenderService
                 Queue<BusEvent> messages = new();
                 group.ToList().ForEach(be => messages.Enqueue(be));
                 return (group.Key, messages);
-            });
+            }).ToList();
 
         await BatchAndSendPerTopic(topicQueues);
-        await _unitOfWork.SaveChangesAsync();
+     
         
     }
 
-    private async Task BatchAndSendPerTopic(IEnumerable<(string Key, Queue<BusEvent> messages)> eventGroups) =>
-        await eventGroups.ForEachAsync(AmountOfBatchesInParallel, async group =>
+    private async Task BatchAndSendPerTopic(List<(string Key, Queue<BusEvent> messages)> eventGroups)
+    {
+        foreach (var (topic, messages) in eventGroups)
         {
             /***
             * group messages into batches, and fail before sending if message exceeds size limit
             * Pattern taken from:
             * https://github.com/Azure/azure-sdk-for-net/blob/main/sdk/servicebus/Azure.Messaging.ServiceBus/MigrationGuide.md
             */
-            var messages = group.messages;
             var messageCount = messages.Count;
-            var topic = group.Key;
             while (messages.Count > 0)
             {
                 using var messageBatch = await _pcsBusSender.CreateMessageBatchAsync(topic);
@@ -147,9 +146,11 @@ public class BusSenderService : IBusSenderService
 
                 _logger.LogDebug("Sending amount: {count} after {ms} ms", messageBatch.Count, _sw.ElapsedMilliseconds);
                 await _pcsBusSender.SendMessagesAsync(messageBatch, topic);
+                await _unitOfWork.SaveChangesAsync();
                 _logger.LogDebug("done sending and save after {ms} ms", _sw.ElapsedMilliseconds);
             }
-        });
+        }
+    }
 
     private static List<BusEvent> SetDuplicatesToSkipped(List<BusEvent> events)
     {
