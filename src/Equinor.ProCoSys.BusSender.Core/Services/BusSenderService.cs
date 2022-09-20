@@ -101,6 +101,8 @@ public class BusSenderService : IBusSenderService
             });
 
         await BatchAndSendPerTopic(topicQueues);
+        await _unitOfWork.SaveChangesAsync();
+        
     }
 
     private async Task BatchAndSendPerTopic(IEnumerable<(string Key, Queue<BusEvent> messages)> eventGroups) =>
@@ -145,7 +147,6 @@ public class BusSenderService : IBusSenderService
 
                 _logger.LogDebug("Sending amount: {count} after {ms} ms", messageBatch.Count, _sw.ElapsedMilliseconds);
                 await _pcsBusSender.SendMessagesAsync(messageBatch, topic);
-                await _unitOfWork.SaveChangesAsync();
                 _logger.LogDebug("done sending and save after {ms} ms", _sw.ElapsedMilliseconds);
             }
         });
@@ -307,7 +308,6 @@ public class BusSenderService : IBusSenderService
                     break;
                 }
         }
-
         _logger.LogDebug("Update for  {event} took {ms} ms", busEvent.Event, sw.ElapsedMilliseconds);
         sw.Stop();
     }
