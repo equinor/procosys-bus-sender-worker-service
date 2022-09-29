@@ -11,11 +11,15 @@ public class HeatTraceQuery
         '{{""Plant"" : ""' || ht.projectschema ||
         '"", ""HeatTraceId"" : ""' || ht.id ||
         '"", ""CableId"" : ""' || ht.cable_id ||
+        '"", ""CableNo"" : ""' || cable.tagno ||
         '"", ""TagId"" : ""' || ht.tag_id ||
+        '"", ""TagNo"" : ""' || t.tagno ||
         '"", ""SpoolNo"" : ""' || ht.spoolno ||
         '"", ""LastUpdated"" : ""' || TO_CHAR(ht.last_updated, 'yyyy-mm-dd hh24:mi:ss') ||
         '""}}' as message
         from htjboxcableservice ht
+        join tag cable on cable.tag_id = ht.cable_id
+        join tag t on t.tag_id = ht.tag_id              
         {whereClause}";
     }
 }

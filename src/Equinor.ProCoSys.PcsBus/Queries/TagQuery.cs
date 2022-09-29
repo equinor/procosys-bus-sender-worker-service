@@ -27,9 +27,11 @@ public class TagQuery
             '""TagFunctionCode"" : ""' || tagfunction.tagfunctioncode || '"",' ||
             '""IsVoided"" : ' || decode(e.IsVoided,'Y', 'true', 'N', 'false') || ',' ||
             '""Plant"" : ""' || t.projectschema || '"",' ||
-            '""PlantName"" : ""' || regexp_replace(ps.TITLE, '([""\])', '\\\1') || '"",' ||    
+            '""PlantName"" : ""' || regexp_replace(ps.TITLE, '([""\])', '\\\1') || '"",' ||
+            '""EngineeringCode"" : ""' || regexp_replace(ec.code, '([""\])', '\\\1') || '"",' ||
+            '""MountedOn"" : ""' || t.mountedon_id || '"",' ||
             '""LastUpdated"" : ""' || TO_CHAR(t.LAST_UPDATED, 'yyyy-mm-dd hh24:mi:ss') || '"",' ||
-            '""TagDetails"" : {{' || 
+            '""TagDetails"" : {{' ||
                 (SELECT listagg('""'|| colName ||'"":""'|| regexp_replace(val, '([""\])', '\\\1') ||'""', ',')
                 WITHIN group (order by colName) as tagdetails  from (
                 SELECT 
@@ -45,7 +47,7 @@ public class TagQuery
                     LEFT JOIN LIBRARY UNIT ON UNIT.LIBRARY_ID = F.UNIT_ID
                     JOIN ELEMENTFIELD VAL
                         ON (VAL.FIELD_ID = DEF.FIELD_ID AND VAL.ELEMENT_ID = t.tag_id)
-                    JOIN TAG t1 on t1.TAG_ID = VAL.ELEMENT_ID  
+                    JOIN TAG t1 on t1.TAG_ID = VAL.ELEMENT_ID
                     LEFT JOIN LIBRARY LIBVAL ON (LIBVAL.LIBRARY_ID = VAL.LIBRARY_ID)
                     LEFT JOIN LIBRARY REG ON REG.LIBRARY_ID = DEF.REGISTER_ID
                     LEFT JOIN TAG t2 ON t2.TAG_ID = VAL.TAG_ID
@@ -67,10 +69,11 @@ public class TagQuery
             left join library discipline on discipline.library_id=t.discipline_id
             left join library register on register.library_id=t.register_id
             left join library status on status.library_id=t.status_id
-            left outer join library system on system.library_id=t.system_id
+            left join library system on system.library_id=t.system_id
             left join calloff  on calloff.calloff_id=t.calloff_id
             left join purchaseorder on purchaseorder.package_id=calloff.package_id
-            left join tagfunction on tagfunction.tagfunction_id = t.tagfunction_id
+            left join tagfunction on tagfunction.tagfunction_id = t.tagfunction_id     
+            left join library ec on ec.library_id = t.engineeringcode_id
         {whereClause}";
     }
 }
