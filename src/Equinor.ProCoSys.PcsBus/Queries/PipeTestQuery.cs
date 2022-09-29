@@ -11,13 +11,12 @@ public class PipeTestQuery
 
         return @$"select
         '{{""Plant"" : ""' || pt.projectschema ||
-        '"", ""PipingRevision"" : ""' || pr.testrevisionno ||
+        '"", ""PipingRevisionId"" : ""' || pt.pipingrevision_id ||
         '"", ""PipeTestLibrary"" : ""' || ptl.label ||
         '"", ""ChecklistId"" : ""' || pt.tagcheck_id ||
         '"", ""LastUpdated"" : ""' || TO_CHAR(pt.last_updated, 'yyyy-mm-dd hh24:mi:ss') ||
         '""}}' as message
-        from pipetest pt
-            join pipingrevision pr on pr.pipingrevision_id = pt.pipingrevision_id      
+        from pipetest pt     
             join pipetestlibrary ptl on ptl.pipetestlibrary_id = pt.pipetestlibrary_id  
         {whereClause}";
     }
