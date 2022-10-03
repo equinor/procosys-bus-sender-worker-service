@@ -157,10 +157,10 @@ public class BusEventService : IBusEventService
         busEventMessage = busEventMessage.Replace("\f", "");
         busEventMessage = _rx.Replace(busEventMessage, m => Regex.Escape(m.Value));
 
-        ////Removes non printable characters
-        const string Pattern = "[^ -~]+";
-        var regExp = new Regex(Pattern);
-        busEventMessage = regExp.Replace(busEventMessage, "");
+        // ////Removes non printable characters
+        // const string Pattern = "[^ -~]+";
+        // var regExp = new Regex(Pattern);
+        // busEventMessage = regExp.Replace(busEventMessage, "");
 
         return busEventMessage;
     }
