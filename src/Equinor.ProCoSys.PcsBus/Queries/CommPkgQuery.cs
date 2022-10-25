@@ -28,6 +28,7 @@ public class CommPkgQuery
          '"", ""Priority1"" : ""' || pri1.code  ||
          '"", ""Priority2"" : ""' || pri2.code  ||
          '"", ""Priority3"" : ""' || pri3.code  ||
+         '"", ""Progress"" : ""' || c.PROGRESS  ||
          '"", ""CommPkgStatus"" : ""' || regexp_replace(commStatus.CODE, '([""\])', '\\\1')  ||
          '"", ""DCCommPkgStatus"" : ""' || regexp_replace(dcStatus.CODE, '([""\])', '\\\1')  ||
          '"", ""LastUpdated"" : ""' || TO_CHAR(c.LAST_UPDATED, 'yyyy-mm-dd hh24:mi:ss') ||                                    
