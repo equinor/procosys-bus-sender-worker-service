@@ -9,6 +9,7 @@ public class PipingSpoolQuery
 
         return @$"select
             '{{""Plant"" : ""' || ps.projectschema || '"",
+            ""ProCoSysGuid"" : ""' || ps.procosys_guid || '"",
             ""ProjectName"" : ""' ||  regexp_replace(p.name, '([""\])', '\\\1') || '"",
             ""PipingSpoolId"" : ""' || ps.pipingspool_id || '"",
             ""PipingRevisionId"" : ""' || ps.pipingrevision_id || '"",

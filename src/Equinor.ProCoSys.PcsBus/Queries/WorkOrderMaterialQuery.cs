@@ -11,7 +11,8 @@ public class WorkOrderMaterialQuery
         var whereClause = CreateWhereClause(woId, plant, "wm", "wo_id");
 
         return @$"select
-            '{{""Plant"" : ""' || wm.projectschema || 
+            '{{""Plant"" : ""' || wm.projectschema ||
+            '"", ""ProCoSysGuid"" : ""' || wm.procosys_guid ||
             '"", ""ProjectName"" : ""' || p.NAME || 
             '"", ""WoNo"" : ""' || regexp_replace(wo.wono, '([""\])', '\\\1') ||
             '"", ""WoId"" : ""' || wo.wo_id ||

@@ -8,7 +8,8 @@ public static class PipingRevisionQuery
         var whereClause = CreateWhereClause(pipeRevId, plant, "pr", "pipingrevision_id");
 
         return @$"select
-            '{{""Plant"" : ""' || pr.projectschema || 
+            '{{""Plant"" : ""' || pr.projectschema ||
+            '"", ""ProCoSysGuid"" : ""' || pr.procosys_guid ||
             '"", ""PipingRevisionId"" : ""' || pr.pipingrevision_id ||
             '"", ""Revision"" : ""' || pr.testrevisionno || 
             '"", ""McPkgNo"" : ""' || m.mcpkgno ||

@@ -8,7 +8,8 @@ public class PunchListItemQuery
         var whereClause = CreateWhereClause(punchListItemId, plant, "pl", "punchlistitem_id");
 
         return @$"select
-            '{{""Plant"" : ""' || pl.projectschema ||            
+            '{{""Plant"" : ""' || pl.projectschema ||
+            '"", ""ProCoSysGuid"" : ""' || pl.procosys_guid ||
             '"", ""ProjectName"" : ""' || p.name ||
             '"", ""LastUpdated"" : ""' || TO_CHAR(pl.LAST_UPDATED, 'yyyy-mm-dd hh24:mi:ss') ||               
             '"", ""PunchItemNo"" : ""' || pl.PunchListItem_Id ||

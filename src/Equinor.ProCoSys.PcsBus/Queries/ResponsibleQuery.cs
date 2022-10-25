@@ -8,7 +8,8 @@ public class ResponsibleQuery
         var whereClause = CreateWhereClause(responsibleId, plant, "r", "responsible_id");
 
         return @$"select
-            '{{""Plant"" : ""' || r.projectschema || 
+            '{{""Plant"" : ""' || r.projectschema ||
+            '"", ""ProCoSysGuid"" : ""' || r.procosys_guid ||
             '"", ""ResponsibleId"" : ""' || r.responsible_id || 
             '"", ""Code"" : ""' || regexp_replace(r.code, '([""\])', '\\\1') ||
             '"", ""ResponsibleGroup"" : ""' || regexp_replace(r.responsiblegroup, '([""\])', '\\\1') ||

@@ -9,6 +9,7 @@ public class LibraryQuery
 
         return @$"select
             '{{""Plant"" : ""' || l.projectschema ||
+            '"", ""ProCoSysGuid"" : ""' || l.procosys_guid ||
             '"", ""LibraryId"" : ""' || l.library_id ||
             '"", ""ParentId"" : ""' || regexp_replace(l.parent_id, '([""\])', '\\\1') ||
             '"", ""Code"" : ""' || regexp_replace(l.code, '([""\])', '\\\1') ||

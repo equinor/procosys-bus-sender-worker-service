@@ -7,7 +7,10 @@ public class CommPkgOperationQuery
         DetectFaultyPlantInput(plant);
         var whereClause = CreateWhereClause(commPkId, plant, "co","commpkg_id");
 
+        //double check if we want our own guid.
+
         return $@"select   '{{""Plant"" : ""' || co.projectschema || '"",
+            ""ProCoSysGuid"" : ""' || c.procosys_guid || '"", 
             ""ProjectName"" : ""' || p.NAME || '"",
             ""CommPkgNo"" : ""' || c.commpkgno || '"",
             ""InOperation"" : ' || decode(co.inoperation,'Y', 'true', 'N', 'false') || ',

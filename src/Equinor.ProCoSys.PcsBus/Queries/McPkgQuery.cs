@@ -8,7 +8,8 @@ public static class McPkgQuery
         var whereClause = CreateWhereClause(mcpkgId, plant, "m", "mcpkg_id");
 
         return @$"select
-            '{{""Plant"" : ""' || e.projectschema || 
+            '{{""Plant"" : ""' || e.projectschema ||
+            '"", ""ProCoSysGuid"" : ""' || m.procosys_guid ||
             '"", ""PlantName"" : ""' || regexp_replace(ps.TITLE, '([""\])', '\\\1') ||
             '"", ""ProjectName"" : ""' || p.name || 
             '"", ""McPkgNo"" : ""' || m.MCPKGNO ||

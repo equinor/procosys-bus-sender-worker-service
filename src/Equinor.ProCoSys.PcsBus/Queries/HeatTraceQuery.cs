@@ -9,6 +9,7 @@ public class HeatTraceQuery
 
         return @$"select
         '{{""Plant"" : ""' || ht.projectschema ||
+        '"", ""ProCoSysGuid"" : ""' || ht.procosys_guid ||
         '"", ""HeatTraceId"" : ""' || ht.id ||
         '"", ""CableId"" : ""' || ht.cable_id ||
         '"", ""CableNo"" : ""' || regexp_replace(cable.tagno, '([""\])', '\\\1') ||

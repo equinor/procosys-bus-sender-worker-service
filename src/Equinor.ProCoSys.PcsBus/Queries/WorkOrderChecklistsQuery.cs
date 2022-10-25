@@ -9,11 +9,11 @@ public class WorkOrderChecklistsQuery
 
         return @$"select
             '{{""Plant"" : ""' || wotc.projectschema ||
+            '"", ""ProCoSysGuid"" : ""' || wotc.procosys_guid ||
             '"", ""ProjectName"" : ""' || p.NAME ||
             '"", ""ChecklistId"" : ""' || wotc.tagcheck_id ||
             '"", ""WoId"" : ""' || wotc.wo_id ||
             '"", ""WoNo"" : ""' || regexp_replace(wo.wono, '([""\])', '\\\1') ||
-            
             '""}}'
         FROM wo_tagcheck wotc
             join wo on wo.wo_id = wotc.wo_id

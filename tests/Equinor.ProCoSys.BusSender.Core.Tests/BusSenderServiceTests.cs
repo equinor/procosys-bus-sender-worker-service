@@ -9,6 +9,7 @@ using Moq;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
@@ -186,4 +187,37 @@ public class BusSenderServiceTests
         //Assert
         _topicClientMockWo.Verify(t => t.SendMessagesAsync(It.IsAny<ServiceBusMessageBatch>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
     }
+
+
+    [TestMethod]
+    public async Task HandleBusEvents_ShouldHandleInvalidCharacters()
+    {
+        //Arrange
+        var wo1 = new BusEvent { Event = WorkOrderTopic.TopicName, Message = "10000", Status = Status.UnProcessed };
+        var wo2 = new BusEvent { Event = WorkOrderTopic.TopicName, Message = "10000", Status = Status.UnProcessed };
+        var wo3 = new BusEvent { Event = WorkOrderTopic.TopicName, Message = "10001", Status = Status.UnProcessed };
+
+        const string jsonMessage =
+            "{\"Plant\" : \"AnyValidPlant\", \"ProjectName\" : \"AnyProjectName\", \"WoNo\" : \"Some0x0bWoNo\"}";
+
+
+        
+
+
+        _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk())
+            .Returns(() => Task.FromResult(new List<BusEvent> { wo1, wo2, wo3 }));
+        _busSenderMessageRepositoryMock.Setup(wr => wr.GetWorkOrderMessage(10000))
+            .Returns(() => Task.FromResult(jsonMessage));
+        _busSenderMessageRepositoryMock.Setup(wr => wr.GetWorkOrderMessage(10001))
+            .Returns(() => Task.FromResult(jsonMessage));
+
+        //Act
+
+
+        await _dut.HandleBusEvents();
+
+        //Assert
+        _topicClientMockWo.Verify(t => t.SendMessagesAsync(It.IsAny<ServiceBusMessageBatch>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
+    }
+
 }

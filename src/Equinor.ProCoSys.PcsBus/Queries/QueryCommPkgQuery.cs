@@ -9,6 +9,7 @@ public class QueryCommPkgQuery
 
         return @$"select
         '{{""Plant"" : ""' || er.projectschema ||
+        '"", ""ProCoSysGuid"" : ""' || er.procosys_guid ||
         '"", ""ProjectName"" : ""' || p.name ||
         '"", ""CommPkgPlaceHolderId"" : ""' || 'c.placeholderId' ||
         '"", ""CommPkgId"" : ""' || c.commpkg_id ||
