@@ -151,16 +151,15 @@ public class BusEventService : IBusEventService
             return busEventMessage;
         }
 
-        busEventMessage = busEventMessage.Replace("\r", "");
-        busEventMessage = busEventMessage.Replace("\n", "");
-        busEventMessage = busEventMessage.Replace("\t", "");
-        busEventMessage = busEventMessage.Replace("\f", "");
-        busEventMessage = _rx.Replace(busEventMessage, m => Regex.Escape(m.Value));
-
-        // ////Removes non printable characters
-        // const string Pattern = "[^ -~]+";
-        // var regExp = new Regex(Pattern);
-        // busEventMessage = regExp.Replace(busEventMessage, "");
+        /***
+         *  This code is duplicated in FamWebJob (TieMapper)
+         *  https://stackoverflow.com/questions/6198986/how-can-i-replace-non-printable-unicode-characters-in-java
+         *  https://regex101.com/
+         *
+         * '\p{C}'  matches invisible control characters and unused code points
+         *  '+'     matches the previous token between one and unlimited times, as many times as possible, giving back as needed (greedy)
+         */
+        busEventMessage = Regex.Replace(busEventMessage, @"\p{C}+", string.Empty);
 
         return busEventMessage;
     }
