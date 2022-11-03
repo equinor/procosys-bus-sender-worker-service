@@ -12,11 +12,14 @@ public class WorkOrderChecklistsQuery
             '"", ""ProCoSysGuid"" : ""' || wotc.procosys_guid ||
             '"", ""ProjectName"" : ""' || p.NAME ||
             '"", ""ChecklistId"" : ""' || wotc.tagcheck_id ||
+            '"", ""ChecklistGuid"" : ""' || tc.procosys_guid ||
             '"", ""WoId"" : ""' || wotc.wo_id ||
+            '"", ""WoGuid"" : ""' || wo.procosys_guid ||
             '"", ""WoNo"" : ""' || regexp_replace(wo.wono, '([""\])', '\\\1') ||
             '""}}'
         FROM wo_tagcheck wotc
             join wo on wo.wo_id = wotc.wo_id
+            join tc on tc.tagcheck_id = wotc.tagcheck_id
             join project p ON p.project_id = wo.project_id
         {whereClause}";
     }

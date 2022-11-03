@@ -21,6 +21,7 @@ public static class PipingRevisionQuery
             '"", ""TestISORevision"" : ""' ||  regexp_replace(pr.TEST_ISO_REVISIONNO, '([""\])', '\\\1') ||
             '"", ""PurchaseOrderNo"" : ""' || po.packageno || 
             '"", ""CallOffNo"" : ""' || co.calloffno ||
+            '"", ""CallOffGuid"" : ""' || co.procosys_guid ||
             '"", ""LastUpdated"" : ""' || TO_CHAR(pr.LAST_UPDATED, 'yyyy-mm-dd hh24:mi:ss') || 
             '""}}' as message
         from pipingrevision pr              

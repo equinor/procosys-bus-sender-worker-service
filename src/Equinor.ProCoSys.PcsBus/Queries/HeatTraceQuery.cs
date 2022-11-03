@@ -12,8 +12,10 @@ public class HeatTraceQuery
         '"", ""ProCoSysGuid"" : ""' || ht.procosys_guid ||
         '"", ""HeatTraceId"" : ""' || ht.id ||
         '"", ""CableId"" : ""' || ht.cable_id ||
+        '"", ""CableGuid"" : ""' || cable.procosys_guid ||
         '"", ""CableNo"" : ""' || regexp_replace(cable.tagno, '([""\])', '\\\1') ||
         '"", ""TagId"" : ""' || ht.tag_id ||
+        '"", ""TagGuid"" : ""' || t.procosys_id ||
         '"", ""TagNo"" : ""' || regexp_replace(t.tagno, '([""\])', '\\\1') ||
         '"", ""SpoolNo"" : ""' || ht.spoolno ||
         '"", ""LastUpdated"" : ""' || TO_CHAR(ht.last_updated, 'yyyy-mm-dd hh24:mi:ss') ||

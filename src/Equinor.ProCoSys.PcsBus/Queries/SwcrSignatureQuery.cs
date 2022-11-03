@@ -12,7 +12,8 @@ public class SwcrSignatureQuery
             '"", ""ProCoSysGuid"" : ""' || sign.procosys_guid ||
             '"", ""SwcrSignatureId"" : ""' || sign.swcrsignature_id ||
             '"", ""ProjectName"" : ""' || p.NAME ||
-            '"", ""SWCRNO"" : ""' || s.SWCRNO ||
+            '"", ""SWCRNO"" : ""' || s.swcrno ||
+            '"", ""SwcrGuid"" : ""' || s.procosys_guid ||
             '"", ""SignatureRoleCode"" : ""' || regexp_replace(sr.code, '([""\])', '\\\1') ||
             '"", ""SignatureRoleDescription"" : ""' || regexp_replace(sr.description, '([""\])', '\\\1') ||
             '"", ""Sequence"" : ""' || sign.ranking ||

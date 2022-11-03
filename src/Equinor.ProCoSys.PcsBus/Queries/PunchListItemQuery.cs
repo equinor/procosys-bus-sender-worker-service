@@ -15,6 +15,7 @@ public class PunchListItemQuery
             '"", ""PunchItemNo"" : ""' || pl.PunchListItem_Id ||
             '"", ""Description"" : ""' || regexp_replace(pl.Description, '([""\])', '\\\1') ||
             '"", ""ChecklistId"" : ""' || pl.tagcheck_id ||
+            '"", ""ChecklistGuid"" : ""' || tc.procosys_guid ||
             '"", ""Category"" : ""' || regexp_replace(cat.code, '([""\])', '\\\1') ||
             '"", ""RaisedByOrg"" : ""' || regexp_replace(raised.code, '([""\])', '\\\1') ||
             '"", ""ClearingByOrg"" : ""' || regexp_replace(cleared.code, '([""\])', '\\\1') ||
@@ -25,7 +26,9 @@ public class PunchListItemQuery
             '"", ""Estimate"" : ""' || pl.estimate ||
             '"", ""OriginalWoNo"" : ""' || regexp_replace(orgwo.wono, '([""\])', '\\\1') ||
             '"", ""WoNo"" : ""' || regexp_replace(wo.wono, '([""\])', '\\\1') ||
+            '"", ""WoGuid"" : ""' || wo.procosys_guid ||            
             '"", ""SWCRNo"" : ""' || swcr.swcrno ||
+            '"", ""SWCRGuid"" : ""' || swcr.procosys_guid ||
             '"", ""DocumentNo"" : ""' || regexp_replace(doc.documentno, '([""\])', '\\\1') ||
             '"", ""ExternalItemNo"" : ""' ||  regexp_replace(pl.external_itemno, '([""\])', '\\\1') ||
             '"", ""MaterialRequired"" : ' || decode(pl.ismaterialrequired,'Y', 'true', 'false') ||

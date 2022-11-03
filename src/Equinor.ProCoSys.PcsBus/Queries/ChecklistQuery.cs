@@ -15,6 +15,7 @@ public class ChecklistQuery
             '"", ""TagId"" : ""' ||  t.tag_id ||
             '"", ""TagRegisterId"" : ""' ||  t.register_id ||
             '"", ""ChecklistId"" : ""' || tc.tagcheck_id ||
+            '"", ""ChecklistGuid"" : ""' || tc.procosys_guid ||
             '"", ""TagCategory"" : ""' || reg.code ||
             '"", ""SheetNo"" : ""' || tft.sheetno ||
             '"", ""SubSheetNo"" : ""' || tft.subsheetno ||

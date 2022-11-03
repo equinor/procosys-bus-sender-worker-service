@@ -13,6 +13,7 @@ public class CommPkgOperationQuery
             ""ProCoSysGuid"" : ""' || c.procosys_guid || '"", 
             ""ProjectName"" : ""' || p.NAME || '"",
             ""CommPkgNo"" : ""' || c.commpkgno || '"",
+            ""CommPkgGuid"" : ""' || c.procosys_guid || '"",
             ""InOperation"" : ' || decode(co.inoperation,'Y', 'true', 'N', 'false') || ',
             ""ReadyForProduction"" : ' || decode(co.readyforproduction,'Y', 'true', 'N', 'false') || ',
             ""MaintenanceProgram"" : ' || decode(co.maintenanceprog,'Y', 'true', 'N', 'false') || ',

@@ -13,7 +13,8 @@ public class CommPkgQuery
          '"", ""PlantName"" : ""' || regexp_replace(ps.TITLE, '([""\])', '\\\1') ||
          '"", ""ProjectName"" : ""' || p.name || 
          '"", ""CommPkgNo"" : ""' || c.COMMPKGNO ||
-         '"", ""CommPkgId"" : ""' || c.COMMPKG_ID || 
+         '"", ""CommPkgId"" : ""' || c.COMMPKG_ID ||
+         '"", ""CommPkgGuid"" : ""' || c.procosys_guid ||
          '"", ""Description"" : ""' || regexp_replace(c.DESCRIPTION, '([""\])', '\\\1') ||
          '"", ""DescriptionOfWork"" : ""' || regexp_replace(c.DESCRIPTIONOFWORK, '([""\])', '\\\1') ||
          '"", ""Remark"" : ""' || regexp_replace(c.REMARK, '([""\])', '\\\1') ||         

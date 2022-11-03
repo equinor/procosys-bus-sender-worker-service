@@ -15,7 +15,9 @@ public class TagQuery
             '""Description"" : ""' || regexp_replace(t.description, '([""\])', '\\\1') || '"",'||
             '""ProjectName"" : ""' || p.name || '"",' ||
             '""McPkgNo"" : ""' || mcpkg.mcpkgno || '"",' ||
+            '""McPkgGuid"" : ""' || mcpkg.procosys_guid || '"",' ||
             '""CommPkgNo"" : ""' || commpkg.commpkgno || '"",' ||
+            '""CommPkgGuid"" : ""' || commpkg.procosys_guid || '"",' ||
             '""TagId"" : ""' || t.tag_id || '"",' ||
             '""AreaCode"" : ""' || area.code || '"",' ||
             '""AreaDescription"" : ""' || regexp_replace(area.description, '([""\])', '\\\1') || '"",' ||
@@ -25,6 +27,7 @@ public class TagQuery
             '""Status"" : ""' || status.code || '"",' ||
             '""System"" : ""' || system.code || '"",' ||
             '""CallOffNo"" : ""' || calloff.calloffno || '"",' ||
+            '""CallOffGuid"" : ""' || calloff.procosys_guid || '"",' ||
             '""PurchaseOrderNo"" : ""' || purchaseorder.packageno || '"",' ||
             '""TagFunctionCode"" : ""' || tagfunction.tagfunctioncode || '"",' ||
             '""IsVoided"" : ' || decode(e.IsVoided,'Y', 'true', 'N', 'false') || ',' ||

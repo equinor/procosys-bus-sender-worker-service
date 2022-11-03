@@ -13,6 +13,7 @@ public class SwcrQuery
             '"", ""ProjectName"" : ""' || p.NAME ||
             '"", ""SWCRNO"" : ""' || sw.SWCRNO ||
             '"", ""SWCRId"" : ""' || sw.SWCR_ID ||
+            '"", ""CommPkgGuid"" : ""' || c.procosys_guid ||
             '"", ""CommPkgNo"" : ""' || c.COMMPKGNO ||
             '"", ""Description"" : ""' || regexp_replace(sw.problemdescription, '([""\])', '\\\1') ||
             '"", ""Modification"" : ""' || regexp_replace(sw.modificationdescription, '([""\])', '\\\1') ||
