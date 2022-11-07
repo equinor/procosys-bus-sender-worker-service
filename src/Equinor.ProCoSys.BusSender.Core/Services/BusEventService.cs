@@ -164,7 +164,7 @@ public class BusEventService : IBusEventService
         return busEventMessage;
     }
 
-    private static bool CanGetTwoIdsFromMessage(IReadOnlyList<string> array, out long id1, out long id2)
+    public static bool CanGetTwoIdsFromMessage(IReadOnlyList<string> array, out long id1, out long id2)
     {
         id1 = 0;
         id2 = 0;

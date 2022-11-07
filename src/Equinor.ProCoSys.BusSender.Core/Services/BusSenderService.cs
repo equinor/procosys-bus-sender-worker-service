@@ -89,6 +89,11 @@ public class BusSenderService : IBusSenderService
         _logger.LogInformation("Update loop finished at at {sw} ms", dsw.ElapsedMilliseconds);
         await _unitOfWork.SaveChangesAsync();
         
+        foreach (var e in events.Where(busEvent => busEvent.Status == Status.UnProcessed && busEvent.Message.EndsWith("_delete")))
+        {
+            e.MessageToSend = e.Message
+        }
+
         /***
          * Group by topic and then create a queue of messages per topic
          */
@@ -177,8 +182,12 @@ public class BusSenderService : IBusSenderService
     /// <returns></returns>
     private static IEnumerable<IGrouping<(string, long), BusEvent>> FilterOnSimpleMessagesAndGroupDuplicates(
         IEnumerable<BusEvent> events)
-        => events.Where(e => long.TryParse(e.Message, out var id))
+        => events.Where(e => IsSimpleMessage(e))
             .GroupBy(e => (e.Event, long.Parse(e.Message)));
+
+    private static bool IsSimpleMessage(BusEvent e) 
+        => long.TryParse(e.Message, out _) 
+           || BusEventService.CanGetTwoIdsFromMessage(e.Message.Split(","),out _,out _);
 
 
     private void TrackMessage(BusEvent busEvent)
