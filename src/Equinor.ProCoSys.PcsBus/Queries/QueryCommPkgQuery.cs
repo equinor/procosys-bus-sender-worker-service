@@ -13,10 +13,11 @@ public class QueryCommPkgQuery
         '"", ""ProjectName"" : ""' || p.name ||
         '"", ""CommPkgPlaceHolderId"" : ""' || 'c.placeholderId' ||
         '"", ""CommPkgId"" : ""' || c.commpkg_id ||
+        '"", ""CommPkgGuid"" : ""' || c.procosys_guid ||
         '"", ""CommPkgNo"" : ""' || c.commpkgno ||
         '"", ""DocumentId"" : ""' || d.document_id ||
-        '"", ""QueryPlaceHolderId"" : ""' || 'q/d.placeholderId'  ||
         '"", ""QueryNo"" : ""' || d.documentno ||
+        '"", ""QueryGuid"" : ""' || d.procosys_guid ||
         '"", ""LastUpdated"" : ""' || TO_CHAR(er.last_updated, 'yyyy-mm-dd hh24:mi:ss') ||
         '""}}' as message
         from elementreference er
