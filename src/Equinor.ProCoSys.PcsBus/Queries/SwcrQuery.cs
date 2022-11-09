@@ -9,10 +9,11 @@ public class SwcrQuery
 
         return @$"select
             '{{""Plant"" : ""' || sw.projectschema ||
-            '"", ""PlantName"" : ""' || regexp_replace(ps.TITLE, '([""\])', '\\\1') ||
+            '"", ""ProCoSysGuid"" : ""' || sw.procosys_guid ||
             '"", ""ProjectName"" : ""' || p.NAME ||
             '"", ""SWCRNO"" : ""' || sw.SWCRNO ||
             '"", ""SWCRId"" : ""' || sw.SWCR_ID ||
+            '"", ""CommPkgGuid"" : ""' || c.procosys_guid ||
             '"", ""CommPkgNo"" : ""' || c.COMMPKGNO ||
             '"", ""Description"" : ""' || regexp_replace(sw.problemdescription, '([""\])', '\\\1') ||
             '"", ""Modification"" : ""' || regexp_replace(sw.modificationdescription, '([""\])', '\\\1') ||

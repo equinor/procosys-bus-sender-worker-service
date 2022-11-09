@@ -177,8 +177,12 @@ public class BusSenderService : IBusSenderService
     /// <returns></returns>
     private static IEnumerable<IGrouping<(string, long), BusEvent>> FilterOnSimpleMessagesAndGroupDuplicates(
         IEnumerable<BusEvent> events)
-        => events.Where(e => long.TryParse(e.Message, out var id))
+        => events.Where(IsSimpleMessage)
             .GroupBy(e => (e.Event, long.Parse(e.Message)));
+
+    private static bool IsSimpleMessage(BusEvent e) 
+        => long.TryParse(e.Message, out _) 
+           || BusEventService.CanGetTwoIdsFromMessage(e.Message.Split(","),out _,out _);
 
 
     private void TrackMessage(BusEvent busEvent)

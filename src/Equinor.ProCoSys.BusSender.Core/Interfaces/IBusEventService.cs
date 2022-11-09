@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using Equinor.ProCoSys.BusSenderWorker.Core.Models;
+﻿using System.Threading.Tasks;
 
 namespace Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 
@@ -29,4 +27,5 @@ public interface IBusEventService
     Task<string> CreateMilestoneMessage(string message);
     Task<string> CreateHeatTraceMessage(string busEventMessage);
     Task<string> CreateCommPkgOperationMessage(string busEventMessage);
+    
 }

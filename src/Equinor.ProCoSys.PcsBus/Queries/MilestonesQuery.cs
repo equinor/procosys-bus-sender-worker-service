@@ -11,8 +11,11 @@ public class MilestonesQuery
 
         return @$"select
             '{{""Plant"" : ""' || e.projectschema ||
+            '"", ""ProCoSysGuid"" : ""' || e.procosys_guid ||
             '"", ""PlantName"" : ""' || regexp_replace(ps.TITLE, '([""\])', '\\\1') ||
-            '"", ""ProjectName"" : ""' || p.name ||  
+            '"", ""ProjectName"" : ""' || p.name ||
+            '"", ""CommPkgGuid"" : ""' || c.procosys_guid ||
+            '"", ""McPkgGuid"" : ""' || c.procosys_guid ||
             '"", ""CommPkgNo"" : ""' || c.commpkgno ||
             '"", ""McPkgNo"" : ""' || m.mcpkgno ||
             '"", ""Code"" : ""' || milestone.code || 

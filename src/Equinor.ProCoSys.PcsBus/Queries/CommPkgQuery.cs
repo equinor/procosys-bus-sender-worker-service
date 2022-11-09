@@ -8,11 +8,12 @@ public class CommPkgQuery
         var whereClause = CreateWhereClause(commPkgId, plant, "c", "commpkg_id");
 
         return @$"select
-        '{{""Plant"" : ""' || c.projectschema || 
+         '{{""Plant"" : ""' || c.projectschema ||
+         '"", ""ProCoSysGuid"" : ""' || c.procosys_guid ||
          '"", ""PlantName"" : ""' || regexp_replace(ps.TITLE, '([""\])', '\\\1') ||
          '"", ""ProjectName"" : ""' || p.name || 
          '"", ""CommPkgNo"" : ""' || c.COMMPKGNO ||
-         '"", ""CommPkgId"" : ""' || c.COMMPKG_ID || 
+         '"", ""CommPkgId"" : ""' || c.COMMPKG_ID ||
          '"", ""Description"" : ""' || regexp_replace(c.DESCRIPTION, '([""\])', '\\\1') ||
          '"", ""DescriptionOfWork"" : ""' || regexp_replace(c.DESCRIPTIONOFWORK, '([""\])', '\\\1') ||
          '"", ""Remark"" : ""' || regexp_replace(c.REMARK, '([""\])', '\\\1') ||         
