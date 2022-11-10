@@ -11,12 +11,13 @@ public class WorkOrderQuery
         var whereClause = CreateWhereClause(workOrderId, plant, "w", "wo_id");
 
         return @$"select
-            '{{""Plant"" : ""' || w.projectschema ||            
+            '{{""Plant"" : ""' || w.projectschema ||
+            '"", ""ProCoSysGuid"" : ""' || w.procosys_guid ||
             '"", ""ProjectName"" : ""' || p.NAME || 
             '"", ""WoNo"" : ""' || regexp_replace(w.wono, '([""\])', '\\\1') ||
             '"", ""WoId"" : ""' || w.WO_ID ||
-            '"", ""CommPkgNo"" : ""' || c.COMMPKGNO || 
-            '"", ""Title"" : ""' || regexp_replace(w.DESCRIPTIONSHORT, '([""\])', '\\\1') || 
+            '"", ""CommPkgNo"" : ""' || c.COMMPKGNO ||
+            '"", ""Title"" : ""' || regexp_replace(w.DESCRIPTIONSHORT, '([""\])', '\\\1') ||
             '"", ""Description"" : ""' || regexp_replace(w.DESCRIPTIONLONG, '([""\])', '\\\1') ||
             '"", ""MilestoneCode"" : ""' || regexp_replace(milestone.CODE, '([""\])', '\\\1') ||
             '"", ""SubMilestoneCode"" : ""' || regexp_replace(submilestone.CODE, '([""\])', '\\\1') ||
@@ -24,21 +25,21 @@ public class WorkOrderQuery
             '"", ""CategoryCode"" : ""' || regexp_replace(cat.CODE, '([""\])', '\\\1') ||  
             '"", ""MaterialStatusCode"" : ""' || regexp_replace(msc.CODE, '([""\])', '\\\1') ||
             '"", ""HoldByCode"" : ""' ||  regexp_replace(hbc.CODE, '([""\])', '\\\1') ||
-            '"", ""DisciplineCode"" : ""' ||  regexp_replace(dis.CODE, '([""\])', '\\\1') ||         
-            '"", ""DisciplineDescription"" : ""' ||  regexp_replace(dis.description, '([""\])', '\\\1') ||         
+            '"", ""DisciplineCode"" : ""' ||  regexp_replace(dis.CODE, '([""\])', '\\\1') ||
+            '"", ""DisciplineDescription"" : ""' ||  regexp_replace(dis.description, '([""\])', '\\\1') ||   
             '"", ""ResponsibleCode"" : ""' || regexp_replace(r.CODE, '([""\])', '\\\1')  ||                    
-            '"", ""ResponsibleDescription"" : ""' || regexp_replace(r.description, '([""\])', '\\\1')  ||                                 
+            '"", ""ResponsibleDescription"" : ""' || regexp_replace(r.description, '([""\])', '\\\1') ||                             
             '"", ""AreaCode"" : ""' || regexp_replace(area.CODE, '([""\])', '\\\1') ||
-            '"", ""AreaDescription"" : ""' || regexp_replace(area.description, '([""\])', '\\\1') ||  
+            '"", ""AreaDescription"" : ""' || regexp_replace(area.description, '([""\])', '\\\1') ||
             '"", ""JobStatusCode"" : ""' || regexp_replace(jsc.CODE, '([""\])', '\\\1') ||
             '"", ""MaterialComments"" : ""' || regexp_replace(w.MATERIALDESCRIPTION, '([""\])', '\\\1') ||
             '"", ""ConstructionComments"" : ""' || regexp_replace(w.ASSISTANCEDESCRIPTION, '([""\])', '\\\1') ||
-            '"", ""TypeOfWorkCode"" : ""' || regexp_replace(tow.CODE, '([""\])', '\\\1') || 
-            '"", ""OnShoreOffShoreCode"" : ""' || regexp_replace(osos.CODE, '([""\])', '\\\1') || 
-            '"", ""WoTypeCode"" : ""' || regexp_replace(woc.CODE, '([""\])', '\\\1') ||   
+            '"", ""TypeOfWorkCode"" : ""' || regexp_replace(tow.CODE, '([""\])', '\\\1') ||
+            '"", ""OnShoreOffShoreCode"" : ""' || regexp_replace(osos.CODE, '([""\])', '\\\1') ||
+            '"", ""WoTypeCode"" : ""' || regexp_replace(woc.CODE, '([""\])', '\\\1') ||
             '"", ""ProjectProgress"" : ""' || regexp_replace(w.PROJECTPROGRESS, '([""\])', '\\\1') ||
             '"", ""ExpendedManHours"" : ""' || regexp_replace(NVL(w.TOTALEXPENDEDMANHOURS, w.expended_mhrs), '([""\])', '\\\1') ||
-            '"", ""EstimatedHours"" : ""' || 
+            '"", ""EstimatedHours"" : ""' ||
                   ( Select ROUND (
                         SUM (quantity
                         * multiplicator
@@ -47,7 +48,7 @@ public class WorkOrderQuery
                     FROM wo_estimate we
                     WHERE we.wo_id = w.wo_id  )
                   ||
-            '"", ""RemainingHours"" : ""' || 
+            '"", ""RemainingHours"" : ""' ||
                  ( SELECT  ROUND (
                      SUM (quantity
                         * multiplicator

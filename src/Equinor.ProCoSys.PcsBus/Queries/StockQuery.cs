@@ -8,7 +8,8 @@ public class StockQuery
         var whereClause = CreateWhereClause(stockId, plant, "s", "id");
 
         return @$"select
-            '{{""Plant"" : ""' || s.projectschema || 
+            '{{""Plant"" : ""' || s.projectschema ||
+            '"", ""ProCoSysGuid"" : ""' || s.procosys_guid ||
             '"", ""StockId"" : ""' || s.id || 
             '"", ""StockNo"" : ""' || regexp_replace(s.stockno, '([""\])', '\\\1')  || 
             '"", ""Description"" : ""' || regexp_replace(s.description, '([""\])', '\\\1') || 

@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
-using Equinor.ProCoSys.BusSenderWorker.Core.Extensions;
 using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 using Equinor.ProCoSys.BusSenderWorker.Core.Models;
 using Equinor.ProCoSys.BusSenderWorker.Core.Telemetry;
@@ -24,7 +23,6 @@ public class BusSenderService : IBusSenderService
     private readonly ITelemetryClient _telemetryClient;
     private readonly IBusEventService _service;
     private readonly Stopwatch _sw;
-    private const int AmountOfBatchesInParallel = 1;
 
     public BusSenderService(IPcsBusSender pcsBusSender,
         IBusEventRepository busEventRepository,
@@ -179,6 +177,10 @@ public class BusSenderService : IBusSenderService
         IEnumerable<BusEvent> events)
         => events.Where(IsSimpleMessage)
             .GroupBy(e => (e.Event, e.Message));
+
+    private static bool IsSimpleMessage(BusEvent e) 
+        => long.TryParse(e.Message, out _) 
+           || BusEventService.CanGetTwoIdsFromMessage(e.Message.Split(","),out _,out _);
 
 
     private void TrackMessage(BusEvent busEvent)

@@ -9,11 +9,13 @@ public class ChecklistQuery
 
         return @$"select
             '{{""Plant"" : ""' || tc.projectschema ||
+            '"", ""ProCoSysGuid"" : ""' || tc.procosys_guid ||
             '"", ""ProjectName"" : ""' || p.name ||
             '"", ""TagNo"" : ""' ||  regexp_replace(t.tagno, '([""\])', '\\\1') ||
             '"", ""TagId"" : ""' ||  t.tag_id ||
             '"", ""TagRegisterId"" : ""' ||  t.register_id ||
             '"", ""ChecklistId"" : ""' || tc.tagcheck_id ||
+            '"", ""ChecklistGuid"" : ""' || tc.procosys_guid ||
             '"", ""TagCategory"" : ""' || reg.code ||
             '"", ""SheetNo"" : ""' || tft.sheetno ||
             '"", ""SubSheetNo"" : ""' || tft.subsheetno ||
