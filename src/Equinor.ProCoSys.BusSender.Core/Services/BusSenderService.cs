@@ -80,9 +80,9 @@ public class BusSenderService : IBusSenderService
         var unProcessedEvents = events.Where(busEvent => busEvent.Status == Status.UnProcessed).ToList();
         _logger.LogInformation("Amount of messages to process: {count} ", unProcessedEvents.Count);
 
-        foreach (var e in unProcessedEvents)
+        foreach (var e in unProcessedEvents.Where(IsSimpleMessage))
         {
-           await UpdateEventBasedOnTopic(e);
+            await UpdateEventBasedOnTopic(e);
         }
         _logger.LogInformation("Update loop finished at at {sw} ms", dsw.ElapsedMilliseconds);
         await _unitOfWork.SaveChangesAsync();

@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
 using Equinor.ProCoSys.PcsServiceBus.Topics;
 using Range = Moq.Range;
+using Microsoft.Azure.Amqp;
 
 namespace Equinor.ProCoSys.BusSenderWorker.Core.Tests;
 
@@ -30,11 +31,13 @@ public class BusSenderServiceTests
     private Mock<IBusSenderMessageRepository> _busSenderMessageRepositoryMock;
     private Mock<BusEventService> _busEventServiceMock;
     private List<ServiceBusMessage> _messagesInTopicClient4;
+    private ServiceBusMessageBatch _mockWoMessageBatch;
+    private PcsBusSender _busSender;
 
     [TestInitialize]
     public void Setup()
     {
-        var busSender = new PcsBusSender();
+        _busSender = new PcsBusSender();
         _topicClientMock1 = new Mock<ServiceBusSender>();
         _topicClientMock1.Setup(t => t.CreateMessageBatchAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(() => ServiceBusModelFactory.ServiceBusMessageBatch(1000, new List<ServiceBusMessage>()));
@@ -47,15 +50,16 @@ public class BusSenderServiceTests
         _topicClientMock4 = new Mock<ServiceBusSender>();
         _topicClientMockWo = new Mock<ServiceBusSender>();
         _messagesInTopicClient4  = new List<ServiceBusMessage>();
+        _mockWoMessageBatch = ServiceBusModelFactory.ServiceBusMessageBatch(1000, new List<ServiceBusMessage>());
         _topicClientMockWo.Setup(t => t.CreateMessageBatchAsync(It.IsAny<CancellationToken>()))
-            .ReturnsAsync(() => ServiceBusModelFactory.ServiceBusMessageBatch(1000, new List<ServiceBusMessage>()));
+            .ReturnsAsync(() => _mockWoMessageBatch);
         _topicClientMock4.Setup(t => t.CreateMessageBatchAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(()=> ServiceBusModelFactory.ServiceBusMessageBatch(1000, _messagesInTopicClient4));
-        busSender.Add("topic1", _topicClientMock1.Object);
-        busSender.Add("topic2", _topicClientMock2.Object);
-        busSender.Add("topic3", _topicClientMock3.Object);
-        busSender.Add("topic4", _topicClientMock4.Object);
-        busSender.Add(WorkOrderTopic.TopicName, _topicClientMockWo.Object);
+        _busSender.Add("topic1", _topicClientMock1.Object);
+        _busSender.Add("topic2", _topicClientMock2.Object);
+        _busSender.Add("topic3", _topicClientMock3.Object);
+        _busSender.Add("topic4", _topicClientMock4.Object);
+        _busSender.Add(WorkOrderTopic.TopicName, _topicClientMockWo.Object);
 
         _busEvents = new List<BusEvent>
         {
@@ -84,7 +88,7 @@ public class BusSenderServiceTests
         _iUnitOfWork = new Mock<IUnitOfWork>();
 
         _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk()).Returns(() => Task.FromResult(_busEvents));
-        _dut = new BusSenderService(busSender, _busEventRepository.Object, _iUnitOfWork.Object, new Mock<ILogger<BusSenderService>>().Object,
+        _dut = new BusSenderService(_busSender, _busEventRepository.Object, _iUnitOfWork.Object, new Mock<ILogger<BusSenderService>>().Object,
             new Mock<ITelemetryClient>().Object, _busEventServiceMock.Object);
     }
 
@@ -184,8 +188,90 @@ public class BusSenderServiceTests
         //Act
         await _dut.HandleBusEvents();
 
+        
+
         //Assert
-        _topicClientMockWo.Verify(t => t.SendMessagesAsync(It.IsAny<ServiceBusMessageBatch>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
+        _topicClientMockWo.Verify(t => t.SendMessagesAsync(_mockWoMessageBatch, It.IsAny<CancellationToken>()), Times.Exactly(1));
+        Assert.AreEqual(2, _mockWoMessageBatch.Count);
+    }
+
+    [TestMethod]
+    public async Task HandleBusEvents_ShouldHandleCompositeSimpleMessages()
+    {
+        //Arrange
+        var wcl1 = new BusEvent { Event = WoChecklistTopic.TopicName, Message = "10001,1003", Status = Status.UnProcessed };
+        var wcl2 = new BusEvent { Event = WoChecklistTopic.TopicName, Message = "10001,1003", Status = Status.UnProcessed };
+        var wcl3 = new BusEvent { Event = WoChecklistTopic.TopicName, Message = "1003,10001", Status = Status.UnProcessed };
+        const string jsonMessage =
+            "{\"Plant\" : \"AnyValidPlant\", \"ProjectName\" : \"AnyProjectName\", \"WoNo\" : \"SomeWoNo\"}";
+
+        _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk())
+            .Returns(() => Task.FromResult(new List<BusEvent> { wcl1, wcl2, wcl3 }));
+        _busSenderMessageRepositoryMock.Setup(wcl => wcl.GetWorkOrderChecklistMessage(10001, 1003))
+            .Returns(() => Task.FromResult(jsonMessage));
+        _busSenderMessageRepositoryMock.Setup(wr => wr.GetWorkOrderChecklistMessage(1003,10001))
+            .Returns(() => Task.FromResult(jsonMessage));
+
+        var topicClientMockWoCl = new Mock<ServiceBusSender>();
+        _busSender.Add(WoChecklistTopic.TopicName, topicClientMockWoCl.Object);
+        var woClMessageBatch = ServiceBusModelFactory.ServiceBusMessageBatch(1000, new List<ServiceBusMessage>());
+        topicClientMockWoCl.Setup(t => t.CreateMessageBatchAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(() => woClMessageBatch);
+
+        //Act
+        await _dut.HandleBusEvents();
+
+        //Assert
+        topicClientMockWoCl.Verify(t => t.SendMessagesAsync(woClMessageBatch, It.IsAny<CancellationToken>()), Times.Exactly(1));
+        Assert.AreEqual(2, woClMessageBatch.Count);
+    }
+
+    [TestMethod]
+    public async Task HandleBusEvents_ShouldAddMessagesToBatchInCorrectOrder()
+    {
+        //Arrange
+        const string deleteMessage =
+            "{\"Plant\" : \"AnyValidPlant\", \"ProCoSysGuid\" : \"someGuid\", \"Behavior\" : \"delete\"}";
+        var wcl1 = new BusEvent { Event = WoChecklistTopic.TopicName, Message = "10001,1003", Status = Status.UnProcessed };
+        var wcl2 = new BusEvent { Event = WoChecklistTopic.TopicName, Message = "10001,1003", Status = Status.UnProcessed };
+        var wcl3 = new BusEvent { Event = WoChecklistTopic.TopicName, Message = "1003,10001", Status = Status.UnProcessed };
+        var wcDelete = new BusEvent { Event = WoChecklistTopic.TopicName, Message = deleteMessage, Status = Status.UnProcessed };
+        const string jsonMessage =
+            "{\"Plant\" : \"AnyValidPlant\", \"ProjectName\" : \"AnyProjectName\", \"WoNo\" : \"SomeWoNo1\"}";
+        const string jsonMessage2 =
+            "{\"Plant\" : \"AnyValidPlant\", \"ProjectName\" : \"AnyProjectName\", \"WoNo\" : \"SomeWoNo2\"}";
+        
+
+        _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk())
+            .Returns(() => Task.FromResult(new List<BusEvent> { wcl1, wcl2, wcl3,wcDelete }));
+        _busSenderMessageRepositoryMock.Setup(wcl => wcl.GetWorkOrderChecklistMessage(10001, 1003))
+            .Returns(() => Task.FromResult(jsonMessage));
+        _busSenderMessageRepositoryMock.Setup(wr => wr.GetWorkOrderChecklistMessage(1003, 10001))
+            .Returns(() => Task.FromResult(jsonMessage2));
+
+        var topicClientMockWoCl = new Mock<ServiceBusSender>();
+        _busSender.Add(WoChecklistTopic.TopicName, topicClientMockWoCl.Object);
+
+        var serviceBusMessages = new List<ServiceBusMessage>();
+        var batch = ServiceBusModelFactory.ServiceBusMessageBatch(1000, serviceBusMessages);
+        
+        topicClientMockWoCl.Setup(t => t.CreateMessageBatchAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(() => batch);
+
+        //Act
+        await _dut.HandleBusEvents();
+
+        //Assert
+        topicClientMockWoCl.Verify(t => t.SendMessagesAsync(batch, It.IsAny<CancellationToken>()), Times.Exactly(1));
+        Assert.AreEqual(3, batch.Count);
+        Assert.AreEqual(3,serviceBusMessages.Count);
+        Assert.AreEqual(jsonMessage, serviceBusMessages[0].Body.ToString());
+        Assert.AreEqual(jsonMessage2, serviceBusMessages[1].Body.ToString());
+        Assert.AreEqual(deleteMessage, serviceBusMessages[2].Body.ToString());
+
+
+
+
     }
 
 
