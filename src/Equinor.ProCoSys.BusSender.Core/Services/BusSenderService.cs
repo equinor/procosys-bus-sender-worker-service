@@ -242,6 +242,12 @@ public class BusSenderService : IBusSenderService
                     await CreateAndSetMessage(busEvent, _service.CreateDocumentMessage);
                     break;
                 }
+            case TaskTopic.TopicName:
+                {
+                    await CreateAndSetMessage(busEvent, _service.CreateTaskMessage);
+                    break;
+                }
+
             case MilestoneTopic.TopicName:
                 {
                     await CreateAndSetMessage(busEvent, _service.CreateMilestoneMessage);
