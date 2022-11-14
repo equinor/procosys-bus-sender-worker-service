@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data;
 using System.Data.Common;
+using System.Reflection.Metadata;
 using System.Threading.Tasks;
 using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 using Equinor.ProCoSys.BusSenderWorker.Infrastructure.Data;
@@ -38,6 +39,9 @@ public class BusSenderMessageRepository : IBusSenderMessageRepository
 
     public async Task<string> GetTaskMessage(long taskId) =>
         await ExecuteQuery(TaskQuery.GetQuery(taskId), taskId.ToString());
+
+    public async Task<string> GetCommPkgTaskMessage(long commPkgId, long taskId) =>
+        await ExecuteQuery(CommPkgTaskQuery.GetQuery(commPkgId, taskId), commPkgId + "," + taskId);
 
     public async Task<string> GetMilestoneMessage(long elementId,long milestoneId) =>
         await ExecuteQuery(MilestonesQuery.GetQuery(elementId, milestoneId),elementId+","+milestoneId);

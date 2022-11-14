@@ -175,10 +175,10 @@ public class BusSenderService : IBusSenderService
     /// </summary>
     /// <param name="events"></param>
     /// <returns></returns>
-    private static IEnumerable<IGrouping<(string, long), BusEvent>> FilterOnSimpleMessagesAndGroupDuplicates(
+    private static IEnumerable<IGrouping<(string, string), BusEvent>> FilterOnSimpleMessagesAndGroupDuplicates(
         IEnumerable<BusEvent> events)
         => events.Where(IsSimpleMessage)
-            .GroupBy(e => (e.Event, long.Parse(e.Message)));
+            .GroupBy(e => (e.Event, e.Message));
 
     private static bool IsSimpleMessage(BusEvent e) 
         => long.TryParse(e.Message, out _) 
@@ -247,7 +247,11 @@ public class BusSenderService : IBusSenderService
                     await CreateAndSetMessage(busEvent, _service.CreateTaskMessage);
                     break;
                 }
-
+            case CommPkgTaskTopic.TopicName:
+                {
+                    await CreateAndSetMessage(busEvent, _service.CreateCommPkgTaskMessage);
+                    break;
+                }
             case MilestoneTopic.TopicName:
                 {
                     await CreateAndSetMessage(busEvent, _service.CreateMilestoneMessage);
