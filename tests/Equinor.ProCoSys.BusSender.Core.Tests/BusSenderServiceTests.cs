@@ -240,7 +240,6 @@ public class BusSenderServiceTests
             "{\"Plant\" : \"AnyValidPlant\", \"ProjectName\" : \"AnyProjectName\", \"WoNo\" : \"SomeWoNo1\"}";
         const string jsonMessage2 =
             "{\"Plant\" : \"AnyValidPlant\", \"ProjectName\" : \"AnyProjectName\", \"WoNo\" : \"SomeWoNo2\"}";
-        
 
         _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk())
             .Returns(() => Task.FromResult(new List<BusEvent> { wcl1, wcl2, wcl3,wcDelete }));
@@ -268,10 +267,6 @@ public class BusSenderServiceTests
         Assert.AreEqual(jsonMessage, serviceBusMessages[0].Body.ToString());
         Assert.AreEqual(jsonMessage2, serviceBusMessages[1].Body.ToString());
         Assert.AreEqual(deleteMessage, serviceBusMessages[2].Body.ToString());
-
-
-
-
     }
 
 

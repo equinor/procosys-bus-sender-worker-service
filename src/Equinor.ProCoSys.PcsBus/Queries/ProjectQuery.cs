@@ -12,7 +12,8 @@ public class ProjectQuery
             '"", ""ProCoSysGuid"" : ""' || p.procosys_guid ||
             '"", ""ProjectName"" : ""' || p.NAME || 
             '"", ""IsClosed"" : ' || decode(p.IsVoided,'Y', 'true', 'N', 'false') || 
-            ', ""Description"" : ""' || REPLACE(REPLACE(p.DESCRIPTION,'\','\\'),'""','\""') || 
+            ', ""Description"" : ""' || REPLACE(REPLACE(p.DESCRIPTION,'\','\\'),'""','\""') ||
+            '"", ""LastUpdated"" : ""' || TO_CHAR(p.last_updated, 'yyyy-mm-dd hh24:mi:ss') ||
             '""}}'  as message
         from project p
         {whereClause}";

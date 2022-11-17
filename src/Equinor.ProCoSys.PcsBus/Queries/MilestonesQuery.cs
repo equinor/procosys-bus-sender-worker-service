@@ -26,6 +26,7 @@ public class MilestonesQuery
             '"", ""IsSent"" : ""' || decode(cert.issent,'Y', 'true', 'N', 'false') ||
             '"", ""IsAccepted"" : ""' || decode(cert.isaccepted,'Y', 'true', 'N', 'false') ||
             '"", ""IsRejected"" : ""' || decode(cert.isrejected,'Y', 'true', 'N', 'false') ||
+            '"", ""LastUpdated"" : ""' || TO_CHAR(e.last_updated, 'yyyy-mm-dd hh24:mi:ss') ||
             '""}}' as message
         from completionmilestonedate e
             join projectschema ps on ps.projectschema = e.projectschema
