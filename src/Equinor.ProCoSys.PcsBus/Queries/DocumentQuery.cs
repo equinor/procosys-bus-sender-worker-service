@@ -9,6 +9,7 @@ public class DocumentQuery
 
         return @$"select
        '{{""Plant"": ""' || d.projectschema ||
+       '"", ""ProCoSysGuid"" : ""' || d.procosys_guid ||
        '"", ""ProjectName"" : ""' || p.name ||
        '"", ""DocumentId"" : ""' || d.document_id ||
        '"", ""DocumentNo"" : ""' || regexp_replace(d.documentno, '([""\])', '\\\1') ||

@@ -14,10 +14,12 @@ public class PipeTestQuery
         '"", ""PipingRevisionId"" : ""' || pt.pipingrevision_id ||
         '"", ""PipeTestLibrary"" : ""' || ptl.label ||
         '"", ""ChecklistId"" : ""' || pt.tagcheck_id ||
+        '"", ""ChecklistGuid"" : ""' || tc.procosys_guid ||
         '"", ""LastUpdated"" : ""' || TO_CHAR(pt.last_updated, 'yyyy-mm-dd hh24:mi:ss') ||
         '""}}' as message
         from pipetest pt     
-            join pipetestlibrary ptl on ptl.pipetestlibrary_id = pt.pipetestlibrary_id  
+            join pipetestlibrary ptl on ptl.pipetestlibrary_id = pt.pipetestlibrary_id
+            join tagcheck tc on tc.tagcheck_id = pt.tagcheck_id
         {whereClause}";
     }
 

@@ -9,10 +9,12 @@ public class QuerySignatureQuery
 
         return @$"select
               '{{""Plant"" : ""' || q.projectschema
+            ||'"", ""ProCoSysGuid"" : ""' || q.procosys_guid
             ||'"", ""PlantName"" : ""' || regexp_replace(ps.TITLE, '([""\])', '\\\1')
             ||'"", ""ProjectName"" : ""' || p.NAME
             ||'"", ""QuerySignatureId"": ""'|| q.id
             ||'"", ""QueryId"": ""'|| do.document_id
+            ||'"", ""QueryGuid"": ""'|| do.procosys_guid
             ||'"", ""QueryNo"": ""'|| do.documentno
             ||'"", ""SignatureRoleCode"": ""' || regexp_replace(sr.code, '([""\])', '\\\1')
             ||'"", ""FunctionalRoleCode"": ""' || regexp_replace(fr.code, '([""\])', '\\\1')

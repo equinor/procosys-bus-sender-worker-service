@@ -14,9 +14,11 @@ public class WorkOrderMilestoneQuery
         var whereClause = CreateWhereClause(milestoneId,woId, plant);
 
         return @$"select
-            '{{""Plant"" : ""' || emd.projectschema || 
+            '{{""Plant"" : ""' || emd.projectschema ||
+            '"", ""ProCoSysGuid"" : ""' || emd.procosys_guid ||
             '"", ""ProjectName"" : ""' || p.NAME ||
-            '"", ""WoId"" : ""' || wo.wo_id || 
+            '"", ""WoId"" : ""' || wo.wo_id ||
+            '"", ""WoGuid"" : ""' || wo.procosys_guid ||
             '"", ""WoNo"" : ""' || regexp_replace(wo.wono, '([""\])', '\\\1') ||
             '"", ""Code"" : ""' || regexp_replace(milestone.code, '([""\])', '\\\1') || 
             '"", ""MilestoneDate"" : ""' || TO_CHAR(emd.milestonedate, 'yyyy-mm-dd hh24:mi:ss') ||
