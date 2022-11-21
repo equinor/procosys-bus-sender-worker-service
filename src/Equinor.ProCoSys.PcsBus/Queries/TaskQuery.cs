@@ -26,6 +26,7 @@ public class TaskQuery
                     )
                 ) ||
            '"", ""Title"" : ""' || regexp_replace(ec.Title, '([""\])', '\\\1') ||
+           '"", ""ElementContentGuid"" : ""' || ec.Id ||
            '"", ""Description"" : ""' || regexp_replace(ec.Description, '([""\])', '\\\1') ||
            '"", ""Comments"" : ""' || regexp_replace(ec.Comments, '([""\])', '\\\1') ||
            '"", ""LastUpdated"" : ""' || TO_CHAR(ec.Last_Updated, 'yyyy-mm-dd hh24:mi:ss') ||
