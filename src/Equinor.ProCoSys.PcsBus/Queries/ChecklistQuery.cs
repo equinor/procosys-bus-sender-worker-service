@@ -46,7 +46,7 @@ public class ChecklistQuery
             left join library reg on reg.library_id = t.register_id
             left join responsible r on r.responsible_id = tc.responsible_id
             left join library status on status.library_id = tc.status_id
-            left join library phase on phase.library_id = tc.mcphase_id 
+            left join library phase on phase.library_id = tc.mcphase_id
         {whereClause}";
     }
 }
