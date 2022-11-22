@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
-using Equinor.ProCoSys.BusSenderWorker.Core.Extensions;
 using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 using Equinor.ProCoSys.BusSenderWorker.Core.Models;
 using Equinor.ProCoSys.BusSenderWorker.Core.Telemetry;
@@ -24,7 +23,6 @@ public class BusSenderService : IBusSenderService
     private readonly ITelemetryClient _telemetryClient;
     private readonly IBusEventService _service;
     private readonly Stopwatch _sw;
-    private const int AmountOfBatchesInParallel = 1;
 
     public BusSenderService(IPcsBusSender pcsBusSender,
         IBusEventRepository busEventRepository,
@@ -82,9 +80,9 @@ public class BusSenderService : IBusSenderService
         var unProcessedEvents = events.Where(busEvent => busEvent.Status == Status.UnProcessed).ToList();
         _logger.LogInformation("Amount of messages to process: {count} ", unProcessedEvents.Count);
 
-        foreach (var e in unProcessedEvents)
+        foreach (var e in unProcessedEvents.Where(IsSimpleMessage))
         {
-           await UpdateEventBasedOnTopic(e);
+            await UpdateEventBasedOnTopic(e);
         }
         _logger.LogInformation("Update loop finished at at {sw} ms", dsw.ElapsedMilliseconds);
         await _unitOfWork.SaveChangesAsync();
@@ -175,10 +173,14 @@ public class BusSenderService : IBusSenderService
     /// </summary>
     /// <param name="events"></param>
     /// <returns></returns>
-    private static IEnumerable<IGrouping<(string, long), BusEvent>> FilterOnSimpleMessagesAndGroupDuplicates(
+    private static IEnumerable<IGrouping<(string, string), BusEvent>> FilterOnSimpleMessagesAndGroupDuplicates(
         IEnumerable<BusEvent> events)
-        => events.Where(e => long.TryParse(e.Message, out var id))
-            .GroupBy(e => (e.Event, long.Parse(e.Message)));
+        => events.Where(IsSimpleMessage)
+            .GroupBy(e => (e.Event, e.Message));
+
+    private static bool IsSimpleMessage(BusEvent e) 
+        => long.TryParse(e.Message, out _) 
+           || BusEventService.CanGetTwoIdsFromMessage(e.Message.Split(","),out _,out _);
 
 
     private void TrackMessage(BusEvent busEvent)
@@ -236,6 +238,16 @@ public class BusSenderService : IBusSenderService
             case DocumentTopic.TopicName:
                 {
                     await CreateAndSetMessage(busEvent, _service.CreateDocumentMessage);
+                    break;
+                }
+            case TaskTopic.TopicName:
+                {
+                    await CreateAndSetMessage(busEvent, _service.CreateTaskMessage);
+                    break;
+                }
+            case CommPkgTaskTopic.TopicName:
+                {
+                    await CreateAndSetMessage(busEvent, _service.CreateCommPkgTaskMessage);
                     break;
                 }
             case MilestoneTopic.TopicName:

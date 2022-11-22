@@ -22,7 +22,8 @@ public class WorkOrderCutoffQuery
 
         return @$"select
             '{{""Plant"" : ""' || wc.projectschema ||
-            '"", ""PlantName"" : ""' || regexp_replace(ps.TITLE, '([""\])', '\\\1') ||   
+            '"", ""PlantName"" : ""' || regexp_replace(ps.TITLE, '([""\])', '\\\1') ||
+            '"", ""WoGuid"" : ""' || wo.procosys_guid ||
             '"", ""ProjectName"" : ""' || p.NAME ||
             '"", ""WoNo"" : ""' || regexp_replace(wo.wono, '([""\])', '\\\1') ||
             '"", ""JobStatusCode"" : ""' || regexp_replace(jsc.CODE, '([""\])', '\\\1') ||

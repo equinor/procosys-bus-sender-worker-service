@@ -57,6 +57,16 @@ public class BusEventService : IBusEventService
             ? WashString(await _busSenderMessageRepository.GetDocumentMessage(documentId))
             : throw new Exception("Failed to extract documentId from message");
 
+    public async Task<string> CreateTaskMessage(string busEventMessage) =>
+        long.TryParse(busEventMessage, out var taskId)
+            ? WashString(await _busSenderMessageRepository.GetTaskMessage(taskId))
+            : throw new Exception("Failed to extract taskId from message");
+
+    public async Task<string> CreateCommPkgTaskMessage(string busEventMessage) =>
+        CanGetTwoIdsFromMessage(busEventMessage.Split(","), out var commPkgId, out var taskId)
+            ? WashString(await _busSenderMessageRepository.GetCommPkgTaskMessage(commPkgId,taskId))
+            : throw new Exception("Failed to extract commPkgId/taskId from message");
+
     public async Task<string> CreateMilestoneMessage(string message) =>
         CanGetTwoIdsFromMessage(message.Split(","), out var elementId, out var milestoneId)
             ? WashString(await _busSenderMessageRepository.GetMilestoneMessage(elementId, milestoneId))
@@ -164,7 +174,7 @@ public class BusEventService : IBusEventService
         return busEventMessage;
     }
 
-    private static bool CanGetTwoIdsFromMessage(IReadOnlyList<string> array, out long id1, out long id2)
+    public static bool CanGetTwoIdsFromMessage(IReadOnlyList<string> array, out long id1, out long id2)
     {
         id1 = 0;
         id2 = 0;

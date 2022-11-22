@@ -8,10 +8,12 @@ public class ProjectQuery
         var whereClause = CreateWhereClause(projectId, plant, "p", "project_id");
 
         return @$"select
-            '{{""Plant"" : ""' || p.projectschema || 
+            '{{""Plant"" : ""' || p.projectschema ||
+            '"", ""ProCoSysGuid"" : ""' || p.procosys_guid ||
             '"", ""ProjectName"" : ""' || p.NAME || 
-            '"", ""IsClosed"" : ' || (case when p.ISVOIDED = 'Y' then 'true' else 'false' end) || 
-            '"", ""Description"" : ""' || REPLACE(REPLACE(p.DESCRIPTION,'\','\\'),'""','\""') || 
+            '"", ""IsClosed"" : ' || decode(p.IsVoided,'Y', 'true', 'N', 'false') || 
+            ', ""Description"" : ""' || REPLACE(REPLACE(p.DESCRIPTION,'\','\\'),'""','\""') ||
+            '"", ""LastUpdated"" : ""' || TO_CHAR(p.last_updated, 'yyyy-mm-dd hh24:mi:ss') ||
             '""}}'  as message
         from project p
         {whereClause}";

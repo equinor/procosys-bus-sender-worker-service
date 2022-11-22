@@ -10,6 +10,7 @@ public class CallOffQuery
 
         return @$"select
         '{{""Plant"" : ""' || co.projectschema ||
+        '"", ""ProCoSysGuid"" : ""' || co.procosys_guid ||
         '"", ""CallOffId"" : ""' || co.calloff_id ||
         '"", ""CallOffNo"" : ""' || regexp_replace(co.calloffno, '([""\])', '\\\1') ||
         '"", ""PackageId"" : ""' || co.package_id ||

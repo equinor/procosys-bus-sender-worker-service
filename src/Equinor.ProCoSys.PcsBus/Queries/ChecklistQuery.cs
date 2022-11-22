@@ -9,11 +9,13 @@ public class ChecklistQuery
 
         return @$"select
             '{{""Plant"" : ""' || tc.projectschema ||
+            '"", ""ProCoSysGuid"" : ""' || tc.procosys_guid ||
             '"", ""ProjectName"" : ""' || p.name ||
             '"", ""TagNo"" : ""' ||  regexp_replace(t.tagno, '([""\])', '\\\1') ||
             '"", ""TagId"" : ""' ||  t.tag_id ||
             '"", ""TagRegisterId"" : ""' ||  t.register_id ||
             '"", ""ChecklistId"" : ""' || tc.tagcheck_id ||
+            '"", ""ChecklistGuid"" : ""' || tc.procosys_guid ||
             '"", ""TagCategory"" : ""' || reg.code ||
             '"", ""SheetNo"" : ""' || tft.sheetno ||
             '"", ""SubSheetNo"" : ""' || tft.subsheetno ||
@@ -27,6 +29,7 @@ public class ChecklistQuery
             '"", ""Responsible"" : ""' || r.code ||
             '"", ""Status"" : ""' || status.code ||
             '"", ""UpdatedAt"" : ""' || TO_CHAR(tc.updatedat, 'yyyy-mm-dd hh24:mi:ss') ||
+            '"", ""LastUpdated"" : ""' || TO_CHAR(tc.updatedat, 'yyyy-mm-dd hh24:mi:ss') ||
             '"", ""CreatedAt"" : ""' || TO_CHAR(tc.createdat, 'yyyy-mm-dd hh24:mi:ss') ||
             '"", ""SignedAt"" : ""' || TO_CHAR(tc.signedat, 'yyyy-mm-dd hh24:mi:ss') ||
             '"", ""VerifiedAt"" : ""' || TO_CHAR(tc.verifiedat, 'yyyy-mm-dd hh24:mi:ss') ||

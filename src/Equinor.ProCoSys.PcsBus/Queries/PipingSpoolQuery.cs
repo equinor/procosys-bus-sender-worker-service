@@ -9,9 +9,11 @@ public class PipingSpoolQuery
 
         return @$"select
             '{{""Plant"" : ""' || ps.projectschema || '"",
+            ""ProCoSysGuid"" : ""' || ps.procosys_guid || '"",
             ""ProjectName"" : ""' ||  regexp_replace(p.name, '([""\])', '\\\1') || '"",
             ""PipingSpoolId"" : ""' || ps.pipingspool_id || '"",
             ""PipingRevisionId"" : ""' || ps.pipingrevision_id || '"",
+            ""PipingRevisionGuid"" : ""' || ps.procosys_guid || '"",
             ""Revision"" : ""' || pr.testrevisionno || '"",
             ""McPkgNo"" : ""' || regexp_replace(m.mcpkgno, '([""\])', '\\\1') || '"",
             ""ISODrawing"" : ""' || regexp_replace(iso.documentno, '([""\])', '\\\1') || '"",

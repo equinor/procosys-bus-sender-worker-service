@@ -11,13 +11,16 @@ public class WorkOrderMaterialQuery
         var whereClause = CreateWhereClause(woId, plant, "wm", "wo_id");
 
         return @$"select
-            '{{""Plant"" : ""' || wm.projectschema || 
+            '{{""Plant"" : ""' || wm.projectschema ||
+            '"", ""ProCoSysGuid"" : ""' || wm.procosys_guid ||
             '"", ""ProjectName"" : ""' || p.NAME || 
             '"", ""WoNo"" : ""' || regexp_replace(wo.wono, '([""\])', '\\\1') ||
             '"", ""WoId"" : ""' || wo.wo_id ||
+            '"", ""WoGuid"" : ""' || wo.procosys_guid ||
             '"", ""ItemNo"" : ""' || wm.itemno || 
             '"", ""TagNo"" : ""' || regexp_replace(t.tagno, '([""\])', '\\\1') ||
             '"", ""TagId"" : ""' || wm.tag_id ||
+            '"", ""TagGuid"" : ""' || t.procosys_guid ||
             '"", ""TagRegisterId"" : ""' || t.register_id ||
             '"", ""StockId"" : ""' || wm.stock_id ||
             '"", ""Quantity"" : ""' || wm.quantity ||
