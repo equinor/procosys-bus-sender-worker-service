@@ -13,6 +13,7 @@ public class ChecklistQuery
             '"", ""ProjectName"" : ""' || p.name ||
             '"", ""TagNo"" : ""' ||  regexp_replace(t.tagno, '([""\])', '\\\1') ||
             '"", ""TagId"" : ""' ||  t.tag_id ||
+            '"", ""TagGuid"" : ""' ||  t.procosys_guid ||
             '"", ""TagRegisterId"" : ""' ||  t.register_id ||
             '"", ""ChecklistId"" : ""' || tc.tagcheck_id ||
             '"", ""ChecklistGuid"" : ""' || tc.procosys_guid ||
