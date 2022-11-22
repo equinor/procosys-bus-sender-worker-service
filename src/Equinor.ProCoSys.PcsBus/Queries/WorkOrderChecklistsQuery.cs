@@ -20,7 +20,7 @@ public class WorkOrderChecklistsQuery
             '""}}'
         FROM wo_tagcheck wotc
             join wo on wo.wo_id = wotc.wo_id
-            join tc on tc.tagcheck_id = wotc.tagcheck_id
+            join tagcheck tc on tc.tagcheck_id = wotc.tagcheck_id
             join project p ON p.project_id = wo.project_id
         {whereClause}";
     }
