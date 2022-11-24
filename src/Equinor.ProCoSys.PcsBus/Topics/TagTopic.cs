@@ -5,6 +5,7 @@ namespace Equinor.ProCoSys.PcsServiceBus.Topics;
 public class TagTopic
 {
     public string Plant { get; set; }
+    public string ProCoSysGuid { get; set; }
     public string PlantName { get; set; }
     public string TagId { get; set; }
     public string TagNo { get; set; }
