@@ -310,11 +310,6 @@ public class BusSenderService : IBusSenderService
                     await CreateAndSetMessage(busEvent, _service.CreatePipingSpoolMessage);
                     break;
                 }
-            case PipeTestTopic.TopicName:
-                {
-                    await CreateAndSetMessage(busEvent, _service.CreatePipeTestMessage);
-                    break;
-                }
             case WoMaterialTopic.TopicName:
                 {
                     await CreateAndSetMessage(busEvent, _service.CreateWoMaterialMessage);
