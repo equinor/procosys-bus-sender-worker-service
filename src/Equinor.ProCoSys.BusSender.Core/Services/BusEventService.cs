@@ -11,7 +11,6 @@ namespace Equinor.ProCoSys.BusSenderWorker.Core.Services;
 public class BusEventService : IBusEventService
 {
     private readonly IBusSenderMessageRepository _busSenderMessageRepository;
-    private readonly Regex _rx = new(@"[\a\e\f\n\r\t\v]", RegexOptions.Compiled);
     private readonly ITagDetailsRepository _tagDetailsRepository;
 
     public BusEventService(ITagDetailsRepository tagDetailsRepository,
@@ -80,11 +79,6 @@ public class BusEventService : IBusEventService
         => long.TryParse(busEventMessage, out var pipingRevisionId)
             ? WashString(await _busSenderMessageRepository.GetPipingRevisionMessage(pipingRevisionId))
             : throw new Exception("Failed to extract PipeRevision from message");
-
-    public async Task<string> CreatePipeTestMessage(string busEventMessage)
-        => CanGetTwoIdsFromMessage(busEventMessage.Split(","), out var pipingRevisionId, out var pipeTestLibId)
-            ? WashString(await _busSenderMessageRepository.GetPipeTestMessage(pipingRevisionId, pipeTestLibId))
-            : throw new Exception("Failed to extract pipingRevisionId or pipeTestLibraryId from message");
 
     public async Task<string> CreateHeatTraceMessage(string busEventMessage)
         => long.TryParse(busEventMessage, out var heatTraceId)

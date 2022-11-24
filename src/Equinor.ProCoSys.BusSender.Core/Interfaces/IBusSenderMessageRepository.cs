@@ -24,7 +24,6 @@ public interface IBusSenderMessageRepository
     Task<string> GetWorkOrderMilestoneMessage(long woId, long milestoneId);
     Task<string> GetWorkOrderCutOffMessage(long workOrderId, string cutoffWeek);
     Task<string> GetMilestoneMessage(long elementId, long milestoneId);
-    Task<string> GetPipeTestMessage(long pipeRevisionId, long pipeTestLibraryId);
     Task<string> GetHeatTraceMessage(long id);
     Task<string> GetCommPkgOperationMessage(long commPkgId);
 }

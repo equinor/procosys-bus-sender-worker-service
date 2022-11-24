@@ -22,7 +22,6 @@ public interface IBusEventService
     Task<string> CreateSwcrSignatureMessage(string busEventMessage);
     Task<string> CreatePipingRevisionMessage(string busEventMessage);
     Task<string> CreatePipingSpoolMessage(string busEventMessage);
-    Task<string> CreatePipeTestMessage(string busEventMessage);
     Task<string> CreateLoopContentMessage(string busEventMessage);
     Task<string> CreateCommPkgQueryMessage(string busEventMessage);
     Task<string> CreateWorkOrderCutOffMessage(string message);
