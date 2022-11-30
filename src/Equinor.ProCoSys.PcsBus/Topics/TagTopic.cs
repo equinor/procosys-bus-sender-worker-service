@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Equinor.ProCoSys.PcsServiceBus.Topics;
 
@@ -31,5 +32,6 @@ public class TagTopic
     public List<string> ProjectNames { get; set; }
     public string LastUpdated { get; set; }
     public bool IsVoided { get; set; }
+    public string Behavior { get; set; }
     public const string TopicName = "tag";
 }

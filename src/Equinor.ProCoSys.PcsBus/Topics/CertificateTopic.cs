@@ -11,5 +11,6 @@ public class CertificateTopic
     public string CertificateType { get; set; }
     public CertificateStatus CertificateStatus { get; set; }
     public Guid ProCoSysGuid { get; set; }
+    public string Behavior { get; set; }
     public const string TopicName = "certificate";
 }
