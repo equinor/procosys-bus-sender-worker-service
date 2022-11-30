@@ -12,6 +12,7 @@ public class CommPkgTaskQuery
         var sql = @$"select
             '{{""Plant"": ""' || c.ProjectSchema ||
             '"", ""ProjectName"" : ""' || p.Title ||
+            '"", ""ProCoSysGuid"" : ""' || er.ProCoSys_Guid ||
             '"", ""TaskGuid"" : ""' || ec.ProCoSys_Guid ||
             '"", ""CommPkgGuid"" : ""' || c.Procosys_Guid ||
             '"", ""CommPkgNo"" : ""' || c.CommPkgNo ||
