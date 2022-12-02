@@ -6,7 +6,7 @@ public class TaskQuery
     {
         DetectFaultyPlantInput(plant);
         var whereClause = CreateWhereClause(taskId, plant, "ec", "element_id");
-        
+
         return @$"select
            '{{""Plant"": ""' || ec.ProjectSchema ||
            '"", ""ProCoSysGuid"" : ""' || ec.ProCoSys_Guid ||
