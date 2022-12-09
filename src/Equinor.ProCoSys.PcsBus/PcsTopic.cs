@@ -2,6 +2,7 @@
 
 public enum PcsTopic
 {
+    Action,
     CommPkgTask,
     Task,
     CommPkg,
