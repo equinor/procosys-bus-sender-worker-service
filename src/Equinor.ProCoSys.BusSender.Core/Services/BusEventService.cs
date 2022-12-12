@@ -61,6 +61,11 @@ public class BusEventService : IBusEventService
             ? WashString(await _busSenderMessageRepository.GetTaskMessage(taskId))
             : throw new Exception("Failed to extract taskId from message");
 
+    public async Task<string> CreateActionMessage(string busEventMessage) =>
+        long.TryParse(busEventMessage, out var actionId)
+            ? WashString(await _busSenderMessageRepository.GetActionMessage(actionId))
+            : throw new Exception("Failed to extract actionId from message");
+
     public async Task<string> CreateCommPkgTaskMessage(string busEventMessage) =>
         CanGetTwoIdsFromMessage(busEventMessage.Split(","), out var commPkgId, out var taskId)
             ? WashString(await _busSenderMessageRepository.GetCommPkgTaskMessage(commPkgId,taskId))

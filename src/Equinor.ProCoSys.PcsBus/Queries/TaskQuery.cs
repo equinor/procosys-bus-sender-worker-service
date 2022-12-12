@@ -6,7 +6,7 @@ public class TaskQuery
     {
         DetectFaultyPlantInput(plant);
         var whereClause = CreateWhereClause(taskId, plant, "ec", "element_id");
-        
+
         return @$"select
            '{{""Plant"": ""' || ec.ProjectSchema ||
            '"", ""ProCoSysGuid"" : ""' || ec.ProCoSys_Guid ||
@@ -26,6 +26,13 @@ public class TaskQuery
                     )
                 ) ||
            '"", ""Title"" : ""' || regexp_replace(ec.Title, '([""\])', '\\\1') ||
+           '"", ""TaskId"" : ""' || SUBSTR(
+                  (
+                      SELECT LISTAGG(CODE,'.') WITHIN GROUP (ORDER BY LEVEL DESC)
+                      FROM ELEMENTCONTENT n
+                      START WITH n.ELEMENT_ID=ec.PARENT_ID
+                      CONNECT BY PRIOR n.PARENT_ID=n.ELEMENT_ID
+                  ),3) || '-' || ec.CODE ||
            '"", ""ElementContentGuid"" : ""' || ec.Id ||
            '"", ""Description"" : ""' || regexp_replace(ec.Description, '([""\])', '\\\1') ||
            '"", ""Comments"" : ""' || regexp_replace(ec.Comments, '([""\])', '\\\1') ||
@@ -41,5 +48,4 @@ public class TaskQuery
             LEFT JOIN Person p ON es.SignedBy_Id = p.Person_Id
         {whereClause}";
     }
-
 }

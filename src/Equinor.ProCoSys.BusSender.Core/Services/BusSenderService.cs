@@ -80,7 +80,7 @@ public class BusSenderService : IBusSenderService
         var unProcessedEvents = events.Where(busEvent => busEvent.Status == Status.UnProcessed).ToList();
         _logger.LogInformation("Amount of messages to process: {count} ", unProcessedEvents.Count);
 
-        foreach (var e in unProcessedEvents.Where(IsSimpleMessage))
+        foreach (var e in unProcessedEvents.Where( e => IsSimpleMessage(e) || e.Event == TagTopic.TopicName))
         {
             await UpdateEventBasedOnTopic(e);
         }
@@ -243,6 +243,11 @@ public class BusSenderService : IBusSenderService
             case TaskTopic.TopicName:
                 {
                     await CreateAndSetMessage(busEvent, _service.CreateTaskMessage);
+                    break;
+                }
+            case ActionTopic.TopicName:
+                {
+                    await CreateAndSetMessage(busEvent, _service.CreateActionMessage);
                     break;
                 }
             case CommPkgTaskTopic.TopicName:
