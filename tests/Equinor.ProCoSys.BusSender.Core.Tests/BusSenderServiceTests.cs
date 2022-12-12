@@ -9,13 +9,11 @@ using Moq;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
 using Equinor.ProCoSys.PcsServiceBus.Topics;
 using Range = Moq.Range;
-using Microsoft.Azure.Amqp;
 
 namespace Equinor.ProCoSys.BusSenderWorker.Core.Tests;
 
@@ -60,6 +58,7 @@ public class BusSenderServiceTests
         _busSender.Add("topic3", _topicClientMock3.Object);
         _busSender.Add("topic4", _topicClientMock4.Object);
         _busSender.Add(WorkOrderTopic.TopicName, _topicClientMockWo.Object);
+       
 
         _busEvents = new List<BusEvent>
         {
@@ -281,10 +280,6 @@ public class BusSenderServiceTests
         const string jsonMessage =
             "{\"Plant\" : \"AnyValidPlant\", \"ProjectName\" : \"AnyProjectName\", \"WoNo\" : \"Some0x0bWoNo\"}";
 
-
-        
-
-
         _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk())
             .Returns(() => Task.FromResult(new List<BusEvent> { wo1, wo2, wo3 }));
         _busSenderMessageRepositoryMock.Setup(wr => wr.GetWorkOrderMessage(10000))
@@ -293,8 +288,6 @@ public class BusSenderServiceTests
             .Returns(() => Task.FromResult(jsonMessage));
 
         //Act
-
-
         await _dut.HandleBusEvents();
 
         //Assert
