@@ -12,7 +12,6 @@ public class QueryQuery
             '"", ""ProCoSysGuid"" : ""' || do.procosys_guid ||
             '"", ""ProjectName"" : ""' || p.name ||
             '"", ""QueryId"" : ""'|| do.document_id ||
-            '"", ""QueryGuid"" : ""'|| do.procosys_guid ||
             '"", ""QueryNo"" : ""'|| regexp_replace(do.documentno, '([""\])', '\\\1') ||
             '"", ""Title"" : ""'|| regexp_replace(do.title , '([""\])', '\\\1') ||
             '"", ""DisciplineCode"" : ""'|| dis.code ||
