@@ -20,7 +20,7 @@ public class LibraryQuery
             '"", ""LastUpdated"" : ""' || TO_CHAR(l.LAST_UPDATED, 'yyyy-mm-dd hh24:mi:ss') ||
             '""}}'  as message
             from library l
-            left join library lp on l.parent_id=lp.parent_id
+            left join library lp on l.parent_id=lp.library_id
             {whereClause}";
     }
 }
