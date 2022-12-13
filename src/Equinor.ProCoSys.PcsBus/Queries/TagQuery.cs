@@ -34,6 +34,7 @@ public class TagQuery
             '""PlantName"" : ""' || regexp_replace(ps.TITLE, '([""\])', '\\\1') || '"",' ||
             '""EngineeringCode"" : ""' || regexp_replace(ec.code, '([""\])', '\\\1') || '"",' ||
             '""MountedOn"" : ""' || t.mountedon_id || '"",' ||
+            '""MountedOnGuid"" : ""' || mt.procosys_guid || '"",' ||
             '""LastUpdated"" : ""' || TO_CHAR(t.LAST_UPDATED, 'yyyy-mm-dd hh24:mi:ss') || '"",' ||
             '""TagDetails"" : {{' ||
                 (SELECT listagg('""'|| colName ||'"":""'|| regexp_replace(val, '([""\])', '\\\1') ||'""', ',')
@@ -78,6 +79,7 @@ public class TagQuery
             left join purchaseorder on purchaseorder.package_id=calloff.package_id
             left join tagfunction on tagfunction.tagfunction_id = t.tagfunction_id     
             left join library ec on ec.library_id = t.engineeringcode_id
+            left join tag mt on t.mountedon_id=mt.tag_id
         {whereClause}";
     }
 }

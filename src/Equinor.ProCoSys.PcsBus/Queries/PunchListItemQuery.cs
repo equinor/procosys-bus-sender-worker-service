@@ -25,11 +25,13 @@ public class PunchListItemQuery
             '"", ""PunchPriority"" : ""' || regexp_replace(plpri.code, '([""\])', '\\\1') ||
             '"", ""Estimate"" : ""' || pl.estimate ||
             '"", ""OriginalWoNo"" : ""' || regexp_replace(orgwo.wono, '([""\])', '\\\1') ||
+            '"", ""OriginalWoGuid"" : ""' || orgwo.procosys_guid ||            
             '"", ""WoNo"" : ""' || regexp_replace(wo.wono, '([""\])', '\\\1') ||
             '"", ""WoGuid"" : ""' || wo.procosys_guid ||            
             '"", ""SWCRNo"" : ""' || swcr.swcrno ||
             '"", ""SWCRGuid"" : ""' || swcr.procosys_guid ||
             '"", ""DocumentNo"" : ""' || regexp_replace(doc.documentno, '([""\])', '\\\1') ||
+            '"", ""DocumentGuid"" : ""' || doc.procosys_guid ||                        
             '"", ""ExternalItemNo"" : ""' ||  regexp_replace(pl.external_itemno, '([""\])', '\\\1') ||
             '"", ""MaterialRequired"" : ' || decode(pl.ismaterialrequired,'Y', 'true', 'false') ||
             ', ""IsVoided"" : ' || decode(pl.isVoided,'Y', 'true', 'false') ||

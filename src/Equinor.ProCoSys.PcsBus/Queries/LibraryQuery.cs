@@ -12,6 +12,7 @@ public class LibraryQuery
             '"", ""ProCoSysGuid"" : ""' || l.procosys_guid ||
             '"", ""LibraryId"" : ""' || l.library_id ||
             '"", ""ParentId"" : ""' || regexp_replace(l.parent_id, '([""\])', '\\\1') ||
+            '"", ""ParentGuid"" : ""' || lp.procosys_guid ||
             '"", ""Code"" : ""' || regexp_replace(l.code, '([""\])', '\\\1') ||
             '"", ""Description"" : ""' || regexp_replace(l.description, '([""\])', '\\\1') ||
             '"", ""IsVoided"" : ' || decode(l.isVoided,'Y', 'true', 'N', 'false') ||
@@ -19,6 +20,7 @@ public class LibraryQuery
             '"", ""LastUpdated"" : ""' || TO_CHAR(l.LAST_UPDATED, 'yyyy-mm-dd hh24:mi:ss') ||
             '""}}'  as message
             from library l
+            left join library lp on l.parent_id=lp.parent_id
             {whereClause}";
     }
 }

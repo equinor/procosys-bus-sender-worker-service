@@ -21,7 +21,7 @@ public class WorkOrderMaterialQuery
             '"", ""TagNo"" : ""' || regexp_replace(t.tagno, '([""\])', '\\\1') ||
             '"", ""TagId"" : ""' || wm.tag_id ||
             '"", ""TagGuid"" : ""' || t.procosys_guid ||
-            '"", ""TagRegisterId"" : ""' || t.register_id ||
+            '"", ""TagRegisterCode"" : ""' || tl.code ||
             '"", ""StockId"" : ""' || wm.stock_id ||
             '"", ""Quantity"" : ""' || wm.quantity ||
             '"", ""UnitName"" : ""' || regexp_replace(u.name, '([""\])', '\\\1') ||
@@ -41,6 +41,7 @@ public class WorkOrderMaterialQuery
             left join library ms  on ms.library_id = wm.materialstatus_id
             left join library sl on sl.library_id = wm.stocklocation_id
             left join unit u on u.unit_id = wm.unit_id 
+            left join library tl on tl.library_id = t.register_id
         {whereClause}";
     }
 }
