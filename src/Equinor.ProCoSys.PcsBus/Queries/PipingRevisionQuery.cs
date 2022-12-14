@@ -13,11 +13,13 @@ public static class PipingRevisionQuery
             '"", ""PipingRevisionId"" : ""' || pr.pipingrevision_id ||
             '"", ""Revision"" : ""' || pr.testrevisionno || 
             '"", ""McPkgNo"" : ""' || m.mcpkgno ||
+            '"", ""McPkgNoGuid"" : ""' || m.procosys_guid ||
             '"", ""ProjectName"" : ""' || p.name || 
             '"", ""MaxDesignPressure"" : ""' || pr.maxdesignpressure || 
             '"", ""MaxTestPressure"" : ""' || pr.maxtestpressure || 
             '"", ""Comments"" : ""' || regexp_replace(pr.comments, '([""\])', '\\\1') ||
             '"", ""TestISODocumentNo"" : ""' ||  regexp_replace(ti.documentno, '([""\])', '\\\1') ||
+            '"", ""TestISODocumentGuid"" : ""' || ti.procosys_guid ||
             '"", ""TestISORevision"" : ""' ||  regexp_replace(pr.TEST_ISO_REVISIONNO, '([""\])', '\\\1') ||
             '"", ""PurchaseOrderNo"" : ""' || po.packageno || 
             '"", ""CallOffNo"" : ""' || co.calloffno ||

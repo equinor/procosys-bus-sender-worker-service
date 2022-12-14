@@ -1,14 +1,8 @@
-﻿using Azure.Messaging.ServiceBus;
-using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
-using Equinor.ProCoSys.BusSenderWorker.Core.Models;
+﻿using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 using Equinor.ProCoSys.BusSenderWorker.Core.Services;
 using Equinor.ProCoSys.PcsServiceBus.Topics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 

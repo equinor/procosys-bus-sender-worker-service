@@ -17,6 +17,7 @@ public class WorkOrderQuery
             '"", ""WoNo"" : ""' || regexp_replace(w.wono, '([""\])', '\\\1') ||
             '"", ""WoId"" : ""' || w.WO_ID ||
             '"", ""CommPkgNo"" : ""' || c.COMMPKGNO ||
+            '"", ""CommPkgGuid"" : ""' || c.procosys_guid ||
             '"", ""Title"" : ""' || regexp_replace(w.DESCRIPTIONSHORT, '([""\])', '\\\1') ||
             '"", ""Description"" : ""' || regexp_replace(w.DESCRIPTIONLONG, '([""\])', '\\\1') ||
             '"", ""MilestoneCode"" : ""' || regexp_replace(milestone.CODE, '([""\])', '\\\1') ||

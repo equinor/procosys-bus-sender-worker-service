@@ -12,12 +12,12 @@ public class QueryQuery
             '"", ""ProCoSysGuid"" : ""' || do.procosys_guid ||
             '"", ""ProjectName"" : ""' || p.name ||
             '"", ""QueryId"" : ""'|| do.document_id ||
-            '"", ""QueryGuid"" : ""'|| do.procosys_guid ||
             '"", ""QueryNo"" : ""'|| regexp_replace(do.documentno, '([""\])', '\\\1') ||
             '"", ""Title"" : ""'|| regexp_replace(do.title , '([""\])', '\\\1') ||
             '"", ""DisciplineCode"" : ""'|| dis.code ||
             '"", ""QueryType"" : ""'|| qt.code ||
             '"", ""CostImpact"" : ""'||  ci.code ||
+            '"", ""Description"" : ""'|| regexp_replace(q.Description , '([""\])', '\\\1') ||
             '"", ""Consequence"" : ""'||  regexp_replace(q.CONSEQUENCE , '([""\])', '\\\1') ||
             '"", ""ProposedSolution"" : ""'|| regexp_replace(q.PROPOSEDSOLUTION , '([""\])', '\\\1') ||
             '"", ""EngineeringReply"" : ""'|| regexp_replace(q.Engineeringreply, '([""\])', '\\\1') ||
