@@ -18,6 +18,7 @@ public class QueryQuery
             '"", ""DisciplineCode"" : ""'|| dis.code ||
             '"", ""QueryType"" : ""'|| qt.code ||
             '"", ""CostImpact"" : ""'||  ci.code ||
+            '"", ""Description"" : ""'|| regexp_replace(q.Description , '([""\])', '\\\1') ||
             '"", ""Consequence"" : ""'||  regexp_replace(q.CONSEQUENCE , '([""\])', '\\\1') ||
             '"", ""ProposedSolution"" : ""'|| regexp_replace(q.PROPOSEDSOLUTION , '([""\])', '\\\1') ||
             '"", ""EngineeringReply"" : ""'|| regexp_replace(q.Engineeringreply, '([""\])', '\\\1') ||
