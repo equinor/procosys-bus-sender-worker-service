@@ -15,7 +15,7 @@ public static class McPkgQuery
             '"", ""McPkgNo"" : ""' || m.MCPKGNO ||
             '"", ""McPkgId"" : ""' || m.MCPKG_ID ||
             '"", ""CommPkgNo"" : ""' || c.commpkgno ||
-            '"", ""CommPkgGuid"" : ""' || c.procoys_guid ||
+            '"", ""CommPkgGuid"" : ""' || c.procosys_guid ||
             '"", ""Description"" : ""' || regexp_replace(m.DESCRIPTION, '([""\])', '\\\1') ||
             '"", ""Remark"" : ""' || regexp_replace(m.REMARK, '([""\])', '\\\1') ||
             '"", ""ResponsibleCode"" : ""' || regexp_replace(resp.CODE, '([""\])', '\\\1') ||
