@@ -7,6 +7,13 @@ public class TaskQuery
         DetectFaultyPlantInput(plant);
         var whereClause = CreateWhereClause(taskId, plant, "ec", "element_id");
 
+        /***
+         * This is to filter out elementcontents that are in fact not Tasks connected to commPackages.
+         * It is done in a where clause instead of inner join to avoid duplicates.
+         */
+        whereClause +=
+            " and EXISTS(select 1 from ElementReference er where ec.Element_id = er.ToElement_id and er.Association= 'Task' and er.FromElement_Role = 'CommPkg')";
+
         return @$"select
            '{{""Plant"": ""' || ec.ProjectSchema ||
            '"", ""ProCoSysGuid"" : ""' || ec.ProCoSys_Guid ||
@@ -42,7 +49,6 @@ public class TaskQuery
            '""}}' as message
         FROM ElementContent ec 
             INNER JOIN ProjectSchema ps ON ec.ProjectSchema=ps.ProjectSchema
-            INNER JOIN ElementReference er on ec.Element_id=er.ToElement_id and er.Association='Task' and er.FromElement_Role='CommPkg'
             LEFT JOIN ElementContent ec2 ON ec.Parent_Id = ec2.Element_Id
             LEFT JOIN ElementSignature es ON es.Element_Id = ec.Element_Id
             LEFT JOIN Person p ON es.SignedBy_Id = p.Person_Id
