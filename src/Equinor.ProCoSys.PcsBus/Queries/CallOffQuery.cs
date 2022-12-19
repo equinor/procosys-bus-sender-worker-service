@@ -6,7 +6,7 @@ public class CallOffQuery
     {
         DetectFaultyPlantInput(plant);
         var whereClause = CreateWhereClause(tagCheckId, plant, "co", "calloff_id");
-        whereClause += "and co.calloffno is not null";
+        whereClause += " and co.calloffno is not null";
 
         return @$"select
         '{{""Plant"" : ""' || co.projectschema ||
