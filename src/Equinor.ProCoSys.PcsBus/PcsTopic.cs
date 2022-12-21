@@ -19,6 +19,7 @@ public enum PcsTopic
     Milestone,
     WorkOrderCutoff,
     Certificate,
+    CertificateEvent,
     WoChecklist,
     SWCR,
     SWCRSignature,
