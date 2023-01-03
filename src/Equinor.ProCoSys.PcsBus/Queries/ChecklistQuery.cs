@@ -27,6 +27,7 @@ public class ChecklistQuery
             '"", ""FormularDiscipline"" : ""' || mccr_disc.code ||
             '"", ""Revision"" : ""' || pir.testrevisionno ||
             '"", ""PipingRevisionMcPkNo"" : ""' || prm.mcpkgno ||
+            '"", ""PipingRevisionMcPkGuid"" : ""' || prm.procosys_guid ||
             '"", ""Responsible"" : ""' || r.code ||
             '"", ""Status"" : ""' || status.code ||
             '"", ""UpdatedAt"" : ""' || TO_CHAR(tc.updatedat, 'yyyy-mm-dd hh24:mi:ss') ||
