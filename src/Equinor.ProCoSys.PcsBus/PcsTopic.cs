@@ -18,6 +18,8 @@ public enum PcsTopic
     Checklist,
     Milestone,
     WorkOrderCutoff,
+    // todo Certificate Topic is used for "accept of a certificate" (consumed in preservation).
+    // Can't be reused as-is for "create certificate" or "edit certificate". See #98630
     Certificate,
     WoChecklist,
     SWCR,
