@@ -226,6 +226,36 @@ public class BusSenderServiceTests
     }
 
     [TestMethod]
+    public async Task HandleBusEvents_ShouldHandleGuidSimpleMessages()
+    {
+        //Arrange
+        var guid = "E9414BA9930E5FF6E0532510000AA1AB";
+        var commPri = new BusEvent { Event = CommPriorityTopic.TopicName, Message = guid, Status = Status.UnProcessed };
+  
+        const string jsonMessage =
+            "{\"Plant\" : \"AnyValidPlant\", \"ProjectName\" : \"AnyProjectName\", \"WoNo\" : \"SomeWoNo\"}";
+
+        _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk())
+            .Returns(() => Task.FromResult(new List<BusEvent> { commPri }));
+        _busSenderMessageRepositoryMock.Setup(wcl => wcl.GetCommPkgPriorityMessage(guid))
+            .Returns(() => Task.FromResult(jsonMessage));
+     
+
+        var topicClientMock = new Mock<ServiceBusSender>();
+        _busSender.Add(CommPriorityTopic.TopicName, topicClientMock.Object);
+        var batch = ServiceBusModelFactory.ServiceBusMessageBatch(1000, new List<ServiceBusMessage>());
+        topicClientMock.Setup(t => t.CreateMessageBatchAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(() => batch);
+
+        //Act
+        await _dut.HandleBusEvents();
+
+        //Assert
+        topicClientMock.Verify(t => t.SendMessagesAsync(batch, It.IsAny<CancellationToken>()), Times.Exactly(1));
+        Assert.AreEqual(1, batch.Count);
+    }
+
+    [TestMethod]
     public async Task HandleBusEvents_ShouldAddMessagesToBatchInCorrectOrder()
     {
         //Arrange

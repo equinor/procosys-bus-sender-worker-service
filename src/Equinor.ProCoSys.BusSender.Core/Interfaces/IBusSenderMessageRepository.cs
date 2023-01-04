@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 
 namespace Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 
@@ -27,4 +28,5 @@ public interface IBusSenderMessageRepository
     Task<string> GetMilestoneMessage(long elementId, long milestoneId);
     Task<string> GetHeatTraceMessage(long id);
     Task<string> GetCommPkgOperationMessage(long commPkgId);
+    Task<string> GetCommPkgPriorityMessage(string? guid);
 }

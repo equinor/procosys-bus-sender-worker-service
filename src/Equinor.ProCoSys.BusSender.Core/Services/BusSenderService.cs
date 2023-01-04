@@ -180,6 +180,7 @@ public class BusSenderService : IBusSenderService
 
     private static bool IsSimpleMessage(BusEvent e) 
         => long.TryParse(e.Message, out _) 
+           || Guid.TryParse(e.Message, out _)
            || BusEventService.CanGetTwoIdsFromMessage(e.Message.Split(","),out _,out _);
 
 
@@ -298,6 +299,11 @@ public class BusSenderService : IBusSenderService
             case LoopContentTopic.TopicName:
                 {
                     await CreateAndSetMessage(busEvent, _service.CreateLoopContentMessage);
+                    break;
+                }
+            case CommPriorityTopic.TopicName:
+                {
+                    await CreateAndSetMessage(busEvent, _service.CreateCommPkgPriorityMessage);
                     break;
                 }
             case StockTopic.TopicName:
