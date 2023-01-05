@@ -6,14 +6,13 @@ public class CommPkgPriorityQuery
     {
         DetectFaultyPlantInput(plant);
         var whereClause = CreateWhereClauseForGuid(libraryContentId, plant, "lf", "procosys_guid");
-        whereClause += " and l.librarytype = 'COMM_PRIORITY";
+        whereClause += " and l.librarytype = 'COMM_PRIORITY'";
 
         return $@"select   
          '{{""Plant"" : ""' || lf.projectschema || '"",
             ""ProCoSysGuid"" : ""' || lf.procosys_guid || '"",
             ""LibraryGuid"" : ""' || l.procosys_guid || '"",
-            ""ProjectName"" : ""' || p.NAME || '"",
-            ""Code"" : ""' || lf.code || '"",
+            ""Code"" : ""' || l.code || '"",
             ""ColumnName"" : ""' || regexp_replace(field.columnname, '([""\])', '\\\1') || '"",
             ""ColumnType"" : ""' || regexp_replace(field.columntype, '([""\])', '\\\1') || '"",
             ""Value"" : ' || COALESCE(TO_CHAR(lf.valuedate, 'yyyy-mm-dd hh24:mi:ss'), regexp_replace(lf.valuestring, '([""\])', '\\\1')) || ',

@@ -2,5 +2,5 @@
 
 public class CommPriorityTopic
 {
-    public const string TopicName = "commpriority";
+    public const string TopicName = "commpriorityfield";
 }

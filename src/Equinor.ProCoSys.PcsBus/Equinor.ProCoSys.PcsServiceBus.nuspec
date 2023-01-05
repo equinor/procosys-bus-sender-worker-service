@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <package >
   <metadata>
-    <id>Equinor.ProCoSys.PcsServiceBus</id>
+    <guid>Equinor.ProCoSys.PcsServiceBus</guid>
     <version>$version$</version>
     <description>Library necessary for communication with PCS service bus</description>
     <authors>Equinor ASA</authors>

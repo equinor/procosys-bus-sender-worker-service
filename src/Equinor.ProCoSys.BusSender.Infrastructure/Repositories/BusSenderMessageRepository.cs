@@ -1,7 +1,4 @@
-﻿using System;
-using System.Data;
-using System.Data.Common;
-using System.Reflection.Metadata;
+﻿using System.Data;
 using System.Threading.Tasks;
 using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 using Equinor.ProCoSys.BusSenderWorker.Infrastructure.Data;

@@ -32,20 +32,20 @@ public  static class QueryHelper
 
         return whereClause;
     }
-    public static string CreateWhereClauseForGuid(string? id, string plant, string shortHand, string idColumn)
+    public static string CreateWhereClauseForGuid(string guid, string plant, string shortHand, string idColumn)
     {
         var whereClause = "";
-        if (id != null && plant != null)
+        if (guid != null && plant != null)
         {
-            whereClause = $"where {shortHand}.projectschema = '{plant}' and {shortHand}.{idColumn} = {id}";
+            whereClause = $"where {shortHand}.projectschema = '{plant}' and {shortHand}.{idColumn} = '{guid}'";
         }
         else if (plant != null)
         {
             whereClause = $"where {shortHand}.projectschema = '{plant}'";
         }
-        else if (id != null)
+        else if (guid != null)
         {
-            whereClause = $"where {shortHand}.{idColumn} = {id}";
+            whereClause = $"where {shortHand}.{idColumn} = '{guid}'";
         }
 
         return whereClause;
