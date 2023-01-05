@@ -24,6 +24,7 @@ public class TagQuery
             '""DisciplineCode"" : ""' || discipline.code || '"",' ||
             '""DisciplineDescription"" : ""' || regexp_replace(discipline.description, '([""\])', '\\\1') || '"",' ||
             '""RegisterCode"" : ""' || register.code || '"",' ||
+            '""InstallationCode"" : ""' || installation.code || '"",' ||
             '""Status"" : ""' || status.code || '"",' ||
             '""System"" : ""' || system.code || '"",' ||
             '""CallOffNo"" : ""' || calloff.calloffno || '"",' ||
@@ -73,6 +74,7 @@ public class TagQuery
             left join library area on area.library_id=t.area_id
             left join library discipline on discipline.library_id=t.discipline_id
             left join library register on register.library_id=t.register_id
+            left join library installation on installation.library_id = t.installation_id
             left join library status on status.library_id=t.status_id
             left join library system on system.library_id=t.system_id
             left join calloff  on calloff.calloff_id=t.calloff_id
