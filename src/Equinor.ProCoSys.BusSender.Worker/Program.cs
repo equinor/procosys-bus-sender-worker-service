@@ -102,8 +102,10 @@ public class Program
         {
             logging.ClearProviders();
             logging.AddConsole();
-            logging.AddApplicationInsightsWebJobs(c 
+        
+            logging.AddApplicationInsightsWebJobs(c
                 => c.ConnectionString = context.Configuration["ApplicationInsights:ConnectionString"]);
+            
         });
 
         builder.UseContentRoot(Directory.GetCurrentDirectory())

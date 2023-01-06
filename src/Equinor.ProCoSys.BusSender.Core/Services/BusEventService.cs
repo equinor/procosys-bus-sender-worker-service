@@ -80,6 +80,11 @@ public class BusEventService : IBusEventService
             ? WashString(await _busSenderMessageRepository.GetLoopContentMessage(loopContentId))
             : throw new Exception("Failed to extract LoopContent from message");
 
+    public async Task<string> CreateCommPkgPriorityMessage(string busEventMessage) =>
+        Guid.TryParse(busEventMessage, out _)
+            ? WashString(await _busSenderMessageRepository.GetCommPkgPriorityMessage(busEventMessage))
+            : throw new Exception($"Failed to extract or parse guid CommPriority from message {busEventMessage}");
+
     public async Task<string> CreatePipingRevisionMessage(string busEventMessage)
         => long.TryParse(busEventMessage, out var pipingRevisionId)
             ? WashString(await _busSenderMessageRepository.GetPipingRevisionMessage(pipingRevisionId))
