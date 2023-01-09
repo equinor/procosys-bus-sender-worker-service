@@ -15,7 +15,7 @@ public class CommPkgPriorityQuery
             ""Code"" : ""' || l.code || '"",
             ""ColumnName"" : ""' || regexp_replace(field.columnname, '([""\])', '\\\1') || '"",
             ""ColumnType"" : ""' || regexp_replace(field.columntype, '([""\])', '\\\1') || '"",
-            ""Value"" : ' || COALESCE(TO_CHAR(lf.valuedate, 'yyyy-mm-dd hh24:mi:ss'), regexp_replace(lf.valuestring, '([""\])', '\\\1')) || '""
+            ""Value"" : ""' || COALESCE(TO_CHAR(lf.valuedate, 'yyyy-mm-dd hh24:mi:ss'), regexp_replace(lf.valuestring, '([""\])', '\\\1')) || '""
             ""LastUpdated"" : ""' || TO_CHAR(lf.LAST_UPDATED, 'yyyy-mm-dd hh24:mi:ss')  || '""
             }}'
         from libraryfield lf
