@@ -2,10 +2,10 @@
 
 public class CommPkgPriorityQuery
 {
-    public static string GetQuery(string? libraryContentId, string plant = null)
+    public static string GetQuery(string libraryFieldGuid, string plant = null)
     {
         DetectFaultyPlantInput(plant);
-        var whereClause = CreateWhereClauseForGuid(libraryContentId, plant, "lf", "procosys_guid");
+        var whereClause = CreateWhereClauseForGuid(libraryFieldGuid, plant, "lf", "procosys_guid");
         whereClause += " and l.librarytype = 'COMM_PRIORITY'";
 
         return $@"select   
