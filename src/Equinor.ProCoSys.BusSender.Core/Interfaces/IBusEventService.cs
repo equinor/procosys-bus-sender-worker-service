@@ -29,5 +29,6 @@ public interface IBusEventService
     Task<string> CreateMilestoneMessage(string message);
     Task<string> CreateHeatTraceMessage(string busEventMessage);
     Task<string> CreateCommPkgOperationMessage(string busEventMessage);
-    
+
+    Task<string> CreateCommPkgPriorityMessage(string busEventMessage);
 }
