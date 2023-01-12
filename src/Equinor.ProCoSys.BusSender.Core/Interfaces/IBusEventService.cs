@@ -10,6 +10,7 @@ public interface IBusEventService
     Task<string> CreateQuerySignatureMessage(string busEventMessage);
     Task<string> CreateDocumentMessage(string busEventMessage);
     Task<string> CreateTaskMessage(string busEventMessage);
+    Task<string> CreateSwcrTypeMessage(string busEventMessage);
     Task<string> CreateActionMessage(string busEventMessage);
     Task<string> CreateCommPkgTaskMessage(string busEventMessage);
     Task<string> CreateWorkOrderMessage(string busEventMessage);
