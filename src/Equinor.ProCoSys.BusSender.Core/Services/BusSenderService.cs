@@ -246,6 +246,11 @@ public class BusSenderService : IBusSenderService
                     await CreateAndSetMessage(busEvent, _service.CreateTaskMessage);
                     break;
                 }
+            case SwcrOtherReferencesTopic.TopicName:
+                {
+                    await CreateAndSetMessage(busEvent, _service.CreateSwcrOtherReferencesMessage);
+                    break;
+                }
             case SwcrTypeTopic.TopicName:
                 {
                     await CreateAndSetMessage(busEvent, _service.CreateSwcrTypeMessage);
