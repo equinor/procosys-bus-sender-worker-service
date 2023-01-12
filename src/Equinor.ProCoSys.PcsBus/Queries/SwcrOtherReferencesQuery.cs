@@ -13,7 +13,7 @@ public class SwcrOtherReferencesQuery
            '"", ""LibraryGuid"" : ""' || l.PROCOSYS_GUID ||
            '"", ""SwcrGuid"" : ""' || s.PROCOSYS_GUID ||
            '"", ""Code"" : ""' || l.CODE ||
-           '"", ""Description"" : ""' || slr.DESCRIPTION ||
+           '"", ""Description"" : ""' || regexp_replace(slr.DESCRIPTION, '([""\])', '\\\1') ||
            '"", ""LastUpdated"" : ""' || TO_CHAR(slr.LAST_UPDATED, 'yyyy-mm-dd hh24:mi:ss') ||
            '""}}' as message
             FROM SWCRLIBRARYREFERENCE slr
