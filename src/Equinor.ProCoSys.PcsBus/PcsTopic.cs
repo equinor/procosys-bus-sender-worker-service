@@ -24,6 +24,8 @@ public enum PcsTopic
     WoChecklist,
     SWCR,
     SWCRSignature,
+    SWCRType,
+    SWCROtherReference,
     PipingRevision,
     WoMaterial,
     WoMilestone,
