@@ -14,6 +14,7 @@ public class BusEventServiceTests
     private BusEventService _dut;
     private Mock<ITagDetailsRepository> _tagDetailsRepositoryMock;
     private Mock<IBusSenderMessageRepository> _busSenderMessageRepositoryMock;
+    private Mock<IDapperRepository> _dapperRepositoryMock;
 
     [TestInitialize]
     public void Setup()
@@ -21,7 +22,8 @@ public class BusEventServiceTests
         _tagDetailsRepositoryMock = new Mock<ITagDetailsRepository>();
 
         _busSenderMessageRepositoryMock = new Mock<IBusSenderMessageRepository>();
-        _dut = new BusEventService(_tagDetailsRepositoryMock.Object,_busSenderMessageRepositoryMock.Object);
+        _dapperRepositoryMock = new Mock<IDapperRepository>();
+        _dut = new BusEventService(_tagDetailsRepositoryMock.Object,_busSenderMessageRepositoryMock.Object,_dapperRepositoryMock.Object);
     }
 
     [TestMethod]

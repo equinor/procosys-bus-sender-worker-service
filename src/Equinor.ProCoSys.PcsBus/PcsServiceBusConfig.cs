@@ -20,7 +20,7 @@ public class PcsServiceBusConfig
         return this;
     }
 
-    public List<(PcsTopic pcsTopic, string topicPath, string subscrition)> Subscriptions { get; } = new();
+    public List<(string pcsTopic, string topicPath, string subscrition)> Subscriptions { get; } = new();
 
     public int RenewLeaseIntervalMilliSec { get; private set; }
 
@@ -30,15 +30,15 @@ public class PcsServiceBusConfig
         return this;
     }
 
-    public PcsServiceBusConfig WithSubscription(PcsTopic pcsTopic, string subscriptionName)
+    public PcsServiceBusConfig WithSubscription(string pcsTopic, string subscriptionName)
     {
-        Subscriptions.Add(new ValueTuple<PcsTopic, string, string>(pcsTopic, null, subscriptionName));
+        Subscriptions.Add(new ValueTuple<string, string, string>(pcsTopic, null, subscriptionName));
         return this;
     }
 
-    public PcsServiceBusConfig WithSubscription(PcsTopic pcsTopic, string topicPath, string subscriptionName)
+    public PcsServiceBusConfig WithSubscription(string pcsTopic, string topicPath, string subscriptionName)
     {
-        Subscriptions.Add(new ValueTuple<PcsTopic, string, string>(pcsTopic, topicPath, subscriptionName));
+        Subscriptions.Add(new ValueTuple<string, string, string>(pcsTopic, topicPath, subscriptionName));
         return this;
     }
 

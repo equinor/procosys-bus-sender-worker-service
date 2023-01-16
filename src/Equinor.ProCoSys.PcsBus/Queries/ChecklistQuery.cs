@@ -8,34 +8,32 @@ public class ChecklistQuery
         var whereClause = CreateWhereClause(tagCheckId, plant, "tc","tagcheck_id");
 
         return @$"select
-            '{{""Plant"" : ""' || tc.projectschema ||
-            '"", ""ProCoSysGuid"" : ""' || tc.procosys_guid ||
-            '"", ""ProjectName"" : ""' || p.name ||
-            '"", ""TagNo"" : ""' ||  regexp_replace(t.tagno, '([""\])', '\\\1') ||
-            '"", ""TagId"" : ""' ||  t.tag_id ||
-            '"", ""TagGuid"" : ""' ||  t.procosys_guid ||
-            '"", ""TagRegisterId"" : ""' ||  t.register_id ||
-            '"", ""ChecklistId"" : ""' || tc.tagcheck_id ||
-            '"", ""ChecklistGuid"" : ""' || tc.procosys_guid ||
-            '"", ""TagCategory"" : ""' || reg.code ||
-            '"", ""SheetNo"" : ""' || tft.sheetno ||
-            '"", ""SubSheetNo"" : ""' || tft.subsheetno ||
-            '"", ""FormularType"" : ""' || ft.formulartype ||
-            '"", ""FormularGroup"" : ""' || ft.formulargroup ||
-            '"", ""FormPhase"" : ""' || phase.code ||
-            '"", ""SystemModule"" : ""' || fg.systemmodule ||
-            '"", ""FormularDiscipline"" : ""' || mccr_disc.code ||
-            '"", ""Revision"" : ""' || pir.testrevisionno ||
-            '"", ""PipingRevisionMcPkNo"" : ""' || prm.mcpkgno ||
-            '"", ""PipingRevisionMcPkGuid"" : ""' || prm.procosys_guid ||
-            '"", ""Responsible"" : ""' || r.code ||
-            '"", ""Status"" : ""' || status.code ||
-            '"", ""UpdatedAt"" : ""' || TO_CHAR(tc.updatedat, 'yyyy-mm-dd hh24:mi:ss') ||
-            '"", ""LastUpdated"" : ""' || TO_CHAR(tc.updatedat, 'yyyy-mm-dd hh24:mi:ss') ||
-            '"", ""CreatedAt"" : ""' || TO_CHAR(tc.createdat, 'yyyy-mm-dd hh24:mi:ss') ||
-            '"", ""SignedAt"" : ""' || TO_CHAR(tc.signedat, 'yyyy-mm-dd hh24:mi:ss') ||
-            '"", ""VerifiedAt"" : ""' || TO_CHAR(tc.verifiedat, 'yyyy-mm-dd hh24:mi:ss') ||
-            '""}}' as message
+            tc.projectschema as Plant, 
+            hextoraw(tc.procosys_guid) as ProCoSysGuid, 
+            p.name as ProjectName, 
+            t.tagno as TagNo, 
+            t.tag_id as TagId, 
+            hextoraw(t.procosys_guid) as TagGuid, 
+            t.register_id as TagRegisterId, 
+            tc.tagcheck_id as ChecklistId, 
+            reg.code as TagCategory, 
+            tft.sheetno as SheetNo, 
+            tft.subsheetno as SubSheetNo, 
+            ft.formulartype as FormularType, 
+            ft.formulargroup as FormularGroup, 
+            phase.code as FormPhase, 
+            fg.systemmodule as SystemModule, 
+            mccr_disc.code as FormularDiscipline, 
+            pir.testrevisionno as Revision, 
+            prm.mcpkgno as PipingRevisionMcPkNo, 
+            hextoraw(prm.procosys_guid) as PipingRevisionMcPkGuid, 
+            r.code as Responsible, 
+            status.code as Status, 
+            tc.updatedat as UpdatedAt,
+            tc.last_updated as LastUpdated,
+            tc.createdat as CreatedAt, 
+            tc.signedat as SignedAt, 
+            tc.verifiedat as VerifiedAt
         from tagcheck tc
             join tagformulartype tft on tft.tagformulartype_id = tc.tagformulartype_id
             join tag t on t.tag_id = tft.tag_id

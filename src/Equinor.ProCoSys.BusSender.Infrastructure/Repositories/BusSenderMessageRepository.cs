@@ -1,8 +1,16 @@
-﻿using System.Data;
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
 using System.Threading.Tasks;
+using Dapper;
 using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
+using Equinor.ProCoSys.BusSenderWorker.Core.Models;
 using Equinor.ProCoSys.BusSenderWorker.Infrastructure.Data;
+using Equinor.ProCoSys.BusSenderWorker.Infrastructure.Handlers;
+using Equinor.ProCoSys.PcsServiceBus.Interfaces;
 using Equinor.ProCoSys.PcsServiceBus.Queries;
+using Equinor.ProCoSys.PcsServiceBus.Topics;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -22,8 +30,6 @@ public class BusSenderMessageRepository : IBusSenderMessageRepository
     public async Task<string> GetCallOffMessage(long callOffId) => 
         await ExecuteQuery(CallOffQuery.GetQuery(callOffId), callOffId.ToString());
 
-    public async Task<string> GetCheckListMessage(long checkListId) => 
-        await ExecuteQuery(ChecklistQuery.GetQuery(checkListId), checkListId.ToString());
 
     public async Task<string> GetCommPkgQueryMessage(long commPkgId, long documentId) =>
         await ExecuteQuery(QueryCommPkgQuery.GetQuery(commPkgId,documentId), commPkgId+","+documentId);
@@ -42,9 +48,6 @@ public class BusSenderMessageRepository : IBusSenderMessageRepository
 
     public async Task<string> GetCommPkgTaskMessage(long commPkgId, long taskId) =>
         await ExecuteQuery(CommPkgTaskQuery.GetQuery(commPkgId, taskId), commPkgId + "," + taskId);
-
-    public async Task<string> GetMilestoneMessage(long elementId,long milestoneId) =>
-        await ExecuteQuery(MilestonesQuery.GetQuery(elementId, milestoneId),elementId+","+milestoneId);
 
     public async Task<string> GetCommPkgPriorityMessage(string guid) =>
         await ExecuteQuery(CommPkgPriorityQuery.GetQuery(guid), guid);
@@ -91,6 +94,24 @@ public class BusSenderMessageRepository : IBusSenderMessageRepository
     public async Task<string> GetWorkOrderMilestoneMessage(long woId, long milestoneId) =>
         await ExecuteQuery(WorkOrderMilestoneQuery.GetQuery(woId, milestoneId), $"{woId},{milestoneId}");
 
+
+    //private async Task<IEnumerable<ChecklistEvent>> ExecuteQueryForEvent(string queryString, string objectId)
+    //{
+    //    await using var connection = _context.Database.GetDbConnection();
+    //    if (_context.Database.GetDbConnection().State != ConnectionState.Open)
+    //    {
+    //        await _context.Database.OpenConnectionAsync();
+    //    }
+        
+    //    var checklists = connection.Query<ChecklistEvent>(queryString).ToList();
+    //    if (checklists.Count == 0)
+    //    {
+    //        _logger.LogError("Object/Entity with id {objectId} did not return anything", objectId);
+    //        return null;
+    //    }
+    //    return checklists;
+    //}
+
     private async Task<string> ExecuteQuery(string queryString, string objectId)
     {
         await using var command = _context.Database.GetDbConnection().CreateCommand();
@@ -109,4 +130,7 @@ public class BusSenderMessageRepository : IBusSenderMessageRepository
         }
         return result;
     }
+
+
+
 }

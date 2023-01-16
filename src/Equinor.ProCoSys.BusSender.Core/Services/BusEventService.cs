@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Equinor.ProCoSys.BusSenderWorker.Core.Extensions;
 using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
+using Equinor.ProCoSys.BusSenderWorker.Core.Models;
+using Equinor.ProCoSys.PcsServiceBus.Queries;
 using Equinor.ProCoSys.PcsServiceBus.Topics;
 
 namespace Equinor.ProCoSys.BusSenderWorker.Core.Services;
@@ -11,13 +14,15 @@ namespace Equinor.ProCoSys.BusSenderWorker.Core.Services;
 public class BusEventService : IBusEventService
 {
     private readonly IBusSenderMessageRepository _busSenderMessageRepository;
+    private readonly IDapperRepository _dapperRepository;
     private readonly ITagDetailsRepository _tagDetailsRepository;
 
     public BusEventService(ITagDetailsRepository tagDetailsRepository,
-        IBusSenderMessageRepository busSenderMessageRepository)
+        IBusSenderMessageRepository busSenderMessageRepository, IDapperRepository dapperRepository)
     {
         _tagDetailsRepository = tagDetailsRepository;
         _busSenderMessageRepository = busSenderMessageRepository;
+        _dapperRepository = dapperRepository;
     }
 
     public async Task<string> AttachTagDetails(string tagMessage)
@@ -38,7 +43,7 @@ public class BusEventService : IBusEventService
 
     public async Task<string> CreateChecklistMessage(string busEventMessage) =>
         long.TryParse(busEventMessage, out var checkListId)
-            ? WashString(await _busSenderMessageRepository.GetCheckListMessage(checkListId))
+            ? JsonSerializer.Serialize(await _dapperRepository.Query<ChecklistEvent>(ChecklistQuery.GetQuery(checkListId),checkListId.ToString()))
             : throw new Exception("Failed to extract checkListId from message");
 
     public async Task<string> CreateCommPkgQueryMessage(string message) =>
@@ -71,10 +76,19 @@ public class BusEventService : IBusEventService
             ? WashString(await _busSenderMessageRepository.GetCommPkgTaskMessage(commPkgId,taskId))
             : throw new Exception("Failed to extract commPkgId/taskId from message");
 
-    public async Task<string> CreateMilestoneMessage(string message) =>
-        CanGetTwoIdsFromMessage(message.Split(","), out var elementId, out var milestoneId)
-            ? WashString(await _busSenderMessageRepository.GetMilestoneMessage(elementId, milestoneId))
+    public async Task<string> CreateMilestoneMessage(string message)
+    {
+        var jsonSerializerOptions = new JsonSerializerOptions
+        {
+            Converters = { new DateOnlyJsonConverter() }
+        };
+
+        return CanGetTwoIdsFromMessage(message.Split(","), out var elementId, out var milestoneId)
+            ? JsonSerializer.Serialize(await _dapperRepository.Query<MilestoneEvent>(
+                MilestonesQuery.GetQuery(elementId, milestoneId), $"{elementId},{milestoneId}"),jsonSerializerOptions)
             : throw new Exception("Failed to extract element or milestone Id from message");
+    }
+
     public async Task<string> CreateLoopContentMessage(string busEventMessage)
         => long.TryParse(busEventMessage, out var loopContentId)
             ? WashString(await _busSenderMessageRepository.GetLoopContentMessage(loopContentId))

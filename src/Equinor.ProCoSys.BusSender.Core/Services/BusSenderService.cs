@@ -6,6 +6,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
 using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
+using Equinor.ProCoSys.BusSenderWorker.Core.Mappers;
 using Equinor.ProCoSys.BusSenderWorker.Core.Models;
 using Equinor.ProCoSys.BusSenderWorker.Core.Telemetry;
 using Equinor.ProCoSys.PcsServiceBus.Sender.Interfaces;
@@ -91,7 +92,7 @@ public class BusSenderService : IBusSenderService
          * Group by topic and then create a queue of messages per topic
          */
         var topicQueues = events.Where(busEvent => busEvent.Status == Status.UnProcessed)
-            .GroupBy(e => e.Event).Select(group =>
+            .GroupBy(e => BusEventToTopicMapper.Map(e.Event)).Select(group =>
             {
                 Queue<BusEvent> messages = new();
                 group.ToList().ForEach(be => messages.Enqueue(be));
@@ -99,8 +100,6 @@ public class BusSenderService : IBusSenderService
             }).ToList();
 
         await BatchAndSendPerTopic(topicQueues);
-     
-        
     }
 
     private async Task BatchAndSendPerTopic(List<(string Key, Queue<BusEvent> messages)> eventGroups)
@@ -211,7 +210,7 @@ public class BusSenderService : IBusSenderService
                     busEvent.Message = await _service.AttachTagDetails(busEvent.Message);
                     break;
                 }
-            case ChecklistTopic.TopicName:
+            case "checklist":
                 {
                     await CreateAndSetMessage(busEvent, _service.CreateChecklistMessage);
                     break;
@@ -256,7 +255,7 @@ public class BusSenderService : IBusSenderService
                     await CreateAndSetMessage(busEvent, _service.CreateCommPkgTaskMessage);
                     break;
                 }
-            case MilestoneTopic.TopicName:
+            case "milestone":
                 {
                     await CreateAndSetMessage(busEvent, _service.CreateMilestoneMessage);
                     break;

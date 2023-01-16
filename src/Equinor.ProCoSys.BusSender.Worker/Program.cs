@@ -134,7 +134,6 @@ public class Program
                     hostContext.Configuration["TopicNames"]);
                 services.AddRepositories();
                 services.AddServices();
-
                 services.AddHostedService<TimedWorkerService>();
             });
 

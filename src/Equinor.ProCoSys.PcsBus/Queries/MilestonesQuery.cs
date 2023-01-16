@@ -4,30 +4,28 @@ namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 
 public class MilestonesQuery
 {
-    public static string GetQuery(long? elementId,long? milestoneId, string plant = null)
+    public static string GetQuery(long? elementId,long? milestoneId, string? plant = null)
     {
         DetectFaultyPlantInput(plant);
         var whereClause = CreateWhereClause(milestoneId, elementId, plant);
 
-        return @$"select
-            '{{""Plant"" : ""' || e.projectschema ||
-            '"", ""ProCoSysGuid"" : ""' || e.procosys_guid ||
-            '"", ""PlantName"" : ""' || regexp_replace(ps.TITLE, '([""\])', '\\\1') ||
-            '"", ""ProjectName"" : ""' || p.name ||
-            '"", ""CommPkgGuid"" : ""' || c.procosys_guid ||
-            '"", ""McPkgGuid"" : ""' || m.procosys_guid ||
-            '"", ""CommPkgNo"" : ""' || c.commpkgno ||
-            '"", ""McPkgNo"" : ""' || m.mcpkgno ||
-            '"", ""Code"" : ""' || milestone.code || 
-            '"", ""ActualDate"" : ""' || TO_CHAR(e.actualdate, 'yyyy-mm-dd hh24:mi:ss') ||
-            '"", ""PlannedDate"" : ""' || TO_CHAR(e.planneddate, 'yyyy-mm-dd hh24:mi:ss') ||
-            '"", ""ForecastDate"" : ""' || TO_CHAR(e.forecastdate, 'yyyy-mm-dd hh24:mi:ss') ||
-            '"", ""Remark"" : ""' || regexp_replace(e.remark, '([""\])', '\\\1') ||
-            '"", ""IsSent"" : ""' || decode(cert.issent,'Y', 'true', 'N', 'false') ||
-            '"", ""IsAccepted"" : ""' || decode(cert.isaccepted,'Y', 'true', 'N', 'false') ||
-            '"", ""IsRejected"" : ""' || decode(cert.isrejected,'Y', 'true', 'N', 'false') ||
-            '"", ""LastUpdated"" : ""' || TO_CHAR(e.last_updated, 'yyyy-mm-dd hh24:mi:ss') ||
-            '""}}' as message
+        return @$"SELECT e.projectschema AS Plant,
+            HEXTORAW(e.procosys_guid) AS ProCoSysGuid,
+            ps.TITLE AS PlantName,
+            p.name AS ProjectName,
+            HEXTORAW(c.procosys_guid) AS CommPkgGuid,
+            HEXTORAW(m.procosys_guid) AS McPkgGuid,
+            c.commpkgno AS CommPkgNo,
+            m.mcpkgno AS McPkgNo,
+            milestone.code AS Code,
+            e.actualdate AS ActualDate,
+            e.planneddate AS PlannedDate,
+            e.forecastdate AS ForecastDate,
+            e.remark AS Remark,
+            cert.issent AS IsSent,
+            cert.isaccepted AS IsAccepted,
+            cert.isrejected AS IsRejected,
+            e.last_updated AS LastUpdated
         from completionmilestonedate e
             join projectschema ps on ps.projectschema = e.projectschema
             join library milestone on milestone.library_id = e.milestone_id
@@ -38,7 +36,7 @@ public class MilestonesQuery
         {whereClause}";
     }
 
-    private static string CreateWhereClause(long? milestoneId, long? element, string plant)
+    private static string CreateWhereClause(long? milestoneId, long? element, string? plant)
     {
         var whereClause = "";
         if (milestoneId != null && element != null && plant != null)

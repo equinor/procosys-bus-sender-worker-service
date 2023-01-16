@@ -7,11 +7,11 @@ namespace Equinor.ProCoSys.PcsServiceBus.Receiver;
 
 public class PcsServiceBusProcessor : ServiceBusProcessor, IPcsServiceBusProcessor
 {
-    public PcsTopic PcsTopic { get; }
+    public string PcsTopic { get; }
 
     private Func<IPcsServiceBusProcessor,ProcessMessageEventArgs, Task>  _pcsHandler;
 
-    public PcsServiceBusProcessor(ServiceBusClient client,string topicName, string subscriptionName,ServiceBusProcessorOptions options, PcsTopic pcsTopic) 
+    public PcsServiceBusProcessor(ServiceBusClient client,string topicName, string subscriptionName,ServiceBusProcessorOptions options, string pcsTopic) 
         : base(client,topicName,subscriptionName,options) =>
         PcsTopic = pcsTopic;
 

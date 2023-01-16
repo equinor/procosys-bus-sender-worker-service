@@ -5,7 +5,7 @@ namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 
 public  static class QueryHelper
 {
-    public static void DetectFaultyPlantInput(string plant)
+    public static void DetectFaultyPlantInput(string? plant)
     {
         if (plant != null && plant.Any(char.IsWhiteSpace))
         {
@@ -14,7 +14,7 @@ public  static class QueryHelper
         }
     }
 
-    public static string CreateWhereClause(long? id, string plant, string shortHand, string idColumn)
+    public static string CreateWhereClause(long? id, string? plant, string shortHand, string? idColumn)
     {
         var whereClause = "";
         if (id != null && plant != null)
@@ -32,7 +32,7 @@ public  static class QueryHelper
 
         return whereClause;
     }
-    public static string CreateWhereClauseForGuid(string guid, string plant, string shortHand, string idColumn)
+    public static string CreateWhereClauseForGuid(string? guid, string? plant, string shortHand, string idColumn)
     {
         var whereClause = "";
         if (guid != null && plant != null)

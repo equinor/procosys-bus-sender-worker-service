@@ -44,7 +44,7 @@ public class Program
                     .UseBusConnection(hostContext.Configuration["ServiceBusConnectionString"])
                    // .WithLeaderElector("uri")
                     .WithRenewLeaseInterval(4000)
-                    .WithSubscription(PcsTopic.Tag, "test_tag")
+                    .WithSubscription(PcsTopicConstants.Tag, "test_tag")
                 );
 
                 services.BuildServiceProvider();

@@ -42,5 +42,6 @@ public static class ServiceCollectionSetup
         => services.AddSingleton<IEntryPointService, EntryPointService>()
             .AddScoped<ITelemetryClient, ApplicationInsightsTelemetryClient>()
             .AddScoped<IBusSenderService, BusSenderService>()
-            .AddScoped<IBusEventService,BusEventService>();
+            .AddScoped<IBusEventService,BusEventService>()
+            .AddScoped<IDapperRepository,DapperRepository>();
 }
