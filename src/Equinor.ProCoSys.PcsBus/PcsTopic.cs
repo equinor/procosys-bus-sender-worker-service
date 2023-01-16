@@ -38,5 +38,6 @@ public enum PcsTopic
     QuerySignature,
     CallOff,
     CommPkgQuery,
-    HeatTrace
+    HeatTrace,
+    CommPriorityField
 }
