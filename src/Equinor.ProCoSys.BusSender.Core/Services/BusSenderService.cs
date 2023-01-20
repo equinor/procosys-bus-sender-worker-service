@@ -256,6 +256,11 @@ public class BusSenderService : IBusSenderService
                     await CreateAndSetMessage(busEvent, _service.CreateSwcrTypeMessage);
                     break;
                 }
+            case SwcrAttachmentTopic.TopicName:
+                {
+                    await CreateAndSetMessage(busEvent, _service.CreateSwcrAttachmentMessage);
+                    break;
+                }
             case ActionTopic.TopicName:
                 {
                     await CreateAndSetMessage(busEvent, _service.CreateActionMessage);

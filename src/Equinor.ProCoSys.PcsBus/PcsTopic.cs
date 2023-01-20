@@ -26,6 +26,7 @@ public enum PcsTopic
     SWCRSignature,
     SWCRType,
     SWCROtherReference,
+    SWCRAttachment,
     PipingRevision,
     WoMaterial,
     WoMilestone,
