@@ -71,6 +71,11 @@ public class BusEventService : IBusEventService
             ? WashString(await _busSenderMessageRepository.GetSwcrTypeMessage(busEventMessage))
             : throw new Exception($"Failed to extract or parse guid SwcrType from message {busEventMessage}");
 
+    public async Task<string> CreateSwcrAttachmentMessage(string busEventMessage) =>
+    Guid.TryParse(busEventMessage, out _)
+        ? WashString(await _busSenderMessageRepository.GetSwcrAttachmentMessage(busEventMessage))
+        : throw new Exception($"Failed to extract or parse guid SwcrAttachment from message {busEventMessage}");
+
     public async Task<string> CreateActionMessage(string busEventMessage) =>
         long.TryParse(busEventMessage, out var actionId)
             ? WashString(await _busSenderMessageRepository.GetActionMessage(actionId))

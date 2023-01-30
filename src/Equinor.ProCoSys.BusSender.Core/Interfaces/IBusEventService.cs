@@ -12,6 +12,7 @@ public interface IBusEventService
     Task<string> CreateTaskMessage(string busEventMessage);
     Task<string> CreateSwcrOtherReferencesMessage(string busEventMessage);
     Task<string> CreateSwcrTypeMessage(string busEventMessage);
+    Task<string> CreateSwcrAttachmentMessage(string busEventMessage);
     Task<string> CreateActionMessage(string busEventMessage);
     Task<string> CreateCommPkgTaskMessage(string busEventMessage);
     Task<string> CreateWorkOrderMessage(string busEventMessage);
