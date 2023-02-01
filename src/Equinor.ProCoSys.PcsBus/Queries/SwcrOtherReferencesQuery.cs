@@ -17,8 +17,8 @@ public class SwcrOtherReferencesQuery
            '"", ""LastUpdated"" : ""' || TO_CHAR(slr.LAST_UPDATED, 'yyyy-mm-dd hh24:mi:ss') ||
            '""}}' as message
             FROM SWCRLIBRARYREFERENCE slr
-            INNER JOIN SWCR s ON s.SWCR_ID=slr.SWCR_ID
-            INNER JOIN LIBRARY l ON slr.LIBRARY_ID=l.LIBRARY_ID
+                INNER JOIN SWCR s ON s.SWCR_ID = slr.SWCR_ID
+                INNER JOIN LIBRARY l ON slr.LIBRARY_ID = l.LIBRARY_ID
             {whereClause}";
     }
 }
