@@ -98,7 +98,7 @@ public class BusEventService : IBusEventService
     public async Task<string> CreateLibraryFieldMessage(string busEventMessage) =>
         Guid.TryParse(busEventMessage, out _)
             ? WashString(await _busSenderMessageRepository.GetLibraryFieldMessage(busEventMessage))
-            : throw new Exception($"Failed to extract or parse guid CommPriority from message {busEventMessage}");
+            : throw new Exception($"Failed to extract or parse guid for LibraryField from message {busEventMessage}");
 
     public async Task<string> CreatePipingRevisionMessage(string busEventMessage)
         => long.TryParse(busEventMessage, out var pipingRevisionId)

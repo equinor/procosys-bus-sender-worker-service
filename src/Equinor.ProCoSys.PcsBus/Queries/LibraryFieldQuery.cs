@@ -16,8 +16,8 @@ public class LibraryFieldQuery
             ""ColumnType"" : ""' || regexp_replace(field.columntype, '([""\])', '\\\1') || '"",
             ""StringValue"" : ""' || regexp_replace(lf.valuestring, '([""\])', '\\\1') || '"",
             ""DateValue"" : ""' || TO_CHAR(lf.valuedate, 'yyyy-mm-dd hh24:mi:ss')  || '"",
-            ""NumberValue"" : ""' || lf.valuenumber  || 
-            ""LibraryValueGuid"" : ""' || lv.procosys_guid  || 
+            ""NumberValue"" : ""' || lf.valuenumber  || '"",
+            ""LibraryValueGuid"" : ""' || lv.procosys_guid  || '"",
             ""LastUpdated"" : ""' || TO_CHAR(lf.LAST_UPDATED, 'yyyy-mm-dd hh24:mi:ss')  || '""
             }}'
         from libraryfield lf
