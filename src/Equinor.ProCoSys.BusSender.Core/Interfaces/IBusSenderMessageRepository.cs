@@ -10,9 +10,9 @@ public interface IBusSenderMessageRepository
     Task<string> GetCommPkgQueryMessage(long commPkgId, long documentId);
     Task<string> GetDocumentMessage(long documentId);
     Task<string> GetTaskMessage(long taskId);
-    Task<string> GetSwcrOtherReferencesMessage(string? guid);
-    Task<string> GetSwcrTypeMessage(string? guid);
-    Task<string> GetSwcrAttachmentMessage(string? guid);
+    Task<string> GetSwcrOtherReferencesMessage(string guid);
+    Task<string> GetSwcrTypeMessage(string guid);
+    Task<string> GetSwcrAttachmentMessage(string guid);
     Task<string> GetActionMessage(long actionId);
     Task<string> GetCommPkgTaskMessage(long commPkgId, long taskId);
     Task<string> GetLoopContentMessage(long loopContentId);
@@ -31,5 +31,5 @@ public interface IBusSenderMessageRepository
     Task<string> GetMilestoneMessage(long elementId, long milestoneId);
     Task<string> GetHeatTraceMessage(long id);
     Task<string> GetCommPkgOperationMessage(long commPkgId);
-    Task<string> GetLibraryFieldMessage(string? guid);
+    Task<string> GetLibraryFieldMessage(string guid);
 }
