@@ -31,5 +31,5 @@ public interface IBusSenderMessageRepository
     Task<string> GetMilestoneMessage(long elementId, long milestoneId);
     Task<string> GetHeatTraceMessage(long id);
     Task<string> GetCommPkgOperationMessage(long commPkgId);
-    Task<string> GetCommPkgPriorityMessage(string? guid);
+    Task<string> GetLibraryFieldMessage(string? guid);
 }

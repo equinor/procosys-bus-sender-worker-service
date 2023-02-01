@@ -33,5 +33,5 @@ public interface IBusEventService
     Task<string> CreateHeatTraceMessage(string busEventMessage);
     Task<string> CreateCommPkgOperationMessage(string busEventMessage);
 
-    Task<string> CreateCommPkgPriorityMessage(string busEventMessage);
+    Task<string> CreateLibraryFieldMessage(string busEventMessage);
 }
