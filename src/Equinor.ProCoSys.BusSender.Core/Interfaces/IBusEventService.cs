@@ -12,6 +12,7 @@ public interface IBusEventService
     Task<string> CreateTaskMessage(string busEventMessage);
     Task<string> CreateSwcrOtherReferencesMessage(string busEventMessage);
     Task<string> CreateSwcrTypeMessage(string busEventMessage);
+    Task<string> CreateSwcrAttachmentMessage(string busEventMessage);
     Task<string> CreateActionMessage(string busEventMessage);
     Task<string> CreateCommPkgTaskMessage(string busEventMessage);
     Task<string> CreateWorkOrderMessage(string busEventMessage);
@@ -32,5 +33,5 @@ public interface IBusEventService
     Task<string> CreateHeatTraceMessage(string busEventMessage);
     Task<string> CreateCommPkgOperationMessage(string busEventMessage);
 
-    Task<string> CreateCommPkgPriorityMessage(string busEventMessage);
+    Task<string> CreateLibraryFieldMessage(string busEventMessage);
 }

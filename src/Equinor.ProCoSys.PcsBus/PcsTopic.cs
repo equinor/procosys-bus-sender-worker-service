@@ -26,6 +26,7 @@ public enum PcsTopic
     SWCRSignature,
     SWCRType,
     SWCROtherReference,
+    SWCRAttachment,
     PipingRevision,
     WoMaterial,
     WoMilestone,
@@ -39,5 +40,8 @@ public enum PcsTopic
     CallOff,
     CommPkgQuery,
     HeatTrace,
-    CommPriorityField
+    LibraryField,
+    SwcrAttachment,
+    SwcrType,
+    SwcrOtherReferences
 }

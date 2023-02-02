@@ -42,6 +42,9 @@ public class BusSenderMessageRepository : IBusSenderMessageRepository
     public async Task<string> GetSwcrTypeMessage(string guid) =>
     await ExecuteQuery(SwcrTypeQuery.GetQuery(guid), guid);
 
+    public async Task<string> GetSwcrAttachmentMessage(string guid) =>
+    await ExecuteQuery(SwcrAttachmentQuery.GetQuery(guid), guid);
+
     public async Task<string> GetActionMessage(long actionId) =>
     await ExecuteQuery(ActionQuery.GetQuery(actionId), actionId.ToString());
 
@@ -51,8 +54,8 @@ public class BusSenderMessageRepository : IBusSenderMessageRepository
     public async Task<string> GetMilestoneMessage(long elementId,long milestoneId) =>
         await ExecuteQuery(MilestonesQuery.GetQuery(elementId, milestoneId),elementId+","+milestoneId);
 
-    public async Task<string> GetCommPkgPriorityMessage(string guid) =>
-        await ExecuteQuery(CommPkgPriorityQuery.GetQuery(guid), guid);
+    public async Task<string> GetLibraryFieldMessage(string guid) =>
+        await ExecuteQuery(LibraryFieldQuery.GetQuery(guid), guid);
 
     public async Task<string> GetLoopContentMessage(long loopContentId) => 
         await ExecuteQuery(LoopContentQuery.GetQuery(loopContentId),loopContentId.ToString());

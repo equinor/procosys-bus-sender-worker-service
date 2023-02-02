@@ -256,6 +256,11 @@ public class BusSenderService : IBusSenderService
                     await CreateAndSetMessage(busEvent, _service.CreateSwcrTypeMessage);
                     break;
                 }
+            case SwcrAttachmentTopic.TopicName:
+                {
+                    await CreateAndSetMessage(busEvent, _service.CreateSwcrAttachmentMessage);
+                    break;
+                }
             case ActionTopic.TopicName:
                 {
                     await CreateAndSetMessage(busEvent, _service.CreateActionMessage);
@@ -311,9 +316,9 @@ public class BusSenderService : IBusSenderService
                     await CreateAndSetMessage(busEvent, _service.CreateLoopContentMessage);
                     break;
                 }
-            case CommPriorityTopic.TopicName:
+            case LibraryFieldTopic.TopicName:
                 {
-                    await CreateAndSetMessage(busEvent, _service.CreateCommPkgPriorityMessage);
+                    await CreateAndSetMessage(busEvent, _service.CreateLibraryFieldMessage);
                     break;
                 }
             case StockTopic.TopicName:

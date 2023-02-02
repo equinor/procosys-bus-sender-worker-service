@@ -230,19 +230,19 @@ public class BusSenderServiceTests
     {
         //Arrange
         var guid = "E9414BA9930E5FF6E0532510000AA1AB";
-        var commPri = new BusEvent { Event = CommPriorityTopic.TopicName, Message = guid, Status = Status.UnProcessed };
+        var commPri = new BusEvent { Event = LibraryFieldTopic.TopicName, Message = guid, Status = Status.UnProcessed };
   
         const string jsonMessage =
             "{\"Plant\" : \"AnyValidPlant\", \"ProjectName\" : \"AnyProjectName\", \"WoNo\" : \"SomeWoNo\"}";
 
         _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk())
             .Returns(() => Task.FromResult(new List<BusEvent> { commPri }));
-        _busSenderMessageRepositoryMock.Setup(wcl => wcl.GetCommPkgPriorityMessage(guid))
+        _busSenderMessageRepositoryMock.Setup(wcl => wcl.GetLibraryFieldMessage(guid))
             .Returns(() => Task.FromResult(jsonMessage));
      
 
         var topicClientMock = new Mock<ServiceBusSender>();
-        _busSender.Add(CommPriorityTopic.TopicName, topicClientMock.Object);
+        _busSender.Add(LibraryFieldTopic.TopicName, topicClientMock.Object);
         var batch = ServiceBusModelFactory.ServiceBusMessageBatch(1000, new List<ServiceBusMessage>());
         topicClientMock.Setup(t => t.CreateMessageBatchAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(() => batch);
