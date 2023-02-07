@@ -11,7 +11,7 @@ public class LibraryFieldQuery
             ""ProCoSysGuid"" : ""' || lf.procosys_guid || '"",
             ""LibraryGuid"" : ""' || l.procosys_guid || '"",
             ""LibraryType"" : ""' ||  regexp_replace(l.librarytype, '([""\])', '\\\1') || '"",
-            ""Code"" : ""' || l.code || '"",
+            ""Code"" : ""' || regexp_replace(l.code, '([""\])', '\\\1') || || '"",
             ""ColumnName"" : ""' || regexp_replace(field.columnname, '([""\])', '\\\1') || '"",
             ""ColumnType"" : ""' || regexp_replace(field.columntype, '([""\])', '\\\1') || '"",
             ""StringValue"" : ""' || regexp_replace(lf.valuestring, '([""\])', '\\\1') || '"",
