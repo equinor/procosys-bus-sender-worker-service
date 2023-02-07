@@ -41,7 +41,4 @@ public enum PcsTopic
     CommPkgQuery,
     HeatTrace,
     LibraryField,
-    SwcrAttachment,
-    SwcrType,
-    SwcrOtherReferences
 }
