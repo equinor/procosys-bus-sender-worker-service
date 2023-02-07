@@ -24,7 +24,7 @@ public class ActionQuery
            '"", ""CommPkgGuid"" : ""' || c.Procosys_guid ||
            '"", ""SwcrNo"" : ""' || s.SwcrNo ||
            '"", ""SwcrGuid"" : ""' || s.Procosys_guid ||
-           '"", ""DocumentNo"" : ""' || d.DocumentNo ||
+           '"", ""DocumentNo"" : ""' || regexp_replace(d.DocumentNo, '([""\])', '\\\1') ||
            '"", ""DocumentGuid"" : ""' || d.Procosys_guid ||
            '"", ""LastUpdated"" : ""' || TO_CHAR(ec.Last_Updated, 'yyyy-mm-dd hh24:mi:ss') ||
            '"", ""SignedAt"" : ""' || TO_CHAR(es.SignedAt, 'yyyy-mm-dd hh24:mi:ss') ||
