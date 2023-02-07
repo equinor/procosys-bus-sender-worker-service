@@ -12,7 +12,7 @@ public class QuerySignatureQuery
             ||'"", ""ProCoSysGuid"" : ""' || q.procosys_guid
             ||'"", ""PlantName"" : ""' || regexp_replace(ps.TITLE, '([""\])', '\\\1')
             ||'"", ""ProjectName"" : ""' || p.NAME
-            ||'"", ""Status"" : ""' || status.code
+            ||'"", ""Status"" : ""' || regexp_replace(status.code, '([""\])', '\\\1')
             ||'"", ""LibraryStatusGuid"" : ""' || status.procosys_guid
             ||'"", ""QuerySignatureId"": ""'|| q.id
             ||'"", ""QueryId"": ""'|| do.document_id

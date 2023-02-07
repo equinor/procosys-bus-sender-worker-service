@@ -17,19 +17,19 @@ public class ChecklistQuery
             '"", ""TagRegisterId"" : ""' ||  t.register_id ||
             '"", ""ChecklistId"" : ""' || tc.tagcheck_id ||
             '"", ""ChecklistGuid"" : ""' || tc.procosys_guid ||
-            '"", ""TagCategory"" : ""' || reg.code ||
+            '"", ""TagCategory"" : ""' || regexp_replace(reg.code, '([""\])', '\\\1') ||
             '"", ""SheetNo"" : ""' || tft.sheetno ||
             '"", ""SubSheetNo"" : ""' || tft.subsheetno ||
             '"", ""FormularType"" : ""' || ft.formulartype ||
             '"", ""FormularGroup"" : ""' || ft.formulargroup ||
-            '"", ""FormPhase"" : ""' || phase.code ||
+            '"", ""FormPhase"" : ""' || regexp_replace(phase.code, '([""\])', '\\\1') ||
             '"", ""SystemModule"" : ""' || fg.systemmodule ||
-            '"", ""FormularDiscipline"" : ""' || mccr_disc.code ||
+            '"", ""FormularDiscipline"" : ""' || regexp_replace(mccr_disc.code, '([""\])', '\\\1') ||
             '"", ""Revision"" : ""' || pir.testrevisionno ||
             '"", ""PipingRevisionMcPkNo"" : ""' || prm.mcpkgno ||
             '"", ""PipingRevisionMcPkGuid"" : ""' || prm.procosys_guid ||
             '"", ""Responsible"" : ""' || r.code ||
-            '"", ""Status"" : ""' || status.code ||
+            '"", ""Status"" : ""' || regexp_replace(status.code, '([""\])', '\\\1') ||
             '"", ""UpdatedAt"" : ""' || TO_CHAR(tc.updatedat, 'yyyy-mm-dd hh24:mi:ss') ||
             '"", ""LastUpdated"" : ""' || TO_CHAR(tc.updatedat, 'yyyy-mm-dd hh24:mi:ss') ||
             '"", ""CreatedAt"" : ""' || TO_CHAR(tc.createdat, 'yyyy-mm-dd hh24:mi:ss') ||
