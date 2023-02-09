@@ -54,6 +54,9 @@ public class BusSenderMessageRepository : IBusSenderMessageRepository
     public async Task<string> GetMilestoneMessage(long elementId,long milestoneId) =>
         await ExecuteQuery(MilestonesQuery.GetQuery(elementId, milestoneId),elementId+","+milestoneId);
 
+    public async Task<string> GetMilestoneMessage(string guid) =>
+        await ExecuteQuery(MilestonesQuery.GetQuery(guid), guid);
+
     public async Task<string> GetLibraryFieldMessage(string guid) =>
         await ExecuteQuery(LibraryFieldQuery.GetQuery(guid), guid);
 
