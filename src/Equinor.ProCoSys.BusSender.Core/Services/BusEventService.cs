@@ -86,18 +86,18 @@ public class BusEventService : IBusEventService
             ? WashString(await _busSenderMessageRepository.GetCommPkgTaskMessage(commPkgId,taskId))
             : throw new Exception("Failed to extract commPkgId/taskId from message");
 
-    public async Task<string> CreateMilestoneMessage(string message)
+    public async Task<string> CreateMilestoneMessage(string busEventMessage)
     {
         /***
          * Keeping both ways to avoid downtime and errors in transition. Will remove id version when changing to ORM
          */
 
-        if (Guid.TryParse(message, out _))
+        if (Guid.TryParse(busEventMessage, out _))
         {
-            return WashString(await _busSenderMessageRepository.GetMilestoneMessage(message));
+            return WashString(await _busSenderMessageRepository.GetMilestoneMessage(busEventMessage));
         }
 
-        if (CanGetTwoIdsFromMessage(message!.Split(","), out var elementId, out var milestoneId))
+        if (CanGetTwoIdsFromMessage(busEventMessage!.Split(","), out var elementId, out var milestoneId))
         {
             return WashString(await _busSenderMessageRepository.GetMilestoneMessage(elementId, milestoneId));
         }
