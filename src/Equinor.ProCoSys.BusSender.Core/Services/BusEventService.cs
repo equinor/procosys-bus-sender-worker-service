@@ -66,6 +66,21 @@ public class BusEventService : IBusEventService
             ? WashString(await _busSenderMessageRepository.GetTaskMessage(taskId))
             : throw new Exception("Failed to extract taskId from message");
 
+    public async Task<string> CreateSwcrOtherReferencesMessage(string busEventMessage) =>
+        Guid.TryParse(busEventMessage, out _)
+            ? WashString(await _busSenderMessageRepository.GetSwcrOtherReferencesMessage(busEventMessage))
+            : throw new Exception($"Failed to extract or parse guid SwcrOtherReferences from message {busEventMessage}");
+
+    public async Task<string> CreateSwcrTypeMessage(string busEventMessage) =>
+        Guid.TryParse(busEventMessage, out _)
+            ? WashString(await _busSenderMessageRepository.GetSwcrTypeMessage(busEventMessage))
+            : throw new Exception($"Failed to extract or parse guid SwcrType from message {busEventMessage}");
+
+    public async Task<string> CreateSwcrAttachmentMessage(string busEventMessage) =>
+    Guid.TryParse(busEventMessage, out _)
+        ? WashString(await _busSenderMessageRepository.GetSwcrAttachmentMessage(busEventMessage))
+        : throw new Exception($"Failed to extract or parse guid SwcrAttachment from message {busEventMessage}");
+
     public async Task<string> CreateActionMessage(string busEventMessage) =>
         long.TryParse(busEventMessage, out var actionId)
             ? WashString(await _busSenderMessageRepository.GetActionMessage(actionId))
@@ -83,9 +98,9 @@ public class BusEventService : IBusEventService
             Converters = { new DateOnlyJsonConverter() }
         };
 
-        return CanGetTwoIdsFromMessage(message.Split(","), out var elementId, out var milestoneId)
+        return Guid.TryParse(message, out _)
             ? JsonSerializer.Serialize(await _dapperRepository.Query<MilestoneEvent>(
-                MilestonesQuery.GetQuery(elementId, milestoneId), $"{elementId},{milestoneId}"),jsonSerializerOptions)
+                MilestonesQuery.GetQuery(message), $"{message}"),jsonSerializerOptions)
             : throw new Exception("Failed to extract element or milestone Id from message");
     }
 
@@ -94,10 +109,10 @@ public class BusEventService : IBusEventService
             ? WashString(await _busSenderMessageRepository.GetLoopContentMessage(loopContentId))
             : throw new Exception("Failed to extract LoopContent from message");
 
-    public async Task<string> CreateCommPkgPriorityMessage(string busEventMessage) =>
+    public async Task<string> CreateLibraryFieldMessage(string busEventMessage) =>
         Guid.TryParse(busEventMessage, out _)
-            ? WashString(await _busSenderMessageRepository.GetCommPkgPriorityMessage(busEventMessage))
-            : throw new Exception($"Failed to extract or parse guid CommPriority from message {busEventMessage}");
+            ? WashString(await _busSenderMessageRepository.GetLibraryFieldMessage(busEventMessage))
+            : throw new Exception($"Failed to extract or parse guid for LibraryField from message {busEventMessage}");
 
     public async Task<string> CreatePipingRevisionMessage(string busEventMessage)
         => long.TryParse(busEventMessage, out var pipingRevisionId)

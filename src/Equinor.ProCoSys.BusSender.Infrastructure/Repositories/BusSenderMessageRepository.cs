@@ -42,6 +42,14 @@ public class BusSenderMessageRepository : IBusSenderMessageRepository
 
     public async Task<string> GetTaskMessage(long taskId) =>
         await ExecuteQuery(TaskQuery.GetQuery(taskId), taskId.ToString());
+    public async Task<string> GetSwcrOtherReferencesMessage(string guid) =>
+    await ExecuteQuery(SwcrOtherReferencesQuery.GetQuery(guid), guid);
+
+    public async Task<string> GetSwcrTypeMessage(string guid) =>
+    await ExecuteQuery(SwcrTypeQuery.GetQuery(guid), guid);
+
+    public async Task<string> GetSwcrAttachmentMessage(string guid) =>
+    await ExecuteQuery(SwcrAttachmentQuery.GetQuery(guid), guid);
 
     public async Task<string> GetActionMessage(long actionId) =>
     await ExecuteQuery(ActionQuery.GetQuery(actionId), actionId.ToString());
@@ -49,8 +57,12 @@ public class BusSenderMessageRepository : IBusSenderMessageRepository
     public async Task<string> GetCommPkgTaskMessage(long commPkgId, long taskId) =>
         await ExecuteQuery(CommPkgTaskQuery.GetQuery(commPkgId, taskId), commPkgId + "," + taskId);
 
-    public async Task<string> GetCommPkgPriorityMessage(string guid) =>
-        await ExecuteQuery(CommPkgPriorityQuery.GetQuery(guid), guid);
+
+    public async Task<string> GetMilestoneMessage(string guid) =>
+        await ExecuteQuery(MilestonesQuery.GetQuery(guid), guid);
+
+    public async Task<string> GetLibraryFieldMessage(string guid) =>
+        await ExecuteQuery(LibraryFieldQuery.GetQuery(guid), guid);
 
     public async Task<string> GetLoopContentMessage(long loopContentId) => 
         await ExecuteQuery(LoopContentQuery.GetQuery(loopContentId),loopContentId.ToString());

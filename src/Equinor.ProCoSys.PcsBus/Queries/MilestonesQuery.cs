@@ -1,13 +1,11 @@
-﻿using System;
-
-namespace Equinor.ProCoSys.PcsServiceBus.Queries;
+﻿namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 
 public class MilestonesQuery
 {
-    public static string GetQuery(long? elementId,long? milestoneId, string? plant = null)
+    public static string GetQuery(string? guid, string? plant = null)
     {
         DetectFaultyPlantInput(plant);
-        var whereClause = CreateWhereClause(milestoneId, elementId, plant);
+        var whereClause = CreateWhereClauseForGuid(guid, plant, "e", "procosys_guid");
 
         return @$"SELECT e.projectschema AS Plant,
             HEXTORAW(e.procosys_guid) AS ProCoSysGuid,
@@ -34,28 +32,5 @@ public class MilestonesQuery
             left join project p on p.project_id = COALESCE(c.project_id,m.project_id)
             left join V$Certificate cert on cert.certificate_id = e.certificate_id
         {whereClause}";
-    }
-
-    private static string CreateWhereClause(long? milestoneId, long? element, string? plant)
-    {
-        var whereClause = "";
-        if (milestoneId != null && element != null && plant != null)
-        {
-            whereClause = $"where e.projectschema = '{plant}' and e.element_id = {element} and e.milestone_id = {milestoneId}";
-        }
-        else if (plant != null)
-        {
-            whereClause = $"where e.projectschema = '{plant}'";
-        }
-        else if (milestoneId != null && element != null)
-        {
-            whereClause = $"where e.element_id = {element} and e.milestone_id = {milestoneId}";
-        }
-        else if (milestoneId != null ^ element != null)
-        {
-            throw new Exception("Message can not contain partial id match, need both milestone and element id to find correct db entry");
-        }
-
-        return whereClause;
     }
 }

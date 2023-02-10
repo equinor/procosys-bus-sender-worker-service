@@ -12,6 +12,8 @@ public class QuerySignatureQuery
             ||'"", ""ProCoSysGuid"" : ""' || q.procosys_guid
             ||'"", ""PlantName"" : ""' || regexp_replace(ps.TITLE, '([""\])', '\\\1')
             ||'"", ""ProjectName"" : ""' || p.NAME
+            ||'"", ""Status"" : ""' || regexp_replace(status.code, '([""\])', '\\\1')
+            ||'"", ""LibraryStatusGuid"" : ""' || status.procosys_guid
             ||'"", ""QuerySignatureId"": ""'|| q.id
             ||'"", ""QueryId"": ""'|| do.document_id
             ||'"", ""QueryGuid"": ""'|| do.procosys_guid
@@ -33,6 +35,7 @@ public class QuerySignatureQuery
             join library sr ON sr.library_id = q.signaturerole_id
             left join person p ON p.person_id = q.signedby_id
             left join library fr On fr.library_id = q.functionalrole_id
+            left join library status on status.library_id = q.status_id
         {whereClause}";
 
     }

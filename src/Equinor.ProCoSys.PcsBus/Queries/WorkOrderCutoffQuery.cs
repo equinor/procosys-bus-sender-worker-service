@@ -5,7 +5,7 @@ public class WorkOrderCutoffQuery
     /// <summary>
     /// Call with either workOrderId and cutoffWeek, plantId  or all 3. Not advised to call without either as result set could get very large
     /// </summary>
-    public static string GetQuery(long? woId, string cutoffWeek, string plant = null, string month = null)
+    public static string GetQuery(long? woId, string? cutoffWeek, string? plant = null, string? month = null)
     {
         DetectFaultyPlantInput(plant);
 
@@ -22,6 +22,7 @@ public class WorkOrderCutoffQuery
 
         return @$"select
             '{{""Plant"" : ""' || wc.projectschema ||
+            '"", ""ProCoSysGuid"" : ""' || wc.procosys_guid ||
             '"", ""PlantName"" : ""' || regexp_replace(ps.TITLE, '([""\])', '\\\1') ||
             '"", ""WoGuid"" : ""' || wo.procosys_guid ||
             '"", ""ProjectName"" : ""' || p.NAME ||

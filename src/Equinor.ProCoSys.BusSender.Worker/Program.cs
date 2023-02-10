@@ -41,6 +41,7 @@ public class Program
                     config.AddAzureAppConfiguration(options =>
                     {
                         var connectionString = settings["ConnectionStrings:AppConfig"];
+                        
                         options.Connect(connectionString)
                             .ConfigureKeyVault(kv =>
                             {
@@ -60,7 +61,6 @@ public class Program
                 {
                     config.AddAzureAppConfiguration(options =>
                     {
-
                         options.Connect(settings["AppConfig"])
                             .ConfigureKeyVault(kv =>
                             {
