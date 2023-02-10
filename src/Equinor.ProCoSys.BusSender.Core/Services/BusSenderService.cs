@@ -276,6 +276,16 @@ public class BusSenderService : IBusSenderService
                     await CreateAndSetMessage(busEvent, _service.CreateMilestoneMessage);
                     break;
                 }
+            case "mcpkgmilestone":
+                {
+                    await CreateAndSetMessage(busEvent, _service.CreateMilestoneMessage);
+                    break;
+                }
+            case "commpkgmilestone":
+                {
+                    await CreateAndSetMessage(busEvent, _service.CreateMilestoneMessage);
+                    break;
+                }
             case WorkOrderTopic.TopicName:
                 {
                     await CreateAndSetMessage(busEvent, _service.CreateWorkOrderMessage);
