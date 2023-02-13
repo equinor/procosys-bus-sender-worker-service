@@ -4,12 +4,23 @@ namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 
 public class MilestonesQuery
 {
-    public static string GetQuery(long? elementId,long? milestoneId, string plant = null)
+
+    public static string GetQuery(long? elementId, long? milestoneId, string plant = null)
     {
         DetectFaultyPlantInput(plant);
-        var whereClause = CreateWhereClause(milestoneId, elementId, plant);
+        var whereClause = CreateWhereClause(milestoneId,elementId, plant);
+        return GetQuery(whereClause);
+    }
 
-        return @$"select
+    public static string GetQuery(string guid, string plant = null)
+    {
+        DetectFaultyPlantInput(plant);
+        var whereClause = CreateWhereClauseForGuid(guid, plant, "e", "procosys_guid");
+        return GetQuery(whereClause);
+    }
+
+    private static string GetQuery(string whereClause) =>
+        @$"select
             '{{""Plant"" : ""' || e.projectschema ||
             '"", ""ProCoSysGuid"" : ""' || e.procosys_guid ||
             '"", ""PlantName"" : ""' || regexp_replace(ps.TITLE, '([""\])', '\\\1') ||
@@ -36,7 +47,6 @@ public class MilestonesQuery
             left join project p on p.project_id = COALESCE(c.project_id,m.project_id)
             left join V$Certificate cert on cert.certificate_id = e.certificate_id
         {whereClause}";
-    }
 
     private static string CreateWhereClause(long? milestoneId, long? element, string plant)
     {
