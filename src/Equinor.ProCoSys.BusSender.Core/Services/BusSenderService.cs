@@ -88,6 +88,7 @@ public class BusSenderService : IBusSenderService
         _logger.LogInformation("Update loop finished at at {sw} ms", dsw.ElapsedMilliseconds);
         await _unitOfWork.SaveChangesAsync();
         
+        
         /***
          * Group by topic and then create a queue of messages per topic
          */

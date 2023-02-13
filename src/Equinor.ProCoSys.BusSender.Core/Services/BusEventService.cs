@@ -99,7 +99,7 @@ public class BusEventService : IBusEventService
         };
 
         return Guid.TryParse(message, out _)
-            ? JsonSerializer.Serialize(await _dapperRepository.Query<MilestoneEvent>(
+            ? JsonSerializer.Serialize(await _dapperRepository.Query<McPkgMilestoneEvent>(
                 MilestonesQuery.GetQuery(message), $"{message}"),jsonSerializerOptions)
             : throw new Exception("Failed to extract element or milestone Id from message");
     }

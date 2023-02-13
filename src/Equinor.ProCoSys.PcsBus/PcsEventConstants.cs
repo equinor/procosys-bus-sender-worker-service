@@ -19,6 +19,11 @@ public static class PcsEventConstants
     public const string MilestoneCreateOrUpdate = "milestoneCreatedOrUpdated";
 
     /// <summary>
+    /// Event that is fired when a milestone is created or updated
+    /// </summary>
+    public const string CommPkgMilestoneCreateOrUpdate = "commpkgMilestoneCreatedOrUpdated";
+
+    /// <summary>
     /// Event that is fired when a new action is created or updated
     /// </summary>
     public const string ActionCreateOrUpdate = "actionCreatedOrUpdated";
