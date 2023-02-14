@@ -104,20 +104,32 @@ public class BusSenderMessageRepository : IBusSenderMessageRepository
 
     private async Task<string> ExecuteQuery(string queryString, string objectId)
     {
-        await using var command = _context.Database.GetDbConnection().CreateCommand();
+        var dbConnection = _context.Database.GetDbConnection();
+        await using var command = dbConnection.CreateCommand();
         command.CommandText = queryString;
-        if( _context.Database.GetDbConnection().State != ConnectionState.Open)
+        var shouldCloseConnection = false;
+
+        if (dbConnection.State != ConnectionState.Open)
         {
             await _context.Database.OpenConnectionAsync();
+            shouldCloseConnection = true;
         }
-
-        var result = (string)await command.ExecuteScalarAsync();
+       
+        var result = (string) await command.ExecuteScalarAsync();
 
         if (result is null)
         {
             _logger.LogError("Object/Entity with id {objectId} did not return anything", objectId);
             return null;
         }
+
+
+        //If we open it, we have to close it.
+        if (shouldCloseConnection)
+        {
+            await _context.Database.CloseConnectionAsync();
+        }
+
         return result;
     }
 }
