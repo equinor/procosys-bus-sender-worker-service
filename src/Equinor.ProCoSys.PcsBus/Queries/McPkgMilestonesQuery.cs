@@ -1,6 +1,6 @@
 ﻿namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 
-public class MilestonesQuery
+public class McPkgMilestonesQuery
 {
     public static string GetQuery(string? guid, string? plant = null)
     {
@@ -11,9 +11,7 @@ public class MilestonesQuery
             HEXTORAW(e.procosys_guid) AS ProCoSysGuid,
             ps.TITLE AS PlantName,
             p.name AS ProjectName,
-            HEXTORAW(c.procosys_guid) AS CommPkgGuid,
             HEXTORAW(m.procosys_guid) AS McPkgGuid,
-            c.commpkgno AS CommPkgNo,
             m.mcpkgno AS McPkgNo,
             milestone.code AS Code,
             e.actualdate AS ActualDate,

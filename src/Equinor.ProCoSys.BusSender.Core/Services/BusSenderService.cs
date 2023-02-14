@@ -9,6 +9,7 @@ using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 using Equinor.ProCoSys.BusSenderWorker.Core.Mappers;
 using Equinor.ProCoSys.BusSenderWorker.Core.Models;
 using Equinor.ProCoSys.BusSenderWorker.Core.Telemetry;
+using Equinor.ProCoSys.PcsServiceBus;
 using Equinor.ProCoSys.PcsServiceBus.Sender.Interfaces;
 using Equinor.ProCoSys.PcsServiceBus.Topics;
 using Microsoft.Extensions.Logging;
@@ -271,19 +272,14 @@ public class BusSenderService : IBusSenderService
                     await CreateAndSetMessage(busEvent, _service.CreateCommPkgTaskMessage);
                     break;
                 }
-            case "milestone":
+            case PcsTopicConstants.McPkgMilestone:
                 {
-                    await CreateAndSetMessage(busEvent, _service.CreateMilestoneMessage);
+                    await CreateAndSetMessage(busEvent, _service.CreateMcPkgMilestoneMessage);
                     break;
                 }
-            case "mcpkgmilestone":
+            case PcsTopicConstants.CommPkgMilestone:
                 {
-                    await CreateAndSetMessage(busEvent, _service.CreateMilestoneMessage);
-                    break;
-                }
-            case "commpkgmilestone":
-                {
-                    await CreateAndSetMessage(busEvent, _service.CreateMilestoneMessage);
+                    await CreateAndSetMessage(busEvent, _service.CreateCommPkgMilestoneMessage);
                     break;
                 }
             case WorkOrderTopic.TopicName:

@@ -91,17 +91,27 @@ public class BusEventService : IBusEventService
             ? WashString(await _busSenderMessageRepository.GetCommPkgTaskMessage(commPkgId,taskId))
             : throw new Exception("Failed to extract commPkgId/taskId from message");
 
-    public async Task<string> CreateMilestoneMessage(string message)
+    public async Task<string> CreateMcPkgMilestoneMessage(string message)
     {
-        var jsonSerializerOptions = new JsonSerializerOptions
+        if (!Guid.TryParse(message, out _))
         {
-            Converters = { new DateOnlyJsonConverter() }
-        };
+            throw new Exception($"Failed to extract guid from message {message}");
+        }
 
-        return Guid.TryParse(message, out _)
-            ? JsonSerializer.Serialize(await _dapperRepository.Query<McPkgMilestoneEvent>(
-                MilestonesQuery.GetQuery(message), $"{message}"),jsonSerializerOptions)
-            : throw new Exception("Failed to extract element or milestone Id from message");
+        var queryString = McPkgMilestonesQuery.GetQuery(message);   
+        var mcPkgMilestoneEvents = await _dapperRepository.Query<McPkgMilestoneEvent>(queryString, message);
+        return JsonSerializer.Serialize(mcPkgMilestoneEvents, DefaultSerializerHelper.SerializerOptions);
+    }
+    public async Task<string> CreateCommPkgMilestoneMessage(string message)
+    {
+        if (!Guid.TryParse(message, out _))
+        {
+            throw new Exception($"Failed to extract guid from message {message}");
+        }
+
+        var queryString = CommPkgMilestoneQuery.GetQuery(message);
+        var mcPkgMilestoneEvents = await _dapperRepository.Query<CommPkgMilestoneEvent>(queryString, message);
+        return JsonSerializer.Serialize(mcPkgMilestoneEvents, DefaultSerializerHelper.SerializerOptions);
     }
 
     public async Task<string> CreateLoopContentMessage(string busEventMessage)

@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Equinor.ProCoSys.BusSenderWorker.Core.Models;
-using Equinor.ProCoSys.PcsServiceBus.Topics;
+﻿using System.Threading.Tasks;
 
 namespace Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 
 public interface IBusSenderMessageRepository
 {
     Task<string> GetCallOffMessage(long callOffId);
-    //Task<IEnumerable<ChecklistEvent>> GetCheckListMessage(long checkListId);
     Task<string> GetCommPkgQueryMessage(long commPkgId, long documentId);
     Task<string> GetDocumentMessage(long documentId);
     Task<string> GetTaskMessage(long taskId);
@@ -29,10 +23,8 @@ public interface IBusSenderMessageRepository
     Task<string> GetSwcrSignatureMessage(long swcrSignatureId);
     Task<string> GetWorkOrderChecklistMessage(long tagCheckId, long workOrderId);
     Task<string> GetWorkOrderMaterialMessage(long workOrderId);
-    Task<string> GetWorkOrderMessage(long workOrderId);
     Task<string> GetWorkOrderMilestoneMessage(long woId, long milestoneId);
     Task<string> GetWorkOrderCutOffMessage(long workOrderId, string cutoffWeek);
-    //Task<string> GetMilestoneMessage(long elementId, long milestoneId);
     Task<string> GetHeatTraceMessage(long id);
     Task<string> GetCommPkgOperationMessage(long commPkgId);
     Task<string> GetLibraryFieldMessage(string guid);

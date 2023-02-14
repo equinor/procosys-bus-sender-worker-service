@@ -29,9 +29,10 @@ public interface IBusEventService
     Task<string> CreateLoopContentMessage(string busEventMessage);
     Task<string> CreateCommPkgQueryMessage(string busEventMessage);
     Task<string> CreateWorkOrderCutOffMessage(string message);
-    Task<string> CreateMilestoneMessage(string message);
+    Task<string> CreateMcPkgMilestoneMessage(string message);
     Task<string> CreateHeatTraceMessage(string busEventMessage);
     Task<string> CreateCommPkgOperationMessage(string busEventMessage);
 
     Task<string> CreateLibraryFieldMessage(string busEventMessage);
+    Task<string> CreateCommPkgMilestoneMessage(string busEventMessage);
 }

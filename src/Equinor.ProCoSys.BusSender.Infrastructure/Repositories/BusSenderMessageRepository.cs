@@ -1,16 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
+﻿using System.Data;
 using System.Threading.Tasks;
-using Dapper;
 using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
-using Equinor.ProCoSys.BusSenderWorker.Core.Models;
 using Equinor.ProCoSys.BusSenderWorker.Infrastructure.Data;
-using Equinor.ProCoSys.BusSenderWorker.Infrastructure.Handlers;
-using Equinor.ProCoSys.PcsServiceBus.Interfaces;
 using Equinor.ProCoSys.PcsServiceBus.Queries;
-using Equinor.ProCoSys.PcsServiceBus.Topics;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -29,7 +21,6 @@ public class BusSenderMessageRepository : IBusSenderMessageRepository
 
     public async Task<string> GetCallOffMessage(long callOffId) => 
         await ExecuteQuery(CallOffQuery.GetQuery(callOffId), callOffId.ToString());
-
 
     public async Task<string> GetCommPkgQueryMessage(long commPkgId, long documentId) =>
         await ExecuteQuery(QueryCommPkgQuery.GetQuery(commPkgId,documentId), commPkgId+","+documentId);
@@ -56,10 +47,6 @@ public class BusSenderMessageRepository : IBusSenderMessageRepository
 
     public async Task<string> GetCommPkgTaskMessage(long commPkgId, long taskId) =>
         await ExecuteQuery(CommPkgTaskQuery.GetQuery(commPkgId, taskId), commPkgId + "," + taskId);
-
-
-    public async Task<string> GetMilestoneMessage(string guid) =>
-        await ExecuteQuery(MilestonesQuery.GetQuery(guid), guid);
 
     public async Task<string> GetLibraryFieldMessage(string guid) =>
         await ExecuteQuery(LibraryFieldQuery.GetQuery(guid), guid);
@@ -97,52 +84,41 @@ public class BusSenderMessageRepository : IBusSenderMessageRepository
     public async Task<string> GetWorkOrderMaterialMessage(long woId) =>
         await ExecuteQuery(WorkOrderMaterialQuery.GetQuery(woId), woId.ToString());
 
-    public async Task<string> GetWorkOrderMessage(long workOrderId) =>
-        await ExecuteQuery(WorkOrderQuery.GetQuery(workOrderId), workOrderId.ToString());
-
     public async Task<string> GetWorkOrderCutOffMessage(long workOrderId, string cutoffWeek) =>
         await ExecuteQuery(WorkOrderCutoffQuery.GetQuery(workOrderId, cutoffWeek ), $"{workOrderId},{cutoffWeek}");
 
     public async Task<string> GetWorkOrderMilestoneMessage(long woId, long milestoneId) =>
         await ExecuteQuery(WorkOrderMilestoneQuery.GetQuery(woId, milestoneId), $"{woId},{milestoneId}");
 
-
-    //private async Task<IEnumerable<ChecklistEvent>> ExecuteQueryForEvent(string queryString, string objectId)
-    //{
-    //    await using var connection = _context.Database.GetDbConnection();
-    //    if (_context.Database.GetDbConnection().State != ConnectionState.Open)
-    //    {
-    //        await _context.Database.OpenConnectionAsync();
-    //    }
-        
-    //    var checklists = connection.Query<ChecklistEvent>(queryString).ToList();
-    //    if (checklists.Count == 0)
-    //    {
-    //        _logger.LogError("Object/Entity with id {objectId} did not return anything", objectId);
-    //        return null;
-    //    }
-    //    return checklists;
-    //}
-
     private async Task<string> ExecuteQuery(string queryString, string objectId)
     {
-        await using var command = _context.Database.GetDbConnection().CreateCommand();
+        var dbConnection = _context.Database.GetDbConnection();
+        await using var command = dbConnection.CreateCommand();
         command.CommandText = queryString;
-        if( _context.Database.GetDbConnection().State != ConnectionState.Open)
+
+        var connectionWasClosed = dbConnection.State != ConnectionState.Open;
+        if (connectionWasClosed)
         {
             await _context.Database.OpenConnectionAsync();
         }
 
-        var result = (string)await command.ExecuteScalarAsync();
-
-        if (result is null)
+        try
         {
-            _logger.LogError("Object/Entity with id {objectId} did not return anything", objectId);
-            return null;
+            var result = (string)await command.ExecuteScalarAsync();
+            if (result is null)
+            {
+                _logger.LogError("Object/Entity with id {objectId} did not return anything", objectId);
+                return null;
+            }
+            return result;
         }
-        return result;
+        finally
+        {
+            //If we open it, we have to close it.
+            if (connectionWasClosed)
+            {
+                await _context.Database.CloseConnectionAsync();
+            }
+        }
     }
-
-
-
 }

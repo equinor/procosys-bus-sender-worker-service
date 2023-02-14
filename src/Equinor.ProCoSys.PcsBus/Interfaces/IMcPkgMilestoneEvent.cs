@@ -11,7 +11,7 @@ public interface IMcPkgMilestoneEvent : IHasEventType
     Guid McPkgGuid { get; }
     string? McPkgNo { get; }
     string Code { get; }
-    DateOnly? ActualDate { get; }
+    DateTime? ActualDate { get; }
     DateOnly? PlannedDate { get; }
     DateOnly? ForecastDate { get; }
     string? Remark { get; }

@@ -16,7 +16,7 @@ public static class PcsTopicConstants
     public const string Library = "library";
     public const string WorkOrder = "workOrder";
     public const string Checklist = "checklist";
-    public const string Milestone = "milestone";
+    public const string McPkgMilestone = "milestone";
     public const string WorkOrderCutoff = "workOrderCutoff";
     public const string Certificate = "certificate";
     public const string WoChecklist = "woChecklist";
@@ -35,4 +35,5 @@ public static class PcsTopicConstants
     public const string CallOff = "callOff";
     public const string CommPkgQuery = "commPkgQuery";
     public const string HeatTrace = "heatTrace";
+    public const string CommPkgMilestone = "commpkgmilestone";
 }

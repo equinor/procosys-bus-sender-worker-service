@@ -14,7 +14,7 @@ public class McPkgMilestoneEvent : IMcPkgMilestoneEvent
     public Guid McPkgGuid { get; }
     public string? McPkgNo { get; }
     public string Code { get; }
-    public DateOnly? ActualDate { get; }
+    public DateTime? ActualDate { get; }
     public DateOnly? PlannedDate { get; }
     public DateOnly? ForecastDate { get; }
     public string? Remark { get; }
