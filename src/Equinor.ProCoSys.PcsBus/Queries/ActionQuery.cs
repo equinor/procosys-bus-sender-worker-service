@@ -22,6 +22,10 @@ public class ActionQuery
            '"", ""Description"" : ""' || regexp_replace(ec.Description, '([""\])', '\\\1') ||
            '"", ""CommPkgNo"" : ""' || c.CommPkgNo ||
            '"", ""CommPkgGuid"" : ""' || c.Procosys_guid ||
+           '"", ""SwcrNo"" : ""' || s.SwcrNo ||
+           '"", ""SwcrGuid"" : ""' || s.Procosys_guid ||
+           '"", ""DocumentNo"" : ""' || regexp_replace(d.DocumentNo, '([""\])', '\\\1') ||
+           '"", ""DocumentGuid"" : ""' || d.Procosys_guid ||
            '"", ""LastUpdated"" : ""' || TO_CHAR(ec.Last_Updated, 'yyyy-mm-dd hh24:mi:ss') ||
            '"", ""SignedAt"" : ""' || TO_CHAR(es.SignedAt, 'yyyy-mm-dd hh24:mi:ss') ||
            '"", ""SignedBy"" : ""' || p.Azure_Oid ||
@@ -35,7 +39,9 @@ public class ActionQuery
                 start with element_id=ec.element_id
                 connect by prior parent_id=element_id
                 )
-            INNER JOIN COMMPKG c ON c.COMMPKG_ID=root.ELEMENT_ID  
+            LEFT JOIN COMMPKG c ON c.COMMPKG_ID=root.ELEMENT_ID  
+            LEFT JOIN SWCR s ON s.SWCR_ID=root.ELEMENT_ID 
+            LEFT JOIN DOCUMENT d ON d.DOCUMENT_ID=root.ELEMENT_ID 
             LEFT JOIN elementsignature es ON es.ELEMENT_ID = ec.ELEMENT_ID
             LEFT JOIN PERSON p ON es.SIGNEDBY_ID=p.PERSON_ID                                             
             {whereClause}";
