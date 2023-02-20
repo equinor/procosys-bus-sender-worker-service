@@ -180,10 +180,21 @@ public class BusEventService : IBusEventService
             ? WashString(await _busSenderMessageRepository.GetWorkOrderMilestoneMessage(workOrderId, milestoneId))
             : throw new Exception("Failed to extract WorkOrder or Milestone Id from message");
 
-    public async Task<string> CreateWorkOrderMessage(string busEventMessage) =>
-        long.TryParse(busEventMessage, out var workOrderId)
-            ? WashString(await _busSenderMessageRepository.GetWorkOrderMessage(workOrderId))
-            : throw new Exception("Failed to extract workOrderId from message");
+    public async Task<string> CreateWorkOrderMessage(string message)
+    {
+        if (!long.TryParse(message, out var workOrderId))
+        {
+            throw new Exception($"Failed to extract guid from message {message}");
+        }
+
+        var queryString = WorkOrderQuery.GetQuery(workOrderId);
+        var workOrderEvents = await _dapperRepository.Query<WorkOrderEvent>(queryString, message);
+        return JsonSerializer.Serialize(workOrderEvents, DefaultSerializerHelper.SerializerOptions);
+        //return long.TryParse(busEventMessage, out var workOrderId)
+        //    ? WashString(await _busSenderMessageRepository.GetWorkOrderMessage(workOrderId))
+        //    : throw new Exception("Failed to extract workOrderId from message");
+
+    }
 
     public async Task<string> CreateWorkOrderCutOffMessage(string message)
     {
