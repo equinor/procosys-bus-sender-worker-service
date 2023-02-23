@@ -86,10 +86,25 @@ public class BusEventService : IBusEventService
             ? WashString(await _busSenderMessageRepository.GetCommPkgTaskMessage(commPkgId,taskId))
             : throw new Exception("Failed to extract commPkgId/taskId from message");
 
-    public async Task<string> CreateMilestoneMessage(string message) =>
-        CanGetTwoIdsFromMessage(message.Split(","), out var elementId, out var milestoneId)
-            ? WashString(await _busSenderMessageRepository.GetMilestoneMessage(elementId, milestoneId))
-            : throw new Exception("Failed to extract element or milestone Id from message");
+    public async Task<string> CreateMilestoneMessage(string busEventMessage)
+    {
+        /***
+         * Keeping both ways to avoid downtime and errors in transition. Will remove id version when changing to ORM
+         */
+
+        if (Guid.TryParse(busEventMessage, out _))
+        {
+            return WashString(await _busSenderMessageRepository.GetMilestoneMessage(busEventMessage));
+        }
+
+        if (CanGetTwoIdsFromMessage(busEventMessage!.Split(","), out var elementId, out var milestoneId))
+        {
+            return WashString(await _busSenderMessageRepository.GetMilestoneMessage(elementId, milestoneId));
+        }
+
+        throw new Exception("Failed to extract element or milestone Id from message");
+    }
+
     public async Task<string> CreateLoopContentMessage(string busEventMessage)
         => long.TryParse(busEventMessage, out var loopContentId)
             ? WashString(await _busSenderMessageRepository.GetLoopContentMessage(loopContentId))

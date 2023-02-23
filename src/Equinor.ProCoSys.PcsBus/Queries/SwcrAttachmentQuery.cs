@@ -18,8 +18,8 @@ public class SwcrAttachmentQuery
            '"", ""LastUpdated"" : ""' || TO_CHAR(a.LAST_UPDATED, 'yyyy-mm-dd hh24:mi:ss') ||
            '""}}' as message
             FROM ATTACHMENT a
-            INNER JOIN ATTACHMENTLINK al ON a.ID=al.ATTACHMENT_ID
-            INNER JOIN SWCR s ON al.ELEMENT_ID=s.SWCR_ID
+            INNER JOIN ATTACHMENTLINK al ON a.ID = al.ATTACHMENT_ID
+            INNER JOIN SWCR s ON al.ELEMENT_ID = s.SWCR_ID
             {whereClause}";
     }
 }
