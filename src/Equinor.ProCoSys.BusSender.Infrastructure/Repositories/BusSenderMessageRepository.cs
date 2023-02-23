@@ -36,7 +36,7 @@ public class BusSenderMessageRepository : IBusSenderMessageRepository
 
     public async Task<string> GetTaskMessage(long taskId) =>
         await ExecuteQuery(TaskQuery.GetQuery(taskId), taskId.ToString());
-    public async Task<string> GetSwcrOtherReferencesMessage(string guid) =>
+    public async Task<string> GetSwcrOtherReferenceMessage(string guid) =>
     await ExecuteQuery(SwcrOtherReferencesQuery.GetQuery(guid), guid);
 
     public async Task<string> GetSwcrTypeMessage(string guid) =>

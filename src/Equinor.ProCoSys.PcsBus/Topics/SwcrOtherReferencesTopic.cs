@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Equinor.ProCoSys.PcsServiceBus.Topics;
+﻿namespace Equinor.ProCoSys.PcsServiceBus.Topics;
 
 public class SwcrOtherReferencesTopic
 {
@@ -12,5 +10,5 @@ public class SwcrOtherReferencesTopic
     public string CodeDescription { get; set; }
     public string LastUpdated { get; set; }
 
-    public const string TopicName = "swcrotherreferences";
+    public const string TopicName = "swcrotherreference";
 }

@@ -11,7 +11,7 @@ public class ActionQuery
         var whereClause = CreateWhereClause(actionId, plant, "ec", "element_id");
 
         return @$"select
-           '{{""Plant"": ""' || ec.ProjectSchema ||
+           '{{""Plant"" : ""' || ec.ProjectSchema ||
            '"", ""ProCoSysGuid"" : ""' || ec.PROCOSYS_GUID ||
            '"", ""ElementContentGuid"" : ""' || ec.Id ||
            '"", ""CommPkgNo"" : ""' || c.CommPkgNo ||

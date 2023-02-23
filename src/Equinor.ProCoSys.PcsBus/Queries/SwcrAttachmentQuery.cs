@@ -8,7 +8,7 @@ public class SwcrAttachmentQuery
         var whereClause = CreateWhereClauseForGuid(swcrAttachmentGuid, plant, "a", "procosys_guid");
 
         return @$"select
-           '{{""Plant"": ""' || a.ProjectSchema ||
+           '{{""Plant"" : ""' || a.ProjectSchema ||
            '"", ""ProCoSysGuid"" : ""' || a.PROCOSYS_GUID ||
            '"", ""SwcrGuid"" : ""' || s.PROCOSYS_GUID ||
            '"", ""Title"" : ""' || regexp_replace(a.TITLE, '([""\])', '\\\1') ||
