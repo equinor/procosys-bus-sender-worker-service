@@ -14,7 +14,7 @@ public class WorkOrderEvent : IWorkOrderEvent
     public string WoNo { get; set; }
     public int WoId { get; set; }
     public string CommPkgNo { get; set; }
-    public Guid CommPkgGuid { get; set; }
+    public Guid? CommPkgGuid { get; set; }
     public string Title { get; set; }
     public string Description { get; set; }
     public string MilestoneCode { get; set; }
@@ -39,6 +39,7 @@ public class WorkOrderEvent : IWorkOrderEvent
     public string ExpendedManHours { get; set; }
     public string EstimatedHours { get; set; }
     public string RemainingHours { get; set; }
+    public int Progress { get; set; }
     public DateTime PlannedStartAtDate { get; set; }
     public DateTime ActualStartAtDate { get; set; }
     public DateTime PlannedFinishedAtDate { get; set; }

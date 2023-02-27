@@ -1,5 +1,4 @@
 ﻿
-using Equinor.ProCoSys.PcsServiceBus;
 using Equinor.ProCoSys.PcsServiceBus.Receiver.Interfaces;
 
 namespace Equinor.ProCoSys.BusReceiver;

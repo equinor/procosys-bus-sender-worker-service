@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
+using Equinor.ProCoSys.PcsServiceBus.Queries;
 using Equinor.ProCoSys.PcsServiceBus.Topics;
 using Range = Moq.Range;
 
@@ -27,6 +28,7 @@ public class BusSenderServiceTests
     private Mock<IBusEventRepository> _busEventRepository;
     private Mock<ITagDetailsRepository> _tagDetailsRepositoryMock;
     private Mock<IBusSenderMessageRepository> _busSenderMessageRepositoryMock;
+    private Mock<IDapperRepository> _dapperRepositoryMock;
     private Mock<BusEventService> _busEventServiceMock;
     private List<ServiceBusMessage> _messagesInTopicClient4;
     private ServiceBusMessageBatch _mockWoMessageBatch;
@@ -83,7 +85,8 @@ public class BusSenderServiceTests
         _tagDetailsRepositoryMock = new Mock<ITagDetailsRepository>();
         
         _busSenderMessageRepositoryMock = new Mock<IBusSenderMessageRepository>();
-        _busEventServiceMock = new Mock<BusEventService>(_tagDetailsRepositoryMock.Object, _busSenderMessageRepositoryMock.Object) { CallBase = true };
+        _dapperRepositoryMock = new Mock<IDapperRepository>();
+        _busEventServiceMock = new Mock<BusEventService>(_tagDetailsRepositoryMock.Object, _busSenderMessageRepositoryMock.Object, _dapperRepositoryMock.Object) { CallBase = true };
         _iUnitOfWork = new Mock<IUnitOfWork>();
 
         _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk()).Returns(() => Task.FromResult(_busEvents));
@@ -151,18 +154,24 @@ public class BusSenderServiceTests
         var wo2 = new BusEvent { Event = WorkOrderTopic.TopicName, Message = "10000", Status = Status.UnProcessed };
         var wo3 = new BusEvent { Event = WorkOrderTopic.TopicName, Message = "10000", Status = Status.UnProcessed };
 
-        const string jsonMessage =
-            "{\"Plant\" : \"AnyValidPlant\", \"ProjectName\" : \"AnyProjectName\", \"WoNo\" : \"SomeWoNo\"}";
+        var wo = new WorkOrderEvent()
+            { Plant = "AnyValidPlant", ProjectName = "AnyProjectName", WoNo = "SomeWoNo" };
+
 
         _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk())
             .Returns(() => Task.FromResult(new List<BusEvent> { wo1, wo2, wo3 }));
-        _busSenderMessageRepositoryMock.Setup(wr => wr.GetWorkOrderMessage(10000))
-            .Returns(() => Task.FromResult(jsonMessage));
+        _dapperRepositoryMock.Setup(wr => wr.QuerySingle<WorkOrderEvent>(It.IsAny<string>(), wo1.ToString()))
+            .Returns(() => Task.FromResult(wo));
+        _dapperRepositoryMock.Setup(wr => wr.QuerySingle<WorkOrderEvent>(It.IsAny<string>(), wo2.ToString()))
+            .Returns(() => Task.FromResult(wo));
+        _dapperRepositoryMock.Setup(wr => wr.QuerySingle<WorkOrderEvent>(It.IsAny<string>(), wo3.ToString()))
+            .Returns(() => Task.FromResult(wo));
 
         //Act
         await _dut.HandleBusEvents();
 
         //Assert
+        _dapperRepositoryMock.Verify(dr => dr.QuerySingle<WorkOrderEvent>(It.IsAny<string>(), It.IsAny<string>()),Times.Once);
         _topicClientMockWo.Verify(t => t.SendMessagesAsync(It.IsAny<ServiceBusMessageBatch>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 
@@ -174,15 +183,20 @@ public class BusSenderServiceTests
         var wo2 = new BusEvent { Event = WorkOrderTopic.TopicName, Message = "10000", Status = Status.UnProcessed };
         var wo3 = new BusEvent { Event = WorkOrderTopic.TopicName, Message = "10001", Status = Status.UnProcessed };
 
-        const string jsonMessage =
-            "{\"Plant\" : \"AnyValidPlant\", \"ProjectName\" : \"AnyProjectName\", \"WoNo\" : \"SomeWoNo\"}";
+        var wo = new WorkOrderEvent()
+            { Plant = "AnyValidPlant", ProjectName = "AnyProjectName", WoNo = "SomeWoNo" };
+
 
         _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk())
             .Returns(() => Task.FromResult(new List<BusEvent> { wo1, wo2, wo3 }));
-        _busSenderMessageRepositoryMock.Setup(wr => wr.GetWorkOrderMessage(10000))
-            .Returns(() => Task.FromResult(jsonMessage));
-        _busSenderMessageRepositoryMock.Setup(wr => wr.GetWorkOrderMessage(10001))
-            .Returns(() => Task.FromResult(jsonMessage));
+        _dapperRepositoryMock.Setup(wr => wr.QuerySingle<WorkOrderEvent>(It.IsAny<string>(), wo1.ToString()))
+            .Returns(() => Task.FromResult(wo));
+        _dapperRepositoryMock.Setup(wr => wr.QuerySingle<WorkOrderEvent>(It.IsAny<string>(), wo2.ToString()))
+            .Returns(() => Task.FromResult(wo));
+        _dapperRepositoryMock.Setup(wr => wr.QuerySingle<WorkOrderEvent>(It.IsAny<string>(), wo3.ToString()))
+            .Returns(() => Task.FromResult(wo));
+
+       
 
         //Act
         await _dut.HandleBusEvents();
@@ -307,15 +321,15 @@ public class BusSenderServiceTests
         var wo2 = new BusEvent { Event = WorkOrderTopic.TopicName, Message = "10000", Status = Status.UnProcessed };
         var wo3 = new BusEvent { Event = WorkOrderTopic.TopicName, Message = "10001", Status = Status.UnProcessed };
 
-        const string jsonMessage =
-            "{\"Plant\" : \"AnyValidPlant\", \"ProjectName\" : \"AnyProjectName\", \"WoNo\" : \"Some0x0bWoNo\"}";
+        var wo = new WorkOrderEvent()
+            { Plant = "AnyValidPlant", ProjectName = "AnyProjectName", WoNo = "Some0x0bWoNo" };
 
         _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk())
             .Returns(() => Task.FromResult(new List<BusEvent> { wo1, wo2, wo3 }));
-        _busSenderMessageRepositoryMock.Setup(wr => wr.GetWorkOrderMessage(10000))
-            .Returns(() => Task.FromResult(jsonMessage));
-        _busSenderMessageRepositoryMock.Setup(wr => wr.GetWorkOrderMessage(10001))
-            .Returns(() => Task.FromResult(jsonMessage));
+        _dapperRepositoryMock.Setup(wr => wr.QuerySingle<WorkOrderEvent>(It.IsAny<string>(), "10000"))
+            .Returns(() => Task.FromResult(wo));
+        _dapperRepositoryMock.Setup(wr => wr.QuerySingle<WorkOrderEvent>(It.IsAny<string>(), "10001"))
+            .Returns(() => Task.FromResult(wo));
 
         //Act
         await _dut.HandleBusEvents();

@@ -14,7 +14,7 @@ internal class CommPkgMilestoneEvent : ICommPkgMilestoneEvent
     public Guid CommPkgGuid { get; }
     public string? CommPkgNo { get; }
     public string Code { get; }
-    public DateOnly? ActualDate { get; }
+    public DateTime? ActualDate { get; }
     public DateOnly? PlannedDate { get; }
     public DateOnly? ForecastDate { get; }
     public string? Remark { get; }

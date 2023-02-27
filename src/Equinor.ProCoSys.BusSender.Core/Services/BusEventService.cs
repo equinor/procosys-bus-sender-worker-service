@@ -43,7 +43,7 @@ public class BusEventService : IBusEventService
 
     public async Task<string> CreateChecklistMessage(string busEventMessage) =>
         long.TryParse(busEventMessage, out var checkListId)
-            ? JsonSerializer.Serialize(await _dapperRepository.Query<ChecklistEvent>(ChecklistQuery.GetQuery(checkListId),checkListId.ToString()))
+            ? JsonSerializer.Serialize(await _dapperRepository.QuerySingle<ChecklistEvent>(ChecklistQuery.GetQuery(checkListId),checkListId.ToString()))
             : throw new Exception("Failed to extract checkListId from message");
 
     public async Task<string> CreateCommPkgQueryMessage(string message) =>
@@ -66,9 +66,9 @@ public class BusEventService : IBusEventService
             ? WashString(await _busSenderMessageRepository.GetTaskMessage(taskId))
             : throw new Exception("Failed to extract taskId from message");
 
-    public async Task<string> CreateSwcrOtherReferencesMessage(string busEventMessage) =>
+    public async Task<string> CreateSwcrOtherReferenceMessage(string busEventMessage) =>
         Guid.TryParse(busEventMessage, out _)
-            ? WashString(await _busSenderMessageRepository.GetSwcrOtherReferencesMessage(busEventMessage))
+            ? WashString(await _busSenderMessageRepository.GetSwcrOtherReferenceMessage(busEventMessage))
             : throw new Exception($"Failed to extract or parse guid SwcrOtherReferences from message {busEventMessage}");
 
     public async Task<string> CreateSwcrTypeMessage(string busEventMessage) =>
@@ -99,7 +99,7 @@ public class BusEventService : IBusEventService
         }
 
         var queryString = McPkgMilestonesQuery.GetQuery(message);   
-        var mcPkgMilestoneEvents = await _dapperRepository.Query<McPkgMilestoneEvent>(queryString, message);
+        var mcPkgMilestoneEvents = await _dapperRepository.QuerySingle<McPkgMilestoneEvent>(queryString, message);
         return JsonSerializer.Serialize(mcPkgMilestoneEvents, DefaultSerializerHelper.SerializerOptions);
     }
     public async Task<string> CreateCommPkgMilestoneMessage(string message)
@@ -110,7 +110,7 @@ public class BusEventService : IBusEventService
         }
 
         var queryString = CommPkgMilestoneQuery.GetQuery(message);
-        var mcPkgMilestoneEvents = await _dapperRepository.Query<CommPkgMilestoneEvent>(queryString, message);
+        var mcPkgMilestoneEvents = await _dapperRepository.QuerySingle<CommPkgMilestoneEvent>(queryString, message);
         return JsonSerializer.Serialize(mcPkgMilestoneEvents, DefaultSerializerHelper.SerializerOptions);
     }
 
@@ -188,12 +188,8 @@ public class BusEventService : IBusEventService
         }
 
         var queryString = WorkOrderQuery.GetQuery(workOrderId);
-        var workOrderEvents = await _dapperRepository.Query<WorkOrderEvent>(queryString, message);
-        return JsonSerializer.Serialize(workOrderEvents, DefaultSerializerHelper.SerializerOptions);
-        //return long.TryParse(busEventMessage, out var workOrderId)
-        //    ? WashString(await _busSenderMessageRepository.GetWorkOrderMessage(workOrderId))
-        //    : throw new Exception("Failed to extract workOrderId from message");
-
+        var workOrderEvent = await _dapperRepository.QuerySingle<WorkOrderEvent>(queryString, message);
+        return JsonSerializer.Serialize(workOrderEvent, DefaultSerializerHelper.SerializerOptions);
     }
 
     public async Task<string> CreateWorkOrderCutOffMessage(string message)

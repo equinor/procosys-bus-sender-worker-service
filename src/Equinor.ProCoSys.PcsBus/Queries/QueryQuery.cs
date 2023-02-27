@@ -22,14 +22,14 @@ public class QueryQuery
             '"", ""ProposedSolution"" : ""'|| regexp_replace(q.PROPOSEDSOLUTION , '([""\])', '\\\1') ||
             '"", ""EngineeringReply"" : ""'|| regexp_replace(q.Engineeringreply, '([""\])', '\\\1') ||
             '"", ""Milestone"" :""'|| (select code
-                                           from procosys.library
+                                           from library
                                            where library_id =
                                              (select library_id
-                                              from procosys.elementfield fi_ex
+                                              from elementfield fi_ex
                                               where fi_ex.element_id = q.document_id
                                               and EXISTS
                                                 (select 1
-                                                from procosys.field f
+                                                from field f
                                                 where f.columnname = 'QUERY_SM'
                                                 and f.field_id = fi_ex.field_id))) ||
             '"", ""ScheduleImpact"" : '|| decode(q.SCHEDULEIMPACT,'Y', 'true', 'false') ||

@@ -5,12 +5,12 @@ namespace Equinor.ProCoSys.PcsServiceBus.Interfaces;
 public interface IWorkOrderEvent  : IHasEventType
 {
     string Plant { get; }
-    Guid? ProCoSysGuid { get; }
+    Guid ProCoSysGuid { get; }
     string ProjectName { get; }
     string WoNo { get;  }
     int WoId { get; }
     string? CommPkgNo { get; }
-    Guid CommPkgGuid { get; }
+    Guid? CommPkgGuid { get; }
     string? Title { get; }
     string? Description { get; }
     string? MilestoneCode { get; }

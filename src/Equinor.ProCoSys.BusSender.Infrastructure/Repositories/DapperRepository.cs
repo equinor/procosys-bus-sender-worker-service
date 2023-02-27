@@ -1,5 +1,4 @@
-﻿using Equinor.ProCoSys.BusSenderWorker.Core.Models;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
@@ -31,13 +30,31 @@ internal class DapperRepository : IDapperRepository
             await _context.Database.OpenConnectionAsync();
         }
 
-        var checklists = connection.Query<T>(queryString).ToList();
-        if (checklists.Count == 0)
+        var events = connection.Query<T>(queryString).ToList();
+        if (events.Count == 0)
         {
             _logger.LogError("Object/Entity with id {objectId} did not return anything", objectId);
             return null;
         }
-        return checklists;
+        return events;
+    }
+
+    public async Task<T> QuerySingle<T>(string queryString, string objectId) where T : IHasEventType
+    {
+        var connection = _context.Database.GetDbConnection();
+        if (_context.Database.GetDbConnection().State != ConnectionState.Open)
+        {
+            await _context.Database.OpenConnectionAsync();
+        }
+
+        var events = connection.Query<T>(queryString).ToList();
+        if (events.Count == 0)
+        {
+            _logger.LogError("Object/Entity with id {objectId} did not return anything", objectId);
+            return default;
+        }
+
+        return events.Single();
     }
 
 

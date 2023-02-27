@@ -8,11 +8,11 @@ public class SwcrOtherReferencesQuery
         var whereClause = CreateWhereClauseForGuid(swcrOtherReferencesGuid, plant, "slr", "procosys_guid");
 
         return @$"select
-           '{{""Plant"": ""' || slr.ProjectSchema ||
+           '{{""Plant"" : ""' || slr.ProjectSchema ||
            '"", ""ProCoSysGuid"" : ""' || slr.PROCOSYS_GUID ||
            '"", ""LibraryGuid"" : ""' || l.PROCOSYS_GUID ||
            '"", ""SwcrGuid"" : ""' || s.PROCOSYS_GUID ||
-           '"", ""Code"" : ""' || l.CODE ||
+           '"", ""Code"" : ""' || regexp_replace(l.CODE, '([""\])', '\\\1') ||
            '"", ""Description"" : ""' || regexp_replace(slr.DESCRIPTION, '([""\])', '\\\1') ||
            '"", ""LastUpdated"" : ""' || TO_CHAR(slr.LAST_UPDATED, 'yyyy-mm-dd hh24:mi:ss') ||
            '""}}' as message

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
+using Equinor.ProCoSys.BusSenderWorker.Core.Extensions;
 using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 using Equinor.ProCoSys.BusSenderWorker.Core.Mappers;
 using Equinor.ProCoSys.BusSenderWorker.Core.Models;
@@ -188,7 +189,7 @@ public class BusSenderService : IBusSenderService
     private void TrackMessage(BusEvent busEvent)
     {
         var busEventMessageToSend = busEvent.MessageToSend ?? busEvent.Message;
-        var message = JsonSerializer.Deserialize<BusEventMessage>(_service.WashString(busEventMessageToSend));
+        var message = JsonSerializer.Deserialize<BusEventMessage>(_service.WashString(busEventMessageToSend), DefaultSerializerHelper.SerializerOptions);
         if (message != null && string.IsNullOrEmpty(message.ProjectName))
         {
             message.ProjectName = "_";
@@ -249,7 +250,7 @@ public class BusSenderService : IBusSenderService
                 }
             case SwcrOtherReferencesTopic.TopicName:
                 {
-                    await CreateAndSetMessage(busEvent, _service.CreateSwcrOtherReferencesMessage);
+                    await CreateAndSetMessage(busEvent, _service.CreateSwcrOtherReferenceMessage);
                     break;
                 }
             case SwcrTypeTopic.TopicName:

@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Equinor.ProCoSys.PcsServiceBus.Interfaces;
 
@@ -15,7 +11,7 @@ public interface ICommPkgMilestoneEvent : IHasEventType
     Guid CommPkgGuid { get; }
     string? CommPkgNo { get; }
     string Code { get; }
-    DateOnly? ActualDate { get; }
+    DateTime? ActualDate { get; }
     DateOnly? PlannedDate { get; }
     DateOnly? ForecastDate { get; }
     string? Remark { get; }
