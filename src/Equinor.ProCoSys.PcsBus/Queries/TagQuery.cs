@@ -38,16 +38,23 @@ public class TagQuery
             '""MountedOnGuid"" : ""' || mt.procosys_guid || '"",' ||
             '""LastUpdated"" : ""' || TO_CHAR(t.LAST_UPDATED, 'yyyy-mm-dd hh24:mi:ss') || '"",' ||
             '""TagDetails"" : {{' ||
-                (SELECT listagg('""'|| colName ||'"":""'|| regexp_replace(val, '([""\])', '\\\1') ||'""', ',')
-                WITHIN group (order by colName) as tagdetails  from (
+                ( SELECT LISTAGG('""'|| COLNAME ||'"":""'|| REGEXP_REPLACE(VAL, '([""\])', '\\\1') ||'""'
+            || CASE WHEN COLNAME2 IS NOT NULL THEN ',' || '""'|| COLNAME2 ||'"":""'|| VAL2 ||'""'ELSE NULL END
+            || CASE WHEN COLNAME3 IS NOT NULL THEN ',' || '""'|| COLNAME3 ||'"":""'|| VAL3 ||'""'ELSE NULL END,
+            ',')
+                WITHIN GROUP (ORDER BY COLNAME, COLNAME2,COLNAME3) AS TAGDETAILS  FROM (
                 SELECT 
-                       f.columnname as colName,
-                        COALESCE(regexp_replace(val.valuestring, '([""\])', '\\\1'),
-                                 TO_CHAR(VAL.VALUEDATE, 'yyyy-mm-dd hh24:mi:ss'),
+                        DECODE(F.COLUMNNAME, 'FROM_TAG_NUMBER', 'FROMTAGGUID', NULL) AS COLNAME2,
+                        DECODE(F.COLUMNNAME, 'TO_TAG_NUMBER', 'TOTAGGUID', NULL) AS COLNAME3,
+                        F.COLUMNNAME AS COLNAME,
+                        COALESCE(REGEXP_REPLACE(VAL.VALUESTRING, '([""\])', '\\\1'),
+                                 TO_CHAR(VAL.VALUEDATE, 'YYYY-MM-DD HH24:MI:SS'),
                                  TO_CHAR(VAL.VALUENUMBER),
-                                 t2.TAGNO, 
+                                 T2.TAGNO, 
                                  LIBVAL.CODE
-                                 ) as val
+                                 ) AS VAL,
+            t1.PROCOSYS_GUID AS VAL2,
+            t1.PROCOSYS_GUID AS VAL3                                 
                 FROM DEFINEELEMENTFIELD DEF
                     LEFT JOIN FIELD F ON DEF.FIELD_ID = F.FIELD_ID
                     LEFT JOIN LIBRARY UNIT ON UNIT.LIBRARY_ID = F.UNIT_ID
