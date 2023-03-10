@@ -44,8 +44,8 @@ public class TagQuery
             ',')
                 WITHIN GROUP (ORDER BY COLNAME, COLNAME2,COLNAME3) AS TAGDETAILS  FROM (
                 SELECT 
-                        DECODE(F.COLUMNNAME, 'FROM_TAG_NUMBER', 'FROMTAGGUID', NULL) AS COLNAME2,
-                        DECODE(F.COLUMNNAME, 'TO_TAG_NUMBER', 'TOTAGGUID', NULL) AS COLNAME3,
+                        DECODE(F.COLUMNNAME, 'FROM_TAG_NUMBER', 'FromTagGuid', NULL) AS COLNAME2,
+                        DECODE(F.COLUMNNAME, 'TO_TAG_NUMBER', 'ToTagGuid', NULL) AS COLNAME3,
                         F.COLUMNNAME AS COLNAME,
                         COALESCE(REGEXP_REPLACE(VAL.VALUESTRING, '([""\])', '\\\1'),
                                  TO_CHAR(VAL.VALUEDATE, 'YYYY-MM-DD HH24:MI:SS'),
