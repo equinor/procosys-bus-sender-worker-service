@@ -2,7 +2,7 @@
 
 public class LibraryQuery
 {
-    public static string GetQuery(long? libraryId, string plant = null)
+    public static string GetQuery(long? libraryId, string? plant = null)
     {
         DetectFaultyPlantInput(plant);
         var whereClause = CreateWhereClause(libraryId, plant, "l", "library_id");

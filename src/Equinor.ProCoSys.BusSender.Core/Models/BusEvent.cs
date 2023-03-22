@@ -1,4 +1,5 @@
 ﻿using System;
+#pragma warning disable CS8618
 
 namespace Equinor.ProCoSys.BusSenderWorker.Core.Models;
 
@@ -11,5 +12,5 @@ public class BusEvent
     public Status Status { get; set; }
 
     //untracked
-    public string MessageToSend { get; set; }
+    public string? MessageToSend { get; set; }
 }

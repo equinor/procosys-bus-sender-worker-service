@@ -5,7 +5,7 @@ using Equinor.ProCoSys.PcsServiceBus.Interfaces;
 #pragma warning disable CS8618
 namespace Equinor.ProCoSys.BusSenderWorker.Core.Models;
 
-internal class CommPkgMilestoneEvent : ICommPkgMilestoneEvent
+internal class CommPkgMilestoneEvent : ICommPkgMilestoneEventV1
 {
     public string Plant { get; }
     public Guid ProCoSysGuid { get; }

@@ -2,7 +2,7 @@
 
 public class ResponsibleQuery
 {
-    public static string GetQuery(long? responsibleId, string plant = null)
+    public static string GetQuery(long? responsibleId, string? plant = null)
     {
         DetectFaultyPlantInput(plant);
         var whereClause = CreateWhereClause(responsibleId, plant, "r", "responsible_id");

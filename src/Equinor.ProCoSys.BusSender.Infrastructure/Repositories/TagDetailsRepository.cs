@@ -18,7 +18,7 @@ public class TagDetailsRepository : ITagDetailsRepository
         _logger = logger;
     }
 
-    public async Task<string> GetDetailsStringByTagId(long tagId)
+    public async Task<string?> GetDetailsStringByTagId(long tagId)
     {
         await using var command = _context.Database.GetDbConnection().CreateCommand();
         command.CommandText = GetTagDetailsQuery(tagId);

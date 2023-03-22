@@ -1,7 +1,7 @@
 ﻿using System;
 
 namespace Equinor.ProCoSys.PcsServiceBus.Topics;
-
+#pragma warning disable CS8618
 public class TagFunctionTopic
 {
     public string Plant { get; set; }

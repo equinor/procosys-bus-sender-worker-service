@@ -7,5 +7,5 @@ namespace Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 public interface IDapperRepository
 {
     Task<IEnumerable<T>> Query<T>(string queryString, string? objectId) where T : IHasEventType;
-    Task<T> QuerySingle<T>(string queryString, string? objectId) where T : IHasEventType;
+    Task<T?> QuerySingle<T>(string queryString, string objectId) where T : IHasEventType;
 }

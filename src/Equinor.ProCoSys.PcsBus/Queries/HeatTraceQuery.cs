@@ -2,7 +2,7 @@
 
 public class HeatTraceQuery
 {
-    public static string GetQuery(long? heatTraceId, string plant = null)
+    public static string GetQuery(long? heatTraceId, string? plant = null)
     {
         DetectFaultyPlantInput(plant);
         var whereClause = CreateWhereClause(heatTraceId, plant, "ht", "id");

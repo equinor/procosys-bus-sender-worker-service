@@ -2,7 +2,7 @@
 
 public class PipingSpoolQuery
 {
-    public static string GetQuery(long? pipingSpoolId, string plant = null)
+    public static string GetQuery(long? pipingSpoolId, string? plant = null)
     {
         DetectFaultyPlantInput(plant);
         var whereClause = CreateWhereClause(pipingSpoolId, plant, "ps", "pipingspool_id");

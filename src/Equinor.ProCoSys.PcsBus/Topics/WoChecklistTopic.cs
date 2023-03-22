@@ -1,5 +1,5 @@
 ﻿namespace Equinor.ProCoSys.PcsServiceBus.Topics;
-
+#pragma warning disable CS8618
 public class WoChecklistTopic
 {
     public string Plant { get; set; }

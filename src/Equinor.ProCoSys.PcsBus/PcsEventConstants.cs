@@ -1,6 +1,5 @@
 ﻿namespace Equinor.ProCoSys.PcsServiceBus;
 
-
 /// <summary>
 /// This class defines a set of constants that represent different types of message events that can be used in the event publish-subscribe pattern.
 /// </summary>
@@ -93,6 +92,10 @@ public static class PcsEventConstants
     /// </summary>
     public const string WorkOrderCutoffCreateOrUpdate = "workOrderCutoffCreatedOrUpdated";
 
+    /// <summary>
+    /// Event that is fired when a new WorkOrderMilestone is created or updated
+    /// </summary>
+    public const string WorkOrderMilestoneCreateOrUpdate = "workOrderCutoffCreatedOrUpdated";
 
-
+    public const string ChecklistDelete = "checkListDeleted";
 }

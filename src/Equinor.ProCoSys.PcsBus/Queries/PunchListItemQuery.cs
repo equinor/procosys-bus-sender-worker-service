@@ -2,7 +2,7 @@
 
 public class PunchListItemQuery
 {
-    public static string GetQuery(long? punchListItemId, string plant = null)
+    public static string GetQuery(long? punchListItemId, string? plant = null)
     {
         DetectFaultyPlantInput(plant);
         var whereClause = CreateWhereClause(punchListItemId, plant, "pl", "punchlistitem_id");

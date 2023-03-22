@@ -2,7 +2,7 @@
 
 public class ChecklistQuery
 {
-    public static string GetQuery(long? tagCheckId, string plant = null)
+    public static string GetQuery(long? tagCheckId, string? plant = null)
     {
         DetectFaultyPlantInput(plant);
         var whereClause = CreateWhereClause(tagCheckId, plant, "tc","tagcheck_id");

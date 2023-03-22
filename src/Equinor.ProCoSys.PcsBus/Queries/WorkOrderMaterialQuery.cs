@@ -5,7 +5,7 @@ public class WorkOrderMaterialQuery
     /// <summary>
     /// Call with either workOrderId, plantId or both. Not advised to call without either as result set could get very large
     /// </summary>
-    public static string GetQuery(long? woId, string plant = null)
+    public static string GetQuery(long? woId, string? plant = null)
     {
         DetectFaultyPlantInput(plant);
         var whereClause = CreateWhereClause(woId, plant, "wm", "wo_id");

@@ -33,7 +33,7 @@ public static class IServiceCollectionExtensions
 
     private static PcsServiceBusProcessors CreateSubscriptionProcessors(PcsServiceBusConfig options)
     {
-        var pcsProcessors = new PcsServiceBusProcessors(options.RenewLeaseIntervalMilliSec);
+        var pcsProcessors = new PcsServiceBusProcessors(options.RenewLeaseIntervalMilliseconds);
         var client = new ServiceBusClient(options.ConnectionString);
         var processorOptions = new ServiceBusProcessorOptions
         {

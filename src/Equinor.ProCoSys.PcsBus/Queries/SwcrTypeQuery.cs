@@ -2,7 +2,7 @@
 
 public class SwcrTypeQuery
 {
-    public static string GetQuery(string swcrTypeGuid, string plant= null)
+    public static string GetQuery(string swcrTypeGuid, string? plant= null)
     {
         DetectFaultyPlantInput(plant);
         var whereClause = CreateWhereClauseForGuid(swcrTypeGuid, plant, "elr", "procosys_guid");

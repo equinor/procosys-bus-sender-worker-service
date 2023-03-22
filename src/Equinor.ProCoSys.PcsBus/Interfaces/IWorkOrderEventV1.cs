@@ -2,13 +2,13 @@
 
 namespace Equinor.ProCoSys.PcsServiceBus.Interfaces;
 
-public interface IWorkOrderEvent  : IHasEventType
+public interface IWorkOrderEventV1 : IHasEventType
 {
     string Plant { get; }
     Guid ProCoSysGuid { get; }
     string ProjectName { get; }
     string WoNo { get;  }
-    int WoId { get; }
+    long WoId { get; }
     string? CommPkgNo { get; }
     Guid? CommPkgGuid { get; }
     string? Title { get; }
@@ -36,10 +36,10 @@ public interface IWorkOrderEvent  : IHasEventType
     string? EstimatedHours { get;  }
     string? RemainingHours { get;  }
     int Progress { get; }
-    DateTime PlannedStartAtDate { get;  }
-    DateTime ActualStartAtDate { get;  }
-    DateTime PlannedFinishedAtDate { get;  }
-    DateTime ActualFinishedAtDate { get;  }
+    DateOnly? PlannedStartAtDate { get;  }
+    DateOnly? ActualStartAtDate { get;  }
+    DateOnly? PlannedFinishedAtDate { get;  }
+    DateOnly? ActualFinishedAtDate { get;  }
     DateTime CreatedAt { get;  }
     bool IsVoided { get;  }
     DateTime LastUpdated { get;  }

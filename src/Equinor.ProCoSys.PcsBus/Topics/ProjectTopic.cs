@@ -1,7 +1,6 @@
 ﻿using System;
-
 namespace Equinor.ProCoSys.PcsServiceBus.Topics;
-
+#pragma warning disable CS8618
 public class ProjectTopic
 {
     public string Plant { get; set; }

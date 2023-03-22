@@ -2,14 +2,14 @@
 
 namespace Equinor.ProCoSys.PcsServiceBus.Interfaces;
 
-public interface IMcPkgMilestoneEvent : IHasEventType
-{
+public interface ICommPkgMilestoneEventV1 : IHasEventType
+{ 
     string Plant { get; }
     Guid ProCoSysGuid { get; }
     string? PlantName { get; }
     string? ProjectName { get; }
-    Guid McPkgGuid { get; }
-    string? McPkgNo { get; }
+    Guid CommPkgGuid { get; }
+    string? CommPkgNo { get; }
     string Code { get; }
     DateTime? ActualDate { get; }
     DateOnly? PlannedDate { get; }

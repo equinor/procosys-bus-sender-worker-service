@@ -11,7 +11,7 @@ public class PcsServiceBusConfig
         return this;
     }
 
-    public string ConnectionString { get; set; }
+    public string? ConnectionString { get; set; }
 
     public bool ReadFromDeadLetterQueue { get; set; }
     public PcsServiceBusConfig WithLeaderElector(string leaderElectorUri)
@@ -20,29 +20,29 @@ public class PcsServiceBusConfig
         return this;
     }
 
-    public List<(string pcsTopic, string topicPath, string subscrition)> Subscriptions { get; } = new();
+    public List<(string pcsTopic, string? topicPath, string subscrition)> Subscriptions { get; } = new();
 
-    public int RenewLeaseIntervalMilliSec { get; private set; }
+    public int RenewLeaseIntervalMilliseconds { get; private set; }
 
-    public PcsServiceBusConfig WithRenewLeaseInterval(int renewLeaseIntervalMilliSec)
+    public PcsServiceBusConfig WithRenewLeaseInterval(int renewLeaseIntervalMilliseconds)
     {
-        RenewLeaseIntervalMilliSec = renewLeaseIntervalMilliSec;
+        RenewLeaseIntervalMilliseconds = renewLeaseIntervalMilliseconds;
         return this;
     }
 
     public PcsServiceBusConfig WithSubscription(string pcsTopic, string subscriptionName)
     {
-        Subscriptions.Add(new ValueTuple<string, string, string>(pcsTopic, null, subscriptionName));
+        Subscriptions.Add(new ValueTuple<string, string?, string>(pcsTopic, null, subscriptionName));
         return this;
     }
 
     public PcsServiceBusConfig WithSubscription(string pcsTopic, string topicPath, string subscriptionName)
     {
-        Subscriptions.Add(new ValueTuple<string, string, string>(pcsTopic, topicPath, subscriptionName));
+        Subscriptions.Add(new ValueTuple<string, string?, string>(pcsTopic, topicPath, subscriptionName));
         return this;
     }
 
-    public Uri LeaderElectorUrl { get; private set; }
+    public Uri? LeaderElectorUrl { get; private set; }
 
     /// <summary>
     /// If true, topic messages will be fetched from Dead Letter Queue instead of normal. This is for special cases, use with caution!

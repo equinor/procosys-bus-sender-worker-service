@@ -22,7 +22,7 @@ internal class DapperRepository : IDapperRepository
         _logger = logger;
     }
 
-    public async Task<IEnumerable<T>> Query<T>(string queryString, string objectId) where T : IHasEventType
+    public async Task<IEnumerable<T>> Query<T>(string queryString, string? objectId) where T : IHasEventType
     {
         var connection = _context.Database.GetDbConnection();
         if (_context.Database.GetDbConnection().State != ConnectionState.Open)
@@ -34,12 +34,12 @@ internal class DapperRepository : IDapperRepository
         if (events.Count == 0)
         {
             _logger.LogError("Object/Entity with id {objectId} did not return anything", objectId);
-            return null;
+            return Enumerable.Empty<T>();
         }
         return events;
     }
 
-    public async Task<T> QuerySingle<T>(string queryString, string objectId) where T : IHasEventType
+    public async Task<T?> QuerySingle<T>(string queryString, string objectId) where T : IHasEventType
     {
         var connection = _context.Database.GetDbConnection();
         if (_context.Database.GetDbConnection().State != ConnectionState.Open)
@@ -53,9 +53,6 @@ internal class DapperRepository : IDapperRepository
             _logger.LogError("Object/Entity with id {objectId} did not return anything", objectId);
             return default;
         }
-
         return events.Single();
     }
-
-
 }

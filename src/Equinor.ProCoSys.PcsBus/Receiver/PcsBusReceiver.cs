@@ -15,7 +15,7 @@ public class PcsBusReceiver : IHostedService
     private readonly IPcsServiceBusProcessors _serviceBusProcessors;
     private readonly IBusReceiverServiceFactory _busReceiverServiceFactory;
     private readonly ILeaderElectorService _leaderElectorService;
-    private Timer _timer;
+    private Timer? _timer;
     private readonly Guid _receiverId = Guid.NewGuid();
 
     public PcsBusReceiver(
@@ -42,7 +42,7 @@ public class PcsBusReceiver : IHostedService
         return Task.CompletedTask;
     }
 
-    private async void CanProceedAsLeaderCheckAsync(object state)
+    private async void CanProceedAsLeaderCheckAsync(object? state)
     {
         try
         {
@@ -63,7 +63,7 @@ public class PcsBusReceiver : IHostedService
         }
         finally
         {
-            _timer.Change(_serviceBusProcessors.RenewLeaseInterval, Timeout.Infinite);
+            _timer?.Change(_serviceBusProcessors.RenewLeaseInterval, Timeout.Infinite);
         }
     }
 

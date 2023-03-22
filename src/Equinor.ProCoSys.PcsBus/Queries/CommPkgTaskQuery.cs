@@ -4,7 +4,7 @@ namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 
 public class CommPkgTaskQuery
 {
-    public static string GetQuery(long? commPkgId, long? taskId, string plant= null)
+    public static string GetQuery(long? commPkgId, long? taskId, string? plant= null)
     {
         DetectFaultyPlantInput(plant);
         var whereClause = CreateWhereClause(commPkgId, taskId, plant);
@@ -26,7 +26,7 @@ public class CommPkgTaskQuery
         return sql;
     }
 
-    private static string CreateWhereClause(long? commPkgId, long? taskId, string plant)
+    private static string CreateWhereClause(long? commPkgId, long? taskId, string? plant)
     {
         var whereClause = "";
         if (commPkgId != null && taskId != null && plant != null)

@@ -175,7 +175,7 @@ public class BusSenderService : IBusSenderService
     /// </summary>
     /// <param name="events"></param>
     /// <returns></returns>
-    private static IEnumerable<IGrouping<(string, string), BusEvent>> FilterOnSimpleMessagesAndGroupDuplicates(
+    private static IEnumerable<IGrouping<(string Event, string Message), BusEvent>> FilterOnSimpleMessagesAndGroupDuplicates(
         IEnumerable<BusEvent> events)
         => events.Where(IsSimpleMessage)
             .GroupBy(e => (e.Event, e.Message));
@@ -189,7 +189,7 @@ public class BusSenderService : IBusSenderService
     private void TrackMessage(BusEvent busEvent)
     {
         var busEventMessageToSend = busEvent.MessageToSend ?? busEvent.Message;
-        var message = JsonSerializer.Deserialize<BusEventMessage>(_service.WashString(busEventMessageToSend), DefaultSerializerHelper.SerializerOptions);
+        var message = JsonSerializer.Deserialize<BusEventMessage>(_service.WashString(busEventMessageToSend)!, DefaultSerializerHelper.SerializerOptions);
         if (message != null && string.IsNullOrEmpty(message.ProjectName))
         {
             message.ProjectName = "_";
@@ -356,7 +356,7 @@ public class BusSenderService : IBusSenderService
     /***
      * Takes a function to create a message, caller needs to make sure that event has the correct topic for the function.
      */
-    private static async Task CreateAndSetMessage(BusEvent busEvent, Func<string, Task<string>> createMessageFunction)
+    private static async Task CreateAndSetMessage(BusEvent busEvent, Func<string, Task<string?>> createMessageFunction)
     {
         var message = await createMessageFunction(busEvent.Message);
         if (message == null)
@@ -369,7 +369,7 @@ public class BusSenderService : IBusSenderService
         }
     }
 
-    private void TrackMetric(BusEventMessage message) =>
+    private void TrackMetric(BusEventMessage? message) =>
         _telemetryClient.TrackMetric("BusSender Topic", 1, "Plant", "ProjectName", message?.Plant?[4..],
             message?.ProjectName?.Replace('$', '_') ?? "NoProject");
 }

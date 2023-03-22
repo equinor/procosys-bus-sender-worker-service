@@ -1,7 +1,5 @@
-﻿using System.Collections.Generic;
-
-namespace Equinor.ProCoSys.PcsServiceBus.Topics;
-
+﻿namespace Equinor.ProCoSys.PcsServiceBus.Topics;
+#pragma warning disable CS8618
 public class ActionTopic
 {
     public string Plant { get; set; }

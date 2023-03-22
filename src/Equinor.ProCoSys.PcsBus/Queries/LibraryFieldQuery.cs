@@ -2,7 +2,7 @@
 
 public class LibraryFieldQuery
 {
-    public static string GetQuery(string libraryFieldGuid, string plant = null)
+    public static string GetQuery(string libraryFieldGuid, string? plant = null)
     {
         DetectFaultyPlantInput(plant);
         var whereClause = CreateWhereClauseForGuid(libraryFieldGuid, plant, "lf", "procosys_guid");

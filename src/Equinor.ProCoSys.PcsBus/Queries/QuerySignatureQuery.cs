@@ -2,7 +2,7 @@
 
 public class QuerySignatureQuery
 {
-    public static string GetQuery(long? queryId, string plant = null)
+    public static string GetQuery(long? queryId, string? plant = null)
     {
         DetectFaultyPlantInput(plant);
         var whereClause = CreateWhereClause(queryId, plant, "q", "id");

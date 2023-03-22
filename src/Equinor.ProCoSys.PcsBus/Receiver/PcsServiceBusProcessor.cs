@@ -9,7 +9,7 @@ public class PcsServiceBusProcessor : ServiceBusProcessor, IPcsServiceBusProcess
 {
     public string PcsTopic { get; }
 
-    private Func<IPcsServiceBusProcessor,ProcessMessageEventArgs, Task>  _pcsHandler;
+    private Func<IPcsServiceBusProcessor, ProcessMessageEventArgs, Task?>?  _pcsHandler;
 
     public PcsServiceBusProcessor(ServiceBusClient client,string topicName, string subscriptionName,ServiceBusProcessorOptions options, string pcsTopic) 
         : base(client,topicName,subscriptionName,options) =>
@@ -26,5 +26,5 @@ public class PcsServiceBusProcessor : ServiceBusProcessor, IPcsServiceBusProcess
 
     public Task StartProcessingAsync() => base.StartProcessingAsync();
 
-    private Task HandleMessage(ProcessMessageEventArgs events) => _pcsHandler.Invoke(this,events);
+    private Task? HandleMessage(ProcessMessageEventArgs events) => _pcsHandler?.Invoke(this,events);
 }

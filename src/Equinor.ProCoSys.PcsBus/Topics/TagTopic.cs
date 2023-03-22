@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Equinor.ProCoSys.PcsServiceBus.Topics;
-
+#pragma warning disable CS8618
 public class TagTopic
 {
     public string Plant { get; set; }
@@ -30,7 +29,7 @@ public class TagTopic
     public string CallOffNo { get; set; }
     public string PurchaseOrderNo { get; set; }
     public string TagFunctionCode { get; set; }
-    public string TagDetails { get; set; }
+    public string? TagDetails { get; set; }
     public List<string> ProjectNames { get; set; }
     public string LastUpdated { get; set; }
     public bool IsVoided { get; set; }

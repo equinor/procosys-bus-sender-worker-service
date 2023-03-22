@@ -2,7 +2,7 @@
 
 public class StockQuery
 {
-    public static string GetQuery(long? stockId, string plant = null)
+    public static string GetQuery(long? stockId, string? plant = null)
     {
         DetectFaultyPlantInput(plant);
         var whereClause = CreateWhereClause(stockId, plant, "s", "id");

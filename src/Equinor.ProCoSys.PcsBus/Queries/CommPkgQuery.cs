@@ -2,7 +2,7 @@
 
 public class CommPkgQuery
 {
-    public static string GetQuery(long? commPkgId, string plant = null)
+    public static string GetQuery(long? commPkgId, string? plant = null)
     {
         DetectFaultyPlantInput(plant);
         var whereClause = CreateWhereClause(commPkgId, plant, "c", "commpkg_id");

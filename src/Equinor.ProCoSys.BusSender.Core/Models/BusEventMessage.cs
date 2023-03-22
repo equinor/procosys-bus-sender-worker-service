@@ -1,4 +1,5 @@
 ﻿namespace Equinor.ProCoSys.BusSenderWorker.Core.Models;
+#pragma warning disable CS8618
 
 public class BusEventMessage
 {

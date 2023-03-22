@@ -1,5 +1,5 @@
 ﻿namespace Equinor.ProCoSys.PcsServiceBus.Topics;
-
+#pragma warning disable CS8618
 public class SwcrSignatureTopic
 {
     public string Node { get; set; }

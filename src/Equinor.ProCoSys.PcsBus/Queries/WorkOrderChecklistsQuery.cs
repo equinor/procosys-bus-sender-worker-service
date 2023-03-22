@@ -2,7 +2,7 @@
 
 public class WorkOrderChecklistsQuery
 {
-    public static string GetQuery(long? tagCheckId, long? woId, string plant = null)
+    public static string GetQuery(long? tagCheckId, long? woId, string? plant = null)
     {
         DetectFaultyPlantInput(plant);
         var whereClause = CreateWhereClause(tagCheckId, woId, plant);
@@ -25,7 +25,7 @@ public class WorkOrderChecklistsQuery
         {whereClause}";
     }
 
-    private static string CreateWhereClause(long? tagCheckId, long? woId, string plant)
+    private static string CreateWhereClause(long? tagCheckId, long? woId, string? plant)
     {
         var whereClause = "";
         if (tagCheckId != null && woId != null && plant != null)

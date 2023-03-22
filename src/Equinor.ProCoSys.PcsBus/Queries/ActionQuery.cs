@@ -5,7 +5,7 @@ namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 [SuppressMessage("ReSharper", "StringLiteralTypo")]
 public class ActionQuery
 {
-    public static string GetQuery(long? actionId, string plant= null)
+    public static string GetQuery(long? actionId, string? plant = null)
     {
         DetectFaultyPlantInput(plant);
         var whereClause = CreateWhereClause(actionId, plant, "ec", "element_id");

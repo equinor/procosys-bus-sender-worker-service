@@ -2,7 +2,7 @@
 
 public class ProjectQuery
 {
-    public static string GetQuery(long? projectId, string plant = null)
+    public static string GetQuery(long? projectId, string? plant = null)
     {
         DetectFaultyPlantInput(plant);
         var whereClause = CreateWhereClause(projectId, plant, "p", "project_id");

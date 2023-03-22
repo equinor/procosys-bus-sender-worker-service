@@ -2,7 +2,7 @@
 
 public class QueryCommPkgQuery
 {
-    public static string GetQuery(long? commPkgId,long? documentId, string plant = null)
+    public static string GetQuery(long? commPkgId,long? documentId, string? plant = null)
     {
         DetectFaultyPlantInput(plant);
         var whereClause = CreateWhereClause(commPkgId,documentId, plant);
@@ -28,7 +28,7 @@ public class QueryCommPkgQuery
         {whereClause}";
     }
 
-    private static string CreateWhereClause(long? commPkgId, long? documentId, string plant)
+    private static string CreateWhereClause(long? commPkgId, long? documentId, string? plant)
     {
         var whereClause = "";
         if (commPkgId != null && documentId != null && plant != null)

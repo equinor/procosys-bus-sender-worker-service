@@ -2,7 +2,7 @@
 
 public class LoopContentQuery
 {
-    public static string GetQuery(long? loopTagId, string plant = null)
+    public static string GetQuery(long? loopTagId, string? plant = null)
     {
         DetectFaultyPlantInput(plant);
         var whereClause = CreateWhereClause(loopTagId, plant, "lt", "looptag_id");

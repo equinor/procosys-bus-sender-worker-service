@@ -25,9 +25,9 @@ public class BusEventService : IBusEventService
         _dapperRepository = dapperRepository;
     }
 
-    public async Task<string> AttachTagDetails(string tagMessage)
+    public async Task<string> AttachTagDetails(string? tagMessage)
     {
-        var tagTopic = JsonSerializer.Deserialize<TagTopic>(WashString(tagMessage));
+        var tagTopic = JsonSerializer.Deserialize<TagTopic>(WashString(tagMessage) ?? throw new InvalidOperationException());
         if (tagTopic?.TagId == null || !long.TryParse(tagTopic.TagId, out var tagId))
         {
             throw new Exception("Could not deserialize TagTopic");
@@ -36,62 +36,62 @@ public class BusEventService : IBusEventService
         return JsonSerializer.Serialize(tagTopic);
     }
 
-    public async Task<string> CreateCallOffMessage(string busEventMessage) =>
+    public async Task<string?> CreateCallOffMessage(string busEventMessage) =>
         long.TryParse(busEventMessage, out var callOffId)
             ? WashString(await _busSenderMessageRepository.GetCallOffMessage(callOffId))
             : throw new Exception("Failed to extract callOffId from message");
 
-    public async Task<string> CreateChecklistMessage(string busEventMessage) =>
+    public async Task<string?> CreateChecklistMessage(string busEventMessage) =>
         long.TryParse(busEventMessage, out var checkListId)
             ? JsonSerializer.Serialize(await _dapperRepository.QuerySingle<ChecklistEvent>(ChecklistQuery.GetQuery(checkListId),checkListId.ToString()))
             : throw new Exception("Failed to extract checkListId from message");
 
-    public async Task<string> CreateCommPkgQueryMessage(string message) =>
+    public async Task<string?> CreateCommPkgQueryMessage(string message) =>
         CanGetTwoIdsFromMessage(message.Split(","), out var commPkgId, out var documentId)
             ? WashString(await _busSenderMessageRepository.GetCommPkgQueryMessage(commPkgId,documentId))
             : throw new Exception("Failed to extract checkListId from message");
 
-    public async Task<string> CreateCommPkgOperationMessage(string busEventMessage) =>
+    public async Task<string?> CreateCommPkgOperationMessage(string busEventMessage) =>
         long.TryParse(busEventMessage, out var commPkgId)
             ? WashString(await _busSenderMessageRepository.GetCommPkgOperationMessage(commPkgId))
             : throw new Exception("Failed to extract commPkgId from message");
 
-    public async Task<string> CreateDocumentMessage(string busEventMessage) =>
+    public async Task<string?> CreateDocumentMessage(string busEventMessage) =>
         long.TryParse(busEventMessage, out var documentId)
             ? WashString(await _busSenderMessageRepository.GetDocumentMessage(documentId))
             : throw new Exception("Failed to extract documentId from message");
 
-    public async Task<string> CreateTaskMessage(string busEventMessage) =>
+    public async Task<string?> CreateTaskMessage(string busEventMessage) =>
         long.TryParse(busEventMessage, out var taskId)
             ? WashString(await _busSenderMessageRepository.GetTaskMessage(taskId))
             : throw new Exception("Failed to extract taskId from message");
 
-    public async Task<string> CreateSwcrOtherReferenceMessage(string busEventMessage) =>
+    public async Task<string?> CreateSwcrOtherReferenceMessage(string busEventMessage) =>
         Guid.TryParse(busEventMessage, out _)
             ? WashString(await _busSenderMessageRepository.GetSwcrOtherReferenceMessage(busEventMessage))
             : throw new Exception($"Failed to extract or parse guid SwcrOtherReferences from message {busEventMessage}");
 
-    public async Task<string> CreateSwcrTypeMessage(string busEventMessage) =>
+    public async Task<string?> CreateSwcrTypeMessage(string busEventMessage) =>
         Guid.TryParse(busEventMessage, out _)
             ? WashString(await _busSenderMessageRepository.GetSwcrTypeMessage(busEventMessage))
             : throw new Exception($"Failed to extract or parse guid SwcrType from message {busEventMessage}");
 
-    public async Task<string> CreateSwcrAttachmentMessage(string busEventMessage) =>
+    public async Task<string?> CreateSwcrAttachmentMessage(string busEventMessage) =>
     Guid.TryParse(busEventMessage, out _)
         ? WashString(await _busSenderMessageRepository.GetSwcrAttachmentMessage(busEventMessage))
         : throw new Exception($"Failed to extract or parse guid SwcrAttachment from message {busEventMessage}");
 
-    public async Task<string> CreateActionMessage(string busEventMessage) =>
+    public async Task<string?> CreateActionMessage(string busEventMessage) =>
         long.TryParse(busEventMessage, out var actionId)
             ? WashString(await _busSenderMessageRepository.GetActionMessage(actionId))
             : throw new Exception("Failed to extract actionId from message");
 
-    public async Task<string> CreateCommPkgTaskMessage(string busEventMessage) =>
+    public async Task<string?> CreateCommPkgTaskMessage(string busEventMessage) =>
         CanGetTwoIdsFromMessage(busEventMessage.Split(","), out var commPkgId, out var taskId)
             ? WashString(await _busSenderMessageRepository.GetCommPkgTaskMessage(commPkgId,taskId))
             : throw new Exception("Failed to extract commPkgId/taskId from message");
 
-    public async Task<string> CreateMcPkgMilestoneMessage(string message)
+    public async Task<string?> CreateMcPkgMilestoneMessage(string message)
     {
         if (!Guid.TryParse(message, out _))
         {
@@ -102,7 +102,7 @@ public class BusEventService : IBusEventService
         var mcPkgMilestoneEvents = await _dapperRepository.QuerySingle<McPkgMilestoneEvent>(queryString, message);
         return JsonSerializer.Serialize(mcPkgMilestoneEvents, DefaultSerializerHelper.SerializerOptions);
     }
-    public async Task<string> CreateCommPkgMilestoneMessage(string message)
+    public async Task<string?> CreateCommPkgMilestoneMessage(string message)
     {
         if (!Guid.TryParse(message, out _))
         {
@@ -114,73 +114,87 @@ public class BusEventService : IBusEventService
         return JsonSerializer.Serialize(mcPkgMilestoneEvents, DefaultSerializerHelper.SerializerOptions);
     }
 
-    public async Task<string> CreateLoopContentMessage(string busEventMessage)
+    public async Task<string?> CreateLoopContentMessage(string busEventMessage)
         => long.TryParse(busEventMessage, out var loopContentId)
             ? WashString(await _busSenderMessageRepository.GetLoopContentMessage(loopContentId))
             : throw new Exception("Failed to extract LoopContent from message");
 
-    public async Task<string> CreateLibraryFieldMessage(string busEventMessage) =>
+    public async Task<string?> CreateLibraryFieldMessage(string busEventMessage) =>
         Guid.TryParse(busEventMessage, out _)
             ? WashString(await _busSenderMessageRepository.GetLibraryFieldMessage(busEventMessage))
             : throw new Exception($"Failed to extract or parse guid for LibraryField from message {busEventMessage}");
 
-    public async Task<string> CreatePipingRevisionMessage(string busEventMessage)
+    public async Task<string?> CreatePipingRevisionMessage(string busEventMessage)
         => long.TryParse(busEventMessage, out var pipingRevisionId)
             ? WashString(await _busSenderMessageRepository.GetPipingRevisionMessage(pipingRevisionId))
             : throw new Exception("Failed to extract PipeRevision from message");
 
-    public async Task<string> CreateHeatTraceMessage(string busEventMessage)
+    public async Task<string?> CreateHeatTraceMessage(string busEventMessage)
         => long.TryParse(busEventMessage, out var heatTraceId)
             ? WashString(await _busSenderMessageRepository.GetHeatTraceMessage(heatTraceId))
             : throw new Exception("Failed to extract (heat trace)id from message");
 
-    public async Task<string> CreatePipingSpoolMessage(string busEventMessage) =>
+    public async Task<string?> CreatePipingSpoolMessage(string busEventMessage) =>
             long.TryParse(busEventMessage, out var pipingSpoolId)
             ? WashString(await _busSenderMessageRepository.GetPipingSpoolMessage(pipingSpoolId))
             : throw new Exception("Failed to extract PipingSpool from message");
 
-    public async Task<string> CreateQueryMessage(string busEventMessage) =>
+    public async Task<string?> CreateQueryMessage(string busEventMessage) =>
         long.TryParse(busEventMessage, out var documentId)
             ? WashString(await _busSenderMessageRepository.GetQueryMessage(documentId))
             : throw new Exception("Failed to extract documentId from message");
 
-    public async Task<string> CreateQuerySignatureMessage(string busEventMessage) =>
+    public async Task<string?> CreateQuerySignatureMessage(string busEventMessage) =>
         long.TryParse(busEventMessage, out var querySignatureId)
             ? WashString(await _busSenderMessageRepository.GetQuerySignatureMessage(querySignatureId))
             : throw new Exception("Failed to extract QuerySignature from message");
 
 
-    public async Task<string> CreateStockMessage(string busEventMessage) =>
+    public async Task<string?> CreateStockMessage(string busEventMessage) =>
         long.TryParse(busEventMessage, out var stockId)
             ? WashString(await _busSenderMessageRepository.GetStockMessage(stockId))
             : throw new Exception("Failed to extract stockId from message");
 
-    public async Task<string> CreateSwcrMessage(string busEventMessage) =>
+    public async Task<string?> CreateSwcrMessage(string busEventMessage) =>
         long.TryParse(busEventMessage, out var swcrId)
             ? WashString(await _busSenderMessageRepository.GetSwcrMessage(swcrId))
             : throw new Exception("Failed to extract swcrId from message");
 
-    public async Task<string> CreateSwcrSignatureMessage(string busEventMessage) =>
+    public async Task<string?> CreateSwcrSignatureMessage(string busEventMessage) =>
         long.TryParse(busEventMessage, out var swcrSignatureId)
             ? WashString(await _busSenderMessageRepository.GetSwcrSignatureMessage(swcrSignatureId))
             : throw new Exception("Failed to extract swcrSignatureId from message");
 
-    public async Task<string> CreateWoChecklistMessage(string busEventMessage) =>
+    public async Task<string?> CreateWoChecklistMessage(string busEventMessage) =>
         CanGetTwoIdsFromMessage(busEventMessage.Split(","), out var tagCheckId, out var woId)
             ? WashString(await _busSenderMessageRepository.GetWorkOrderChecklistMessage(tagCheckId, woId))
             : throw new Exception("Failed to extract Wo or Checklist Id from message");
 
-    public async Task<string> CreateWoMaterialMessage(string busEventMessage) =>
+    public async Task<string?> CreateWoMaterialMessage(string busEventMessage) =>
         long.TryParse(busEventMessage, out var workOrderId)
             ? WashString(await _busSenderMessageRepository.GetWorkOrderMaterialMessage(workOrderId))
             : throw new Exception("Failed to extract workOrderId from message");
 
-    public async Task<string> CreateWoMilestoneMessage(string message) =>
-        CanGetTwoIdsFromMessage(message.Split(","), out var workOrderId, out var milestoneId)
-            ? WashString(await _busSenderMessageRepository.GetWorkOrderMilestoneMessage(workOrderId, milestoneId))
-            : throw new Exception("Failed to extract WorkOrder or Milestone Id from message");
+    public async Task<string?> CreateWoMilestoneMessage(string message)
+    {
+        if (CanGetTwoIdsFromMessage(message.Split(","), out var workOrderId, out var milestoneId))
+        {
+            throw new Exception($"Failed to extract guid from message {message}");
+        }
 
-    public async Task<string> CreateWorkOrderMessage(string message)
+        var queryString = WorkOrderMilestoneQuery.GetQuery(workOrderId,milestoneId);
+        var workOrderMilestoneEvent = await _dapperRepository.QuerySingle<WorkOrderMilestoneEvent>(queryString, message);
+        return JsonSerializer.Serialize(workOrderMilestoneEvent, DefaultSerializerHelper.SerializerOptions);
+
+
+
+
+        //return CanGetTwoIdsFromMessage(message.Split(","), out var workOrderId, out var milestoneId)
+        //    ? WashString(await _busSenderMessageRepository.GetWorkOrderMilestoneMessage(workOrderId, milestoneId))
+        //    : throw new Exception("Failed to extract WorkOrder or Milestone Id from message");
+    }
+
+    public async Task<string?> CreateWorkOrderMessage(string message)
     {
         if (!long.TryParse(message, out var workOrderId))
         {
@@ -192,7 +206,7 @@ public class BusEventService : IBusEventService
         return JsonSerializer.Serialize(workOrderEvent, DefaultSerializerHelper.SerializerOptions);
     }
 
-    public async Task<string> CreateWorkOrderCutOffMessage(string message)
+    public async Task<string?> CreateWorkOrderCutOffMessage(string message)
     {
         var  woInfo = message.Split(","); // woId,cutoffweek
         if (woInfo.Length != 2)
@@ -204,7 +218,7 @@ public class BusEventService : IBusEventService
             : throw new Exception("Failed to extract workOrderId from message");
     }
 
-    public string WashString(string busEventMessage)
+    public string? WashString(string? busEventMessage)
     {
         if (string.IsNullOrEmpty(busEventMessage))
         {

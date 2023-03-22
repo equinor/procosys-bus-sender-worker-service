@@ -1,18 +1,17 @@
-﻿
-using System;
+﻿using System;
 using Equinor.ProCoSys.PcsServiceBus;
 using Equinor.ProCoSys.PcsServiceBus.Interfaces;
+#pragma warning disable CS8618
 
 namespace Equinor.ProCoSys.BusSenderWorker.Core.Models;
 
-public class WorkOrderEvent : IWorkOrderEvent
+public class WorkOrderEvent : IWorkOrderEventV1
 {
-    public string EventType => PcsEventConstants.WorkOrderCreateOrUpdate;
     public string Plant { get; set; }
     public Guid ProCoSysGuid { get; set; }
     public string ProjectName { get; set; }
     public string WoNo { get; set; }
-    public int WoId { get; set; }
+    public long WoId { get; set; }
     public string CommPkgNo { get; set; }
     public Guid? CommPkgGuid { get; set; }
     public string Title { get; set; }
@@ -40,11 +39,13 @@ public class WorkOrderEvent : IWorkOrderEvent
     public string EstimatedHours { get; set; }
     public string RemainingHours { get; set; }
     public int Progress { get; set; }
-    public DateTime PlannedStartAtDate { get; set; }
-    public DateTime ActualStartAtDate { get; set; }
-    public DateTime PlannedFinishedAtDate { get; set; }
-    public DateTime ActualFinishedAtDate { get; set; }
+    public DateOnly? PlannedStartAtDate { get; set; }
+    public DateOnly? ActualStartAtDate { get; set; }
+    public DateOnly? PlannedFinishedAtDate { get; set; }
+    public DateOnly? ActualFinishedAtDate { get; set; }
     public DateTime CreatedAt { get; set; }
     public bool IsVoided { get; set; }
     public DateTime LastUpdated { get; set; }
+
+    public string EventType => PcsEventConstants.WorkOrderCreateOrUpdate;
 }

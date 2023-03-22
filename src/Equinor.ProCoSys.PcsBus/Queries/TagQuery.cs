@@ -2,7 +2,7 @@
 
 public class TagQuery
 {
-    public static string GetQuery(long? tagId, string plant = null)
+    public static string GetQuery(long? tagId, string? plant = null)
     {
         DetectFaultyPlantInput(plant);
         var whereClause = CreateWhereClause(tagId, plant, "t", "tag_id");
