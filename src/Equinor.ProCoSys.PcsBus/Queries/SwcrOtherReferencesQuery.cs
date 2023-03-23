@@ -8,17 +8,16 @@ public class SwcrOtherReferencesQuery
         var whereClause = CreateWhereClauseForGuid(swcrOtherReferencesGuid, plant, "slr", "procosys_guid");
 
         return @$"select
-           '{{""Plant"" : ""' || slr.ProjectSchema ||
-           '"", ""ProCoSysGuid"" : ""' || slr.PROCOSYS_GUID ||
-           '"", ""LibraryGuid"" : ""' || l.PROCOSYS_GUID ||
-           '"", ""SwcrGuid"" : ""' || s.PROCOSYS_GUID ||
-           '"", ""Code"" : ""' || regexp_replace(l.CODE, '([""\])', '\\\1') ||
-           '"", ""Description"" : ""' || regexp_replace(slr.DESCRIPTION, '([""\])', '\\\1') ||
-           '"", ""LastUpdated"" : ""' || TO_CHAR(slr.LAST_UPDATED, 'yyyy-mm-dd hh24:mi:ss') ||
-           '""}}' as message
-            FROM SWCRLIBRARYREFERENCE slr
-                INNER JOIN SWCR s ON s.SWCR_ID = slr.SWCR_ID
-                INNER JOIN LIBRARY l ON slr.LIBRARY_ID = l.LIBRARY_ID
-            {whereClause}";
+            slr.ProjectSchema as Plant,
+            slr.PROCOSYS_GUID as ProCoSysGuid,
+            l.PROCOSYS_GUID as LibraryGuid,
+            s.PROCOSYS_GUID as SwcrGuid,
+            l.CODE as Code,
+            slr.DESCRIPTION as Description,
+            slr.LAST_UPDATED as LastUpdated
+        from SWCRLIBRARYREFERENCE slr
+                join SWCR s ON s.SWCR_ID = slr.SWCR_ID
+                join LIBRARY l ON slr.LIBRARY_ID = l.LIBRARY_ID
+        {whereClause}";
     }
 }

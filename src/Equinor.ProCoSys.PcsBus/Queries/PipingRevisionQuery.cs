@@ -8,24 +8,23 @@ public static class PipingRevisionQuery
         var whereClause = CreateWhereClause(pipeRevId, plant, "pr", "pipingrevision_id");
 
         return @$"select
-            '{{""Plant"" : ""' || pr.projectschema ||
-            '"", ""ProCoSysGuid"" : ""' || pr.procosys_guid ||
-            '"", ""PipingRevisionId"" : ""' || pr.pipingrevision_id ||
-            '"", ""Revision"" : ""' || pr.testrevisionno || 
-            '"", ""McPkgNo"" : ""' || m.mcpkgno ||
-            '"", ""McPkgNoGuid"" : ""' || m.procosys_guid ||
-            '"", ""ProjectName"" : ""' || p.name || 
-            '"", ""MaxDesignPressure"" : ""' || pr.maxdesignpressure || 
-            '"", ""MaxTestPressure"" : ""' || pr.maxtestpressure || 
-            '"", ""Comments"" : ""' || regexp_replace(pr.comments, '([""\])', '\\\1') ||
-            '"", ""TestISODocumentNo"" : ""' ||  regexp_replace(ti.documentno, '([""\])', '\\\1') ||
-            '"", ""TestISODocumentGuid"" : ""' || ti.procosys_guid ||
-            '"", ""TestISORevision"" : ""' ||  regexp_replace(pr.TEST_ISO_REVISIONNO, '([""\])', '\\\1') ||
-            '"", ""PurchaseOrderNo"" : ""' || po.packageno || 
-            '"", ""CallOffNo"" : ""' || co.calloffno ||
-            '"", ""CallOffGuid"" : ""' || co.procosys_guid ||
-            '"", ""LastUpdated"" : ""' || TO_CHAR(pr.LAST_UPDATED, 'yyyy-mm-dd hh24:mi:ss') || 
-            '""}}' as message
+            pr.projectschema as Plant,
+            pr.procosys_guid as ProCoSysGuid,
+            pr.pipingrevision_id as PipingRevisionId,
+            pr.testrevisionno as Revision,
+            m.mcpkgno as McPkgNo,
+            m.procosys_guid as McPkgNoGuid,
+            p.name as ProjectName,
+            pr.maxdesignpressure as MaxDesignPressure,
+            pr.maxtestpressure as MaxTestPressure,
+            pr.comments as Comments,
+            ti.documentno as TestISODocumentNo,
+            ti.procosys_guid as TestISODocumentGuid,
+            pr.TEST_ISO_REVISIONNO as TestISORevision,
+            po.packageno as PurchaseOrderNo,
+            co.calloffno as CallOffNo,
+            co.procosys_guid as CallOffGuid,
+            pr.LAST_UPDATED as LastUpdated
         from pipingrevision pr              
             join mcpkg m on m.mcpkg_id = pr.mcpkg_id
             join project p on p.project_id=m.project_id

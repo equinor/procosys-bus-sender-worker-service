@@ -8,16 +8,15 @@ public class WorkOrderChecklistsQuery
         var whereClause = CreateWhereClause(tagCheckId, woId, plant);
 
         return @$"select
-            '{{""Plant"" : ""' || wotc.projectschema ||
-            '"", ""ProCoSysGuid"" : ""' || wotc.procosys_guid ||
-            '"", ""ProjectName"" : ""' || p.NAME ||
-            '"", ""ChecklistId"" : ""' || wotc.tagcheck_id ||
-            '"", ""ChecklistGuid"" : ""' || tc.procosys_guid ||
-            '"", ""WoId"" : ""' || wotc.wo_id ||
-            '"", ""WoGuid"" : ""' || wo.procosys_guid ||
-            '"", ""WoNo"" : ""' || regexp_replace(wo.wono, '([""\])', '\\\1') ||
-            '"", ""LastUpdated"" : ""' || TO_CHAR(wotc.last_updated, 'yyyy-mm-dd hh24:mi:ss') ||
-            '""}}'
+            wotc.projectschema as Plant,
+            wotc.procosys_guid as ProCoSysGuid,
+            p.NAME as ProjectName,
+            wotc.tagcheck_id as ChecklistId,
+            tc.procosys_guid as ChecklistGuid,
+            wotc.wo_id as WoId,
+            wo.procosys_guid as WoGuid,
+            wo.wono as WoNo,
+            wotc.last_updated as LastUpdated
         FROM wo_tagcheck wotc
             join wo on wo.wo_id = wotc.wo_id
             join tagcheck tc on tc.tagcheck_id = wotc.tagcheck_id

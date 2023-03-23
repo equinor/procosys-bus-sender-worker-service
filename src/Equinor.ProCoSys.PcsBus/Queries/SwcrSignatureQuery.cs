@@ -8,21 +8,20 @@ public class SwcrSignatureQuery
         var whereClause = CreateWhereClause(swcrSignatureId, plant, "sign", "swcrsignature_id");
 
         return @$"select
-            '{{""Plant"" : ""' || sign.projectschema ||
-            '"", ""ProCoSysGuid"" : ""' || sign.procosys_guid ||
-            '"", ""SwcrSignatureId"" : ""' || sign.swcrsignature_id ||
-            '"", ""ProjectName"" : ""' || p.NAME ||
-            '"", ""SWCRNO"" : ""' || s.swcrno ||
-            '"", ""SwcrGuid"" : ""' || s.procosys_guid ||
-            '"", ""SignatureRoleCode"" : ""' || regexp_replace(sr.code, '([""\])', '\\\1') ||
-            '"", ""SignatureRoleDescription"" : ""' || regexp_replace(sr.description, '([""\])', '\\\1') ||
-            '"", ""Sequence"" : ""' || sign.ranking ||
-            '"", ""SignedByAzureOid"" : ""' || p.azure_oid ||
-            '"", ""FunctionalRoleCode"" : ""' || regexp_replace(fr.code, '([""\])', '\\\1') ||
-            '"", ""FunctionalRoleDescription"" : ""' || regexp_replace(fr.description, '([""\])', '\\\1') ||
-            '"", ""SignedDate"" : ""' || TO_CHAR(sign.signedat, 'yyyy-mm-dd hh24:mi:ss') ||
-            '"", ""LastUpdated"" : ""' || TO_CHAR(sign.last_updated, 'yyyy-mm-dd hh24:mi:ss') ||
-            '""}}' as message
+            sign.projectschema as Plant,
+            sign.procosys_guid as ProCoSysGuid,
+            sign.swcrsignature_id as SwcrSignatureId,
+            p.NAME as ProjectName,
+            s.swcrno as SWCRNO,
+            s.procosys_guid as SwcrGuid,
+            sr.code as SignatureRoleCode,
+            sr.description as SignatureRoleDescription,
+            sign.ranking as Sequence,
+            p.azure_oid as SignedByAzureOid,
+            fr.code as FunctionalRoleCode,
+            fr.description as FunctionalRoleDescription,
+            sign.signedat as SignedDate,
+            sign.last_updated as LastUpdated
         from swcrsignature sign
             join swcr s on s.swcr_id = sign.swcr_id
             join projectschema ps ON ps.projectschema = sign.projectschema

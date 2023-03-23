@@ -6,25 +6,24 @@ public class QueryCommPkgQuery
     {
         DetectFaultyPlantInput(plant);
         var whereClause = CreateWhereClause(commPkgId,documentId, plant);
+        const string Query = @"QUERY";
 
-        return @$"select
-        '{{""Plant"" : ""' || er.projectschema ||
-        '"", ""ProCoSysGuid"" : ""' || er.procosys_guid ||
-        '"", ""ProjectName"" : ""' || p.name ||
-        '"", ""CommPkgPlaceHolderId"" : ""' || 'c.placeholderId' ||
-        '"", ""CommPkgId"" : ""' || c.commpkg_id ||
-        '"", ""CommPkgGuid"" : ""' || c.procosys_guid ||
-        '"", ""CommPkgNo"" : ""' || c.commpkgno ||
-        '"", ""DocumentId"" : ""' || d.document_id ||
-        '"", ""QueryNo"" : ""' || d.documentno ||
-        '"", ""QueryGuid"" : ""' || d.procosys_guid ||
-        '"", ""LastUpdated"" : ""' || TO_CHAR(er.last_updated, 'yyyy-mm-dd hh24:mi:ss') ||
-        '""}}' as message
+        return $@"select
+            er.projectschema as Plant,
+            er.procosys_guid as ProCoSysGuid,
+            p.name as ProjectName,
+            c.commpkg_id as CommPkgId,
+            c.procosys_guid as CommPkgGuid,
+            c.commpkgno as CommPkgNo,
+            d.document_id as DocumentId,
+            d.documentno as QueryNo,
+            d.procosys_guid as QueryGuid,
+            er.last_updated as Last
         from elementreference er
             join commpkg c on c.commpkg_id = er.fromelement_id
             join project p on p.project_id = c.project_id
             join document d on d.document_id = er.toelement_id
-            join library l on l.library_id = d.register_id and l.code = 'QUERY'
+            join library l on l.library_id = d.register_id and l.code = '{Query}'
         {whereClause}";
     }
 

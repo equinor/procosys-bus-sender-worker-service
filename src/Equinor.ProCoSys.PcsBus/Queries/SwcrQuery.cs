@@ -33,11 +33,11 @@ public class SwcrQuery
         from swcr sw
             join element e on  E.ELEMENT_ID = sw.swcr_ID
             join projectschema ps ON ps.projectschema = sw.projectschema
-            join project p ON p.project_id = sw.project_id
+            left join project p ON p.project_id = sw.project_id
             left join commpkg c ON c.commpkg_id = sw.commpkg_id
             left join library pri ON pri.library_id = sw.priority_id
             left join library sys On sys.library_id = sw.processsystem_id
-            left join library con ON con.library_id =sw.contract_id
+            left join library con ON con.library_id = sw.contract_id
             left join library cs ON cs.library_id = sw.controlsystem_id
             left join library sup ON sup.library_id = sw.supplier_id
             left join library act On act.library_id = sw.action_id 

@@ -8,27 +8,26 @@ public class DocumentQuery
         var whereClause = CreateWhereClause(documentId, plant, "d", "document_id");
 
         return @$"select
-       '{{""Plant"": ""' || d.projectschema ||
-       '"", ""ProCoSysGuid"" : ""' || d.procosys_guid ||
-       '"", ""ProjectName"" : ""' || p.name ||
-       '"", ""DocumentId"" : ""' || d.document_id ||
-       '"", ""DocumentNo"" : ""' || regexp_replace(d.documentno, '([""\])', '\\\1') ||
-       '"", ""Title"" : ""' || regexp_replace(d.title, '([""\])', '\\\1') ||
-       '"", ""AcceptanceCode"" : ""' || apc.code ||
-       '"", ""Archive"" : ""' || arc.code ||
-       '"", ""AccessCode"" : ""' || acc.code ||
-       '"", ""Complex"" : ""' || com.code ||
-       '"", ""DocumentType"" : ""' || DT.code ||
-       '"", ""DisciplineId"" : ""' || dp.code ||
-       '"", ""DocumentCategory"" : ""' || dc.code ||
-       '"", ""HandoverStatus"" : ""' || ho.code ||
-       '"", ""RegisterType"" : ""' || RT.code ||
-       '"", ""RevisionNo"" : ""' || d.revisionno ||
-       '"", ""RevisionStatus"" : ""' || rev.code ||
-       '"", ""ResponsibleContractor"" : ""' || res.code ||
-       '"", ""LastUpdated"" : ""' || TO_CHAR(d.last_Updated, 'yyyy-mm-dd hh24:mi:ss') ||
-       '"", ""RevisionDate"" : ""' || TO_CHAR(d.revisiondate, 'yyyy-mm-dd hh24:mi:ss') ||
-       '""}}' as message
+            d.projectschema as Plant,
+            d.procosys_guid as ProCoSysGuid,
+            p.name as ProjectName,
+            d.document_id as DocumentId,
+            d.documentno as DocumentNo,
+            d.title as Title,
+            apc.code as AcceptanceCode,
+            arc.code as Archive,
+            acc.code as AccessCode,
+            com.code as Complex,
+            DT.code as DocumentType,
+            dp.code as DisciplineId,
+            dc.code as DocumentCategory,
+            ho.code as HandoverStatus,
+            RT.code as RegisterType,
+            d.revisionno as RevisionNo,
+            rev.code as RevisionStatus,
+            res.code as ResponsibleContractor,
+            d.last_Updated as LastUpdated,
+            d.revisiondate as RevisionDate
         from document d
             left join project p on p.project_id = d.project_id
             left join library RT on RT.library_id = d.register_id

@@ -8,40 +8,39 @@ public class PunchListItemQuery
         var whereClause = CreateWhereClause(punchListItemId, plant, "pl", "punchlistitem_id");
 
         return @$"select
-            '{{""Plant"" : ""' || pl.projectschema ||
-            '"", ""ProCoSysGuid"" : ""' || pl.procosys_guid ||
-            '"", ""ProjectName"" : ""' || p.name ||
-            '"", ""LastUpdated"" : ""' || TO_CHAR(pl.LAST_UPDATED, 'yyyy-mm-dd hh24:mi:ss') ||               
-            '"", ""PunchItemNo"" : ""' || pl.PunchListItem_Id ||
-            '"", ""Description"" : ""' || regexp_replace(pl.Description, '([""\])', '\\\1') ||
-            '"", ""ChecklistId"" : ""' || pl.tagcheck_id ||
-            '"", ""ChecklistGuid"" : ""' || tc.procosys_guid ||
-            '"", ""Category"" : ""' || regexp_replace(cat.code, '([""\])', '\\\1') ||
-            '"", ""RaisedByOrg"" : ""' || regexp_replace(raised.code, '([""\])', '\\\1') ||
-            '"", ""ClearingByOrg"" : ""' || regexp_replace(cleared.code, '([""\])', '\\\1') ||
-            '"", ""DueDate"" : ""' || TO_CHAR(pl.duedate, 'yyyy-mm-dd hh24:mi:ss') ||
-            '"", ""PunchListSorting"" : ""' || regexp_replace(plsorting.code, '([""\])', '\\\1') ||
-            '"", ""PunchListType"" : ""' || regexp_replace(pltype.code, '([""\])', '\\\1') ||
-            '"", ""PunchPriority"" : ""' || regexp_replace(plpri.code, '([""\])', '\\\1') ||
-            '"", ""Estimate"" : ""' || pl.estimate ||
-            '"", ""OriginalWoNo"" : ""' || regexp_replace(orgwo.wono, '([""\])', '\\\1') ||
-            '"", ""OriginalWoGuid"" : ""' || orgwo.procosys_guid ||            
-            '"", ""WoNo"" : ""' || regexp_replace(wo.wono, '([""\])', '\\\1') ||
-            '"", ""WoGuid"" : ""' || wo.procosys_guid ||            
-            '"", ""SWCRNo"" : ""' || swcr.swcrno ||
-            '"", ""SWCRGuid"" : ""' || swcr.procosys_guid ||
-            '"", ""DocumentNo"" : ""' || regexp_replace(doc.documentno, '([""\])', '\\\1') ||
-            '"", ""DocumentGuid"" : ""' || doc.procosys_guid ||                        
-            '"", ""ExternalItemNo"" : ""' ||  regexp_replace(pl.external_itemno, '([""\])', '\\\1') ||
-            '"", ""MaterialRequired"" : ' || decode(pl.ismaterialrequired,'Y', 'true', 'false') ||
-            ', ""IsVoided"" : ' || decode(pl.isVoided,'Y', 'true', 'false') ||
-            ', ""MaterialETA"" : ""' || TO_CHAR(pl.material_eta, 'yyyy-mm-dd hh24:mi:ss') ||
-            '"", ""MaterialExternalNo"" : ""' || regexp_replace(pl.materialno, '([""\])', '\\\1') ||
-            '"", ""ClearedAt"" : ""' || TO_CHAR(pl.clearedat, 'yyyy-mm-dd hh24:mi:ss') ||
-            '"", ""RejectedAt"" : ""' || TO_CHAR(pl.rejectedat, 'yyyy-mm-dd hh24:mi:ss') ||
-            '"", ""VerifiedAt"" : ""' || TO_CHAR(pl.verifiedat, 'yyyy-mm-dd hh24:mi:ss') ||
-            '"", ""CreatedAt"" : ""' || TO_CHAR(pl.createdat, 'yyyy-mm-dd hh24:mi:ss') ||
-            '""}}' as message
+            pl.projectschema as Plant,
+            pl.procosys_guid as ProCoSysGuid,
+            p.name as ProjectName,
+            pl.LAST_UPDATED as LastUpdated,
+            pl.PunchListItem_Id as PunchItemNo,
+            pl.Description as Description,
+            pl.tagcheck_id as ChecklistId,
+            tc.procosys_guid as ChecklistGuid,
+            cat.code as Category,
+            raised.code as RaisedByOrg,
+            cleared.code as ClearingByOrg,
+            pl.duedate as DueDate,
+            plsorting.code as PunchListSorting,
+            pltype.code as PunchListType,
+            plpri.code as PunchPriority,
+            pl.estimate as Estimate,
+            orgwo.wono as OriginalWoNo,
+            orgwo.procosys_guid as OriginalWoGuid,
+            wo.wono as WoNo,
+            wo.procosys_guid as WoGuid,
+            swcr.swcrno as SWCRNo,
+            swcr.procosys_guid as SWCRGuid,
+            doc.documentno as DocumentNo,
+            doc.procosys_guid as DocumentGuid,
+            pl.external_itemno as ExternalItemNo,
+            pl.ismaterialrequired as MaterialRequired,
+            pl.isVoided as IsVoided,
+            pl.material_eta as MaterialETA,
+            pl.materialno as MaterialExternalNo,
+            pl.clearedat as ClearedAt,
+            pl.rejectedat as RejectedAt,
+            pl.verifiedat as VerifiedAt,
+            pl.createdat as CreatedAt
         from punchlistitem pl
             join tagcheck tc on tc.tagcheck_id = pl.tagcheck_id
             left join Responsible r ON tc.Responsible_id = r.Responsible_Id

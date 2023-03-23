@@ -11,29 +11,28 @@ public class WorkOrderMaterialQuery
         var whereClause = CreateWhereClause(woId, plant, "wm", "wo_id");
 
         return @$"select
-            '{{""Plant"" : ""' || wm.projectschema ||
-            '"", ""ProCoSysGuid"" : ""' || wm.procosys_guid ||
-            '"", ""ProjectName"" : ""' || p.NAME || 
-            '"", ""WoNo"" : ""' || regexp_replace(wo.wono, '([""\])', '\\\1') ||
-            '"", ""WoId"" : ""' || wo.wo_id ||
-            '"", ""WoGuid"" : ""' || wo.procosys_guid ||
-            '"", ""ItemNo"" : ""' || wm.itemno || 
-            '"", ""TagNo"" : ""' || regexp_replace(t.tagno, '([""\])', '\\\1') ||
-            '"", ""TagId"" : ""' || wm.tag_id ||
-            '"", ""TagGuid"" : ""' || t.procosys_guid ||
-            '"", ""TagRegisterCode"" : ""' || tl.code ||
-            '"", ""StockId"" : ""' || wm.stock_id ||
-            '"", ""Quantity"" : ""' || wm.quantity ||
-            '"", ""UnitName"" : ""' || regexp_replace(u.name, '([""\])', '\\\1') ||
-            '"", ""UnitDescription"" : ""' || regexp_replace(u.description, '([""\])', '\\\1') ||
-            '"", ""AdditionalInformation"" : ""' || regexp_replace(wm.description, '([""\])', '\\\1') ||
-            '"", ""RequiredDate"" : ""' || TO_CHAR(wm.requireddate, 'yyyy-mm-dd hh24:mi:ss') ||
-            '"", ""EstimatedAvailableDate"" : ""' || TO_CHAR(wm.ESTIMATEDAVAILABLEDATE, 'yyyy-mm-dd hh24:mi:ss') ||
-            '"", ""Available"" : ""' || decode(wm.AVAILABLE,'Y', 'true', 'N', 'false') ||
-            '"", ""MaterialStatus"" : ""' ||regexp_replace(ms.code, '([""\])', '\\\1') ||       
-            '"", ""StockLocation"" : ""' || regexp_replace(sl.code, '([""\])', '\\\1') ||
-            '"", ""LastUpdated"" : ""' || TO_CHAR(wm.last_updated, 'yyyy-mm-dd hh24:mi:ss') ||        
-            '""}}' as message
+            wm.projectschema as Plant,
+            wm.procosys_guid as ProCoSysGuid,
+            p.NAME as ProjectName,
+            wo.wono as WoNo,
+            wo.wo_id as WoId,
+            wo.procosys_guid as WoGuid,
+            wm.itemno as ItemNo,
+            t.tagno as TagNo,
+            wm.tag_id as TagId,
+            t.procosys_guid as TagGuid,
+            tl.code as TagRegisterCode,
+            wm.stock_id as StockId,
+            wm.quantity as Quantity,
+            u.name as UnitName,
+            u.description as UnitDescription,
+            wm.description as AdditionalInformation,
+            wm.requireddate as RequiredDate,
+            wm.ESTIMATEDAVAILABLEDATE as EstimatedAvailableDate,
+            wm.AVAILABLE as Available,
+            ms.code as MaterialStatus,
+            sl.code as StockLocation,
+            wm.last_updated as LastUpdated
         from wo_material wm
             join wo on wo.wo_id = wm.wo_id
             join project p on p.project_id = wo.project_id       

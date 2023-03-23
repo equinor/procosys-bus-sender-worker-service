@@ -7,38 +7,38 @@ public class TagQuery
         DetectFaultyPlantInput(plant);
         var whereClause = CreateWhereClause(tagId, plant, "t", "tag_id");
 
+        //TODO fix to and from guid and test this
+
         return @$"select
-            '{{'||
-            '""Plant"" : ""' || t.projectschema || '"",' ||
-            '""ProCoSysGuid"" : ""' || t.procosys_guid ||  '"",' ||
-            '""TagNo"" : ""' || regexp_replace(t.tagno, '([""\])', '\\\1') || '"",' ||
-            '""Description"" : ""' || regexp_replace(t.description, '([""\])', '\\\1') || '"",'||
-            '""ProjectName"" : ""' || p.name || '"",' ||
-            '""McPkgNo"" : ""' || mcpkg.mcpkgno || '"",' ||
-            '""McPkgGuid"" : ""' || mcpkg.procosys_guid || '"",' ||
-            '""CommPkgNo"" : ""' || commpkg.commpkgno || '"",' ||
-            '""CommPkgGuid"" : ""' || commpkg.procosys_guid || '"",' ||
-            '""TagId"" : ""' || t.tag_id || '"",' ||
-            '""AreaCode"" : ""' || area.code || '"",' ||
-            '""AreaDescription"" : ""' || regexp_replace(area.description, '([""\])', '\\\1') || '"",' ||
-            '""DisciplineCode"" : ""' || discipline.code || '"",' ||
-            '""DisciplineDescription"" : ""' || regexp_replace(discipline.description, '([""\])', '\\\1') || '"",' ||
-            '""RegisterCode"" : ""' || register.code || '"",' ||
-            '""InstallationCode"" : ""' || installation.code || '"",' ||
-            '""Status"" : ""' || status.code || '"",' ||
-            '""System"" : ""' || system.code || '"",' ||
-            '""CallOffNo"" : ""' || calloff.calloffno || '"",' ||
-            '""CallOffGuid"" : ""' || calloff.procosys_guid || '"",' ||
-            '""PurchaseOrderNo"" : ""' || purchaseorder.packageno || '"",' ||
-            '""TagFunctionCode"" : ""' || tagfunction.tagfunctioncode || '"",' ||
-            '""IsVoided"" : ' || decode(e.IsVoided,'Y', 'true', 'N', 'false') || ',' ||
-            '""PlantName"" : ""' || regexp_replace(ps.TITLE, '([""\])', '\\\1') || '"",' ||
-            '""EngineeringCode"" : ""' || regexp_replace(ec.code, '([""\])', '\\\1') || '"",' ||
-            '""MountedOn"" : ""' || t.mountedon_id || '"",' ||
-            '""MountedOnGuid"" : ""' || mt.procosys_guid || '"",' ||
-            '""LastUpdated"" : ""' || TO_CHAR(t.LAST_UPDATED, 'yyyy-mm-dd hh24:mi:ss') || '"",' ||
-            '""TagDetails"" : {{' ||
-                (SELECT listagg('""'|| colName ||'"":""'|| regexp_replace(val, '([""\])', '\\\1') ||'""', ',')
+            t.projectschema as Plant,
+            t.procosys_guid as ProCoSysGuid,
+            t.tagno as TagNo,
+            t.description as Description,
+            p.name as ProjectName,
+            mcpkg.mcpkgno as McPkgNo,
+            mcpkg.procosys_guid as McPkgGuid,
+            commpkg.commpkgno as CommPkgNo,
+            commpkg.procosys_guid as CommPkgGuid,
+            t.tag_id as TagId,
+            area.code as AreaCode,
+            area.description as AreaDescription,
+            discipline.code as DisciplineCode,
+            discipline.description as DisciplineDescription,
+            register.code as RegisterCode,
+            installation.code as InstallationCode,
+            status.code as Status,
+            system.code as System,
+            calloff.calloffno as CallOffNo,
+            calloff.procosys_guid as CallOffGuid,
+            purchaseorder.packageno as PurchaseOrderNo,
+            tagfunction.tagfunctioncode as TagFunctionCode,
+            e.IsVoided as IsVoided,
+            ps.TITLE as PlantName,
+            ec.code as EngineeringCode,
+            t.mountedon_id as MountedOn,
+            mt.procosys_guid as MountedOnGuid,
+            t.LAST_UPDATED as LastUpdated,
+            (SELECT listagg('""'|| colName ||'"":""'|| regexp_replace(val, '([""\])', '\\\1') ||'""', ',')
                 WITHIN group (order by colName) as tagdetails  from (
                 SELECT 
                        f.columnname as colName,
@@ -62,8 +62,7 @@ public class TagQuery
                 AND NOT (DEF.ISVOIDED = 'Y')
                 AND F.COLUMNTYPE in ('NUMBER','DATE','STRING', 'LIBRARY','TAG')
                 AND f.projectschema ='{plant}'))
-                || '}}' ||
-            '}}' as message
+            as TagDetails
         from tag t
             join element e on e.element_id = t.tag_id
             join projectschema ps on ps.projectschema = t.projectschema
