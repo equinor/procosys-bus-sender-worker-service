@@ -19,19 +19,8 @@ public class TaskQuery
            '"", ""ProCoSysGuid"" : ""' || ec.ProCoSys_Guid ||
            '"", ""TaskParentProCoSysGuid"" : ""' || ec2.ProCoSys_Guid ||
            '"", ""PlantName"" : ""' || ps.Title ||
-           '"", ""ProjectName"" : ""' || (
-                SELECT project.Title 
-                FROM Document 
-                    LEFT JOIN Project ON Document.Project_Id=Project.Project_id 
-                WHERE Document.DOCUMENT_ID = (
-                    SELECT MIN (e.element_id) AS rootElement_Id 
-                    FROM ELEMENTCONTENT e 
-                    START WITH e.ELEMENT_ID = ec.Element_Id 
-                    CONNECT BY PRIOR e.parent_Id = e.element_id 
-                    GROUP BY e.parent_id 
-                    HAVING parent_id IS NULL
-                    )
-                ) ||
+           '"", ""DocumentId"" : ""' || subquery.DocumentId ||
+           '"", ""ProjectName"" : ""' || regexp_replace(subquery.ProjectName, '([""\])', '\\\1') ||
            '"", ""Title"" : ""' || regexp_replace(ec.Title, '([""\])', '\\\1') ||
            '"", ""TaskId"" : ""' || SUBSTR(
                   (
@@ -47,8 +36,24 @@ public class TaskQuery
            '"", ""SignedAt"" : ""' || TO_CHAR(es.SignedAt, 'yyyy-mm-dd hh24:mi:ss') ||
            '"", ""SignedBy"" : ""' || p.Azure_Oid ||
            '""}}' as message
-        FROM ElementContent ec 
-            INNER JOIN ProjectSchema ps ON ec.ProjectSchema=ps.ProjectSchema
+        FROM     
+            (
+                SELECT
+                    project.Title as ProjectName,
+                    document.DOCUMENT_ID as DocumentId
+                FROM document
+                LEFT JOIN Project ON Document.Project_Id = Project.Project_id
+                WHERE Document.DOCUMENT_ID = (
+                    SELECT MIN(e.element_id) AS rootElement_Id
+                    FROM ELEMENTCONTENT e
+                    START WITH e.ELEMENT_ID = {taskId}
+                    CONNECT BY PRIOR e.parent_Id = e.element_id
+                    GROUP BY e.parent_id
+                    HAVING parent_id IS NULL
+                )
+            ) subquery,
+         ElementContent ec 
+            JOIN ProjectSchema ps ON ec.ProjectSchema=ps.ProjectSchema
             LEFT JOIN ElementContent ec2 ON ec.Parent_Id = ec2.Element_Id
             LEFT JOIN ElementSignature es ON es.Element_Id = ec.Element_Id
             LEFT JOIN Person p ON es.SignedBy_Id = p.Person_Id
