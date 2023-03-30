@@ -9,7 +9,13 @@
     <PackageReference Include="Microsoft.ApplicationInsights" Version="2.21.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.ApplicationInsights" Version="2.21.0" />
+
+    <!-- This is added explicitly due to System.Text.Encodings.Web 4.7.1.
+    Vulnerabily introduced in Azure.Storage.Blobs" Version="12.15.1"
+    If newer version fixes it, we should remove
+    -->
     <PackageReference Include="System.Text.Encodings.Web" Version="6.0.0" />
+    
   </ItemGroup>
 
   <ItemGroup>
