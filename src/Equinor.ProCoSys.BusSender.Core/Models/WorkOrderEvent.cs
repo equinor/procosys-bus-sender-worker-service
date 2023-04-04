@@ -38,6 +38,7 @@ public class WorkOrderEvent : IWorkOrderEventV1
     public string ExpendedManHours { get; set; }
     public string EstimatedHours { get; set; }
     public string RemainingHours { get; set; }
+    public string? WBS { get; }
     public int Progress { get; set; }
     public DateOnly? PlannedStartAtDate { get; set; }
     public DateOnly? ActualStartAtDate { get; set; }

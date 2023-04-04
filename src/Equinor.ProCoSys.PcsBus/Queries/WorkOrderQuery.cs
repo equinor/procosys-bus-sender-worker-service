@@ -33,6 +33,7 @@ public class WorkOrderQuery
                 area.CODE as AreaCode,
                 area.description as AreaDescription,
                 jsc.CODE as JobStatusCode,
+                w.WBS as WBS
                 w.MATERIALDESCRIPTION as MaterialComments,
                 w.ASSISTANCEDESCRIPTION as ConstructionComments,
                 tow.CODE as TypeOfWorkCode,

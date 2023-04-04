@@ -42,20 +42,20 @@ public class TaskQuery
                     document.DOCUMENT_ID as DocumentId
                 FROM document
                 LEFT JOIN Project ON Document.Project_Id = Project.Project_id
-                WHERE Document.DOCUMENT_ID = (
-                    SELECT MIN(e.element_id) AS rootElement_Id
-                    FROM ELEMENTCONTENT e
-                    START WITH e.ELEMENT_ID = {{taskId}}
-                    CONNECT BY PRIOR e.parent_Id = e.element_id
-                    GROUP BY e.parent_id
-                    HAVING parent_id IS NULL
-                )
             ) subquery,
          ElementContent ec 
             JOIN ProjectSchema ps ON ec.ProjectSchema=ps.ProjectSchema
             LEFT JOIN ElementContent ec2 ON ec.Parent_Id = ec2.Element_Id
             LEFT JOIN ElementSignature es ON es.Element_Id = ec.Element_Id
-            LEFT JOIN Person p ON es.SignedBy_Id = p.Person_Id    
-        {whereClause}";
+            LEFT JOIN Person p ON es.SignedBy_Id = p.Person_Id
+        {whereClause}
+         and subquery.DocumentId = (
+            SELECT MIN(e.element_id) AS rootElement_Id
+            FROM ELEMENTCONTENT e
+            START WITH e.ELEMENT_ID = ec.element_id
+            CONNECT BY PRIOR e.parent_Id = e.element_id
+            GROUP BY e.parent_id
+            HAVING parent_id IS NULL
+        )";
     }
 }
