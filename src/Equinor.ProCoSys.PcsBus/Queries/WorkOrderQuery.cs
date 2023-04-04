@@ -63,6 +63,7 @@ public class WorkOrderQuery
             '"", ""ActualStartAtDate"" : ""' || TO_CHAR(w.WOACTUALSTARTUPDATE, 'yyyy-mm-dd hh24:mi:ss') ||
             '"", ""PlannedFinishedAtDate"" : ""' || TO_CHAR(w.WOPLANNEDCOMPLETIONDATE, 'yyyy-mm-dd hh24:mi:ss') ||
             '"", ""ActualFinishedAtDate"" : ""' ||  TO_CHAR(w.WOACTUALCOMPLETIONDATE, 'yyyy-mm-dd hh24:mi:ss') ||
+            '"", ""WBS"" : ""' || regexp_replace(w.WBS, '([""\])', '\\\1') ||
             '"", ""CreatedAt"" : ""' || TO_CHAR(e.CREATEDAT, 'yyyy-mm-dd hh24:mi:ss') ||
             '"", ""IsVoided"" : ' || decode(e.isVoided,'Y', 'true', 'N', 'false') ||
             ', ""LastUpdated"" : ""' || TO_CHAR(w.LAST_UPDATED, 'yyyy-mm-dd hh24:mi:ss') ||        
