@@ -35,6 +35,7 @@ public interface IWorkOrderEventV1 : IHasEventType
     string? ExpendedManHours { get;  }
     string? EstimatedHours { get;  }
     string? RemainingHours { get;  }
+    string? WBS { get; }
     int Progress { get; }
     DateOnly? PlannedStartAtDate { get;  }
     DateOnly? ActualStartAtDate { get;  }

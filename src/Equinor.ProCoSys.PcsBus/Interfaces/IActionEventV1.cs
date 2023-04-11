@@ -6,7 +6,7 @@ public interface IActionEventV1
     string Plant { get; set; }
     Guid ProCoSysGuid { get; set; }
     Guid ElementContentGuid { get; set; }
-    string? CommPkgNo { get; set; }
+    string CommPkgNo { get; set; }
     Guid? CommPkgGuid { get; set; }
     string? SwcrNo { get; set; }
     Guid? SwcrGuid { get; set; }
