@@ -1,6 +1,7 @@
-﻿namespace Equinor.ProCoSys.PcsServiceBus.Queries;
+﻿// ReSharper disable StringLiteralTypo
+namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 
-public class HeatTraceQuery
+public static class HeatTraceQuery
 {
     public static string GetQuery(long? heatTraceId, string? plant = null)
     {
