@@ -5,7 +5,7 @@ using Equinor.ProCoSys.PcsServiceBus.Interfaces;
 
 namespace Equinor.ProCoSys.BusSenderWorker.Core.Models;
 
-public class McPkgMilestoneEvent : IMcPkgMilestoneEventV1
+internal class McPkgMilestoneEvent : IMcPkgMilestoneEventV1
 {
     public string Plant { get;  }
     public Guid ProCoSysGuid { get;  }

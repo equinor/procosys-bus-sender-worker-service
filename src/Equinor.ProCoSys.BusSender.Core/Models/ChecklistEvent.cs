@@ -5,7 +5,7 @@ using Equinor.ProCoSys.PcsServiceBus.Interfaces;
 namespace Equinor.ProCoSys.BusSenderWorker.Core.Models;
 
 #pragma warning disable CS8618
-public class ChecklistEvent : IChecklistEventV1
+internal class ChecklistEvent : IChecklistEventV1
 {
     public string Plant { get;  }
     public Guid ProCoSysGuid { get;  }

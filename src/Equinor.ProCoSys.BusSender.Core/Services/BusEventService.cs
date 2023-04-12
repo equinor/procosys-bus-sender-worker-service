@@ -81,10 +81,16 @@ public class BusEventService : IBusEventService
         ? WashString(await _busSenderMessageRepository.GetSwcrAttachmentMessage(busEventMessage))
         : throw new Exception($"Failed to extract or parse guid SwcrAttachment from message {busEventMessage}");
 
-    public async Task<string?> CreateActionMessage(string busEventMessage) =>
-        long.TryParse(busEventMessage, out var actionId)
-            ? WashString(await _busSenderMessageRepository.GetActionMessage(actionId))
-            : throw new Exception("Failed to extract actionId from message");
+    public async Task<string?> CreateActionMessage(string message)
+    {
+        if (!long.TryParse(message, out var actionId))
+        {
+            throw new Exception($"Failed to extract guid from message {message}");
+        }
+        var queryString = ActionQuery.GetQuery(actionId);
+        var actionEvents = await _dapperRepository.QuerySingle<ActionEvent>(queryString, message);
+        return JsonSerializer.Serialize(actionEvents, DefaultSerializerHelper.SerializerOptions);
+    }
 
     public async Task<string?> CreateCommPkgTaskMessage(string busEventMessage) =>
         CanGetTwoIdsFromMessage(busEventMessage.Split(","), out var commPkgId, out var taskId)

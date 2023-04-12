@@ -9,7 +9,6 @@ namespace Equinor.ProCoSys.PcsServiceBusTests.EventVersioningTests;
 [TestClass]
 public class ActionEventTests
 {
-
     /**If this tests fails, its most likely because the versioning contract is breached. Consider creating a new version instead of
         modifying the existing one.
         If new properties are added to the interface (non breaking), this test should be updated with the new properties,

@@ -1,10 +1,14 @@
-﻿using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
+﻿using System;
+using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 using Equinor.ProCoSys.BusSenderWorker.Core.Services;
 using Equinor.ProCoSys.PcsServiceBus.Topics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Equinor.ProCoSys.BusSenderWorker.Core.Extensions;
+using Equinor.ProCoSys.BusSenderWorker.Core.Models;
+using Equinor.ProCoSys.PcsServiceBus.Queries;
 
 namespace Equinor.ProCoSys.BusSenderWorker.Core.Tests;
 
@@ -24,6 +28,88 @@ public class BusEventServiceTests
         _busSenderMessageRepositoryMock = new Mock<IBusSenderMessageRepository>();
         _dapperRepositoryMock = new Mock<IDapperRepository>();
         _dut = new BusEventService(_tagDetailsRepositoryMock.Object,_busSenderMessageRepositoryMock.Object,_dapperRepositoryMock.Object);
+    }
+    
+    [TestMethod]
+    public async Task CreateActionMessage_ValidMessage_ReturnsSerializedActionEvent()
+    {
+        // Arrange
+        const string message = "123";
+        const long actionId = 123L;
+        var queryString = ActionQuery.GetQuery(actionId);
+        var actionEvent = new ActionEvent
+        {
+            Plant = "Plant1",
+            ProCoSysGuid = Guid.NewGuid(),
+            ElementContentGuid = Guid.NewGuid(),
+            CommPkgNo = "CommPkg1",
+            CommPkgGuid = Guid.NewGuid(),
+            SwcrNo = "SWCR1",
+            SwcrGuid = Guid.NewGuid(),
+            DocumentNo = "Document1",
+            Description = "Description1",
+            DocumentGuid = Guid.NewGuid(),
+            ActionNo = "Action1",
+            Title = "Title1",
+            Comments = "Comments1",
+            Deadline = DateOnly.MinValue,
+            CategoryCode = "Category1",
+            CategoryGuid = Guid.NewGuid(),
+            PriorityCode = "Priority1",
+            PriorityGuid = Guid.NewGuid(),
+            RequestedByOid = Guid.NewGuid(),
+            ActionByOid = Guid.NewGuid(),
+            ActionByRole = "Role1",
+            ActionByRoleGuid = Guid.NewGuid(),
+            ResponsibleOid = Guid.NewGuid(),
+            ResponsibleRole = "Role2",
+            ResponsibleRoleGuid = Guid.NewGuid(),
+            LastUpdated = DateTime.UtcNow,
+            SignedAt = DateTime.UtcNow,
+            SignedBy = Guid.NewGuid()
+        };
+
+        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<ActionEvent>(queryString, message)).ReturnsAsync(actionEvent);
+
+        // Act
+        var result = await _dut.CreateActionMessage(message);
+
+        // Assert
+        Assert.IsNotNull(result);
+        var deserializedResult = JsonSerializer.Deserialize<ActionEvent>(result, DefaultSerializerHelper.SerializerOptions);
+
+        // Check if the properties are equal
+        Assert.AreEqual(actionEvent.Plant, deserializedResult.Plant);
+        Assert.AreEqual(actionEvent.ProCoSysGuid, deserializedResult.ProCoSysGuid);
+        Assert.AreEqual(actionEvent.ElementContentGuid, deserializedResult.ElementContentGuid);
+        Assert.AreEqual(actionEvent.CommPkgNo, deserializedResult.CommPkgNo);
+        Assert.AreEqual(actionEvent.CommPkgGuid, deserializedResult.CommPkgGuid);
+        Assert.AreEqual(actionEvent.SwcrNo, deserializedResult.SwcrNo);
+        Assert.AreEqual(actionEvent.SwcrGuid, deserializedResult.SwcrGuid);
+        Assert.AreEqual(actionEvent.DocumentNo, deserializedResult.DocumentNo);
+        Assert.AreEqual(actionEvent.Description, deserializedResult.Description);
+        Assert.AreEqual(actionEvent.DocumentGuid, deserializedResult.DocumentGuid);
+        Assert.AreEqual(actionEvent.ActionNo, deserializedResult.ActionNo);
+        Assert.AreEqual(actionEvent.Title, deserializedResult.Title);
+        Assert.AreEqual(actionEvent.Comments, deserializedResult.Comments);
+        Assert.AreEqual(actionEvent.Deadline, deserializedResult.Deadline);
+        Assert.AreEqual(actionEvent.CategoryCode, deserializedResult.CategoryCode);
+        Assert.AreEqual(actionEvent.CategoryGuid, deserializedResult.CategoryGuid);
+        Assert.AreEqual(actionEvent.PriorityCode, deserializedResult.PriorityCode);
+        Assert.AreEqual(actionEvent.PriorityGuid, deserializedResult.PriorityGuid);
+        Assert.AreEqual(actionEvent.RequestedByOid, deserializedResult.RequestedByOid);
+        Assert.AreEqual(actionEvent.ActionByOid, deserializedResult.ActionByOid);
+        Assert.AreEqual(actionEvent.ActionByRole, deserializedResult.ActionByRole);
+        Assert.AreEqual(actionEvent.ActionByRoleGuid, deserializedResult.ActionByRoleGuid);
+        Assert.AreEqual(actionEvent.ResponsibleOid, deserializedResult.ResponsibleOid);
+        Assert.AreEqual(actionEvent.ResponsibleRole, deserializedResult.ResponsibleRole);
+        Assert.AreEqual(actionEvent.ResponsibleRoleGuid, deserializedResult.ResponsibleRoleGuid);
+        Assert.AreEqual(actionEvent.LastUpdated, deserializedResult.LastUpdated);
+        Assert.AreEqual(actionEvent.SignedAt, deserializedResult.SignedAt);
+        Assert.AreEqual(actionEvent.SignedBy, deserializedResult.SignedBy);
+        Assert.AreEqual(actionEvent.EventType, deserializedResult.EventType);
+
+        Assert.AreEqual(actionEvent.EventType, deserializedResult.EventType);
     }
 
     [TestMethod]

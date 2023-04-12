@@ -1,7 +1,7 @@
 ﻿using System;
 namespace Equinor.ProCoSys.PcsServiceBus.Interfaces;
 
-public interface IActionEventV1
+public interface IActionEventV1 :IHasEventType
 {
     string Plant { get; set; }
     Guid ProCoSysGuid { get; set; }
