@@ -97,5 +97,35 @@ public static class PcsEventConstants
     /// </summary>
     public const string WorkOrderMilestoneCreateOrUpdate = "workOrderCutoffCreatedOrUpdated";
 
-    public const string ChecklistDelete = "checkListDeleted";
+    public const string ChecklistDelete = "checklistDeleted";
+
+    /// <summary>
+    /// Event that is fired when a new CalOff is created or updated
+    /// </summary>
+    public const string CallOffCreateOrUpdate = "callOffCreatedOrUpdated";
+
+    /// <summary>
+    /// Event that is fired when a new CommPkgOperation is created or updated
+    /// </summary>
+    public const string CommPkgOperationCreateOrUpdate = "commPkgOperationCreatedOrUpdated";
+
+    /// <summary>
+    /// Event that is fired when a new CommPkg_Query (connection between commPackage and query) is created or updated
+    /// </summary>
+    public const string CommPkgQueryCreateOrUpdate = "commPkgQueryCreatedOrUpdated";
+ 
+    /// <summary>
+    /// Event that is fired when a new HeatTrace is created or updated
+    /// </summary>
+    public const string HeatTraceCreateOrUpdate = "heatTraceCreatedOrUpdated";
+
+    /// <summary>
+    /// Event that is fired when a new LibraryField is created or updated
+    /// </summary>
+    public const string LibraryFieldCreateOrUpdate = "libraryFieldCreatedOrUpdated";
+    
+    /// <summary>
+    /// Event that is fired when a new swcr is created or updated
+    /// </summary>
+    public const string SwcrCreateOrUpdate = "swcrCreatedOrUpdated";
 }

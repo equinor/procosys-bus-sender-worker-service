@@ -1,6 +1,9 @@
 ﻿using System;
+using JetBrains.Annotations;
+
 namespace Equinor.ProCoSys.PcsServiceBus.Interfaces;
 
+[UsedImplicitly]
 public interface IChecklistEventV1 : IHasEventType
 {
     public string Plant { get;  }

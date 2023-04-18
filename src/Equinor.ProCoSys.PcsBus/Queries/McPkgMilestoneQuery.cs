@@ -1,6 +1,6 @@
 ﻿namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 
-public class McPkgMilestonesQuery
+public class McPkgMilestoneQuery
 {
     public static string GetQuery(string? guid, string? plant = null)
     {

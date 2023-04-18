@@ -5,23 +5,23 @@ using Equinor.ProCoSys.PcsServiceBus.Interfaces;
 
 namespace Equinor.ProCoSys.BusSenderWorker.Core.Models;
 
-internal class McPkgMilestoneEvent : IMcPkgMilestoneEventV1
+public class McPkgMilestoneEvent : IMcPkgMilestoneEventV1
 {
-    public string Plant { get;  }
-    public Guid ProCoSysGuid { get;  }
-    public string? PlantName { get; }
-    public string? ProjectName { get; }
-    public Guid McPkgGuid { get; }
-    public string? McPkgNo { get; }
-    public string Code { get; }
-    public DateTime? ActualDate { get; }
-    public DateOnly? PlannedDate { get; }
-    public DateOnly? ForecastDate { get; }
-    public string? Remark { get; }
-    public bool? IsSent { get; }
-    public bool? IsAccepted { get; }
-    public bool? IsRejected { get; }
-    public DateTime LastUpdated { get; }
+    public string Plant { get; init; }
+    public Guid ProCoSysGuid { get; init; }
+    public string? PlantName { get; init; }
+    public string? ProjectName { get; init; }
+    public Guid McPkgGuid { get; init; }
+    public string? McPkgNo { get; init; }
+    public string Code { get; init; }
+    public DateTime? ActualDate { get; init; }
+    public DateOnly? PlannedDate { get; init; }
+    public DateOnly? ForecastDate { get; init; }
+    public string? Remark { get; init; }
+    public bool? IsSent { get; init; }
+    public bool? IsAccepted { get; init; }
+    public bool? IsRejected { get; init; }
+    public DateTime LastUpdated { get; init; }
 
     public string EventType => PcsEventConstants.MilestoneCreateOrUpdate;
 }

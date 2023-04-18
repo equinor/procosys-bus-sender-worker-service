@@ -1,8 +1,10 @@
 ﻿using System;
+using JetBrains.Annotations;
 
 namespace Equinor.ProCoSys.PcsServiceBus.Interfaces;
 
-public interface ICommPkgOperationEventV1 
+[UsedImplicitly]
+public interface ICommPkgOperationEventV1 : IHasEventType
 {
     string Plant { get; set; }
     Guid ProCoSysGuid { get; set; }

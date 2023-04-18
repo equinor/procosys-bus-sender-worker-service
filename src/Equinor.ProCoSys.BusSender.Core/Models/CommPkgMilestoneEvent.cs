@@ -5,23 +5,23 @@ using Equinor.ProCoSys.PcsServiceBus.Interfaces;
 #pragma warning disable CS8618
 namespace Equinor.ProCoSys.BusSenderWorker.Core.Models;
 
-internal class CommPkgMilestoneEvent : ICommPkgMilestoneEventV1
+public class CommPkgMilestoneEvent : ICommPkgMilestoneEventV1
 {
-    public string Plant { get; }
-    public Guid ProCoSysGuid { get; }
-    public string? PlantName { get; }
-    public string? ProjectName { get; }
-    public Guid CommPkgGuid { get; }
-    public string? CommPkgNo { get; }
-    public string Code { get; }
-    public DateTime? ActualDate { get; }
-    public DateOnly? PlannedDate { get; }
-    public DateOnly? ForecastDate { get; }
-    public string? Remark { get; }
-    public bool? IsSent { get; }
-    public bool? IsAccepted { get; }
-    public bool? IsRejected { get; }
-    public DateTime LastUpdated { get; }
+    public string Plant { get; init; }
+    public Guid ProCoSysGuid { get; init; }
+    public string? PlantName { get; init; }
+    public string? ProjectName { get; init; }
+    public Guid CommPkgGuid { get; init; }
+    public string? CommPkgNo { get; init; }
+    public string Code { get; init; }
+    public DateTime? ActualDate { get; init; }
+    public DateOnly? PlannedDate { get; init; }
+    public DateOnly? ForecastDate { get; init; }
+    public string? Remark { get; init; }
+    public bool? IsSent { get; init; }
+    public bool? IsAccepted { get; init; }
+    public bool? IsRejected { get; init; }
+    public DateTime LastUpdated { get; init; }
 
     public string EventType => PcsEventConstants.MilestoneCreateOrUpdate;
 }

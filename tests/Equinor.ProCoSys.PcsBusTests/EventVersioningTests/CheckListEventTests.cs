@@ -19,7 +19,7 @@ public class CheckListEventTests
     public void ICheckListEventV1_InterfacePropertiesAndMethods_DoNotChange()
     {
         // Arrange
-        var checkListEventInterfaceType = typeof(IChecklistEventV1);
+        var checklistEventInterfaceType = typeof(IChecklistEventV1);
         var expectedProperties = new Dictionary<string, Type>
         {
             {"Plant", typeof(string)},
@@ -50,7 +50,7 @@ public class CheckListEventTests
             {"VerifiedAt", typeof(DateTime?)},
         };
         // Act
-        var actualProperties = checkListEventInterfaceType.GetProperties()
+        var actualProperties = checklistEventInterfaceType.GetProperties()
             .ToDictionary(p => p.Name, p => p.PropertyType);
 
         // Assert

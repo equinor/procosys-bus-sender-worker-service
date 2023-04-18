@@ -1,10 +1,11 @@
 ﻿using System;
-using JetBrains.Annotations;
+using Equinor.ProCoSys.PcsServiceBus;
+using Equinor.ProCoSys.PcsServiceBus.Interfaces;
+#pragma warning disable CS8618
 
-namespace Equinor.ProCoSys.PcsServiceBus.Interfaces;
+namespace Equinor.ProCoSys.BusSenderWorker.Core.Models;
 
-[UsedImplicitly]
-public interface ICommPkgQueryEventV1 : IHasEventType
+public class CommPkgQueryEvent : ICommPkgQueryEventV1
 {
     public string Plant { get; set; }
     public Guid ProCoSysGuid { get; set; }
@@ -16,4 +17,6 @@ public interface ICommPkgQueryEventV1 : IHasEventType
     public string QueryNo { get; set; }
     public Guid QueryGuid { get; set; }
     public DateTime LastUpdated { get; set; }
+    
+    public string EventType => PcsEventConstants.CommPkgQueryCreateOrUpdate;
 }
