@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.IO;
+using System.Threading.Tasks;
 
 namespace Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 
@@ -35,4 +36,8 @@ public interface IBusEventService
 
     Task<string?> CreateLibraryFieldMessage(string busEventMessage);
     Task<string?> CreateCommPkgMilestoneMessage(string busEventMessage);
+    Task<string> CreateCommPkgMessage(string message);
+    Task<string> CreateLibraryMessage(string message);
+    Task<string> CreateMcPkgMessage(string message);
+    Task<string> CreateProjectMessage(string message);
 }

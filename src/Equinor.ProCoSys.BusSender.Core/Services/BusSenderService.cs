@@ -51,12 +51,13 @@ public class BusSenderService : IBusSenderService
             var events = await _busEventRepository.GetEarliestUnProcessedEventChunk();
             if (events.Any())
             {
-                _logger.LogInformation("BusSenderService found {count} messages to process after {sw} ms", events.Count, _sw.ElapsedMilliseconds);
+                _logger.LogInformation("BusSenderService found {count} messages to process after {sw} ms", events.Count,
+                    _sw.ElapsedMilliseconds);
                 _telemetryClient.TrackMetric("BusSender Chunk", events.Count);
                 await ProcessBusEvents(events);
                 _logger.LogInformation("BusSenderService ProcessBusEvents used {sw} ms", _sw.ElapsedMilliseconds);
-
             }
+
             _sw.Reset();
         }
         catch (Exception exception)
@@ -83,14 +84,15 @@ public class BusSenderService : IBusSenderService
         var unProcessedEvents = events.Where(busEvent => busEvent.Status == Status.UnProcessed).ToList();
         _logger.LogInformation("Amount of messages to process: {count} ", unProcessedEvents.Count);
 
-        foreach (var e in unProcessedEvents.Where( e => IsSimpleMessage(e) || e.Event == TagTopic.TopicName))
+        foreach (var e in unProcessedEvents.Where(e => IsSimpleMessage(e) || e.Event == TagTopic.TopicName))
         {
             await UpdateEventBasedOnTopic(e);
         }
+
         _logger.LogInformation("Update loop finished at at {sw} ms", dsw.ElapsedMilliseconds);
         await _unitOfWork.SaveChangesAsync();
-        
-        
+
+
         /***
          * Group by topic and then create a queue of messages per topic
          */
@@ -159,8 +161,10 @@ public class BusSenderService : IBusSenderService
         {
             SetAllButOneEventToSkipped(group);
         }
+
         return events;
     }
+
     private static void SetAllButOneEventToSkipped(IEnumerable<BusEvent> group)
     {
         foreach (var busEvent in group.SkipLast(1))
@@ -175,25 +179,28 @@ public class BusSenderService : IBusSenderService
     /// </summary>
     /// <param name="events"></param>
     /// <returns></returns>
-    private static IEnumerable<IGrouping<(string Event, string Message), BusEvent>> FilterOnSimpleMessagesAndGroupDuplicates(
-        IEnumerable<BusEvent> events)
+    private static IEnumerable<IGrouping<(string Event, string Message), BusEvent>>
+        FilterOnSimpleMessagesAndGroupDuplicates(
+            IEnumerable<BusEvent> events)
         => events.Where(IsSimpleMessage)
             .GroupBy(e => (e.Event, e.Message));
 
-    private static bool IsSimpleMessage(BusEvent e) 
-        => long.TryParse(e.Message, out _) 
+    private static bool IsSimpleMessage(BusEvent e)
+        => long.TryParse(e.Message, out _)
            || Guid.TryParse(e.Message, out _)
-           || BusEventService.CanGetTwoIdsFromMessage(e.Message.Split(","),out _,out _);
+           || BusEventService.CanGetTwoIdsFromMessage(e.Message.Split(","), out _, out _);
 
 
     private void TrackMessage(BusEvent busEvent)
     {
         var busEventMessageToSend = busEvent.MessageToSend ?? busEvent.Message;
-        var message = JsonSerializer.Deserialize<BusEventMessage>(_service.WashString(busEventMessageToSend)!, DefaultSerializerHelper.SerializerOptions);
+        var message = JsonSerializer.Deserialize<BusEventMessage>(_service.WashString(busEventMessageToSend)!,
+            DefaultSerializerHelper.SerializerOptions);
         if (message != null && string.IsNullOrEmpty(message.ProjectName))
         {
             message.ProjectName = "_";
         }
+
         TrackMetric(message);
     }
 
@@ -349,6 +356,7 @@ public class BusSenderService : IBusSenderService
                     break;
                 }
         }
+
         _logger.LogDebug("Update for  {event} took {ms} ms", busEvent.Event, sw.ElapsedMilliseconds);
         sw.Stop();
     }

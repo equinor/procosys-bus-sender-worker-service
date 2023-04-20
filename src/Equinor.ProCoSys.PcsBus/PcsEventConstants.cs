@@ -128,4 +128,14 @@ public static class PcsEventConstants
     /// Event that is fired when a new swcr is created or updated
     /// </summary>
     public const string SwcrCreateOrUpdate = "swcrCreatedOrUpdated";
+
+    /// <summary>
+    /// Event that is fired when a new piping revision is created or updated
+    /// </summary>
+    public const string PipingRevisionCreateOrUpdate = "pipingRevisionCreatedOrUpdated";
+
+    /// <summary>
+    /// Event that is fired when a new piping spool is created or updated
+    /// </summary>
+    public const string PipingSpoolCreateOrUpdate = "pipingSpoolCreatedOrUpdated";
 }
