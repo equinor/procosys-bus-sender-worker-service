@@ -1,6 +1,6 @@
 ﻿namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 
-public class SwcrOtherReferencesQuery
+public class SwcrOtherReferenceQuery
 {
     public static string GetQuery(string swcrOtherReferencesGuid, string? plant= null)
     {

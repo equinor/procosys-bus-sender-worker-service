@@ -297,7 +297,7 @@ public class BusSenderService : IBusSenderService
                 }
             case WorkOrderCutoffTopic.TopicName:
                 {
-                    await CreateAndSetMessage(busEvent, _service.CreateWorkOrderCutOffMessage);
+                    await CreateAndSetMessage(busEvent, _service.CreateWorkOrderCutoffMessage);
                     break;
                 }
             case CallOffTopic.TopicName:

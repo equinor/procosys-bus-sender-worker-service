@@ -17,16 +17,14 @@ public class BusEventServiceTests
 {
     private IBusEventService _dut;
     private Mock<ITagDetailsRepository> _tagDetailsRepositoryMock;
-    private Mock<IBusSenderMessageRepository> _busSenderMessageRepositoryMock;
     private Mock<IDapperRepository> _dapperRepositoryMock;
 
     [TestInitialize]
     public void Setup()
     {
         _tagDetailsRepositoryMock = new Mock<ITagDetailsRepository>();
-        _busSenderMessageRepositoryMock = new Mock<IBusSenderMessageRepository>();
         _dapperRepositoryMock = new Mock<IDapperRepository>();
-        _dut = new BusEventService(_tagDetailsRepositoryMock.Object, _busSenderMessageRepositoryMock.Object,
+        _dut = new BusEventService(_tagDetailsRepositoryMock.Object,
             _dapperRepositoryMock.Object);
     }
 
@@ -461,7 +459,7 @@ public class BusEventServiceTests
         const string message = "123,456";
         const long commPkgId = 123L;
         const long documentId = 456L;
-        var queryString = QueryCommPkgQuery.GetQuery(commPkgId, documentId);
+        var queryString = CommPkgQueryQuery.GetQuery(commPkgId, documentId);
         var commPkgQueryEvent = new CommPkgQueryEvent
         {
             Plant = "Plant1",
@@ -916,7 +914,6 @@ public class BusEventServiceTests
             LastUpdated = DateTime.UtcNow
         };
 
-
         _dapperRepositoryMock.Setup(repo => repo.QuerySingle<PipingSpoolEvent>(queryString, message))
             .ReturnsAsync(pipingSpoolEvent);
 
@@ -993,6 +990,98 @@ public class BusEventServiceTests
         Assert.AreEqual(projectEvent.Description, deserializedResult.Description);
         Assert.AreEqual(projectEvent.LastUpdated, deserializedResult.LastUpdated);
         Assert.AreEqual(projectEvent.EventType, deserializedResult.EventType);
+    }
+
+    [TestMethod]
+    public async Task CreatePunchListItem_ValidMessage_ReturnsSerializedPunchListItemEvent()
+    {
+        // Arrange
+        const string message = "12345";
+        const long punchListItemId = 12345L;
+        var queryString = PunchListItemQuery.GetQuery(punchListItemId);
+
+        var punchListItemEvent = new PunchListItemEvent
+        {
+            Plant = "Plant1",
+            ProCoSysGuid = Guid.NewGuid(),
+            ProjectName = "Project1",
+            LastUpdated = DateTime.UtcNow,
+            PunchItemNo = 12345,
+            Description = "Test punch item",
+            ChecklistId = 67890,
+            ChecklistGuid = Guid.NewGuid(),
+            Category = "Category1",
+            RaisedByOrg = "ORG1",
+            ClearingByOrg = "ORG2",
+            DueDate = DateTime.UtcNow.AddDays(10),
+            PunchListSorting = "Sort1",
+            PunchListType = "Type1",
+            PunchPriority = "P1",
+            Estimate = "Estimate1",
+            OriginalWoNo = "WO1",
+            OriginalWoGuid = Guid.NewGuid(),
+            WoNo = "WO2",
+            WoGuid = Guid.NewGuid(),
+            SWCRNo = "SWCR1",
+            SWCRGuid = Guid.NewGuid(),
+            DocumentNo = "DOC1",
+            DocumentGuid = Guid.NewGuid(),
+            ExternalItemNo = "EXT1",
+            MaterialRequired = true,
+            IsVoided = false,
+            MaterialETA = DateTime.UtcNow.AddDays(5),
+            MaterialExternalNo = "EXT2",
+            ClearedAt = DateTime.UtcNow.AddDays(-2),
+            RejectedAt = null,
+            VerifiedAt = null,
+            CreatedAt = DateTime.UtcNow.AddDays(-7)
+        };
+        
+        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<PunchListItemEvent>(queryString, message))
+            .ReturnsAsync(punchListItemEvent);
+
+        // Act
+        var result = await _dut.CreatePunchListItemMessage(message);
+
+        // Assert
+        Assert.IsNotNull(result);
+        var deserializedResult =
+            JsonSerializer.Deserialize<PunchListItemEvent>(result);
+
+        // Check if the properties are equal
+        Assert.AreEqual(punchListItemEvent.Plant, deserializedResult.Plant);
+        Assert.AreEqual(punchListItemEvent.ProCoSysGuid, deserializedResult.ProCoSysGuid);
+        Assert.AreEqual(punchListItemEvent.ProjectName, deserializedResult.ProjectName);
+        Assert.AreEqual(punchListItemEvent.LastUpdated, deserializedResult.LastUpdated);
+        Assert.AreEqual(punchListItemEvent.PunchItemNo, deserializedResult.PunchItemNo);
+        Assert.AreEqual(punchListItemEvent.Description, deserializedResult.Description);
+        Assert.AreEqual(punchListItemEvent.ChecklistId, deserializedResult.ChecklistId);
+        Assert.AreEqual(punchListItemEvent.ChecklistGuid, deserializedResult.ChecklistGuid);
+        Assert.AreEqual(punchListItemEvent.Category, deserializedResult.Category);
+        Assert.AreEqual(punchListItemEvent.RaisedByOrg, deserializedResult.RaisedByOrg);
+        Assert.AreEqual(punchListItemEvent.ClearingByOrg, deserializedResult.ClearingByOrg);
+        Assert.AreEqual(punchListItemEvent.DueDate, deserializedResult.DueDate);
+        Assert.AreEqual(punchListItemEvent.PunchListSorting, deserializedResult.PunchListSorting);
+        Assert.AreEqual(punchListItemEvent.PunchListType, deserializedResult.PunchListType);
+        Assert.AreEqual(punchListItemEvent.PunchPriority, deserializedResult.PunchPriority);
+        Assert.AreEqual(punchListItemEvent.Estimate, deserializedResult.Estimate);
+        Assert.AreEqual(punchListItemEvent.OriginalWoNo, deserializedResult.OriginalWoNo);
+        Assert.AreEqual(punchListItemEvent.OriginalWoGuid, deserializedResult.OriginalWoGuid);
+        Assert.AreEqual(punchListItemEvent.WoNo, deserializedResult.WoNo);
+        Assert.AreEqual(punchListItemEvent.WoGuid, deserializedResult.WoGuid);
+        Assert.AreEqual(punchListItemEvent.SWCRNo, deserializedResult.SWCRNo);
+        Assert.AreEqual(punchListItemEvent.SWCRGuid, deserializedResult.SWCRGuid);
+        Assert.AreEqual(punchListItemEvent.DocumentNo, deserializedResult.DocumentNo);
+        Assert.AreEqual(punchListItemEvent.DocumentGuid, deserializedResult.DocumentGuid);
+        Assert.AreEqual(deserializedResult.ExternalItemNo, deserializedResult.ExternalItemNo);
+        Assert.AreEqual(punchListItemEvent.MaterialRequired, deserializedResult.MaterialRequired);
+        Assert.AreEqual(punchListItemEvent.IsVoided, deserializedResult.IsVoided);
+        Assert.AreEqual(punchListItemEvent.MaterialETA, deserializedResult.MaterialETA);
+        Assert.AreEqual(punchListItemEvent.MaterialExternalNo, deserializedResult.MaterialExternalNo);
+        Assert.AreEqual(punchListItemEvent.ClearedAt, deserializedResult.ClearedAt);
+        Assert.AreEqual(punchListItemEvent.RejectedAt, deserializedResult.RejectedAt);
+        Assert.AreEqual(punchListItemEvent.VerifiedAt, deserializedResult.VerifiedAt);
+        Assert.AreEqual(punchListItemEvent.CreatedAt, deserializedResult.CreatedAt);
     }
 
     [TestMethod]

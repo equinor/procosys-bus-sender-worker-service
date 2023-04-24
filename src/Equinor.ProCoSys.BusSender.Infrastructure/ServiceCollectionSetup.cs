@@ -35,8 +35,7 @@ public static class ServiceCollectionSetup
 
     public static IServiceCollection AddRepositories(this IServiceCollection services)
         => services.AddScoped<IBusEventRepository, BusEventRepository>()
-            .AddScoped<ITagDetailsRepository, TagDetailsRepository>()
-            .AddScoped<IBusSenderMessageRepository,BusSenderMessageRepository>();
+            .AddScoped<ITagDetailsRepository, TagDetailsRepository>();
 
     public static IServiceCollection AddServices(this IServiceCollection services)
         => services.AddSingleton<IEntryPointService, EntryPointService>()

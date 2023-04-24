@@ -13,15 +13,14 @@ namespace Equinor.ProCoSys.BusSenderWorker.Core.Services;
 
 public class BusEventService : IBusEventService
 {
-    private readonly IBusSenderMessageRepository _busSenderMessageRepository;
+  
     private readonly IDapperRepository _dapperRepository;
     private readonly ITagDetailsRepository _tagDetailsRepository;
 
     public BusEventService(ITagDetailsRepository tagDetailsRepository,
-        IBusSenderMessageRepository busSenderMessageRepository, IDapperRepository dapperRepository)
+         IDapperRepository dapperRepository)
     {
         _tagDetailsRepository = tagDetailsRepository;
-        _busSenderMessageRepository = busSenderMessageRepository;
         _dapperRepository = dapperRepository;
     }
 
@@ -63,7 +62,7 @@ public class BusEventService : IBusEventService
                 await _dapperRepository.QuerySingle<ChecklistEvent>(ChecklistQuery.GetQuery(checklistId),
                     checklistId.ToString()))
             : throw new Exception($"Failed to extract checklistId from message: {message}");
-    
+
     public async Task<string> CreateCommPkgMessage(string message)
         => long.TryParse(message, out var commPkgId)
             ? JsonSerializer.Serialize(
@@ -94,7 +93,7 @@ public class BusEventService : IBusEventService
         CanGetTwoIdsFromMessage(message.Split(","), out var commPkgId, out var documentId)
             ? JsonSerializer.Serialize(
                 await _dapperRepository.QuerySingle<CommPkgQueryEvent>(
-                    QueryCommPkgQuery.GetQuery(commPkgId, documentId), message))
+                    CommPkgQueryQuery.GetQuery(commPkgId, documentId), message))
             : throw new Exception($"Failed to extract commPkgId or TaskId from message: {message}");
 
     public async Task<string?> CreateCommPkgTaskMessage(string message) =>
@@ -106,7 +105,9 @@ public class BusEventService : IBusEventService
 
     public async Task<string?> CreateDocumentMessage(string message) =>
         long.TryParse(message, out var documentId)
-            ? WashString(await _busSenderMessageRepository.GetDocumentMessage(documentId))
+            ? JsonSerializer.Serialize(
+                await _dapperRepository.QuerySingle<DocumentEvent>(DocumentQuery.GetQuery(documentId),
+                    documentId.ToString()))
             : throw new Exception($"Failed to extract documentId from message: {message}");
 
     public async Task<string?> CreateHeatTraceMessage(string message)
@@ -115,7 +116,7 @@ public class BusEventService : IBusEventService
                 await _dapperRepository.QuerySingle<HeatTraceEvent>(
                     HeatTraceQuery.GetQuery(heatTraceId), message))
             : throw new Exception($"Failed to extract heatTraceId from message: {message}");
-    
+
     public async Task<string> CreateLibraryMessage(string message)
         => long.TryParse(message, out var libraryId)
             ? JsonSerializer.Serialize(
@@ -123,7 +124,7 @@ public class BusEventService : IBusEventService
                     libraryId.ToString()))
             : throw new Exception($"Failed to extract checklistId from message: {message}");
 
-    public async Task<string> CreateMcPkgMessage(string message) => 
+    public async Task<string> CreateMcPkgMessage(string message) =>
         long.TryParse(message, out var mcPkgId)
             ? JsonSerializer.Serialize(
                 await _dapperRepository.QuerySingle<McPkgEvent>(McPkgQuery.GetQuery(mcPkgId),
@@ -137,12 +138,20 @@ public class BusEventService : IBusEventService
                     projectId.ToString()))
             : throw new Exception($"Failed to extract projectId from message: {message}");
 
+    public async Task<string> CreatePunchListItemMessage(string message) =>
+        long.TryParse(message, out var punchListItemId)
+            ? JsonSerializer.Serialize(
+                await _dapperRepository.QuerySingle<PunchListItemEvent>(PunchListItemQuery.GetQuery(punchListItemId),
+                    punchListItemId.ToString()))
+            : throw new Exception($"Failed to extract punchListItemId from message: {message}");
+
     public async Task<string?> CreateLibraryFieldMessage(string message)
     {
         if (!Guid.TryParse(message, out _))
         {
             throw new Exception($"Failed to extract libraryField(elementcontent) guid from message {message}");
         }
+
         var queryString = LibraryFieldQuery.GetQuery(message);
         var libraryFieldEvents = await _dapperRepository.QuerySingle<LibraryFieldEvent>(queryString, message);
         return JsonSerializer.Serialize(libraryFieldEvents, DefaultSerializerHelper.SerializerOptions);
@@ -150,7 +159,9 @@ public class BusEventService : IBusEventService
 
     public async Task<string?> CreateLoopContentMessage(string message)
         => long.TryParse(message, out var loopContentId)
-            ? WashString(await _busSenderMessageRepository.GetLoopContentMessage(loopContentId))
+            ? JsonSerializer.Serialize(
+                await _dapperRepository.QuerySingle<LoopContentEvent>(
+                    LoopContentQuery.GetQuery(loopContentId), message))
             : throw new Exception($"Failed to extract LoopContent from message: {message}");
 
     public async Task<string?> CreateMcPkgMilestoneMessage(string message)
@@ -167,54 +178,74 @@ public class BusEventService : IBusEventService
 
     public async Task<string?> CreatePipingRevisionMessage(string message)
         => long.TryParse(message, out var pipingRevisionId)
-            ? WashString(await _busSenderMessageRepository.GetPipingRevisionMessage(pipingRevisionId))
+            ? JsonSerializer.Serialize(
+                await _dapperRepository.QuerySingle<PipingRevisionEvent>(
+                    PipingRevisionQuery.GetQuery(pipingRevisionId), message))
             : throw new Exception($"Failed to extract PipeRevision from message: {message}");
 
     public async Task<string?> CreatePipingSpoolMessage(string message) =>
         long.TryParse(message, out var pipingSpoolId)
-            ? WashString(await _busSenderMessageRepository.GetPipingSpoolMessage(pipingSpoolId))
+            ? JsonSerializer.Serialize(
+                await _dapperRepository.QuerySingle<PipingSpoolEvent>(
+                    PipingSpoolQuery.GetQuery(pipingSpoolId), message), DefaultSerializerHelper.SerializerOptions)
             : throw new Exception($"Failed to extract PipingSpool from message: {message}");
 
     public async Task<string?> CreateQueryMessage(string message) =>
         long.TryParse(message, out var documentId)
-            ? WashString(await _busSenderMessageRepository.GetQueryMessage(documentId))
+            ? JsonSerializer.Serialize(
+                await _dapperRepository.QuerySingle<QueryEvent>(QueryQuery.GetQuery(documentId),
+                    documentId.ToString()))
             : throw new Exception($"Failed to extract documentId from message: {message}");
 
     public async Task<string?> CreateQuerySignatureMessage(string message) =>
         long.TryParse(message, out var querySignatureId)
-            ? WashString(await _busSenderMessageRepository.GetQuerySignatureMessage(querySignatureId))
-        : throw new Exception($"Failed to extract QuerySignature from message: {message}");
+            ? JsonSerializer.Serialize(
+                await _dapperRepository.QuerySingle<QuerySignatureEvent>(
+                    QuerySignatureQuery.GetQuery(querySignatureId), message))
+            : throw new Exception($"Failed to extract QuerySignature from message: {message}");
 
 
     public async Task<string?> CreateStockMessage(string message) =>
         long.TryParse(message, out var stockId)
-            ? WashString(await _busSenderMessageRepository.GetStockMessage(stockId))
+            ? JsonSerializer.Serialize(
+                await _dapperRepository.QuerySingle<StockEvent>(StockQuery.GetQuery(stockId),
+                    stockId.ToString()))
             : throw new Exception($"Failed to extract stockId from message: {message}");
 
     public async Task<string?> CreateSwcrAttachmentMessage(string message) =>
         Guid.TryParse(message, out _)
-            ? WashString(await _busSenderMessageRepository.GetSwcrAttachmentMessage(message))
+            ? JsonSerializer.Serialize(
+                await _dapperRepository.QuerySingle<SwcrAttachmentEvent>(
+                    SwcrAttachmentQuery.GetQuery(message), message))
             : throw new Exception($"Failed to extract or parse guid SwcrAttachment from message {message}");
 
     public async Task<string?> CreateSwcrMessage(string message) =>
         long.TryParse(message, out var swcrId)
-            ? WashString(await _busSenderMessageRepository.GetSwcrMessage(swcrId))
+            ? JsonSerializer.Serialize(
+                await _dapperRepository.QuerySingle<SwcrEvent>(SwcrQuery.GetQuery(swcrId),
+                    swcrId.ToString()))
             : throw new Exception($"Failed to extract swcrId from message: {message}");
 
     public async Task<string?> CreateSwcrOtherReferenceMessage(string message) =>
         Guid.TryParse(message, out _)
-            ? WashString(await _busSenderMessageRepository.GetSwcrOtherReferenceMessage(message))
+            ? JsonSerializer.Serialize(
+                await _dapperRepository.QuerySingle<SwcrOtherReferenceEvent>(
+                    SwcrOtherReferenceQuery.GetQuery(message), message))
             : throw new Exception(
                 $"Failed to extract or parse guid SwcrOtherReferences from message {message}");
 
     public async Task<string?> CreateSwcrSignatureMessage(string message) =>
         long.TryParse(message, out var swcrSignatureId)
-            ? WashString(await _busSenderMessageRepository.GetSwcrSignatureMessage(swcrSignatureId))
+            ? JsonSerializer.Serialize(
+                await _dapperRepository.QuerySingle<SwcrSignatureEvent>(
+                    SwcrSignatureQuery.GetQuery(swcrSignatureId), message))
             : throw new Exception($"Failed to extract swcrSignatureId from message: {message}");
 
     public async Task<string?> CreateSwcrTypeMessage(string message) =>
         Guid.TryParse(message, out _)
-            ? WashString(await _busSenderMessageRepository.GetSwcrTypeMessage(message))
+            ? JsonSerializer.Serialize(
+                await _dapperRepository.QuerySingle<SwcrTypeEvent>(
+                    SwcrTypeQuery.GetQuery(message), message))
             : throw new Exception($"Failed to extract or parse guid SwcrType from message {message}");
 
     public async Task<string?> CreateTaskMessage(string message) =>
@@ -225,12 +256,16 @@ public class BusEventService : IBusEventService
 
     public async Task<string?> CreateWoChecklistMessage(string message) =>
         CanGetTwoIdsFromMessage(message.Split(","), out var tagCheckId, out var woId)
-            ? WashString(await _busSenderMessageRepository.GetWorkOrderChecklistMessage(tagCheckId, woId))
+            ? JsonSerializer.Serialize(
+                await _dapperRepository.QuerySingle<WorkOrderChecklistEvent>(
+                    WorkOrderChecklistsQuery.GetQuery(tagCheckId, woId), message))
             : throw new Exception($"Failed to extract Wo or Checklist Id from message: {message}");
 
     public async Task<string?> CreateWoMaterialMessage(string message) =>
         long.TryParse(message, out var workOrderId)
-            ? WashString(await _busSenderMessageRepository.GetWorkOrderMaterialMessage(workOrderId))
+            ? JsonSerializer.Serialize(
+                await _dapperRepository.QuerySingle<WorkOrderMaterialEvent>(
+                    WorkOrderMaterialQuery.GetQuery(workOrderId), message))
             : throw new Exception($"Failed to extract workOrderId from message: {message}");
 
     public async Task<string?> CreateWoMilestoneMessage(string message)
@@ -246,16 +281,18 @@ public class BusEventService : IBusEventService
         return JsonSerializer.Serialize(workOrderMilestoneEvent, DefaultSerializerHelper.SerializerOptions);
     }
 
-    public async Task<string?> CreateWorkOrderCutOffMessage(string message)
+    public async Task<string?> CreateWorkOrderCutoffMessage(string message)
     {
         var woInfo = message.Split(","); // woId,cutoffweek
         if (woInfo.Length != 2)
         {
-            throw new Exception($"Failed to extract workOrderId and cutoffweek from message: {message}");
+            throw new Exception($"Failed to extract workOrderId and cutoff week from message: {message}");
         }
 
         return long.TryParse(woInfo[0], out var workOrderId)
-            ? WashString(await _busSenderMessageRepository.GetWorkOrderCutOffMessage(workOrderId, woInfo[1]))
+            ? JsonSerializer.Serialize(
+                await _dapperRepository.QuerySingle<WorkOrderCutoffEvent>(
+                    WorkOrderCutoffQuery.GetQuery(workOrderId, woInfo[1]), message))
             : throw new Exception($"Failed to extract workOrderId from message: {message}");
     }
 

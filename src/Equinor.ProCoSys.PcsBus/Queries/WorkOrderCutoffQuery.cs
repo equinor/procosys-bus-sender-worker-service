@@ -42,10 +42,10 @@ public class WorkOrderCutoffQuery
             wc.WOPLANNEDSTARTUPDATE as PlannedStartAtDate,
             wc.WOPLANNEDCOMPLETIONDATE as PlannedFinishedAtDate,
             wc.EXPENDED_MHRS as ExpendedManHours,
-            wc.EARNED_MHRS as ManhoursEarned,
+            wc.EARNED_MHRS as ManHoursEarned,
             wc.ESTIMATED_MHRS as EstimatedHours,
-            wc.EXPENDED_LW as ManhoursExpendedLastWeek,
-            wc.EARNED_LW as ManhoursEarnedLastWeek,
+            wc.EXPENDED_LW as ManHoursExpendedLastWeek,
+            wc.EARNED_LW as ManHoursEarnedLastWeek,
             wc.PROJECTPROGRESS as ProjectProgress
         from wo_cutoff wc
             join wo wo on wo.wo_id = wc.wo_id

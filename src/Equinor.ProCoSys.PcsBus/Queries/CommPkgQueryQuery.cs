@@ -1,8 +1,9 @@
 ﻿namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 
-//Duplicate of CommPkgQueryQuery
-//Remove this class when we've written it out of fam-feeder-function.
-public class QueryCommPkgQuery
+
+//Duplicate of QueryCommPkgQuery, we're keeping this long term, as even if its bad naming, its less bad that the other one.
+//QueryCommPkgQuery is for now in use in other project(fam-feeder-function), only remove if you are certain.
+public class CommPkgQueryQuery
 {
     public static string GetQuery(long? commPkgId,long? documentId, string? plant = null)
     {
