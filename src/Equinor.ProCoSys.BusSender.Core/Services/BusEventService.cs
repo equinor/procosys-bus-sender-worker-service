@@ -18,6 +18,7 @@ public class BusEventService : IBusEventService
     {
         _tagDetailsRepository = tagDetailsRepository;
         _busSenderMessageRepository = busSenderMessageRepository;
+
     }
 
     public async Task<string> AttachTagDetails(string tagMessage)
@@ -75,6 +76,11 @@ public class BusEventService : IBusEventService
     Guid.TryParse(busEventMessage, out _)
         ? WashString(await _busSenderMessageRepository.GetSwcrAttachmentMessage(busEventMessage))
         : throw new Exception($"Failed to extract or parse guid SwcrAttachment from message {busEventMessage}");
+
+    public async Task<string> CreateTagEquipmentMessage(string busEventMessage) =>
+    Guid.TryParse(busEventMessage, out _)
+    ? WashString(await _busSenderMessageRepository.GetTagEquipmentMessage(busEventMessage))
+    : throw new Exception($"Failed to extract or parse guid TagEquipment from message {busEventMessage}");
 
     public async Task<string> CreateActionMessage(string busEventMessage) =>
         long.TryParse(busEventMessage, out var actionId)

@@ -48,6 +48,9 @@ public class BusSenderMessageRepository : IBusSenderMessageRepository
     public async Task<string> GetActionMessage(long actionId) =>
     await ExecuteQuery(ActionQuery.GetQuery(actionId), actionId.ToString());
 
+    public async Task<string> GetTagEquipmentMessage(string guid) =>
+    await ExecuteQuery(TagEquipmentQuery.GetQuery(guid), guid);
+
     public async Task<string> GetCommPkgTaskMessage(long commPkgId, long taskId) =>
         await ExecuteQuery(CommPkgTaskQuery.GetQuery(commPkgId, taskId), commPkgId + "," + taskId);
 
