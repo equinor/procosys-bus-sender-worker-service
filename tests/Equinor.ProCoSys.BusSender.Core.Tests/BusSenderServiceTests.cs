@@ -9,6 +9,7 @@ using Moq;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
@@ -27,7 +28,6 @@ public class BusSenderServiceTests
     private List<BusEvent> _busEvents;
     private Mock<IBusEventRepository> _busEventRepository;
     private Mock<ITagDetailsRepository> _tagDetailsRepositoryMock;
-    private Mock<IBusSenderMessageRepository> _busSenderMessageRepositoryMock;
     private Mock<IDapperRepository> _dapperRepositoryMock;
     private Mock<BusEventService> _busEventServiceMock;
     private List<ServiceBusMessage> _messagesInTopicClient4;
@@ -84,9 +84,8 @@ public class BusSenderServiceTests
         _busEventRepository = new Mock<IBusEventRepository>();
         _tagDetailsRepositoryMock = new Mock<ITagDetailsRepository>();
         
-        _busSenderMessageRepositoryMock = new Mock<IBusSenderMessageRepository>();
         _dapperRepositoryMock = new Mock<IDapperRepository>();
-        _busEventServiceMock = new Mock<BusEventService>(_tagDetailsRepositoryMock.Object, _busSenderMessageRepositoryMock.Object, _dapperRepositoryMock.Object) { CallBase = true };
+        _busEventServiceMock = new Mock<BusEventService>(_tagDetailsRepositoryMock.Object, _dapperRepositoryMock.Object) { CallBase = true };
         _iUnitOfWork = new Mock<IUnitOfWork>();
 
         _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk()).Returns(() => Task.FromResult(_busEvents));
@@ -220,10 +219,6 @@ public class BusSenderServiceTests
 
         _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk())
             .Returns(() => Task.FromResult(new List<BusEvent> { wcl1, wcl2, wcl3 }));
-        _busSenderMessageRepositoryMock.Setup(wcl => wcl.GetWorkOrderChecklistMessage(10001, 1003))
-            .Returns(() => Task.FromResult(jsonMessage));
-        _busSenderMessageRepositoryMock.Setup(wr => wr.GetWorkOrderChecklistMessage(1003,10001))
-            .Returns(() => Task.FromResult(jsonMessage));
 
         var topicClientMockWoCl = new Mock<ServiceBusSender>();
         _busSender.Add(WoChecklistTopic.TopicName, topicClientMockWoCl.Object);
@@ -251,8 +246,6 @@ public class BusSenderServiceTests
 
         _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk())
             .Returns(() => Task.FromResult(new List<BusEvent> { commPri }));
-        _busSenderMessageRepositoryMock.Setup(wcl => wcl.GetLibraryFieldMessage(guid))
-            .Returns(() => Task.FromResult(jsonMessage));
      
 
         var topicClientMock = new Mock<ServiceBusSender>();
@@ -279,17 +272,16 @@ public class BusSenderServiceTests
         var wcl2 = new BusEvent { Event = WoChecklistTopic.TopicName, Message = "10001,1003", Status = Status.UnProcessed };
         var wcl3 = new BusEvent { Event = WoChecklistTopic.TopicName, Message = "1003,10001", Status = Status.UnProcessed };
         var wcDelete = new BusEvent { Event = WoChecklistTopic.TopicName, Message = deleteMessage, Status = Status.UnProcessed };
-        const string jsonMessage =
-            "{\"Plant\" : \"AnyValidPlant\", \"ProjectName\" : \"AnyProjectName\", \"WoNo\" : \"SomeWoNo1\"}";
-        const string jsonMessage2 =
-            "{\"Plant\" : \"AnyValidPlant\", \"ProjectName\" : \"AnyProjectName\", \"WoNo\" : \"SomeWoNo2\"}";
+        var workOrderChecklistEvent1 = new WorkOrderChecklistEvent { WoNo = "SomeWoNo1" };  
+        var workOrderChecklistEvent2 = new WorkOrderChecklistEvent { WoNo = "SomeWoNo2" };  
 
         _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk())
             .Returns(() => Task.FromResult(new List<BusEvent> { wcl1, wcl2, wcl3,wcDelete }));
-        _busSenderMessageRepositoryMock.Setup(wcl => wcl.GetWorkOrderChecklistMessage(10001, 1003))
-            .Returns(() => Task.FromResult(jsonMessage));
-        _busSenderMessageRepositoryMock.Setup(wr => wr.GetWorkOrderChecklistMessage(1003, 10001))
-            .Returns(() => Task.FromResult(jsonMessage2));
+        
+        _dapperRepositoryMock.Setup(wcl => wcl.QuerySingle<WorkOrderChecklistEvent>(It.IsAny<string>(), "10001,1003"))
+            .Returns(() => Task.FromResult(workOrderChecklistEvent1));     
+        _dapperRepositoryMock.Setup(wcl => wcl.QuerySingle<WorkOrderChecklistEvent>(It.IsAny<string>(), "1003,10001"))
+            .Returns(() => Task.FromResult(workOrderChecklistEvent2));
 
         var topicClientMockWoCl = new Mock<ServiceBusSender>();
         _busSender.Add(WoChecklistTopic.TopicName, topicClientMockWoCl.Object);
@@ -307,8 +299,8 @@ public class BusSenderServiceTests
         topicClientMockWoCl.Verify(t => t.SendMessagesAsync(batch, It.IsAny<CancellationToken>()), Times.Exactly(1));
         Assert.AreEqual(3, batch.Count);
         Assert.AreEqual(3,serviceBusMessages.Count);
-        Assert.AreEqual(jsonMessage, serviceBusMessages[0].Body.ToString());
-        Assert.AreEqual(jsonMessage2, serviceBusMessages[1].Body.ToString());
+        Assert.AreEqual(JsonSerializer.Serialize(workOrderChecklistEvent1), serviceBusMessages[0].Body.ToString());
+        Assert.AreEqual(JsonSerializer.Serialize(workOrderChecklistEvent2), serviceBusMessages[1].Body.ToString());
         Assert.AreEqual(deleteMessage, serviceBusMessages[2].Body.ToString());
     }
 
