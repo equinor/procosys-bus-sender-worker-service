@@ -692,6 +692,50 @@ public class BusEventServiceTests
     }
 
     [TestMethod]
+    public async Task CreateLoopContentMessage_ValidMessage_ReturnsSerializedLoopContentEvent()
+    {
+        // Arrange
+        const string message = "123";
+        const long loopId = 123L;
+        var queryString = LoopContentQuery.GetQuery(loopId);
+        
+        // Arrange
+        var loopContentEvent = new LoopContentEvent
+        {
+            Plant = "TestPlant",
+            ProCoSysGuid = Guid.NewGuid(),
+            LoopTagId = 1234,
+            LoopTagGuid = Guid.NewGuid(),
+            TagId = 5678,
+            TagGuid = Guid.NewGuid(),
+            RegisterCode = "A123",
+            LastUpdated = DateTime.UtcNow
+        };
+
+        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<LoopContentEvent>(queryString, message))
+            .ReturnsAsync(loopContentEvent);
+
+        // Act
+        var result = await _dut.CreateLoopContentMessage(message);
+
+        // Assert
+        Assert.IsNotNull(result);
+        var deserializedResult =
+            JsonSerializer.Deserialize<LoopContentEvent>(result, DefaultSerializerHelper.SerializerOptions);
+
+        // Check if the properties are equal
+        Assert.IsNotNull(loopContentEvent);
+        Assert.AreEqual(loopContentEvent.Plant, deserializedResult.Plant);
+        Assert.AreEqual(loopContentEvent.ProCoSysGuid, deserializedResult.ProCoSysGuid);
+        Assert.AreEqual(loopContentEvent.LoopTagId, deserializedResult.LoopTagId);
+        Assert.AreEqual(loopContentEvent.LoopTagGuid, deserializedResult.LoopTagGuid);
+        Assert.AreEqual(loopContentEvent.TagId, deserializedResult.TagId);
+        Assert.AreEqual(loopContentEvent.TagGuid, deserializedResult.TagGuid);
+        Assert.AreEqual(loopContentEvent.RegisterCode, deserializedResult.RegisterCode);
+        Assert.AreEqual(loopContentEvent.LastUpdated, deserializedResult.LastUpdated);
+    }
+
+    [TestMethod]
     public async Task CreateMcPkgMessage_ValidMessage_ReturnsSerializedMcPkgEvent()
     {
         // Arrange
@@ -1082,6 +1126,73 @@ public class BusEventServiceTests
         Assert.AreEqual(punchListItemEvent.RejectedAt, deserializedResult.RejectedAt);
         Assert.AreEqual(punchListItemEvent.VerifiedAt, deserializedResult.VerifiedAt);
         Assert.AreEqual(punchListItemEvent.CreatedAt, deserializedResult.CreatedAt);
+    }
+
+    [TestMethod]
+    public async Task CreateQueryMessage_ValidMessage_ReturnsSerializedQueryEvent()
+    {
+        // Arrange
+        const string message = "12345";
+        const long queryId = 12345L;
+        var queryString = QueryQuery.GetQuery(queryId);
+        var queryEvent = new QueryEvent
+        {
+            Plant = "GardenOfMystery",
+            ProCoSysGuid = Guid.NewGuid(),
+            ProjectName = "EnigmaticExpedition",
+            QueryId = 42,
+            QueryNo = "R-1",
+            Title = "The Sphinx's Secret",
+            DisciplineCode = "ARCH",
+            QueryType = "Riddle",
+            CostImpact = "Medium",
+            Description = "What walks on four legs in the morning, two legs at noon, and three legs in the evening?",
+            Consequence = "Failure to solve the riddle may result in dire consequences.",
+            ProposedSolution = "The answer is a human being.",
+            EngineeringReply = "Solution accepted, the riddle is solved.",
+            Milestone = "M2",
+            ScheduleImpact = false,
+            PossibleWarrantyClaim = false,
+            IsVoided = false,
+            RequiredDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(3)),
+            CreatedAt = DateTime.UtcNow,
+            LastUpdated = DateTime.UtcNow
+        };
+
+        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<QueryEvent>(queryString, message))
+            .ReturnsAsync(queryEvent);
+
+        // Act
+        var result = await _dut.CreateQueryMessage(message);
+
+        // Assert
+        Assert.IsNotNull(result);
+        var deserializedResult =
+            JsonSerializer.Deserialize<QueryEvent>(result,DefaultSerializerHelper.SerializerOptions);
+
+        // Check if the properties are equal
+        Assert.IsNotNull(deserializedResult);
+        Assert.AreEqual(queryEvent.Plant, deserializedResult.Plant);
+        Assert.AreEqual(queryEvent.ProCoSysGuid, deserializedResult.ProCoSysGuid);
+        Assert.AreEqual(queryEvent.ProjectName, deserializedResult.ProjectName);
+        Assert.AreEqual(queryEvent.QueryId, deserializedResult.QueryId);
+        Assert.AreEqual(queryEvent.QueryNo, deserializedResult.QueryNo);
+        Assert.AreEqual(queryEvent.Title, deserializedResult.Title);
+        Assert.AreEqual(queryEvent.DisciplineCode, deserializedResult.DisciplineCode);
+        Assert.AreEqual(queryEvent.QueryType, deserializedResult.QueryType);
+        Assert.AreEqual(queryEvent.CostImpact, deserializedResult.CostImpact);
+        Assert.AreEqual(queryEvent.Description, deserializedResult.Description);
+        Assert.AreEqual(queryEvent.Consequence, deserializedResult.Consequence);
+        Assert.AreEqual(queryEvent.ProposedSolution, deserializedResult.ProposedSolution);
+        Assert.AreEqual(queryEvent.EngineeringReply, deserializedResult.EngineeringReply);
+        Assert.AreEqual(queryEvent.Milestone, deserializedResult.Milestone);
+        Assert.AreEqual(queryEvent.ScheduleImpact, deserializedResult.ScheduleImpact);
+        Assert.AreEqual(queryEvent.PossibleWarrantyClaim, deserializedResult.PossibleWarrantyClaim);
+        Assert.AreEqual(queryEvent.IsVoided, deserializedResult.IsVoided);
+        Assert.AreEqual(queryEvent.RequiredDate, deserializedResult.RequiredDate);
+        Assert.AreEqual(queryEvent.CreatedAt, deserializedResult.CreatedAt);
+        Assert.AreEqual(queryEvent.LastUpdated, deserializedResult.LastUpdated);
+
     }
 
     [TestMethod]

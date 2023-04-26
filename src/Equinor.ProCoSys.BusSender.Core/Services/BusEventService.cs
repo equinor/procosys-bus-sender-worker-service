@@ -194,7 +194,7 @@ public class BusEventService : IBusEventService
         long.TryParse(message, out var documentId)
             ? JsonSerializer.Serialize(
                 await _dapperRepository.QuerySingle<QueryEvent>(QueryQuery.GetQuery(documentId),
-                    documentId.ToString()))
+                    documentId.ToString()), DefaultSerializerHelper.SerializerOptions)
             : throw new Exception($"Failed to extract documentId from message: {message}");
 
     public async Task<string?> CreateQuerySignatureMessage(string message) =>
@@ -223,7 +223,7 @@ public class BusEventService : IBusEventService
         long.TryParse(message, out var swcrId)
             ? JsonSerializer.Serialize(
                 await _dapperRepository.QuerySingle<SwcrEvent>(SwcrQuery.GetQuery(swcrId),
-                    swcrId.ToString()))
+                    swcrId.ToString()),DefaultSerializerHelper.SerializerOptions)
             : throw new Exception($"Failed to extract swcrId from message: {message}");
 
     public async Task<string?> CreateSwcrOtherReferenceMessage(string message) =>
