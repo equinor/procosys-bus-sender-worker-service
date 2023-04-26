@@ -13,6 +13,7 @@ public interface IBusSenderMessageRepository
     Task<string> GetSwcrOtherReferenceMessage(string guid);
     Task<string> GetSwcrTypeMessage(string guid);
     Task<string> GetSwcrAttachmentMessage(string guid);
+    Task<string> GetTagEquipmentMessage(string guid);
     Task<string> GetActionMessage(long actionId);
     Task<string> GetCommPkgTaskMessage(long commPkgId, long taskId);
     Task<string> GetLoopContentMessage(long loopContentId);
