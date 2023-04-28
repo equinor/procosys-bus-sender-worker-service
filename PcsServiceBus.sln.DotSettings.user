@@ -6,18 +6,6 @@
   &lt;/TestAncestor&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=a8de3bc2_002Dae28_002D42a6_002D8f8c_002D05f8909f8012/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="WorkOrderMilestoneEventVersioningTests" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
-  &lt;Or&gt;&#xD;
-    &lt;Project Location="C:\W\procosys-bus-sender-worker-service\tests\Equinor.ProCoSys.PcsBusTests" Presentation="&amp;lt;Tests&amp;gt;\&amp;lt;Equinor.ProCoSys.PcsServiceBusTests&amp;gt;" /&gt;&#xD;
-    &lt;TestAncestor&gt;&#xD;
-      &lt;TestId&gt;MSTest::2B0B4E2B-8005-4270-BB3C-A83B165F8787::net6.0::Equinor.ProCoSys.BusSenderWorker.Core.Tests.BusSenderServiceTests&lt;/TestId&gt;&#xD;
-      &lt;TestId&gt;MSTest::2B0B4E2B-8005-4270-BB3C-A83B165F8787::net6.0::Equinor.ProCoSys.BusSenderWorker.Core.Tests.BusEventServiceTests.CreateActionMessage_ValidMessage_ReturnsSerializedActionEvent&lt;/TestId&gt;&#xD;
-      &lt;TestId&gt;MSTest::2B0B4E2B-8005-4270-BB3C-A83B165F8787::net6.0::Equinor.ProCoSys.BusSenderWorker.Core.Tests.BusEventServiceTests.CreateCallOffMessage_ValidMessage_ReturnsSerializedCallOffEvent&lt;/TestId&gt;&#xD;
-      &lt;TestId&gt;MSTest::2B0B4E2B-8005-4270-BB3C-A83B165F8787::net6.0::Equinor.ProCoSys.BusSenderWorker.Core.Tests.BusEventServiceTests.CreateChecklistEvent_ValidMessage_ReturnsSerializedCheckListEvent&lt;/TestId&gt;&#xD;
-      &lt;TestId&gt;MSTest::2B0B4E2B-8005-4270-BB3C-A83B165F8787::net6.0::Equinor.ProCoSys.BusSenderWorker.Core.Tests.BusEventServiceTests.CreateCommPkgMilestoneEvent_ValidMessage_ReturnsSerializedCommPkgMilestoneEvent&lt;/TestId&gt;&#xD;
-      &lt;TestId&gt;MSTest::2B0B4E2B-8005-4270-BB3C-A83B165F8787::net6.0::Equinor.ProCoSys.BusSenderWorker.Core.Tests.BusEventServiceTests.CreateLibraryFieldMessage_ValidMessage_ReturnsSerializedLibraryFieldEvent&lt;/TestId&gt;&#xD;
-      &lt;TestId&gt;MSTest::2B0B4E2B-8005-4270-BB3C-A83B165F8787::net6.0::Equinor.ProCoSys.BusSenderWorker.Core.Tests.BusEventServiceTests.CreateMcPkgMilestoneMessage_ValidMessage_ReturnsSerializedMcPkgMilestoneEvent&lt;/TestId&gt;&#xD;
-      &lt;TestId&gt;MSTest::2B0B4E2B-8005-4270-BB3C-A83B165F8787::net6.0::Equinor.ProCoSys.BusSenderWorker.Core.Tests.BusEventServiceTests&lt;/TestId&gt;&#xD;
-    &lt;/TestAncestor&gt;&#xD;
-  &lt;/Or&gt;&#xD;
+  &lt;Project Location="C:\W\procosys-bus-sender-worker-service" Presentation="&amp;lt;Tests&amp;gt;" /&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
 	</wpf:ResourceDictionary>

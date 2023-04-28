@@ -1192,7 +1192,45 @@ public class BusEventServiceTests
         Assert.AreEqual(queryEvent.RequiredDate, deserializedResult.RequiredDate);
         Assert.AreEqual(queryEvent.CreatedAt, deserializedResult.CreatedAt);
         Assert.AreEqual(queryEvent.LastUpdated, deserializedResult.LastUpdated);
+    }
+    
+    [TestMethod]
+    public async Task CreateQuerySignatureMessage_ValidMessage_ReturnsSerializedQuerySignatureEvent()
+    {
+        // Arrange
+        const string message = "12345";
+        const long queryId = 12345L;
+        var queryString = QuerySignatureQuery.GetQuery(queryId);
+        var querySignatureEvent = new QuerySignatureEvent
+        {
+            Plant = "GardenOfMystery",
+            ProCoSysGuid = Guid.NewGuid(),
+            ProjectName = "EnigmaticExpedition",
+            QueryId = 42,
+            QueryNo = "R-1",
+            LastUpdated = DateTime.UtcNow
+        };
 
+        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<QuerySignatureEvent>(queryString, message))
+            .ReturnsAsync(querySignatureEvent);
+
+        // Act
+        var result = await _dut.CreateQuerySignatureMessage(message);
+
+        // Assert
+        Assert.IsNotNull(result);
+        var deserializedResult =
+            JsonSerializer.Deserialize<QuerySignatureEvent>(result,DefaultSerializerHelper.SerializerOptions);
+
+        // Check if the properties are equal
+        Assert.IsNotNull(deserializedResult);
+        Assert.AreEqual(querySignatureEvent.Plant, deserializedResult.Plant);
+        Assert.AreEqual(querySignatureEvent.ProCoSysGuid, deserializedResult.ProCoSysGuid);
+        Assert.AreEqual(querySignatureEvent.ProjectName, deserializedResult.ProjectName);
+        Assert.AreEqual(querySignatureEvent.QueryId, deserializedResult.QueryId);
+        Assert.AreEqual(querySignatureEvent.QueryNo, deserializedResult.QueryNo);
+
+        Assert.AreEqual(querySignatureEvent.LastUpdated, deserializedResult.LastUpdated);
     }
 
     [TestMethod]
