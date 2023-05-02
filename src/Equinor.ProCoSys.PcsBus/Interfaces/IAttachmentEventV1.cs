@@ -14,7 +14,7 @@ public interface IAttachmentEventV1 : IHasEventType
     Guid? SwcrGuid { get; set; }
     string Title { get; set; }  
     string ClassificationCode { get; set; }
-    string URI { get; set; }
+    string Uri { get; set; }
     string FileName { get; set; }
     DateTime LastUpdated { get; set; }
     

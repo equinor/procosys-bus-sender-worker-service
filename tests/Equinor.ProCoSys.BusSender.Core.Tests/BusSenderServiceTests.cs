@@ -194,14 +194,10 @@ public class BusSenderServiceTests
             .Returns(() => Task.FromResult(wo));
         _dapperRepositoryMock.Setup(wr => wr.QuerySingle<WorkOrderEvent>(It.IsAny<string>(), wo3.ToString()))
             .Returns(() => Task.FromResult(wo));
-
-       
-
+        
         //Act
         await _dut.HandleBusEvents();
-
         
-
         //Assert
         _topicClientMockWo.Verify(t => t.SendMessagesAsync(_mockWoMessageBatch, It.IsAny<CancellationToken>()), Times.Exactly(1));
         Assert.AreEqual(2, _mockWoMessageBatch.Count);
@@ -214,9 +210,7 @@ public class BusSenderServiceTests
         var wcl1 = new BusEvent { Event = WoChecklistTopic.TopicName, Message = "10001,1003", Status = Status.UnProcessed };
         var wcl2 = new BusEvent { Event = WoChecklistTopic.TopicName, Message = "10001,1003", Status = Status.UnProcessed };
         var wcl3 = new BusEvent { Event = WoChecklistTopic.TopicName, Message = "1003,10001", Status = Status.UnProcessed };
-        const string jsonMessage =
-            "{\"Plant\" : \"AnyValidPlant\", \"ProjectName\" : \"AnyProjectName\", \"WoNo\" : \"SomeWoNo\"}";
-
+        
         _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk())
             .Returns(() => Task.FromResult(new List<BusEvent> { wcl1, wcl2, wcl3 }));
 
@@ -304,7 +298,6 @@ public class BusSenderServiceTests
         Assert.AreEqual(deleteMessage, serviceBusMessages[2].Body.ToString());
     }
 
-
     [TestMethod]
     public async Task HandleBusEvents_ShouldHandleInvalidCharacters()
     {
@@ -329,5 +322,4 @@ public class BusSenderServiceTests
         //Assert
         _topicClientMockWo.Verify(t => t.SendMessagesAsync(It.IsAny<ServiceBusMessageBatch>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
     }
-
 }

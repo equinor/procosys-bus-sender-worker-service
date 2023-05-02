@@ -12,7 +12,7 @@ public class SwcrAttachmentEvent : IAttachmentEventV1
     public Guid? SwcrGuid { get; set; }
     public string Title { get; set; }
     public string ClassificationCode { get; set; }
-    public string URI { get; set; }
+    public string Uri { get; set; }
     public string FileName { get; set; }
     public DateTime LastUpdated { get; set; }
     

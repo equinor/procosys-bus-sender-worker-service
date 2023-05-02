@@ -10,7 +10,7 @@ namespace Equinor.ProCoSys.PcsServiceBusTests;
 public class SwcrEventTests
 {
     [TestMethod]
-    public void ISWCRV1_InterfacePropertiesAndMethods_DoNotChange()
+    public void ISwcrV1_InterfacePropertiesAndMethods_DoNotChange()
     {
         // Arrange
         var swcrEventInterfaceType = typeof(ISwcrEventV1);
@@ -19,8 +19,8 @@ public class SwcrEventTests
             {"Plant", typeof(string)},
             {"ProCoSysGuid", typeof(Guid)},
             {"ProjectName", typeof(string)},
-            {"SWCRNO", typeof(string)},
-            {"SWCRId", typeof(long)},
+            {"SwcrNo", typeof(string)},
+            {"SwcrId", typeof(long)},
             {"CommPkgGuid", typeof(Guid?)},
             {"CommPkgNo", typeof(string)},
             {"Description", typeof(string)},

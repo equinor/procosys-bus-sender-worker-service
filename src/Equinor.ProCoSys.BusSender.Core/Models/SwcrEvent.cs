@@ -10,8 +10,8 @@ public class SwcrEvent : ISwcrEventV1
     public string Plant { get; set; }
     public Guid ProCoSysGuid { get; set; }
     public string? ProjectName { get; set; }
-    public string SWCRNO { get; set; }
-    public long SWCRId { get; set; }
+    public string SwcrNo { get; set; }
+    public long SwcrId { get; set; }
     public Guid? CommPkgGuid { get; set; }
     public string? CommPkgNo { get; set; }
     public string? Description { get; set; }

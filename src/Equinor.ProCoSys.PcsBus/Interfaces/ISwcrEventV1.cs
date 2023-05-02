@@ -6,8 +6,8 @@ public interface ISwcrEventV1 : IHasEventType
     string Plant { get; set; }
     Guid ProCoSysGuid { get; set; }
     string? ProjectName { get; set; }
-    string SWCRNO { get; set; }
-    long SWCRId { get; set; }
+    string SwcrNo { get; set; }
+    long SwcrId { get; set; }
     Guid? CommPkgGuid { get; set; }
     string? CommPkgNo { get; set; }
     string? Description { get; set; }

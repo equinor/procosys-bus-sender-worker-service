@@ -11,7 +11,7 @@ public class SwcrSignatureEvent : ISwcrSignatureEventV1
     public Guid ProCoSysGuid { get; set; }
     public long SwcrSignatureId { get; set; }
     public string ProjectName { get; set; }
-    public string SWCRNO { get; set; }
+    public string SwcrNo { get; set; }
     public Guid SwcrGuid { get; set; }
     public string SignatureRoleCode { get; set; }
     public string? SignatureRoleDescription { get; set; }

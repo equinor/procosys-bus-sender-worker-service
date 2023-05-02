@@ -8,7 +8,7 @@ public interface ISwcrSignatureEventV1 : IHasEventType
     Guid ProCoSysGuid { get; set; }
     long SwcrSignatureId { get; set; }
     string ProjectName { get; set; }
-    string SWCRNO { get; set; }
+    string SwcrNo { get; set; }
     Guid SwcrGuid { get; set; }
     string SignatureRoleCode { get; set; }
     string? SignatureRoleDescription { get; set; }

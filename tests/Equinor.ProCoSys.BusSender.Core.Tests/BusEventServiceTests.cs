@@ -1245,8 +1245,8 @@ public class BusEventServiceTests
             Plant = "Plant1",
             ProCoSysGuid = Guid.NewGuid(),
             ProjectName = "ProjectName1",
-            SWCRNO = "SWCRNO1",
-            SWCRId = 1,
+            SwcrNo = "SWCRNO1",
+            SwcrId  = 1,
             CommPkgGuid = Guid.NewGuid(),
             CommPkgNo = "CommPkgNo1",
             Description = "Description1",
@@ -1280,8 +1280,8 @@ public class BusEventServiceTests
         Assert.AreEqual(swcrEvent.Plant, deserializedResult.Plant);
         Assert.AreEqual(swcrEvent.ProCoSysGuid, deserializedResult.ProCoSysGuid);
         Assert.AreEqual(swcrEvent.ProjectName, deserializedResult.ProjectName);
-        Assert.AreEqual(swcrEvent.SWCRNO, deserializedResult.SWCRNO);
-        Assert.AreEqual(swcrEvent.SWCRId, deserializedResult.SWCRId);
+        Assert.AreEqual(swcrEvent.SwcrNo, deserializedResult.SwcrNo);
+        Assert.AreEqual(swcrEvent.SwcrId, deserializedResult.SwcrId);
         Assert.AreEqual(swcrEvent.CommPkgGuid, deserializedResult.CommPkgGuid);
         Assert.AreEqual(swcrEvent.CommPkgNo, deserializedResult.CommPkgNo);
         Assert.AreEqual(swcrEvent.Description, deserializedResult.Description);
