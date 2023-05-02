@@ -1,7 +1,9 @@
 ﻿using System;
+using JetBrains.Annotations;
 
 namespace Equinor.ProCoSys.PcsServiceBus.Interfaces;
 
+[UsedImplicitly]
 public interface IWorkOrderCutoffEventV1 : IHasEventType
 {
     string Plant { get; set; }
