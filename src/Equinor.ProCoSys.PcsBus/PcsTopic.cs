@@ -42,5 +42,6 @@ public enum PcsTopic
     HeatTrace,
     LibraryField,
     CommPkgMilestone,
-    McPkgMilestone
+    McPkgMilestone,
+    TagEquipment
 }
