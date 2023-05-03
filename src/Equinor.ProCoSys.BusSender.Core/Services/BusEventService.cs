@@ -145,6 +145,13 @@ public class BusEventService : IBusEventService
                     punchListItemId.ToString()))
             : throw new Exception($"Failed to extract punchListItemId from message: {message}");
 
+    public async Task<string> CreateResponsibleMessage(string message) => 
+        long.TryParse(message, out var responsibleId)
+            ? JsonSerializer.Serialize(
+               await _dapperRepository.QuerySingle<ResponsibleEvent>(ResponsibleQuery.GetQuery(responsibleId),
+                    responsibleId.ToString()))
+            : throw new Exception($"Failed to extract responsibleId from message: {message}");
+    
     public async Task<string?> CreateLibraryFieldMessage(string message)
     {
         if (!Guid.TryParse(message, out _))
@@ -254,25 +261,25 @@ public class BusEventService : IBusEventService
                 await _dapperRepository.QuerySingle<TaskEvent>(TaskQuery.GetQuery(taskId), taskId.ToString()))
             : throw new Exception($"Failed to extract checklistId from message: {message}");
 
-    public async Task<string?> CreateWoChecklistMessage(string message) =>
+    public async Task<string?> CreateWorkOrderChecklistMessage(string message) =>
         CanGetTwoIdsFromMessage(message.Split(","), out var tagCheckId, out var woId)
             ? JsonSerializer.Serialize(
                 await _dapperRepository.QuerySingle<WorkOrderChecklistEvent>(
-                    WorkOrderChecklistsQuery.GetQuery(tagCheckId, woId), message))
+                    WorkOrderChecklistQuery.GetQuery(tagCheckId, woId), message))
             : throw new Exception($"Failed to extract Wo or Checklist Id from message: {message}");
 
-    public async Task<string?> CreateWoMaterialMessage(string message) =>
+    public async Task<string?> CreateWorkOrderMaterialMessage(string message) =>
         long.TryParse(message, out var workOrderId)
             ? JsonSerializer.Serialize(
                 await _dapperRepository.QuerySingle<WorkOrderMaterialEvent>(
-                    WorkOrderMaterialQuery.GetQuery(workOrderId), message))
+                    WorkOrderMaterialQuery.GetQuery(workOrderId), message),DefaultSerializerHelper.SerializerOptions)
             : throw new Exception($"Failed to extract workOrderId from message: {message}");
 
-    public async Task<string?> CreateWoMilestoneMessage(string message)
+    public async Task<string?> CreateWorkOrderMilestoneMessage(string message)
     {
-        if (CanGetTwoIdsFromMessage(message.Split(","), out var workOrderId, out var milestoneId))
+        if (!CanGetTwoIdsFromMessage(message.Split(","), out var workOrderId, out var milestoneId))
         {
-            throw new Exception($"Failed to extract guid from message {message}");
+            throw new Exception($"Failed to extract ids from message {message}");
         }
 
         var queryString = WorkOrderMilestoneQuery.GetQuery(workOrderId, milestoneId);
@@ -292,7 +299,7 @@ public class BusEventService : IBusEventService
         return long.TryParse(woInfo[0], out var workOrderId)
             ? JsonSerializer.Serialize(
                 await _dapperRepository.QuerySingle<WorkOrderCutoffEvent>(
-                    WorkOrderCutoffQuery.GetQuery(workOrderId, woInfo[1]), message))
+                    WorkOrderCutoffQuery.GetQuery(workOrderId, woInfo[1]), message),DefaultSerializerHelper.SerializerOptions)
             : throw new Exception($"Failed to extract workOrderId from message: {message}");
     }
 

@@ -307,12 +307,12 @@ public class BusSenderService : IBusSenderService
                 }
             case WoChecklistTopic.TopicName:
                 {
-                    await CreateAndSetMessage(busEvent, _service.CreateWoChecklistMessage);
+                    await CreateAndSetMessage(busEvent, _service.CreateWorkOrderChecklistMessage);
                     break;
                 }
             case WoMilestoneTopic.TopicName:
                 {
-                    await CreateAndSetMessage(busEvent, _service.CreateWoMilestoneMessage);
+                    await CreateAndSetMessage(busEvent, _service.CreateWorkOrderMilestoneMessage);
                     break;
                 }
             case SwcrTopic.TopicName:
@@ -352,7 +352,7 @@ public class BusSenderService : IBusSenderService
                 }
             case WoMaterialTopic.TopicName:
                 {
-                    await CreateAndSetMessage(busEvent, _service.CreateWoMaterialMessage);
+                    await CreateAndSetMessage(busEvent, _service.CreateWorkOrderMaterialMessage);
                     break;
                 }
         }

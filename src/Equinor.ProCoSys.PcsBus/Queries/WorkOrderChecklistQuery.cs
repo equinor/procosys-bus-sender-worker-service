@@ -1,6 +1,6 @@
 ﻿namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 
-public class WorkOrderChecklistsQuery
+public class WorkOrderChecklistQuery
 {
     public static string GetQuery(long? tagCheckId, long? woId, string? plant = null)
     {

@@ -1,14 +1,14 @@
 ﻿using System;
-using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
-using Equinor.ProCoSys.BusSenderWorker.Core.Services;
-using Equinor.ProCoSys.PcsServiceBus.Topics;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Equinor.ProCoSys.BusSenderWorker.Core.Extensions;
+using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 using Equinor.ProCoSys.BusSenderWorker.Core.Models;
+using Equinor.ProCoSys.BusSenderWorker.Core.Services;
 using Equinor.ProCoSys.PcsServiceBus.Queries;
+using Equinor.ProCoSys.PcsServiceBus.Topics;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 
 namespace Equinor.ProCoSys.BusSenderWorker.Core.Tests;
 
@@ -594,6 +594,54 @@ public class BusEventServiceTests
     }
 
     [TestMethod]
+    public async Task CreateLibraryMessage_ValidMessage_ReturnsSerializedLibraryEvent()
+    {
+        //Arrange
+        const string message = "123";
+        const long libraryId = 123L;
+        var queryString = LibraryQuery.GetQuery(libraryId);
+
+
+        var libraryEvent = new LibraryEvent
+        {
+            Plant = "Plant1",
+            ProCoSysGuid = Guid.NewGuid(),
+            LibraryId = 1,
+            ParentId = 2,
+            ParentGuid = Guid.NewGuid(),
+            Code = "Code1",
+            Description = "Description1",
+            IsVoided = false,
+            Type = "Type1",
+            LastUpdated = DateTime.UtcNow
+        };
+
+        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<LibraryEvent>(queryString, message))
+            .ReturnsAsync(libraryEvent);
+
+        // Act
+        var result = await _dut.CreateLibraryMessage(message);
+
+        // Assert
+        Assert.IsNotNull(result);
+        var deserializedResult =
+            JsonSerializer.Deserialize<LibraryEvent>(result, DefaultSerializerHelper.SerializerOptions);
+
+        // Check if the properties are equal
+        Assert.AreEqual(libraryEvent.Plant, deserializedResult.Plant);
+        Assert.AreEqual(libraryEvent.ProCoSysGuid, deserializedResult.ProCoSysGuid);
+        Assert.AreEqual(libraryEvent.LibraryId, deserializedResult.LibraryId);
+        Assert.AreEqual(libraryEvent.ParentId, deserializedResult.ParentId);
+        Assert.AreEqual(libraryEvent.ParentGuid, deserializedResult.ParentGuid);
+        Assert.AreEqual(libraryEvent.Code, deserializedResult.Code);
+        Assert.AreEqual(libraryEvent.Description, deserializedResult.Description);
+        Assert.AreEqual(libraryEvent.IsVoided, deserializedResult.IsVoided);
+        Assert.AreEqual(libraryEvent.Type, deserializedResult.Type);
+        Assert.AreEqual(libraryEvent.LastUpdated, deserializedResult.LastUpdated);
+        Assert.AreEqual(libraryEvent.EventType, deserializedResult.EventType);
+    }
+
+    [TestMethod]
     public async Task CreateLibraryFieldMessage_ValidMessage_ReturnsSerializedLibraryFieldEvent()
     {
         // Arrange
@@ -644,61 +692,13 @@ public class BusEventServiceTests
     }
 
     [TestMethod]
-    public async Task CreateLibraryMessage_ValidMessage_ReturnsSerializedLibraryEvent()
-    {
-        //Arrange
-        const string message = "123";
-        const long libraryId = 123L;
-        var queryString = LibraryQuery.GetQuery(libraryId);
-
-
-        var libraryEvent = new LibraryEvent
-        {
-            Plant = "Plant1",
-            ProCoSysGuid = Guid.NewGuid(),
-            LibraryId = 1,
-            ParentId = 2,
-            ParentGuid = Guid.NewGuid(),
-            Code = "Code1",
-            Description = "Description1",
-            IsVoided = false,
-            Type = "Type1",
-            LastUpdated = DateTime.UtcNow
-        };
-
-        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<LibraryEvent>(queryString, message))
-            .ReturnsAsync(libraryEvent);
-
-        // Act
-        var result = await _dut.CreateLibraryMessage(message);
-
-        // Assert
-        Assert.IsNotNull(result);
-        var deserializedResult =
-            JsonSerializer.Deserialize<LibraryEvent>(result, DefaultSerializerHelper.SerializerOptions);
-
-        // Check if the properties are equal
-        Assert.AreEqual(libraryEvent.Plant, deserializedResult.Plant);
-        Assert.AreEqual(libraryEvent.ProCoSysGuid, deserializedResult.ProCoSysGuid);
-        Assert.AreEqual(libraryEvent.LibraryId, deserializedResult.LibraryId);
-        Assert.AreEqual(libraryEvent.ParentId, deserializedResult.ParentId);
-        Assert.AreEqual(libraryEvent.ParentGuid, deserializedResult.ParentGuid);
-        Assert.AreEqual(libraryEvent.Code, deserializedResult.Code);
-        Assert.AreEqual(libraryEvent.Description, deserializedResult.Description);
-        Assert.AreEqual(libraryEvent.IsVoided, deserializedResult.IsVoided);
-        Assert.AreEqual(libraryEvent.Type, deserializedResult.Type);
-        Assert.AreEqual(libraryEvent.LastUpdated, deserializedResult.LastUpdated);
-        Assert.AreEqual(libraryEvent.EventType, deserializedResult.EventType);
-    }
-
-    [TestMethod]
     public async Task CreateLoopContentMessage_ValidMessage_ReturnsSerializedLoopContentEvent()
     {
         // Arrange
         const string message = "123";
         const long loopId = 123L;
         var queryString = LoopContentQuery.GetQuery(loopId);
-        
+
         // Arrange
         var loopContentEvent = new LoopContentEvent
         {
@@ -996,7 +996,7 @@ public class BusEventServiceTests
         Assert.AreEqual(pipingSpoolEvent.LastUpdated, deserializedResult.LastUpdated);
         Assert.AreEqual(pipingSpoolEvent.EventType, deserializedResult.EventType);
     }
-    
+
     [TestMethod]
     public async Task CreateProjectMessage_ValidMessage_ReturnsSerializedProjectEvent()
     {
@@ -1080,7 +1080,7 @@ public class BusEventServiceTests
             VerifiedAt = null,
             CreatedAt = DateTime.UtcNow.AddDays(-7)
         };
-        
+
         _dapperRepositoryMock.Setup(repo => repo.QuerySingle<PunchListItemEvent>(queryString, message))
             .ReturnsAsync(punchListItemEvent);
 
@@ -1168,7 +1168,7 @@ public class BusEventServiceTests
         // Assert
         Assert.IsNotNull(result);
         var deserializedResult =
-            JsonSerializer.Deserialize<QueryEvent>(result,DefaultSerializerHelper.SerializerOptions);
+            JsonSerializer.Deserialize<QueryEvent>(result, DefaultSerializerHelper.SerializerOptions);
 
         // Check if the properties are equal
         Assert.IsNotNull(deserializedResult);
@@ -1193,7 +1193,7 @@ public class BusEventServiceTests
         Assert.AreEqual(queryEvent.CreatedAt, deserializedResult.CreatedAt);
         Assert.AreEqual(queryEvent.LastUpdated, deserializedResult.LastUpdated);
     }
-    
+
     [TestMethod]
     public async Task CreateQuerySignatureMessage_ValidMessage_ReturnsSerializedQuerySignatureEvent()
     {
@@ -1220,7 +1220,7 @@ public class BusEventServiceTests
         // Assert
         Assert.IsNotNull(result);
         var deserializedResult =
-            JsonSerializer.Deserialize<QuerySignatureEvent>(result,DefaultSerializerHelper.SerializerOptions);
+            JsonSerializer.Deserialize<QuerySignatureEvent>(result, DefaultSerializerHelper.SerializerOptions);
 
         // Check if the properties are equal
         Assert.IsNotNull(deserializedResult);
@@ -1231,6 +1231,123 @@ public class BusEventServiceTests
         Assert.AreEqual(querySignatureEvent.QueryNo, deserializedResult.QueryNo);
 
         Assert.AreEqual(querySignatureEvent.LastUpdated, deserializedResult.LastUpdated);
+    }
+
+    [TestMethod]
+    public async Task CreateResponsibleMessage_ValidMessage_ReturnsSerializedResponsibleEvent()
+    {
+        // Arrange
+        const string message = "12345";
+        const long responsibleId = 12345L;
+        var queryString = ResponsibleQuery.GetQuery(responsibleId);
+        var responsibleEvent = new ResponsibleEvent
+        {
+            Plant = "MysteriousIsland",
+            ProCoSysGuid = Guid.NewGuid(),
+            ResponsibleId = 101,
+            Code = "SHR",
+            ResponsibleGroup = "Sherlock",
+            Description = "Solving enigmatic cases",
+            IsVoided = false,
+            LastUpdated = DateTime.UtcNow
+        };
+
+        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<ResponsibleEvent>(queryString, message))
+            .ReturnsAsync(responsibleEvent);
+
+        // Act
+        var result = await _dut.CreateResponsibleMessage(message);
+
+        // Assert
+        Assert.IsNotNull(result);
+        var deserializedResult =
+            JsonSerializer.Deserialize<ResponsibleEvent>(result, DefaultSerializerHelper.SerializerOptions);
+
+        // Check if the properties are equal
+        Assert.IsNotNull(responsibleEvent);
+        Assert.AreEqual(responsibleEvent.Plant, deserializedResult.Plant);
+        Assert.AreEqual(responsibleEvent.ProCoSysGuid, deserializedResult.ProCoSysGuid);
+        Assert.AreEqual(responsibleEvent.ResponsibleId, deserializedResult.ResponsibleId);
+        Assert.AreEqual(responsibleEvent.Code, deserializedResult.Code);
+        Assert.AreEqual(responsibleEvent.ResponsibleGroup, deserializedResult.ResponsibleGroup);
+        Assert.AreEqual(responsibleEvent.Description, deserializedResult.Description);
+        Assert.AreEqual(responsibleEvent.IsVoided, deserializedResult.IsVoided);
+        Assert.AreEqual(responsibleEvent.LastUpdated.Date, deserializedResult.LastUpdated.Date);
+    }
+
+    [TestMethod]
+    public async Task CreateStockMessage_ValidMessage_ReturnsSerializedStockEvent()
+    {
+        // Arrange
+        const string message = "12345";
+        const long stockId = 12345L;
+        var queryString = StockQuery.GetQuery(stockId);
+        var stockEvent = new StockEvent
+        {
+            Plant = "EnchantedForest",
+            ProCoSysGuid = Guid.NewGuid(),
+            StockId = 42,
+            StockNo = "MAGIC001",
+            Description = "Magical artifacts",
+            LastUpdated = DateTime.UtcNow
+        };
+
+        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<StockEvent>(queryString, message))
+            .ReturnsAsync(stockEvent);
+
+        // Act
+        var result = await _dut.CreateStockMessage(message);
+
+        // Assert
+        Assert.IsNotNull(result);
+        var deserializedResult =
+            JsonSerializer.Deserialize<StockEvent>(result, DefaultSerializerHelper.SerializerOptions);
+
+        Assert.AreEqual(stockEvent.Plant, deserializedResult.Plant);
+        Assert.AreEqual(stockEvent.ProCoSysGuid, deserializedResult.ProCoSysGuid);
+        Assert.AreEqual(stockEvent.StockId, deserializedResult.StockId);
+        Assert.AreEqual(stockEvent.StockNo, deserializedResult.StockNo);
+        Assert.AreEqual(stockEvent.Description, deserializedResult.Description);
+        Assert.AreEqual(stockEvent.LastUpdated, deserializedResult.LastUpdated);
+    }
+
+    [TestMethod]
+    public async Task CreateSwcrAttachmentMessage_ValidMessage_ReturnsSerializedSwcrAttachmentEvent()
+    {
+        // Arrange
+        const string message = "5f643eeb-b114-4fc4-b884-ade3f6ea63ce";
+        var queryString = SwcrAttachmentQuery.GetQuery(message);
+        var swcrAttachmentEvent = new SwcrAttachmentEvent
+        {
+            Plant = "EnchantedForest",
+            ProCoSysGuid = Guid.NewGuid(),
+            SwcrGuid = Guid.NewGuid(),
+            Title = "MysteriousArtifact",
+            ClassificationCode = "MAGIC",
+            Uri = "https://example.com/mysterious-artifact",
+            FileName = "mysterious-artifact.jpg",
+            LastUpdated = DateTime.UtcNow
+        };
+
+        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<SwcrAttachmentEvent>(queryString, message))
+            .ReturnsAsync(swcrAttachmentEvent);
+
+        // Act
+        var result = await _dut.CreateSwcrAttachmentMessage(message);
+
+        // Assert
+        Assert.IsNotNull(result);
+        var deserializedResult =
+            JsonSerializer.Deserialize<SwcrAttachmentEvent>(result, DefaultSerializerHelper.SerializerOptions);
+
+        Assert.AreEqual(swcrAttachmentEvent.Plant, deserializedResult.Plant);
+        Assert.AreEqual(swcrAttachmentEvent.ProCoSysGuid, deserializedResult.ProCoSysGuid);
+        Assert.AreEqual(swcrAttachmentEvent.SwcrGuid, deserializedResult.SwcrGuid);
+        Assert.AreEqual(swcrAttachmentEvent.Title, deserializedResult.Title);
+        Assert.AreEqual(swcrAttachmentEvent.ClassificationCode, deserializedResult.ClassificationCode);
+        Assert.AreEqual(swcrAttachmentEvent.Uri, deserializedResult.Uri);
+        Assert.AreEqual(swcrAttachmentEvent.FileName, deserializedResult.FileName);
+        Assert.AreEqual(swcrAttachmentEvent.LastUpdated, deserializedResult.LastUpdated);
     }
 
     [TestMethod]
@@ -1246,7 +1363,7 @@ public class BusEventServiceTests
             ProCoSysGuid = Guid.NewGuid(),
             ProjectName = "ProjectName1",
             SwcrNo = "SWCRNO1",
-            SwcrId  = 1,
+            SwcrId = 1,
             CommPkgGuid = Guid.NewGuid(),
             CommPkgNo = "CommPkgNo1",
             Description = "Description1",
@@ -1302,6 +1419,535 @@ public class BusEventServiceTests
     }
 
     [TestMethod]
+    public async Task CreateSwcrOtherReferenceMessage_ValidMessage_ReturnsSerializedSwcrOtherReferenceEvent()
+    {
+        // Arrange
+        const string message = "5f643eeb-0b7a-4b9e-9b1a-0e6b7b7b6b6b";
+        var queryString = SwcrOtherReferenceQuery.GetQuery(message);
+        var swcrOtherReferenceEvent = new SwcrOtherReferenceEvent
+        {
+            Plant = "EnchantedForest",
+            ProCoSysGuid = Guid.NewGuid(),
+            LibraryGuid = Guid.NewGuid(),
+            SwcrGuid = Guid.NewGuid(),
+            Code = "MAGIC_REF",
+            Description = "Mysterious artifact reference",
+            LastUpdated = DateTime.UtcNow
+        };
+
+        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<SwcrOtherReferenceEvent>(queryString, message))
+            .ReturnsAsync(swcrOtherReferenceEvent);
+
+        // Act
+        var result = await _dut.CreateSwcrOtherReferenceMessage(message);
+
+        // Assert
+        Assert.IsNotNull(result);
+        var deserializedResult =
+            JsonSerializer.Deserialize<SwcrOtherReferenceEvent>(result, DefaultSerializerHelper.SerializerOptions);
+
+        // Check if the properties are equal
+        Assert.AreEqual(swcrOtherReferenceEvent.Plant, deserializedResult.Plant);
+        Assert.AreEqual(swcrOtherReferenceEvent.ProCoSysGuid, deserializedResult.ProCoSysGuid);
+        Assert.AreEqual(swcrOtherReferenceEvent.LibraryGuid, deserializedResult.LibraryGuid);
+        Assert.AreEqual(swcrOtherReferenceEvent.SwcrGuid, deserializedResult.SwcrGuid);
+        Assert.AreEqual(swcrOtherReferenceEvent.Code, deserializedResult.Code);
+        Assert.AreEqual(swcrOtherReferenceEvent.Description, deserializedResult.Description);
+        Assert.AreEqual(swcrOtherReferenceEvent.LastUpdated, deserializedResult.LastUpdated);
+    }
+
+    [TestMethod]
+    public async Task CreateSwcrSignatureMessage_ValidMessage_ReturnsSerializedSwcrSignatureEvent()
+    {
+        // Arrange
+        const string message = "1234";
+        var swcrSignatureId = long.Parse(message);
+        var queryString = SwcrSignatureQuery.GetQuery(swcrSignatureId);
+        var swcrSignatureEvent = new SwcrSignatureEvent
+        {
+            Plant = "EnchantedForest",
+            ProCoSysGuid = Guid.NewGuid(),
+            SwcrSignatureId = 12345,
+            ProjectName = "MagicalProject",
+            SwcrNo = "SWCR-001",
+            SwcrGuid = Guid.NewGuid(),
+            SignatureRoleCode = "WIZARD",
+            SignatureRoleDescription = "Wizard's approval",
+            Sequence = 1,
+            SignedByAzureOid = Guid.NewGuid(),
+            FunctionalRoleCode = "MAGIC_ROLE",
+            FunctionalRoleDescription = "Magic-related tasks",
+            SignedDate = DateTime.UtcNow,
+            LastUpdated = DateTime.UtcNow
+        };
+
+        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<SwcrSignatureEvent>(queryString, message))
+            .ReturnsAsync(swcrSignatureEvent);
+
+        // Act
+        var result = await _dut.CreateSwcrSignatureMessage(message);
+
+        // Assert
+        Assert.IsNotNull(result);
+        var deserializedResult =
+            JsonSerializer.Deserialize<SwcrSignatureEvent>(result, DefaultSerializerHelper.SerializerOptions);
+
+        // Check if the properties are equal
+        Assert.AreEqual(swcrSignatureEvent.Plant, deserializedResult.Plant);
+        Assert.AreEqual(swcrSignatureEvent.ProCoSysGuid, deserializedResult.ProCoSysGuid);
+        Assert.AreEqual(swcrSignatureEvent.SwcrSignatureId, deserializedResult.SwcrSignatureId);
+        Assert.AreEqual(swcrSignatureEvent.ProjectName, deserializedResult.ProjectName);
+        Assert.AreEqual(swcrSignatureEvent.SwcrNo, deserializedResult.SwcrNo);
+        Assert.AreEqual(swcrSignatureEvent.SwcrGuid, deserializedResult.SwcrGuid);
+        Assert.AreEqual(swcrSignatureEvent.SignatureRoleCode, deserializedResult.SignatureRoleCode);
+        Assert.AreEqual(swcrSignatureEvent.SignatureRoleDescription, deserializedResult.SignatureRoleDescription);
+        Assert.AreEqual(swcrSignatureEvent.Sequence, deserializedResult.Sequence);
+        Assert.AreEqual(swcrSignatureEvent.SignedByAzureOid, deserializedResult.SignedByAzureOid);
+        Assert.AreEqual(swcrSignatureEvent.FunctionalRoleCode, deserializedResult.FunctionalRoleCode);
+        Assert.AreEqual(swcrSignatureEvent.FunctionalRoleDescription, deserializedResult.FunctionalRoleDescription);
+        Assert.AreEqual(swcrSignatureEvent.SignedDate, deserializedResult.SignedDate);
+        Assert.AreEqual(swcrSignatureEvent.LastUpdated, deserializedResult.LastUpdated);
+    }
+
+    [TestMethod]
+    public async Task CreateSwcrTypeMessage_ValidMessage_ReturnsSerializedSwcrTypeEvent()
+    {
+        // Arrange
+        const string message = "5a643eeb-0b7a-4b9e-9b1a-0e6b7b7b6b6b";
+        var queryString = SwcrTypeQuery.GetQuery(message);
+
+        var swcrTypeEvent = new SwcrTypeEvent
+        {
+            Plant = "EnchantedForest",
+            ProCoSysGuid = Guid.NewGuid(),
+            LibraryGuid = Guid.NewGuid(),
+            SwcrGuid = Guid.NewGuid(),
+            Code = "MAGIC_TYPE",
+            LastUpdated = DateTime.UtcNow
+        };
+
+        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<SwcrTypeEvent>(queryString, message))
+            .ReturnsAsync(swcrTypeEvent);
+
+        // Act
+        var result = await _dut.CreateSwcrTypeMessage(message);
+
+        // Assert
+        Assert.IsNotNull(result);
+        var deserializedResult =
+            JsonSerializer.Deserialize<SwcrTypeEvent>(result, DefaultSerializerHelper.SerializerOptions);
+
+        // Check if the properties are equal
+        Assert.AreEqual(swcrTypeEvent.Plant, deserializedResult.Plant);
+        Assert.AreEqual(swcrTypeEvent.ProCoSysGuid, deserializedResult.ProCoSysGuid);
+        Assert.AreEqual(swcrTypeEvent.LibraryGuid, deserializedResult.LibraryGuid);
+        Assert.AreEqual(swcrTypeEvent.SwcrGuid, deserializedResult.SwcrGuid);
+        Assert.AreEqual(swcrTypeEvent.Code, deserializedResult.Code);
+        Assert.AreEqual(swcrTypeEvent.LastUpdated, deserializedResult.LastUpdated);
+    }
+
+    [TestMethod]
+    public async Task CreateTaskMessage_ValidMessage_ReturnsSerializedTaskEvent()
+    {
+        // Arrange
+        const string message = "123456";
+        var taskId = long.Parse(message);
+        var queryString = TaskQuery.GetQuery(taskId);
+
+        var taskEvent = new TaskEvent
+        {
+            Plant = "MysteriousIsland",
+            ProCoSysGuid = Guid.NewGuid(),
+            TaskParentProCoSysGuid = Guid.NewGuid(),
+            ProjectName = "SecretProject",
+            DocumentId = 123,
+            Title = "HiddenTask",
+            TaskId = "T123",
+            ElementContentGuid = Guid.NewGuid(),
+            Description = "Discover the secrets",
+            Comments = "Be cautious",
+            LastUpdated = DateTime.UtcNow,
+            SignedAt = DateTime.UtcNow,
+            SignedBy = Guid.NewGuid()
+        };
+
+
+        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<TaskEvent>(queryString, message))
+            .ReturnsAsync(taskEvent);
+
+        // Act
+        var result = await _dut.CreateTaskMessage(message);
+
+        // Assert
+        Assert.IsNotNull(result);
+        var deserializedResult =
+            JsonSerializer.Deserialize<TaskEvent>(result, DefaultSerializerHelper.SerializerOptions);
+
+        // Check if the properties are equal
+        Assert.AreEqual(taskEvent.Plant, deserializedResult.Plant);
+        Assert.AreEqual(taskEvent.ProCoSysGuid, deserializedResult.ProCoSysGuid);
+        Assert.AreEqual(taskEvent.TaskParentProCoSysGuid, deserializedResult.TaskParentProCoSysGuid);
+        Assert.AreEqual(taskEvent.ProjectName, deserializedResult.ProjectName);
+        Assert.AreEqual(taskEvent.DocumentId, deserializedResult.DocumentId);
+        Assert.AreEqual(taskEvent.Title, deserializedResult.Title);
+        Assert.AreEqual(taskEvent.TaskId, deserializedResult.TaskId);
+        Assert.AreEqual(taskEvent.ElementContentGuid, deserializedResult.ElementContentGuid);
+        Assert.AreEqual(taskEvent.Description, deserializedResult.Description);
+        Assert.AreEqual(taskEvent.Comments, deserializedResult.Comments);
+        Assert.AreEqual(taskEvent.LastUpdated, deserializedResult.LastUpdated);
+        Assert.AreEqual(taskEvent.SignedAt, deserializedResult.SignedAt);
+        Assert.AreEqual(taskEvent.SignedBy, deserializedResult.SignedBy);
+    }
+
+    [TestMethod]
+    public async Task CreateWorkOrderChecklistMessage_ValidMessage_ReturnsSerializedWorkOrderChecklistMessage()
+    {
+        // Arrange
+        const string message = "4321,1234";
+        const long workOrderId = 1234L;
+        const long checkListId = 4321L;
+        var queryString = WorkOrderChecklistQuery.GetQuery(checkListId, workOrderId);
+
+        var workOrderChecklistEvent = new WorkOrderChecklistEvent
+        {
+            Plant = "EnigmaticFactory",
+            ProCoSysGuid = Guid.NewGuid(),
+            ProjectName = "HiddenProject",
+            ChecklistId = 456,
+            ChecklistGuid = Guid.NewGuid(),
+            WoId = 789,
+            WoGuid = Guid.NewGuid(),
+            WoNo = "WO789",
+            LastUpdated = DateTime.UtcNow
+        };
+
+        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<WorkOrderChecklistEvent>(queryString, message))
+            .ReturnsAsync(workOrderChecklistEvent);
+
+        // Act
+        var result = await _dut.CreateWorkOrderChecklistMessage(message);
+
+        // Assert
+        Assert.IsNotNull(result);
+        var deserializedResult =
+            JsonSerializer.Deserialize<WorkOrderChecklistEvent>(result, DefaultSerializerHelper.SerializerOptions);
+
+        // Check if the properties are equal
+        Assert.AreEqual(workOrderChecklistEvent.Plant, deserializedResult.Plant);
+        Assert.AreEqual(workOrderChecklistEvent.ProCoSysGuid, deserializedResult.ProCoSysGuid);
+        Assert.AreEqual(workOrderChecklistEvent.ProjectName, deserializedResult.ProjectName);
+        Assert.AreEqual(workOrderChecklistEvent.ChecklistId, deserializedResult.ChecklistId);
+        Assert.AreEqual(workOrderChecklistEvent.ChecklistGuid, deserializedResult.ChecklistGuid);
+        Assert.AreEqual(workOrderChecklistEvent.WoId, deserializedResult.WoId);
+        Assert.AreEqual(workOrderChecklistEvent.WoGuid, deserializedResult.WoGuid);
+        Assert.AreEqual(workOrderChecklistEvent.WoNo, deserializedResult.WoNo);
+        Assert.AreEqual(workOrderChecklistEvent.LastUpdated, deserializedResult.LastUpdated);
+    }
+
+    [TestMethod]
+    public async Task CreateWorkOrderCutoffMessage_ValidMessage_ReturnsSerializedWorkOrderCutoffMessage()
+    {
+        // Arrange
+        const string message = "1234,03052023";
+        const long workOrderId = 1234L;
+        const string cutoffWeek = "03052023";
+        var queryString = WorkOrderCutoffQuery.GetQuery(workOrderId, cutoffWeek);
+
+        var workOrderCutoffEvent = new WorkOrderCutoffEvent
+        {
+            Plant = "MysteriousFactory",
+            ProCoSysGuid = Guid.NewGuid(),
+            PlantName = "HiddenPlant",
+            WoGuid = Guid.NewGuid(),
+            ProjectName = "SecretProject",
+            WoNo = "WO123",
+            JobStatusCode = "JS123",
+            MaterialStatusCode = "MS123",
+            DisciplineCode = "D123",
+            CategoryCode = "C123",
+            MilestoneCode = "M123",
+            SubMilestoneCode = "SM123",
+            HoldByCode = "HB123",
+            PlanActivityCode = "PA123",
+            ResponsibleCode = "R123",
+            LastUpdated = DateTime.UtcNow,
+            CutoffWeek = 1,
+            CutoffDate = DateOnly.FromDateTime(DateTime.Now),
+            PlannedStartAtDate = DateOnly.FromDateTime(DateTime.Now.AddDays(1)),
+            PlannedFinishedAtDate = DateOnly.FromDateTime(DateTime.Now.AddDays(10)),
+            ExpendedManHours = 100.0,
+            ManHoursEarned = 80.0,
+            EstimatedHours = 120.0,
+            ManHoursExpendedLastWeek = 20.0,
+            ManHoursEarnedLastWeek = 15.0,
+            ProjectProgress = 75.0
+        };
+
+        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<WorkOrderCutoffEvent>(queryString, message))
+            .ReturnsAsync(workOrderCutoffEvent);
+
+        // Act
+        var result = await _dut.CreateWorkOrderCutoffMessage(message);
+
+        // Assert
+        Assert.IsNotNull(result);
+        var deserializedResult =
+            JsonSerializer.Deserialize<WorkOrderCutoffEvent>(result, DefaultSerializerHelper.SerializerOptions);
+
+        // Check if the properties are equal
+        Assert.AreEqual(workOrderCutoffEvent.Plant, deserializedResult.Plant);
+        Assert.AreEqual(workOrderCutoffEvent.ProCoSysGuid, deserializedResult.ProCoSysGuid);
+        Assert.AreEqual(workOrderCutoffEvent.PlantName, deserializedResult.PlantName);
+        Assert.AreEqual(workOrderCutoffEvent.WoGuid, deserializedResult.WoGuid);
+        Assert.AreEqual(workOrderCutoffEvent.ProjectName, deserializedResult.ProjectName);
+        Assert.AreEqual(workOrderCutoffEvent.WoNo, deserializedResult.WoNo);
+        Assert.AreEqual(workOrderCutoffEvent.JobStatusCode, deserializedResult.JobStatusCode);
+        Assert.AreEqual(workOrderCutoffEvent.MaterialStatusCode, deserializedResult.MaterialStatusCode);
+        Assert.AreEqual(workOrderCutoffEvent.DisciplineCode, deserializedResult.DisciplineCode);
+        Assert.AreEqual(workOrderCutoffEvent.CategoryCode, deserializedResult.CategoryCode);
+        Assert.AreEqual(workOrderCutoffEvent.MilestoneCode, deserializedResult.MilestoneCode);
+        Assert.AreEqual(workOrderCutoffEvent.SubMilestoneCode, deserializedResult.SubMilestoneCode);
+        Assert.AreEqual(workOrderCutoffEvent.HoldByCode, deserializedResult.HoldByCode);
+        Assert.AreEqual(workOrderCutoffEvent.PlanActivityCode, deserializedResult.PlanActivityCode);
+        Assert.AreEqual(workOrderCutoffEvent.ResponsibleCode, deserializedResult.ResponsibleCode);
+        Assert.AreEqual(workOrderCutoffEvent.LastUpdated, deserializedResult.LastUpdated);
+        Assert.AreEqual(workOrderCutoffEvent.CutoffWeek, deserializedResult.CutoffWeek);
+        Assert.AreEqual(workOrderCutoffEvent.CutoffDate, deserializedResult.CutoffDate);
+        Assert.AreEqual(workOrderCutoffEvent.PlannedStartAtDate, deserializedResult.PlannedStartAtDate);
+        Assert.AreEqual(workOrderCutoffEvent.PlannedFinishedAtDate, deserializedResult.PlannedFinishedAtDate);
+        Assert.AreEqual(workOrderCutoffEvent.ExpendedManHours, deserializedResult.ExpendedManHours);
+        Assert.AreEqual(workOrderCutoffEvent.ManHoursEarned, deserializedResult.ManHoursEarned);
+        Assert.AreEqual(workOrderCutoffEvent.EstimatedHours, deserializedResult.EstimatedHours);
+        Assert.AreEqual(workOrderCutoffEvent.ManHoursExpendedLastWeek, deserializedResult.ManHoursExpendedLastWeek);
+        Assert.AreEqual(workOrderCutoffEvent.ManHoursEarnedLastWeek, deserializedResult.ManHoursEarnedLastWeek);
+        Assert.AreEqual(workOrderCutoffEvent.ProjectProgress, deserializedResult.ProjectProgress);
+    }
+
+    [TestMethod]
+    public async Task CreateWorkOrderMaterialMessage_ValidMessage_ReturnsSerializedWorkOrderMaterialMessage()
+    {
+        // Arrange
+        const string message = "1234";
+        const long workOrderId = 1234L;
+
+        var queryString = WorkOrderMaterialQuery.GetQuery(workOrderId);
+
+        var workOrderMaterialEvent = new WorkOrderMaterialEvent
+        {
+            Plant = "ThePlant",
+            ProCoSysGuid = Guid.NewGuid(),
+            ProjectName = "TheEnigmaticProject",
+            WoNo = "WONO",
+            WoId = 12345,
+            WoGuid = Guid.NewGuid(),
+            ItemNo = "ITEMNO",
+            TagNo = "TAGNO",
+            TagId = 67890,
+            TagGuid = Guid.NewGuid(),
+            TagRegisterCode = "TRC",
+            StockId = 24680,
+            Quantity = 42.0,
+            UnitName = "UN",
+            UnitDescription = "Unit Description",
+            AdditionalInformation = "Additional Info",
+            RequiredDate = DateOnly.FromDateTime(DateTime.Now.AddDays(10)),
+            EstimatedAvailableDate = DateOnly.FromDateTime(DateTime.Now.AddDays(20)),
+            Available = true,
+            MaterialStatus = "MSTATUS",
+            StockLocation = "SLOC",
+            LastUpdated = DateTime.Now
+        };
+
+        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<WorkOrderMaterialEvent>(queryString, message))
+            .ReturnsAsync(workOrderMaterialEvent);
+
+        // Act
+        var result = await _dut.CreateWorkOrderMaterialMessage(message);
+
+        // Assert
+        Assert.IsNotNull(result);
+        var deserializedResult =
+            JsonSerializer.Deserialize<WorkOrderMaterialEvent>(result, DefaultSerializerHelper.SerializerOptions);
+
+        // Check if the properties are equal
+        Assert.AreEqual(workOrderMaterialEvent.Plant, deserializedResult.Plant);
+        Assert.AreEqual(workOrderMaterialEvent.ProCoSysGuid, deserializedResult.ProCoSysGuid);
+        Assert.AreEqual(workOrderMaterialEvent.ProjectName, deserializedResult.ProjectName);
+        Assert.AreEqual(workOrderMaterialEvent.WoNo, deserializedResult.WoNo);
+        Assert.AreEqual(workOrderMaterialEvent.WoId, deserializedResult.WoId);
+        Assert.AreEqual(workOrderMaterialEvent.WoGuid, deserializedResult.WoGuid);
+        Assert.AreEqual(workOrderMaterialEvent.ItemNo, deserializedResult.ItemNo);
+        Assert.AreEqual(workOrderMaterialEvent.TagNo, deserializedResult.TagNo);
+        Assert.AreEqual(workOrderMaterialEvent.TagId, deserializedResult.TagId);
+        Assert.AreEqual(workOrderMaterialEvent.TagGuid, deserializedResult.TagGuid);
+        Assert.AreEqual(workOrderMaterialEvent.TagRegisterCode, deserializedResult.TagRegisterCode);
+        Assert.AreEqual(workOrderMaterialEvent.StockId, deserializedResult.StockId);
+        Assert.AreEqual(workOrderMaterialEvent.Quantity, deserializedResult.Quantity);
+        Assert.AreEqual(workOrderMaterialEvent.UnitName, deserializedResult.UnitName);
+        Assert.AreEqual(workOrderMaterialEvent.UnitDescription, deserializedResult.UnitDescription);
+        Assert.AreEqual(workOrderMaterialEvent.AdditionalInformation, deserializedResult.AdditionalInformation);
+        Assert.AreEqual(workOrderMaterialEvent.RequiredDate, deserializedResult.RequiredDate);
+        Assert.AreEqual(workOrderMaterialEvent.EstimatedAvailableDate, deserializedResult.EstimatedAvailableDate);
+        Assert.AreEqual(workOrderMaterialEvent.Available, deserializedResult.Available);
+        Assert.AreEqual(workOrderMaterialEvent.MaterialStatus, deserializedResult.MaterialStatus);
+        Assert.AreEqual(workOrderMaterialEvent.StockLocation, deserializedResult.StockLocation);
+        Assert.AreEqual(workOrderMaterialEvent.LastUpdated.Date, deserializedResult.LastUpdated.Date);
+    }
+
+    [TestMethod]
+    public async Task CreateWorkOrderMilestoneMessage_ValidMessage_ReturnsSerializedWorkOrderMilestoneMessage()
+    {
+        // Arrange
+        const string message = "1234,4321";
+        const long workOrderId = 1234L;
+        const long milestoneId = 4321L;
+
+        var queryString = WorkOrderMilestoneQuery.GetQuery(workOrderId, milestoneId);
+
+        var workOrderMilestoneEvent = new WorkOrderMilestoneEvent
+        {
+            Plant = "ThePlant",
+            ProCoSysGuid = Guid.NewGuid(),
+            ProjectName = "TheEnigmaticProject",
+            WoId = 12345,
+            WoGuid = Guid.NewGuid(),
+            WoNo = "WONO",
+            Code = "CODE",
+            MilestoneDate = DateOnly.FromDateTime(DateTime.Now.AddDays(10)),
+            SignedByAzureOid = "12345678",
+            LastUpdated = DateTime.Now
+        };
+
+        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<WorkOrderMilestoneEvent>(queryString, message))
+            .ReturnsAsync(workOrderMilestoneEvent);
+
+        // Act
+        var result = await _dut.CreateWorkOrderMilestoneMessage(message);
+
+        // Assert
+        Assert.IsNotNull(result);
+        var deserializedResult =
+            JsonSerializer.Deserialize<WorkOrderMilestoneEvent>(result, DefaultSerializerHelper.SerializerOptions);
+
+        // Check if the properties are equal
+        Assert.AreEqual(workOrderMilestoneEvent.Plant, deserializedResult.Plant);
+        Assert.AreEqual(workOrderMilestoneEvent.ProCoSysGuid, deserializedResult.ProCoSysGuid);
+        Assert.AreEqual(workOrderMilestoneEvent.ProjectName, deserializedResult.ProjectName);
+        Assert.AreEqual(workOrderMilestoneEvent.WoId, deserializedResult.WoId);
+        Assert.AreEqual(workOrderMilestoneEvent.WoGuid, deserializedResult.WoGuid);
+        Assert.AreEqual(workOrderMilestoneEvent.WoNo, deserializedResult.WoNo);
+        Assert.AreEqual(workOrderMilestoneEvent.Code, deserializedResult.Code);
+        Assert.AreEqual(workOrderMilestoneEvent.MilestoneDate, deserializedResult.MilestoneDate);
+        Assert.AreEqual(workOrderMilestoneEvent.SignedByAzureOid, deserializedResult.SignedByAzureOid);
+        Assert.AreEqual(workOrderMilestoneEvent.LastUpdated.Date, deserializedResult.LastUpdated.Date);
+    }
+
+    [TestMethod]
+    public async Task CreateWorkOrderMessage_ValidMessage_ReturnsSerializedWorkOrderMessage()
+    {
+        // Arrange
+        const string message = "1234";
+        var queryString = WorkOrderQuery.GetQuery(long.Parse(message));
+
+        var workOrderEvent = new WorkOrderEvent
+        {
+            Plant = "ThePlant",
+            ProCoSysGuid = Guid.NewGuid(),
+            ProjectName = "TheEnigmaticProject",
+            WoNo = "101-Dalmatians",
+            WoId = 12345,
+            CommPkgNo = "CommPkgNo",
+            CommPkgGuid = Guid.NewGuid(),
+            Title = "Title",
+            Description = "Description",
+            MilestoneCode = "MilestoneCode",
+            SubMilestoneCode = "SubMilestoneCode",
+            MilestoneDescription = "MilestoneDescription",
+            CategoryCode = "CategoryCode",
+            MaterialStatusCode = "MaterialStatusCode",
+            HoldByCode = "HoldByCode",
+            DisciplineCode = "DisciplineCode",
+            DisciplineDescription = "DisciplineDescription",
+            ResponsibleCode = "ResponsibleCode",
+            ResponsibleDescription = "ResponsibleDescription",
+            AreaCode = "AreaCode",
+            AreaDescription = "AreaDescription",
+            JobStatusCode = "JobStatusCode",
+            MaterialComments = "MaterialComments",
+            ConstructionComments = "ConstructionComments",
+            TypeOfWorkCode = "TypeOfWorkCode",
+            OnShoreOffShoreCode = "OnShoreOffShoreCode",
+            WoTypeCode = "WoTypeCode",
+            ProjectProgress = "ProjectProgress",
+            ExpendedManHours = "ExpendedManHours",
+            EstimatedHours = "EstimatedHours",
+            RemainingHours = "RemainingHours",
+            WBS = "WBS",
+            Progress = 50,
+            PlannedStartAtDate = DateOnly.FromDateTime(DateTime.Now.AddDays(10)),
+            ActualStartAtDate = DateOnly.FromDateTime(DateTime.Now.AddDays(5)),
+            PlannedFinishedAtDate = DateOnly.FromDateTime(DateTime.Now.AddDays(20)),
+            ActualFinishedAtDate = DateOnly.FromDateTime(DateTime.Now.AddDays(15)),
+            CreatedAt = DateTime.Now,
+            IsVoided = false,
+            LastUpdated = DateTime.Now
+        };
+
+        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<WorkOrderEvent>(queryString, message))
+            .ReturnsAsync(workOrderEvent);
+
+        // Act
+        var result = await _dut.CreateWorkOrderMessage(message);
+
+        // Assert
+        Assert.IsNotNull(result);
+        var deserializedResult =
+            JsonSerializer.Deserialize<WorkOrderEvent>(result, DefaultSerializerHelper.SerializerOptions);
+
+        // Check if the properties are equal
+        Assert.AreEqual(workOrderEvent.Plant, deserializedResult.Plant);
+        Assert.AreEqual(workOrderEvent.ProCoSysGuid, deserializedResult.ProCoSysGuid);
+        Assert.AreEqual(workOrderEvent.ProjectName, deserializedResult.ProjectName);
+        Assert.AreEqual(workOrderEvent.WoNo, deserializedResult.WoNo);
+        Assert.AreEqual(workOrderEvent.WoId, deserializedResult.WoId);
+        Assert.AreEqual(workOrderEvent.CommPkgNo, deserializedResult.CommPkgNo);
+        Assert.AreEqual(workOrderEvent.CommPkgGuid, deserializedResult.CommPkgGuid);
+        Assert.AreEqual(workOrderEvent.Title, deserializedResult.Title);
+        Assert.AreEqual(workOrderEvent.Description, deserializedResult.Description);
+        Assert.AreEqual(workOrderEvent.MilestoneCode, deserializedResult.MilestoneCode);
+        Assert.AreEqual(workOrderEvent.SubMilestoneCode, deserializedResult.SubMilestoneCode);
+        Assert.AreEqual(workOrderEvent.MilestoneDescription, deserializedResult.MilestoneDescription);
+        Assert.AreEqual(workOrderEvent.CategoryCode, deserializedResult.CategoryCode);
+        Assert.AreEqual(workOrderEvent.MaterialStatusCode, deserializedResult.MaterialStatusCode);
+        Assert.AreEqual(workOrderEvent.HoldByCode, deserializedResult.HoldByCode);
+        Assert.AreEqual(workOrderEvent.DisciplineCode, deserializedResult.DisciplineCode);
+        Assert.AreEqual(workOrderEvent.DisciplineDescription, deserializedResult.DisciplineDescription);
+        Assert.AreEqual(workOrderEvent.ResponsibleCode, deserializedResult.ResponsibleCode);
+        Assert.AreEqual(workOrderEvent.ResponsibleDescription, deserializedResult.ResponsibleDescription);
+        Assert.AreEqual(workOrderEvent.AreaCode, deserializedResult.AreaCode);
+        Assert.AreEqual(workOrderEvent.AreaDescription, deserializedResult.AreaDescription);
+        Assert.AreEqual(workOrderEvent.JobStatusCode, deserializedResult.JobStatusCode);
+        Assert.AreEqual(workOrderEvent.MaterialComments, deserializedResult.MaterialComments);
+        Assert.AreEqual(workOrderEvent.ConstructionComments, deserializedResult.ConstructionComments);
+        Assert.AreEqual(workOrderEvent.TypeOfWorkCode, deserializedResult.TypeOfWorkCode);
+        Assert.AreEqual(workOrderEvent.OnShoreOffShoreCode, deserializedResult.OnShoreOffShoreCode);
+        Assert.AreEqual(workOrderEvent.WoTypeCode, deserializedResult.WoTypeCode);
+        Assert.AreEqual(workOrderEvent.ProjectProgress, deserializedResult.ProjectProgress);
+        Assert.AreEqual(workOrderEvent.ExpendedManHours, deserializedResult.ExpendedManHours);
+        Assert.AreEqual(workOrderEvent.EstimatedHours, deserializedResult.EstimatedHours);
+        Assert.AreEqual(workOrderEvent.RemainingHours, deserializedResult.RemainingHours);
+        Assert.AreEqual(workOrderEvent.WBS, deserializedResult.WBS);
+        Assert.AreEqual(workOrderEvent.Progress, deserializedResult.Progress);
+        Assert.AreEqual(workOrderEvent.PlannedStartAtDate, deserializedResult.PlannedStartAtDate);
+        Assert.AreEqual(workOrderEvent.ActualStartAtDate, deserializedResult.ActualStartAtDate);
+        Assert.AreEqual(workOrderEvent.PlannedFinishedAtDate, deserializedResult.PlannedFinishedAtDate);
+        Assert.AreEqual(workOrderEvent.ActualFinishedAtDate, deserializedResult.ActualFinishedAtDate);
+        Assert.AreEqual(workOrderEvent.CreatedAt.Date, deserializedResult.CreatedAt.Date);
+        Assert.AreEqual(workOrderEvent.IsVoided, deserializedResult.IsVoided);
+        Assert.AreEqual(workOrderEvent.LastUpdated.Date, deserializedResult.LastUpdated.Date);
+    }
+
+    [TestMethod]
     public async Task HandleBusEvents_AddsTagDetailsToTag()
     {
         //Arrange
@@ -1309,7 +1955,7 @@ public class BusEventServiceTests
         _tagDetailsRepositoryMock.Setup(t => t.GetDetailsStringByTagId(116866654))
             .ReturnsAsync(tagDetailsString);
         const string jsonMessage =
-            $@"{{
+            @"{
                 ""TagNo"": ""P-PL470003"",
                 ""TagId"": ""116866654"",
                 ""Description"": ""Power cable (110 V < U < 400 V AC)"",
@@ -1340,7 +1986,7 @@ public class BusEventServiceTests
                     ""L.UKDBB.001"",
                     ""DOGGER_BANK_B_PRO""
                 ]
-            }}";
+            }";
 
         //Act
         var result = await _dut.AttachTagDetails(jsonMessage);

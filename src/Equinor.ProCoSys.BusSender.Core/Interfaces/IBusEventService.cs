@@ -19,9 +19,9 @@ public interface IBusEventService
     Task<string?> CreateWorkOrderMessage(string busEventMessage);
     Task<string?> CreateChecklistMessage(string busEventMessage);
     Task<string?> CreateCallOffMessage(string busEventMessage);
-    Task<string?> CreateWoChecklistMessage(string busEventMessage);
-    Task<string?> CreateWoMilestoneMessage(string message);
-    Task<string?> CreateWoMaterialMessage(string busEventMessage);
+    Task<string?> CreateWorkOrderChecklistMessage(string busEventMessage);
+    Task<string?> CreateWorkOrderMilestoneMessage(string message);
+    Task<string?> CreateWorkOrderMaterialMessage(string busEventMessage);
     Task<string?> CreateStockMessage(string busEventMessage);
     Task<string?> CreateSwcrMessage(string busEventMessage);
     Task<string?> CreateSwcrSignatureMessage(string busEventMessage);
@@ -41,4 +41,5 @@ public interface IBusEventService
     Task<string> CreateMcPkgMessage(string message);
     Task<string> CreateProjectMessage(string message);
     Task<string> CreatePunchListItemMessage(string message);
+    Task<string> CreateResponsibleMessage(string message);
 }
