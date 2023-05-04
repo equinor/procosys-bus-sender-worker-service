@@ -1,5 +1,4 @@
-﻿using System.IO;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 
@@ -11,6 +10,7 @@ public interface IBusEventService
     Task<string?> CreateQuerySignatureMessage(string busEventMessage);
     Task<string?> CreateDocumentMessage(string busEventMessage);
     Task<string?> CreateTaskMessage(string busEventMessage);
+    Task<string?> CreateTagEquipmentMessage(string busEventMessage);
     Task<string?> CreateSwcrOtherReferenceMessage(string busEventMessage);
     Task<string?> CreateSwcrTypeMessage(string busEventMessage);
     Task<string?> CreateSwcrAttachmentMessage(string busEventMessage);
@@ -36,10 +36,10 @@ public interface IBusEventService
 
     Task<string?> CreateLibraryFieldMessage(string busEventMessage);
     Task<string?> CreateCommPkgMilestoneMessage(string busEventMessage);
-    Task<string> CreateCommPkgMessage(string message);
-    Task<string> CreateLibraryMessage(string message);
-    Task<string> CreateMcPkgMessage(string message);
-    Task<string> CreateProjectMessage(string message);
-    Task<string> CreatePunchListItemMessage(string message);
-    Task<string> CreateResponsibleMessage(string message);
+    Task<string?> CreateCommPkgMessage(string message);
+    Task<string?> CreateLibraryMessage(string message);
+    Task<string?> CreateMcPkgMessage(string message);
+    Task<string?> CreateProjectMessage(string message);
+    Task<string?> CreatePunchListItemMessage(string message);
+    Task<string?> CreateResponsibleMessage(string message);
 }

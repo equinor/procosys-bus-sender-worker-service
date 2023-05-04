@@ -194,4 +194,9 @@ public static class PcsEventConstants
     ///    Event that is fired when a new workorder material is created or updated
     /// </summary>
     public const string WorkOrderMaterialCreateOrUpdate = "workOrderMaterialCreatedOrUpdated";
+
+    /// <summary>
+    ///    Event that is fired when a new tag equipment  is created or updated
+    /// </summary>
+    public const string TagEquipmentCreateOrUpdate = "tagEquipmentCreatedOrUpdated";
 }

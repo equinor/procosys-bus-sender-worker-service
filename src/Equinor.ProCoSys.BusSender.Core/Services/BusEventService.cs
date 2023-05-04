@@ -117,35 +117,43 @@ public class BusEventService : IBusEventService
                     HeatTraceQuery.GetQuery(heatTraceId), message))
             : throw new Exception($"Failed to extract heatTraceId from message: {message}");
 
-    public async Task<string> CreateLibraryMessage(string message)
+    public async Task<string?> CreateLibraryMessage(string message)
         => long.TryParse(message, out var libraryId)
             ? JsonSerializer.Serialize(
                 await _dapperRepository.QuerySingle<LibraryEvent>(LibraryQuery.GetQuery(libraryId),
                     libraryId.ToString()))
             : throw new Exception($"Failed to extract checklistId from message: {message}");
 
-    public async Task<string> CreateMcPkgMessage(string message) =>
+    public async Task<string?> CreateMcPkgMessage(string message) =>
         long.TryParse(message, out var mcPkgId)
             ? JsonSerializer.Serialize(
                 await _dapperRepository.QuerySingle<McPkgEvent>(McPkgQuery.GetQuery(mcPkgId),
                     mcPkgId.ToString()))
             : throw new Exception($"Failed to extract mcPkgId from message: {message}");
 
-    public async Task<string> CreateProjectMessage(string message) =>
+    public async Task<string?> CreateProjectMessage(string message) =>
         long.TryParse(message, out var projectId)
             ? JsonSerializer.Serialize(
                 await _dapperRepository.QuerySingle<ProjectEvent>(ProjectQuery.GetQuery(projectId),
                     projectId.ToString()))
             : throw new Exception($"Failed to extract projectId from message: {message}");
 
-    public async Task<string> CreatePunchListItemMessage(string message) =>
+    public async Task<string?> CreateTagEquipmentMessage(string busEventMessage) =>
+        Guid.TryParse(busEventMessage, out _)
+        ? JsonSerializer.Serialize(
+            await _dapperRepository.QuerySingle<TagEquipmentEvent>(TagEquipmentQuery.GetQuery(busEventMessage),
+            busEventMessage))
+    : throw new Exception($"Failed to extract or parse guid TagEquipment from message {busEventMessage}");
+
+ 
+    public async Task<string?> CreatePunchListItemMessage(string message) =>
         long.TryParse(message, out var punchListItemId)
             ? JsonSerializer.Serialize(
                 await _dapperRepository.QuerySingle<PunchListItemEvent>(PunchListItemQuery.GetQuery(punchListItemId),
                     punchListItemId.ToString()))
             : throw new Exception($"Failed to extract punchListItemId from message: {message}");
 
-    public async Task<string> CreateResponsibleMessage(string message) => 
+    public async Task<string?> CreateResponsibleMessage(string message) => 
         long.TryParse(message, out var responsibleId)
             ? JsonSerializer.Serialize(
                await _dapperRepository.QuerySingle<ResponsibleEvent>(ResponsibleQuery.GetQuery(responsibleId),
