@@ -53,8 +53,8 @@ public class TagQuery
                                  T2.TAGNO, 
                                  LIBVAL.CODE
                                  ) AS VAL,
-            t1.PROCOSYS_GUID AS VAL2,
-            t1.PROCOSYS_GUID AS VAL3                                 
+            t2.PROCOSYS_GUID AS VAL2,
+            t2.PROCOSYS_GUID AS VAL3                                 
                 FROM DEFINEELEMENTFIELD DEF
                     LEFT JOIN FIELD F ON DEF.FIELD_ID = F.FIELD_ID
                     LEFT JOIN LIBRARY UNIT ON UNIT.LIBRARY_ID = F.UNIT_ID
