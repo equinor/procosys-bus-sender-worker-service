@@ -5,10 +5,10 @@
     &lt;TestId&gt;MSTest::2B0B4E2B-8005-4270-BB3C-A83B165F8787::net6.0::Equinor.ProCoSys.BusSenderWorker.Core.Tests.BusEventServiceTests&lt;/TestId&gt;&#xD;
   &lt;/TestAncestor&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=a8de3bc2_002Dae28_002D42a6_002D8f8c_002D05f8909f8012/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="WorkOrderMilestoneEventVersioningTests" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=a8de3bc2_002Dae28_002D42a6_002D8f8c_002D05f8909f8012/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="WorkOrderMilestoneEventVersioningTests" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;Project Location="C:\W\procosys-bus-sender-worker-service" Presentation="&amp;lt;Tests&amp;gt;" /&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=f953b919_002D1f4c_002D4f03_002D8f0f_002D7dc5c65beb62/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="CreateWorkOrderChecklistMessage_ValidMessage_ReturnsSerializedWorkOrderChecklistMessage" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=f953b919_002D1f4c_002D4f03_002D8f0f_002D7dc5c65beb62/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="CreateWorkOrderChecklistMessage_ValidMessage_ReturnsSerializedWorkOrderChecklistMessage" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;TestAncestor&gt;&#xD;
     &lt;TestId&gt;MSTest::2B0B4E2B-8005-4270-BB3C-A83B165F8787::net6.0::Equinor.ProCoSys.BusSenderWorker.Core.Tests.BusEventServiceTests.CreateWorkOrderChecklistMessage_ValidMessage_ReturnsSerializedWorkOrderChecklistMessage&lt;/TestId&gt;&#xD;
   &lt;/TestAncestor&gt;&#xD;

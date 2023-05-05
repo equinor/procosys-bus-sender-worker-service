@@ -7,8 +7,6 @@ public class TagQuery
         DetectFaultyPlantInput(plant);
         var whereClause = CreateWhereClause(tagId, plant, "t", "tag_id");
 
-        //TODO fix to and from guid and test this
-
         return @$"select
             t.projectschema as Plant,
             t.procosys_guid as ProCoSysGuid,
@@ -38,35 +36,34 @@ public class TagQuery
             t.mountedon_id as MountedOn,
             mt.procosys_guid as MountedOnGuid,
             t.LAST_UPDATED as LastUpdated,
-            (SELECT listagg('""'|| colName ||'"":""'|| regexp_replace(val, '([""\])', '\\\1') ||'""', ',')
-                WITHIN group (order by colName) as tagdetails  from (
-                SELECT 
-                        DECODE(F.COLUMNNAME, 'FROM_TAG_NUMBER', 'FromTagGuid', NULL) AS COLNAME2,
-                        DECODE(F.COLUMNNAME, 'TO_TAG_NUMBER', 'ToTagGuid', NULL) AS COLNAME3,
-                        F.COLUMNNAME AS COLNAME,
-                        COALESCE(REGEXP_REPLACE(VAL.VALUESTRING, '([""\])', '\\\1'),
-                                 TO_CHAR(VAL.VALUEDATE, 'YYYY-MM-DD HH24:MI:SS'),
-                                 TO_CHAR(VAL.VALUENUMBER),
-                                 T2.TAGNO, 
-                                 LIBVAL.CODE
-                                 ) AS VAL,
-            t1.PROCOSYS_GUID AS VAL2,
-            t1.PROCOSYS_GUID AS VAL3                                 
-                FROM DEFINEELEMENTFIELD DEF
-                    LEFT JOIN FIELD F ON DEF.FIELD_ID = F.FIELD_ID
-                    LEFT JOIN LIBRARY UNIT ON UNIT.LIBRARY_ID = F.UNIT_ID
-                    JOIN ELEMENTFIELD VAL
-                        ON (VAL.FIELD_ID = DEF.FIELD_ID AND VAL.ELEMENT_ID = t.tag_id)
-                    JOIN TAG t1 on t1.TAG_ID = VAL.ELEMENT_ID
-                    LEFT JOIN LIBRARY LIBVAL ON (LIBVAL.LIBRARY_ID = VAL.LIBRARY_ID)
-                    LEFT JOIN LIBRARY REG ON REG.LIBRARY_ID = DEF.REGISTER_ID
-                    LEFT JOIN TAG t2 ON t2.TAG_ID = VAL.TAG_ID
-                WHERE DEF.ELEMENTTYPE = 'TAG'
-                AND (DEF.REGISTER_ID IS NULL OR DEF.REGISTER_ID = t.register_id)
-                AND NOT (DEF.ISVOIDED = 'Y')
-                AND F.COLUMNTYPE in ('NUMBER','DATE','STRING', 'LIBRARY','TAG')
-                AND f.projectschema ='{plant}'))
-            as TagDetails
+            (SELECT
+                 --t.tag_id as TagId,
+                 F.COLUMNNAME AS ColName,
+                 COALESCE(
+                    REGEXP_REPLACE(VAL.VALUESTRING, '([""\])', '\\\1'),
+                    TO_CHAR(VAL.VALUEDATE, 'YYYY-MM-DD HH24:MI:SS'),
+                    TO_CHAR(VAL.VALUENUMBER),
+                    T2.TAGNO,
+                    LIBVAL.CODE
+                ) AS Val,
+                DECODE(F.COLUMNNAME, 'FROM_TAG_NUMBER', 'FromTagGuid', NULL) AS ColName2,
+                t2.PROCOSYS_GUID AS Val2,
+                DECODE(F.COLUMNNAME, 'TO_TAG_NUMBER', 'ToTagGuid', NULL) AS ColName3,
+                t2.PROCOSYS_GUID AS Val3
+            FROM DEFINEELEMENTFIELD DEF
+                LEFT JOIN FIELD F ON DEF.FIELD_ID = F.FIELD_ID
+                LEFT JOIN LIBRARY UNIT ON UNIT.LIBRARY_ID = F.UNIT_ID
+                JOIN ELEMENTFIELD VAL
+                    ON (VAL.FIELD_ID = DEF.FIELD_ID AND VAL.ELEMENT_ID = t.tag_id)
+                JOIN TAG t1 on t1.TAG_ID = VAL.ELEMENT_ID
+                LEFT JOIN LIBRARY LIBVAL ON (LIBVAL.LIBRARY_ID = VAL.LIBRARY_ID)
+                LEFT JOIN LIBRARY REG ON REG.LIBRARY_ID = DEF.REGISTER_ID
+                LEFT JOIN TAG t2 ON t2.TAG_ID = VAL.TAG_ID
+            WHERE DEF.ELEMENTTYPE = 'TAG'
+            AND (DEF.REGISTER_ID IS NULL OR DEF.REGISTER_ID = t.register_id)
+            AND NOT (DEF.ISVOIDED = 'Y')
+            AND F.COLUMNTYPE in ('NUMBER','DATE','STRING', 'LIBRARY','TAG')
+            AND f.projectschema = '{plant}')
         from tag t
             join element e on e.element_id = t.tag_id
             join projectschema ps on ps.projectschema = t.projectschema

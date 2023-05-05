@@ -13,6 +13,7 @@
     <None Include=".dockerignore" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include=".gitignore" />
+    <Content Include="doc\architecture\decisions\0001-record-architecture-decisions.md" />
+    <Content Include="doc\architecture\decisions\0002-dapper-as-orm.md" />
   </ItemGroup>
 </Project>
