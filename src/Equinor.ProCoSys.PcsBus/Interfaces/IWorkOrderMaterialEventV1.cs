@@ -6,26 +6,26 @@ namespace Equinor.ProCoSys.PcsServiceBus.Interfaces;
 [UsedImplicitly]
 public interface IWorkOrderMaterialEventV1 : IHasEventType
 {
-    string Plant { get; set; }
-    Guid ProCoSysGuid { get; set; }
-    string ProjectName { get; set; }
-    string WoNo { get; set; }
-    long WoId { get; set; }
-    Guid WoGuid { get; set; }
-    string ItemNo { get; set; }
-    string? TagNo { get; set; }
-    long? TagId { get; set; }
-    Guid? TagGuid { get; set; }
-    string TagRegisterCode { get; set; }
-    long? StockId { get; set; }
-    double? Quantity { get; set; }
-    string? UnitName { get; set; }
-    string? UnitDescription { get; set; }
-    string? AdditionalInformation { get; set; }
-    DateOnly? RequiredDate { get; set; }
-    DateOnly? EstimatedAvailableDate { get; set; }
-    bool? Available { get; set; }
-    string? MaterialStatus { get; set; }
-    string? StockLocation { get; set; }
-    DateTime LastUpdated { get; set; }
+    string Plant { get; init; }
+    Guid ProCoSysGuid { get; init; }
+    string ProjectName { get; init; }
+    string WoNo { get; init; }
+    long WoId { get; init; }
+    Guid WoGuid { get; init; }
+    string ItemNo { get; init; }
+    string? TagNo { get; init; }
+    long? TagId { get; init; }
+    Guid? TagGuid { get; init; }
+    string TagRegisterCode { get; init; }
+    long? StockId { get; init; }
+    double? Quantity { get; init; }
+    string? UnitName { get; init; }
+    string? UnitDescription { get; init; }
+    string? AdditionalInformation { get; init; }
+    DateOnly? RequiredDate { get; init; }
+    DateOnly? EstimatedAvailableDate { get; init; }
+    bool? Available { get; init; }
+    string? MaterialStatus { get; init; }
+    string? StockLocation { get; init; }
+    DateTime LastUpdated { get; init; }
 }

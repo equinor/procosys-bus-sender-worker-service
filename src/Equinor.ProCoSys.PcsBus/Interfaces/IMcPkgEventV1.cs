@@ -6,24 +6,24 @@ namespace Equinor.ProCoSys.PcsServiceBus.Interfaces;
 [UsedImplicitly]
 public interface IMcPkgEventV1 : IHasEventType
 {
-    string Plant { get; set; }
-    Guid ProCoSysGuid { get; set; }
-    string PlantName { get; set; }
-    string ProjectName { get; set; }
-    string McPkgNo { get; set; }
-    long McPkgId { get; set; }
-    string CommPkgNo { get; set; }
-    Guid CommPkgGuid { get; set; }
-    string? Description { get; set; }
-    string? Remark { get; set; }
-    string ResponsibleCode { get; set; }
-    string? ResponsibleDescription { get; set; }
-    string? AreaCode { get; set; }
-    string? AreaDescription { get; set; }
-    string Discipline { get; set; }
-    string McStatus { get; set; }
-    string? Phase { get; set; }
-    bool IsVoided { get; set; }
-    DateTime CreatedAt { get; set; }
-    DateTime LastUpdated { get; set; }
+    string Plant { get; init; }
+    Guid ProCoSysGuid { get; init; }
+    string PlantName { get; init; }
+    string ProjectName { get; init; }
+    string McPkgNo { get; init; }
+    long McPkgId { get; init; }
+    string CommPkgNo { get; init; }
+    Guid CommPkgGuid { get; init; }
+    string? Description { get; init; }
+    string? Remark { get; init; }
+    string ResponsibleCode { get; init; }
+    string? ResponsibleDescription { get; init; }
+    string? AreaCode { get; init; }
+    string? AreaDescription { get; init; }
+    string Discipline { get; init; }
+    string McStatus { get; init; }
+    string? Phase { get; init; }
+    bool IsVoided { get; init; }
+    DateTime CreatedAt { get; init; }
+    DateTime LastUpdated { get; init; }
 }

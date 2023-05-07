@@ -7,34 +7,34 @@ namespace Equinor.ProCoSys.BusSenderWorker.Core.Models;
 
 public class ActionEvent : IActionEventV1
 {
-    public string Plant { get; set; }
-    public Guid ProCoSysGuid { get; set; }
-    public Guid ElementContentGuid { get; set; }
-    public string CommPkgNo { get; set; }
-    public Guid? CommPkgGuid { get; set; }
-    public string? SwcrNo { get; set; }
-    public Guid? SwcrGuid { get; set; }
-    public string? DocumentNo { get; set; }
-    public string? Description { get; set; }
-    public Guid? DocumentGuid { get; set; }
-    public string ActionNo { get; set; }
-    public string? Title { get; set; }
-    public string? Comments { get; set; }
-    public DateOnly? Deadline { get; set; }
-    public string? CategoryCode { get; set; }
-    public Guid? CategoryGuid { get; set; }
-    public string? PriorityCode { get; set; }
-    public Guid? PriorityGuid { get; set; }
-    public Guid? RequestedByOid { get; set; }
-    public Guid? ActionByOid { get; set; }
-    public string? ActionByRole { get; set; }
-    public Guid? ActionByRoleGuid { get; set; }
-    public Guid? ResponsibleOid { get; set; }
-    public string? ResponsibleRole { get; set; }
-    public Guid? ResponsibleRoleGuid { get; set; }
-    public DateTime LastUpdated { get; set; }
-    public DateTime? SignedAt { get; set; }
-    public Guid? SignedBy { get; set; }
+    public string Plant { get; init; }
+    public Guid ProCoSysGuid { get; init; }
+    public Guid ElementContentGuid { get; init; }
+    public string CommPkgNo { get; init; }
+    public Guid? CommPkgGuid { get; init; }
+    public string? SwcrNo { get; init; }
+    public Guid? SwcrGuid { get; init; }
+    public string? DocumentNo { get; init; }
+    public string? Description { get; init; }
+    public Guid? DocumentGuid { get; init; }
+    public string ActionNo { get; init; }
+    public string? Title { get; init; }
+    public string? Comments { get; init; }
+    public DateOnly? Deadline { get; init; }
+    public string? CategoryCode { get; init; }
+    public Guid? CategoryGuid { get; init; }
+    public string? PriorityCode { get; init; }
+    public Guid? PriorityGuid { get; init; }
+    public Guid? RequestedByOid { get; init; }
+    public Guid? ActionByOid { get; init; }
+    public string? ActionByRole { get; init; }
+    public Guid? ActionByRoleGuid { get; init; }
+    public Guid? ResponsibleOid { get; init; }
+    public string? ResponsibleRole { get; init; }
+    public Guid? ResponsibleRoleGuid { get; init; }
+    public DateTime LastUpdated { get; init; }
+    public DateTime? SignedAt { get; init; }
+    public Guid? SignedBy { get; init; }
     
     public string EventType => PcsEventConstants.ActionCreateOrUpdate;
 }

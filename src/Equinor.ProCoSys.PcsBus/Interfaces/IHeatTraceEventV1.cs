@@ -6,15 +6,15 @@ namespace Equinor.ProCoSys.PcsServiceBus.Interfaces;
 [UsedImplicitly]
 public interface IHeatTraceEventV1 : IHasEventType
 {
-    string Plant { get; set; }
-    Guid ProCoSysGuid { get; set; }
-    long HeatTraceId { get; set; }
-    long CableId { get; set; }
-    Guid CableGuid { get; set; }
-    string CableNo { get; set; }
-    long TagId { get; set; }
-    Guid TagGuid { get; set; }
-    string TagNo { get; set; }
-    string? SpoolNo { get; set; }
-    DateTime LastUpdated { get; set; }
+    string Plant { get; init; }
+    Guid ProCoSysGuid { get; init; }
+    long HeatTraceId { get; init; }
+    long CableId { get; init; }
+    Guid CableGuid { get; init; }
+    string CableNo { get; init; }
+    long TagId { get; init; }
+    Guid TagGuid { get; init; }
+    string TagNo { get; init; }
+    string? SpoolNo { get; init; }
+    DateTime LastUpdated { get; init; }
 }

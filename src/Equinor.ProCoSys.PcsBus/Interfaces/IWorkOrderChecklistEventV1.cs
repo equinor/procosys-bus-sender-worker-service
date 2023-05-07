@@ -4,13 +4,13 @@ namespace Equinor.ProCoSys.PcsServiceBus.Interfaces;
 
 public interface IWorkOrderChecklistEventV1 : IHasEventType
 {
-    string Plant { get; set; }
-    Guid ProCoSysGuid { get; set; }
-    string ProjectName { get; set; }
-    long ChecklistId { get; set; }
-    Guid ChecklistGuid { get; set; }
-    long WoId { get; set; }
-    Guid WoGuid { get; set; }
-    string WoNo { get; set; }
-    DateTime LastUpdated { get; set; }
+    string Plant { get; init; }
+    Guid ProCoSysGuid { get; init; }
+    string ProjectName { get; init; }
+    long ChecklistId { get; init; }
+    Guid ChecklistGuid { get; init; }
+    long WoId { get; init; }
+    Guid WoGuid { get; init; }
+    string WoNo { get; init; }
+    DateTime LastUpdated { get; init; }
 }

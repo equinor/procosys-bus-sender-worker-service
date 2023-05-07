@@ -6,30 +6,30 @@ namespace Equinor.ProCoSys.PcsServiceBus.Interfaces;
 [UsedImplicitly]
 public interface IWorkOrderCutoffEventV1 : IHasEventType
 {
-    string Plant { get; set; }
-    Guid ProCoSysGuid { get; set; }
-    string PlantName { get; set; }
-    Guid WoGuid { get; set; }
-    string ProjectName { get; set; }
-    string WoNo { get; set; }
-    string? JobStatusCode { get; set; }
-    string? MaterialStatusCode { get; set; }
-    string? DisciplineCode { get; set; }
-    string? CategoryCode { get; set; }
-    string? MilestoneCode { get; set; }
-    string? SubMilestoneCode { get; set; }
-    string? HoldByCode { get; set; }
-    string? PlanActivityCode { get; set; }
-    string? ResponsibleCode { get; set; }
-    DateTime LastUpdated { get; set; }
-    int CutoffWeek { get; set; }
-    DateOnly CutoffDate { get; set; }
-    DateOnly? PlannedStartAtDate { get; set; }
-    DateOnly? PlannedFinishedAtDate { get; set; }
-    double? ExpendedManHours { get; set; }
-    double? ManHoursEarned { get; set; }
-    double? EstimatedHours { get; set; }
-    double? ManHoursExpendedLastWeek { get; set; }
-    double? ManHoursEarnedLastWeek { get; set; }
-    double? ProjectProgress { get; set; }
+    string Plant { get; init; }
+    Guid ProCoSysGuid { get; init; }
+    string PlantName { get; init; }
+    Guid WoGuid { get; init; }
+    string ProjectName { get; init; }
+    string WoNo { get; init; }
+    string? JobStatusCode { get; init; }
+    string? MaterialStatusCode { get; init; }
+    string? DisciplineCode { get; init; }
+    string? CategoryCode { get; init; }
+    string? MilestoneCode { get; init; }
+    string? SubMilestoneCode { get; init; }
+    string? HoldByCode { get; init; }
+    string? PlanActivityCode { get; init; }
+    string? ResponsibleCode { get; init; }
+    DateTime LastUpdated { get; init; }
+    int CutoffWeek { get; init; }
+    DateOnly CutoffDate { get; init; }
+    DateOnly? PlannedStartAtDate { get; init; }
+    DateOnly? PlannedFinishedAtDate { get; init; }
+    double? ExpendedManHours { get; init; }
+    double? ManHoursEarned { get; init; }
+    double? EstimatedHours { get; init; }
+    double? ManHoursExpendedLastWeek { get; init; }
+    double? ManHoursEarnedLastWeek { get; init; }
+    double? ProjectProgress { get; init; }
 }

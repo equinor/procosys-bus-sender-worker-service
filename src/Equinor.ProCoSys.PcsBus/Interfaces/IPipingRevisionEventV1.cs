@@ -6,22 +6,22 @@ namespace Equinor.ProCoSys.PcsServiceBus.Interfaces;
 [UsedImplicitly]
 public interface IPipingRevisionEventV1 : IHasEventType
 {
-    string Plant { get; set; }
-    Guid ProCoSysGuid { get; set; }
-    long PipingRevisionId { get; set; }
-    int Revision { get; set; }
-    string McPkgNo { get; set; }
-    Guid McPkgNoGuid { get; set; }
-    string ProjectName { get; set; }
-    double? MaxDesignPressure { get; set; }
-    double? MaxTestPressure { get; set; }
-    string? Comments { get; set; }
-    string? TestISODocumentNo { get; set; }
-    Guid? TestISODocumentGuid { get; set; }
-    int? TestISORevision { get; set; }
-    string? PurchaseOrderNo { get; set; }
-    string? CallOffNo { get; set; }
-    Guid? CallOffGuid { get; set; }
-    DateTime LastUpdated { get; set; }
+    string Plant { get; init; }
+    Guid ProCoSysGuid { get; init; }
+    long PipingRevisionId { get; init; }
+    int Revision { get; init; }
+    string McPkgNo { get; init; }
+    Guid McPkgNoGuid { get; init; }
+    string ProjectName { get; init; }
+    double? MaxDesignPressure { get; init; }
+    double? MaxTestPressure { get; init; }
+    string? Comments { get; init; }
+    string? TestISODocumentNo { get; init; }
+    Guid? TestISODocumentGuid { get; init; }
+    int? TestISORevision { get; init; }
+    string? PurchaseOrderNo { get; init; }
+    string? CallOffNo { get; init; }
+    Guid? CallOffGuid { get; init; }
+    DateTime LastUpdated { get; init; }
 }
 

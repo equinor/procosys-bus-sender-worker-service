@@ -6,29 +6,29 @@ namespace Equinor.ProCoSys.PcsServiceBus.Interfaces;
 [UsedImplicitly]
 public interface ICommPkgEventV1 : IHasEventType
 {
-    string Plant { get; set; }
-    Guid ProCoSysGuid { get; set; }
-    string PlantName { get; set; }
-    string ProjectName { get; set; }
-    string CommPkgNo { get; set; }
-    long CommPkgId { get; set; }
-    string Description { get; set; }
-    string CommPkgStatus { get; set; }
-    bool IsVoided { get; set; }
-    DateTime LastUpdated { get; set; }
-    DateTime CreatedAt { get; set; }
-    string? DescriptionOfWork { get; set; }
-    string? Remark { get; set; }
-    string ResponsibleCode { get; set; }
-    string? ResponsibleDescription { get; set; }
-    string? AreaCode { get; set; }
-    string? AreaDescription { get; set; }
-    string? Phase { get; set; }
-    string? CommissioningIdentifier { get; set; }
-    bool? Demolition { get; set; }
-    string? Priority1 { get; set; }
-    string? Priority2 { get; set; }
-    string? Priority3 { get; set; }
-    string? Progress { get; set; }
-    string? DCCommPkgStatus { get; set; }
+    string Plant { get; init; }
+    Guid ProCoSysGuid { get; init; }
+    string PlantName { get; init; }
+    string ProjectName { get; init; }
+    string CommPkgNo { get; init; }
+    long CommPkgId { get; init; }
+    string Description { get; init; }
+    string CommPkgStatus { get; init; }
+    bool IsVoided { get; init; }
+    DateTime LastUpdated { get; init; }
+    DateTime CreatedAt { get; init; }
+    string? DescriptionOfWork { get; init; }
+    string? Remark { get; init; }
+    string ResponsibleCode { get; init; }
+    string? ResponsibleDescription { get; init; }
+    string? AreaCode { get; init; }
+    string? AreaDescription { get; init; }
+    string? Phase { get; init; }
+    string? CommissioningIdentifier { get; init; }
+    bool? Demolition { get; init; }
+    string? Priority1 { get; init; }
+    string? Priority2 { get; init; }
+    string? Priority3 { get; init; }
+    string? Progress { get; init; }
+    string? DCCommPkgStatus { get; init; }
 }

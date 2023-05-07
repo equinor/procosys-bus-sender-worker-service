@@ -6,26 +6,26 @@ namespace Equinor.ProCoSys.PcsServiceBus.Interfaces;
 [UsedImplicitly]
 public interface ICallOffEventV1 : IHasEventType
 {
-    string Plant { get; set; }
-    Guid ProCoSysGuid { get; set; }
-    long CallOffId { get; set; }
-    long PackageId { get; set; }
-    string PurchaseOrderNo { get; set; }
-    bool IsCompleted { get; set; }
-    bool UseMcScope { get; set; }
-    DateTime LastUpdated { get; set; }
-    bool IsVoided { get; set; }
-    DateTime CreatedAt { get; set; }
-    string? CallOffNo { get; set; }
-    string? Description { get; set; }
-    string? ResponsibleCode { get; set; }
-    string? ContractorCode { get; set; }
-    string? SupplierCode { get; set; }
-    int? EstimatedTagCount { get; set; }
-    DateOnly? FATPlanned { get; set; }
-    DateOnly? PackagePlannedDelivery { get; set; }
-    DateOnly? PackageActualDelivery { get; set; }
-    DateOnly? PackageClosed { get; set; }
-    DateOnly? McDossierSent { get; set; }
-    DateOnly? McDossierReceived { get; set; }
+    string Plant { get; init; }
+    Guid ProCoSysGuid { get; init; }
+    long CallOffId { get; init; }
+    long PackageId { get; init; }
+    string PurchaseOrderNo { get; init; }
+    bool IsCompleted { get; init; }
+    bool UseMcScope { get; init; }
+    DateTime LastUpdated { get; init; }
+    bool IsVoided { get; init; }
+    DateTime CreatedAt { get; init; }
+    string? CallOffNo { get; init; }
+    string? Description { get; init; }
+    string? ResponsibleCode { get; init; }
+    string? ContractorCode { get; init; }
+    string? SupplierCode { get; init; }
+    int? EstimatedTagCount { get; init; }
+    DateOnly? FATPlanned { get; init; }
+    DateOnly? PackagePlannedDelivery { get; init; }
+    DateOnly? PackageActualDelivery { get; init; }
+    DateOnly? PackageClosed { get; init; }
+    DateOnly? McDossierSent { get; init; }
+    DateOnly? McDossierReceived { get; init; }
 }

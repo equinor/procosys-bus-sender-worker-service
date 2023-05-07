@@ -7,30 +7,30 @@ namespace Equinor.ProCoSys.BusSenderWorker.Core.Models;
 
 public class PipingSpoolEvent : IPipingSpoolEventV1
 {
-    public string Plant { get; set; }
-    public Guid ProCoSysGuid { get; set; }
-    public string ProjectName { get; set; }
-    public int PipingSpoolId { get; set; }
-    public int PipingRevisionId { get; set; }
-    public Guid PipingRevisionGuid { get; set; }
-    public int Revision { get; set; }
-    public string McPkgNo { get; set; }
-    public Guid McPkgGuid { get; set; }
-    public string ISODrawing { get; set; }
-    public string? Spool { get; set; }
-    public string LineNo { get; set; }
-    public Guid LineGuid { get; set; }
-    public bool? N2HeTest { get; set; }
-    public bool? AlternativeTest { get; set; }
-    public int? AlternativeTestNoOfWelds { get; set; }
-    public bool Installed { get; set; }
-    public bool? Welded { get; set; }
-    public DateOnly? WeldedDate { get; set; }
-    public bool? PressureTested { get; set; }
-    public bool? NDE { get; set; }
-    public bool? Primed { get; set; }
-    public bool? Painted { get; set; }
-    public DateTime LastUpdated { get; set; }
+    public string Plant { get; init; }
+    public Guid ProCoSysGuid { get; init; }
+    public string ProjectName { get; init; }
+    public int PipingSpoolId { get; init; }
+    public int PipingRevisionId { get; init; }
+    public Guid PipingRevisionGuid { get; init; }
+    public int Revision { get; init; }
+    public string McPkgNo { get; init; }
+    public Guid McPkgGuid { get; init; }
+    public string ISODrawing { get; init; }
+    public string? Spool { get; init; }
+    public string LineNo { get; init; }
+    public Guid LineGuid { get; init; }
+    public bool? N2HeTest { get; init; }
+    public bool? AlternativeTest { get; init; }
+    public int? AlternativeTestNoOfWelds { get; init; }
+    public bool Installed { get; init; }
+    public bool? Welded { get; init; }
+    public DateOnly? WeldedDate { get; init; }
+    public bool? PressureTested { get; init; }
+    public bool? NDE { get; init; }
+    public bool? Primed { get; init; }
+    public bool? Painted { get; init; }
+    public DateTime LastUpdated { get; init; }
     
     public string EventType => PcsEventConstants.PipingSpoolCreateOrUpdate;
 }

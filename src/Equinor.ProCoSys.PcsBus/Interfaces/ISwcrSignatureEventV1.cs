@@ -4,18 +4,18 @@ namespace Equinor.ProCoSys.PcsServiceBus.Interfaces;
 
 public interface ISwcrSignatureEventV1 : IHasEventType
 {
-    string Plant { get; set; }
-    Guid ProCoSysGuid { get; set; }
-    long SwcrSignatureId { get; set; }
-    string ProjectName { get; set; }
-    string SwcrNo { get; set; }
-    Guid SwcrGuid { get; set; }
-    string SignatureRoleCode { get; set; }
-    string? SignatureRoleDescription { get; set; }
-    int Sequence { get; set; }
-    Guid? SignedByAzureOid { get; set; }
-    string? FunctionalRoleCode { get; set; }
-    string? FunctionalRoleDescription { get; set; }
-    DateTime? SignedDate { get; set; }
-    DateTime LastUpdated { get; set; }
+    string Plant { get; init; }
+    Guid ProCoSysGuid { get; init; }
+    long SwcrSignatureId { get; init; }
+    string ProjectName { get; init; }
+    string SwcrNo { get; init; }
+    Guid SwcrGuid { get; init; }
+    string SignatureRoleCode { get; init; }
+    string? SignatureRoleDescription { get; init; }
+    int Sequence { get; init; }
+    Guid? SignedByAzureOid { get; init; }
+    string? FunctionalRoleCode { get; init; }
+    string? FunctionalRoleDescription { get; init; }
+    DateTime? SignedDate { get; init; }
+    DateTime LastUpdated { get; init; }
 }

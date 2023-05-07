@@ -6,17 +6,17 @@ namespace Equinor.ProCoSys.BusSenderWorker.Core.Models;
 
 public class LibraryFieldEvent : ILibraryFieldEventV1
 {
-    public string Plant { get; set; }
-    public Guid ProCoSysGuid { get; set; }
-    public Guid LibraryGuid { get; set; }
-    public string? LibraryType { get; set; }
-    public string Code { get; set; }
-    public string ColumnName { get; set; }
-    public string? ColumnType { get; set; }
-    public string? StringValue { get; set; }
-    public DateOnly? DateValue { get; set; }
-    public double? NumberValue { get; set; }
-    public Guid? LibraryValueGuid { get; set; }
-    public DateTime LastUpdated { get; set; }
+    public string Plant { get; init; }
+    public Guid ProCoSysGuid { get; init; }
+    public Guid LibraryGuid { get; init; }
+    public string? LibraryType { get; init; }
+    public string Code { get; init; }
+    public string ColumnName { get; init; }
+    public string? ColumnType { get; init; }
+    public string? StringValue { get; init; }
+    public DateOnly? DateValue { get; init; }
+    public double? NumberValue { get; init; }
+    public Guid? LibraryValueGuid { get; init; }
+    public DateTime LastUpdated { get; init; }
     public string EventType => PcsEventConstants.LibraryFieldCreateOrUpdate;
 }

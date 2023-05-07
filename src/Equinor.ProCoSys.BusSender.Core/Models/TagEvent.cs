@@ -8,36 +8,36 @@ namespace Equinor.ProCoSys.BusSenderWorker.Core.Models;
 public class TagEvent : ITagEventV1
 {
     
-    public string Plant { get; }
-    public string PlantName { get; }
-    public Guid ProCoSysGuid { get; }
-    public long TagId { get; }
-    public string TagNo { get; }
-    public Guid? CommPkgGuid { get; }
-    public string? CommPkgNo { get; }
-    public Guid? McPkgGuid { get; }
-    public string? McPkgNo { get; }
-    public string? Description { get; }
-    public string? ProjectName { get; }
-    public string? AreaCode { get; }
-    public string? AreaDescription { get; }
-    public string? DisciplineCode { get; }
-    public string? DisciplineDescription { get; }
-    public string? RegisterCode { get; }
-    public string? InstallationCode { get; }
-    public string? Status { get; }
-    public string? System { get; }
-    public string? CallOffNo { get; }
-    public Guid? CallOffGuid { get; }
-    public string? PurchaseOrderNo { get; }
-    public string? TagFunctionCode { get; }
-    public string? EngineeringCode { get; }
-    public int? MountedOn { get; }
-    public Guid? MountedOnGuid { get; }
-    public bool IsVoided { get; }
-    public DateTime LastUpdated { get; }
-    
-    public List<dynamic>? TagDetails { get; set; }
+    public string Plant { get; init; }
+    public string PlantName { get; init; }
+    public Guid ProCoSysGuid { get; init; }
+    public long TagId { get; init; }
+    public string TagNo { get; init; }
+    public Guid? CommPkgGuid { get; init; }
+    public string? CommPkgNo { get; init; }
+    public Guid? McPkgGuid { get; init; }
+    public string? McPkgNo { get; init; }
+    public string? Description { get; init; }
+    public string? ProjectName { get; init; }
+    public string? AreaCode { get; init; }
+    public string? AreaDescription { get; init; }
+    public string? DisciplineCode { get; init; }
+    public string? DisciplineDescription { get; init; }
+    public string? RegisterCode { get; init; }
+    public string? InstallationCode { get; init; }
+    public string? Status { get; init; }
+    public string? System { get; init; }
+    public string? CallOffNo { get; init; }
+    public Guid? CallOffGuid { get; init; }
+    public string? PurchaseOrderNo { get; init; }
+    public string? TagFunctionCode { get; init; }
+    public string? EngineeringCode { get; init; }
+    public int? MountedOn { get; init; }
+    public Guid? MountedOnGuid { get; init; }
+    public bool IsVoided { get; init; }
+    public DateTime LastUpdated { get; init; }
+
+    public string TagDetails { get; set; }
     
     public string EventType => PcsEventConstants.TagCreateOrUpdate;
 }

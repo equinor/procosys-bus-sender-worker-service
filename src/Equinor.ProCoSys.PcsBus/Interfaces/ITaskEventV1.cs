@@ -6,17 +6,17 @@ namespace Equinor.ProCoSys.PcsServiceBus.Interfaces;
 [UsedImplicitly]
 public interface ITaskEventV1 : IHasEventType
 {
-    string Plant { get; set; }
-    Guid ProCoSysGuid { get; set; }
-    Guid? TaskParentProCoSysGuid { get; set; }
-    string ProjectName { get; set; }
-    int DocumentId { get; set; }
-    string Title { get; set; }
-    string TaskId { get; set; }
-    Guid ElementContentGuid { get; set; }
-    string Description { get; set; }
-    string Comments { get; set; }
-    DateTime LastUpdated { get; set; }
-    DateTime? SignedAt { get; set; }
-    Guid? SignedBy { get; set; }
+    string Plant { get; init; }
+    Guid ProCoSysGuid { get; init; }
+    Guid? TaskParentProCoSysGuid { get; init; }
+    string ProjectName { get; init; }
+    int DocumentId { get; init; }
+    string Title { get; init; }
+    string TaskId { get; init; }
+    Guid ElementContentGuid { get; init; }
+    string Description { get; init; }
+    string Comments { get; init; }
+    DateTime LastUpdated { get; init; }
+    DateTime? SignedAt { get; init; }
+    Guid? SignedBy { get; init; }
 }

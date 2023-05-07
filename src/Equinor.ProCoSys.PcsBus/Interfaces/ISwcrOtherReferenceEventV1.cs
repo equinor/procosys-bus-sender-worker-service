@@ -4,11 +4,11 @@ namespace Equinor.ProCoSys.PcsServiceBus.Interfaces;
 
 public interface ISwcrOtherReferenceEventV1 : IHasEventType
 {
-    string Plant { get; set; }
-    Guid ProCoSysGuid { get; set; }
-    Guid LibraryGuid { get; set; }
-    Guid SwcrGuid { get; set; }
-    string Code { get; set; }
-    string? Description { get; set; }
-    DateTime LastUpdated { get; set; } 
+    string Plant { get; init; }
+    Guid ProCoSysGuid { get; init; }
+    Guid LibraryGuid { get; init; }
+    Guid SwcrGuid { get; init; }
+    string Code { get; init; }
+    string? Description { get; init; }
+    DateTime LastUpdated { get; init; } 
 }

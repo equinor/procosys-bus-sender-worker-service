@@ -7,16 +7,16 @@ namespace Equinor.ProCoSys.BusSenderWorker.Core.Models;
 
 public class CommPkgQueryEvent : ICommPkgQueryEventV1
 {
-    public string Plant { get; set; }
-    public Guid ProCoSysGuid { get; set; }
-    public string ProjectName { get; set; }
-    public long CommPkgId { get; set; }
-    public Guid CommPkgGuid { get; set; }
-    public string CommPkgNo { get; set; }
-    public long DocumentId { get; set; }
-    public string QueryNo { get; set; }
-    public Guid QueryGuid { get; set; }
-    public DateTime LastUpdated { get; set; }
+    public string Plant { get; init; }
+    public Guid ProCoSysGuid { get; init; }
+    public string ProjectName { get; init; }
+    public long CommPkgId { get; init; }
+    public Guid CommPkgGuid { get; init; }
+    public string CommPkgNo { get; init; }
+    public long DocumentId { get; init; }
+    public string QueryNo { get; init; }
+    public Guid QueryGuid { get; init; }
+    public DateTime LastUpdated { get; init; }
     
     public string EventType => PcsEventConstants.CommPkgQueryCreateOrUpdate;
 }

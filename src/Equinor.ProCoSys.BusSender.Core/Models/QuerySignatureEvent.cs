@@ -6,23 +6,23 @@ namespace Equinor.ProCoSys.BusSenderWorker.Core.Models;
 #pragma warning disable CS8618
 public class QuerySignatureEvent : IQuerySignatureEventV1
 {
-    public string Plant { get; set; }
-    public Guid ProCoSysGuid { get; set; }
-    public string PlantName { get; set; }
-    public string ProjectName { get; set; }
-    public string? Status { get; set; }
-    public Guid? LibraryStatusGuid { get; set; }
-    public long QuerySignatureId { get; set; }
-    public long QueryId { get; set; }
-    public Guid QueryGuid { get; set; }
-    public string QueryNo { get; set; }
-    public string? SignatureRoleCode { get; set; }
-    public string? FunctionalRoleCode { get; set; }
-    public int Sequence { get; set; }
-    public Guid? SignedByAzureOid { get; set; }
-    public string? FunctionalRoleDescription { get; set; }
-    public DateTime? SignedDate { get; set; }
-    public DateTime LastUpdated { get; set; }
+    public string Plant { get; init; }
+    public Guid ProCoSysGuid { get; init; }
+    public string PlantName { get; init; }
+    public string ProjectName { get; init; }
+    public string? Status { get; init; }
+    public Guid? LibraryStatusGuid { get; init; }
+    public long QuerySignatureId { get; init; }
+    public long QueryId { get; init; }
+    public Guid QueryGuid { get; init; }
+    public string QueryNo { get; init; }
+    public string? SignatureRoleCode { get; init; }
+    public string? FunctionalRoleCode { get; init; }
+    public int Sequence { get; init; }
+    public Guid? SignedByAzureOid { get; init; }
+    public string? FunctionalRoleDescription { get; init; }
+    public DateTime? SignedDate { get; init; }
+    public DateTime LastUpdated { get; init; }
     
     public string EventType => PcsEventConstants.QuerySignatureCreateOrUpdate;
 }

@@ -4,13 +4,13 @@ namespace Equinor.ProCoSys.PcsServiceBus.Interfaces;
 
 public interface IResponsibleEventV1 : IHasEventType
 {
-    string Plant { get; set; }
-    Guid ProCoSysGuid { get; set; }
-    long ResponsibleId { get; set; }
-    string Code { get; set; }
-    string ResponsibleGroup { get; set; }
-    string? Description { get; set; }
-    bool IsVoided { get; set; }
-    DateTime LastUpdated { get; set; }
+    string Plant { get; init; }
+    Guid ProCoSysGuid { get; init; }
+    long ResponsibleId { get; init; }
+    string Code { get; init; }
+    string ResponsibleGroup { get; init; }
+    string? Description { get; init; }
+    bool IsVoided { get; init; }
+    DateTime LastUpdated { get; init; }
     
 }

@@ -7,39 +7,39 @@ namespace Equinor.ProCoSys.BusSenderWorker.Core.Models;
 
 public class PunchListItemEvent : IPunchListItemEventV1
 {
-    public string Plant { get; set; }
-    public Guid ProCoSysGuid { get; set; }
-    public string ProjectName { get; set; }
-    public DateTime LastUpdated { get; set; }
-    public long PunchItemNo { get; set; }
-    public string? Description { get; set; }
-    public long ChecklistId { get; set; }
-    public Guid ChecklistGuid { get; set; }
-    public string Category { get; set; }
-    public string? RaisedByOrg { get; set; }
-    public string? ClearingByOrg { get; set; }
-    public DateTime? DueDate { get; set; }
-    public string? PunchListSorting { get; set; }
-    public string? PunchListType { get; set; }
-    public string? PunchPriority { get; set; }
-    public string? Estimate { get; set; }
-    public string? OriginalWoNo { get; set; }
-    public Guid? OriginalWoGuid { get; set; }
-    public string? WoNo { get; set; }
-    public Guid? WoGuid { get; set; }
-    public string? SWCRNo { get; set; }
-    public Guid? SWCRGuid { get; set; }
-    public string? DocumentNo { get; set; }
-    public Guid? DocumentGuid { get; set; }
-    public string? ExternalItemNo { get; set; }
-    public bool MaterialRequired { get; set; }
-    public bool IsVoided { get; set; }
-    public DateTime? MaterialETA { get; set; }
-    public string? MaterialExternalNo { get; set; }
-    public DateTime? ClearedAt { get; set; }
-    public DateTime? RejectedAt { get; set; }
-    public DateTime? VerifiedAt { get; set; }
-    public DateTime CreatedAt { get; set; }
+    public string Plant { get; init; }
+    public Guid ProCoSysGuid { get; init; }
+    public string ProjectName { get; init; }
+    public DateTime LastUpdated { get; init; }
+    public long PunchItemNo { get; init; }
+    public string? Description { get; init; }
+    public long ChecklistId { get; init; }
+    public Guid ChecklistGuid { get; init; }
+    public string Category { get; init; }
+    public string? RaisedByOrg { get; init; }
+    public string? ClearingByOrg { get; init; }
+    public DateTime? DueDate { get; init; }
+    public string? PunchListSorting { get; init; }
+    public string? PunchListType { get; init; }
+    public string? PunchPriority { get; init; }
+    public string? Estimate { get; init; }
+    public string? OriginalWoNo { get; init; }
+    public Guid? OriginalWoGuid { get; init; }
+    public string? WoNo { get; init; }
+    public Guid? WoGuid { get; init; }
+    public string? SWCRNo { get; init; }
+    public Guid? SWCRGuid { get; init; }
+    public string? DocumentNo { get; init; }
+    public Guid? DocumentGuid { get; init; }
+    public string? ExternalItemNo { get; init; }
+    public bool MaterialRequired { get; init; }
+    public bool IsVoided { get; init; }
+    public DateTime? MaterialETA { get; init; }
+    public string? MaterialExternalNo { get; init; }
+    public DateTime? ClearedAt { get; init; }
+    public DateTime? RejectedAt { get; init; }
+    public DateTime? VerifiedAt { get; init; }
+    public DateTime CreatedAt { get; init; }
     
     public string EventType => PcsEventConstants.PunchListItemCreateOrUpdate;
 }

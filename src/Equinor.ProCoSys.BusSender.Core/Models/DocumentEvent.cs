@@ -6,25 +6,25 @@ namespace Equinor.ProCoSys.BusSenderWorker.Core.Models;
 #pragma warning disable CS8618
 public class DocumentEvent : IDocumentEventV1
 {
-    public string Plant { get; set; }
-    public Guid ProCoSysGuid { get; set; }
-    public string ProjectName { get; set; }
-    public long DocumentId { get; set; }
-    public string DocumentNo { get; set; }
-    public string? Title { get; set; }
-    public string? AcceptanceCode { get; set; }
-    public string? Archive { get; set; }
-    public string? AccessCode { get; set; }
-    public string? Complex { get; set; }
-    public string? DocumentType { get; set; }
-    public string? DisciplineId { get; set; }
-    public string? DocumentCategory { get; set; }
-    public string? HandoverStatus { get; set; }
-    public string? RegisterType { get; set; }
-    public int? RevisionNo { get; set; }
-    public string? RevisionStatus { get; set; }
-    public string? ResponsibleContractor { get; set; }
-    public DateTime LastUpdated { get; set; }
-    public DateOnly? RevisionDate { get; set; }
+    public string Plant { get; init; }
+    public Guid ProCoSysGuid { get; init; }
+    public string ProjectName { get; init; }
+    public long DocumentId { get; init; }
+    public string DocumentNo { get; init; }
+    public string? Title { get; init; }
+    public string? AcceptanceCode { get; init; }
+    public string? Archive { get; init; }
+    public string? AccessCode { get; init; }
+    public string? Complex { get; init; }
+    public string? DocumentType { get; init; }
+    public string? DisciplineId { get; init; }
+    public string? DocumentCategory { get; init; }
+    public string? HandoverStatus { get; init; }
+    public string? RegisterType { get; init; }
+    public int? RevisionNo { get; init; }
+    public string? RevisionStatus { get; init; }
+    public string? ResponsibleContractor { get; init; }
+    public DateTime LastUpdated { get; init; }
+    public DateOnly? RevisionDate { get; init; }
     public string EventType => PcsEventConstants.DocumentCreateOrUpdate;
 }

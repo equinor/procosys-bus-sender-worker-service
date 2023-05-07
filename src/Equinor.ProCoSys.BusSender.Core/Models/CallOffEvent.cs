@@ -7,27 +7,27 @@ namespace Equinor.ProCoSys.BusSenderWorker.Core.Models;
 
 public class CallOffEvent : ICallOffEventV1
 {
-    public string Plant { get; set; }
-    public Guid ProCoSysGuid { get; set; }
-    public long CallOffId { get; set; }
-    public long PackageId { get; set; }
-    public string PurchaseOrderNo { get; set; }
-    public bool IsCompleted { get; set; }
-    public bool UseMcScope { get; set; }
-    public DateTime LastUpdated { get; set; }
-    public bool IsVoided { get; set; }
-    public DateTime CreatedAt { get; set; }
-    public string? CallOffNo { get; set; }
-    public string? Description { get; set; }
-    public string? ResponsibleCode { get; set; }
-    public string? ContractorCode { get; set; }
-    public string? SupplierCode { get; set; }
-    public int? EstimatedTagCount { get; set; }
-    public DateOnly? FATPlanned { get; set; }
-    public DateOnly? PackagePlannedDelivery { get; set; }
-    public DateOnly? PackageActualDelivery { get; set; }
-    public DateOnly? PackageClosed { get; set; }
-    public DateOnly? McDossierSent { get; set; }
-    public DateOnly? McDossierReceived { get; set; }
+    public string Plant { get; init; }
+    public Guid ProCoSysGuid { get; init; }
+    public long CallOffId { get; init; }
+    public long PackageId { get; init; }
+    public string PurchaseOrderNo { get; init; }
+    public bool IsCompleted { get; init; }
+    public bool UseMcScope { get; init; }
+    public DateTime LastUpdated { get; init; }
+    public bool IsVoided { get; init; }
+    public DateTime CreatedAt { get; init; }
+    public string? CallOffNo { get; init; }
+    public string? Description { get; init; }
+    public string? ResponsibleCode { get; init; }
+    public string? ContractorCode { get; init; }
+    public string? SupplierCode { get; init; }
+    public int? EstimatedTagCount { get; init; }
+    public DateOnly? FATPlanned { get; init; }
+    public DateOnly? PackagePlannedDelivery { get; init; }
+    public DateOnly? PackageActualDelivery { get; init; }
+    public DateOnly? PackageClosed { get; init; }
+    public DateOnly? McDossierSent { get; init; }
+    public DateOnly? McDossierReceived { get; init; }
     public string EventType => PcsEventConstants.CallOffCreateOrUpdate;
 }

@@ -7,27 +7,27 @@ namespace Equinor.ProCoSys.BusSenderWorker.Core.Models;
 
 public class SwcrEvent : ISwcrEventV1
 {
-    public string Plant { get; set; }
-    public Guid ProCoSysGuid { get; set; }
-    public string? ProjectName { get; set; }
-    public string SwcrNo { get; set; }
-    public long SwcrId { get; set; }
-    public Guid? CommPkgGuid { get; set; }
-    public string? CommPkgNo { get; set; }
-    public string? Description { get; set; }
-    public string? Modification { get; set; }
-    public string? Priority { get; set; }
-    public string? System { get; set; }
-    public string? ControlSystem { get; set; }
-    public string? Contract { get; set; }
-    public string? Supplier { get; set; }
-    public string? Node { get; set; }
-    public string? Status { get; set; }
-    public DateTime CreatedAt { get; set; }
-    public bool IsVoided { get; set; }
-    public DateTime LastUpdated { get; set; }
-    public DateOnly? DueDate { get; set; }
-    public float? EstimatedManHours { get; set; }
+    public string Plant { get; init; }
+    public Guid ProCoSysGuid { get; init; }
+    public string? ProjectName { get; init; }
+    public string SwcrNo { get; init; }
+    public long SwcrId { get; init; }
+    public Guid? CommPkgGuid { get; init; }
+    public string? CommPkgNo { get; init; }
+    public string? Description { get; init; }
+    public string? Modification { get; init; }
+    public string? Priority { get; init; }
+    public string? System { get; init; }
+    public string? ControlSystem { get; init; }
+    public string? Contract { get; init; }
+    public string? Supplier { get; init; }
+    public string? Node { get; init; }
+    public string? Status { get; init; }
+    public DateTime CreatedAt { get; init; }
+    public bool IsVoided { get; init; }
+    public DateTime LastUpdated { get; init; }
+    public DateOnly? DueDate { get; init; }
+    public float? EstimatedManHours { get; init; }
     
     public string EventType  => PcsEventConstants.SwcrCreateOrUpdate;
 }

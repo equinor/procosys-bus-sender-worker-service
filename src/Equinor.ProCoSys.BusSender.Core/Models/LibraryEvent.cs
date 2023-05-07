@@ -6,15 +6,15 @@ namespace Equinor.ProCoSys.BusSenderWorker.Core.Models;
 
 public class LibraryEvent : ILibraryEventV1 
 {
-    public string Plant { get; set; }
-    public Guid ProCoSysGuid { get; set; }
-    public long LibraryId { get; set; }
-    public int? ParentId { get; set; }
-    public Guid? ParentGuid { get; set; }
-    public string Code { get; set; }
-    public string? Description { get; set; }
-    public bool IsVoided { get; set; }
-    public string Type { get; set; }
-    public DateTime LastUpdated { get; set; }
+    public string Plant { get; init; }
+    public Guid ProCoSysGuid { get; init; }
+    public long LibraryId { get; init; }
+    public int? ParentId { get; init; }
+    public Guid? ParentGuid { get; init; }
+    public string Code { get; init; }
+    public string? Description { get; init; }
+    public bool IsVoided { get; init; }
+    public string Type { get; init; }
+    public DateTime LastUpdated { get; init; }
     public string EventType => PcsEventConstants.LibraryCreateOrUpdate;
 }

@@ -4,21 +4,21 @@ namespace Equinor.ProCoSys.PcsServiceBus.Interfaces;
 
 public interface IQuerySignatureEventV1 : IHasEventType
 {
-    string Plant { get; set; }
-    Guid ProCoSysGuid { get; set; }
-    string PlantName { get; set; }
-    string ProjectName { get; set; }
-    string? Status { get; set; }
-    Guid? LibraryStatusGuid { get; set; }
-    long QuerySignatureId { get; set; }
-    long QueryId { get; set; }
-    Guid QueryGuid { get; set; }
-    string QueryNo { get; set; }
-    string? SignatureRoleCode { get; set; }
-    string? FunctionalRoleCode { get; set; }
-    int Sequence { get; set; }
-    Guid? SignedByAzureOid { get; set; }
-    string? FunctionalRoleDescription { get; set; }
-    DateTime? SignedDate { get; set; }
-    DateTime LastUpdated { get; set; }
+    string Plant { get; init; }
+    Guid ProCoSysGuid { get; init; }
+    string PlantName { get; init; }
+    string ProjectName { get; init; }
+    string? Status { get; init; }
+    Guid? LibraryStatusGuid { get; init; }
+    long QuerySignatureId { get; init; }
+    long QueryId { get; init; }
+    Guid QueryGuid { get; init; }
+    string QueryNo { get; init; }
+    string? SignatureRoleCode { get; init; }
+    string? FunctionalRoleCode { get; init; }
+    int Sequence { get; init; }
+    Guid? SignedByAzureOid { get; init; }
+    string? FunctionalRoleDescription { get; init; }
+    DateTime? SignedDate { get; init; }
+    DateTime LastUpdated { get; init; }
 }

@@ -6,17 +6,17 @@ namespace Equinor.ProCoSys.BusSenderWorker.Core.Models;
 
 public class HeatTraceEvent : IHeatTraceEventV1
 {
-    public string Plant { get; set; }
-    public Guid ProCoSysGuid { get; set; }
-    public long HeatTraceId { get; set; }
-    public long CableId { get; set; }
-    public Guid CableGuid { get; set; }
-    public string CableNo { get; set; }
-    public long TagId { get; set; }
-    public Guid TagGuid { get; set; }
-    public string TagNo { get; set; }
-    public string? SpoolNo { get; set; }
-    public DateTime LastUpdated { get; set; }
+    public string Plant { get; init; }
+    public Guid ProCoSysGuid { get; init; }
+    public long HeatTraceId { get; init; }
+    public long CableId { get; init; }
+    public Guid CableGuid { get; init; }
+    public string CableNo { get; init; }
+    public long TagId { get; init; }
+    public Guid TagGuid { get; init; }
+    public string TagNo { get; init; }
+    public string? SpoolNo { get; init; }
+    public DateTime LastUpdated { get; init; }
     
     public string EventType => PcsEventConstants.HeatTraceCreateOrUpdate;
 }

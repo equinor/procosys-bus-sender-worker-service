@@ -7,14 +7,14 @@ namespace Equinor.ProCoSys.BusSenderWorker.Core.Models;
 
 public class SwcrAttachmentEvent : IAttachmentEventV1
 {
-    public string Plant { get; set; }
-    public Guid ProCoSysGuid { get; set; }
-    public Guid? SwcrGuid { get; set; }
-    public string Title { get; set; }
-    public string ClassificationCode { get; set; }
-    public string Uri { get; set; }
-    public string FileName { get; set; }
-    public DateTime LastUpdated { get; set; }
+    public string Plant { get; init; }
+    public Guid ProCoSysGuid { get; init; }
+    public Guid? SwcrGuid { get; init; }
+    public string Title { get; init; }
+    public string ClassificationCode { get; init; }
+    public string Uri { get; init; }
+    public string FileName { get; init; }
+    public DateTime LastUpdated { get; init; }
     
     public string EventType => PcsEventConstants.SwcrAttachmentCreateOrUpdate;
 }

@@ -6,20 +6,20 @@ namespace Equinor.ProCoSys.BusSenderWorker.Core.Models;
 #pragma warning disable 8618
 public class TagEquipmentEvent : ITagEquipmentEventV1
 {
-    public string Plant { get; set; }
-    public Guid ProCoSysGuid { get; set; }
-    public string ManufacturerName { get; set; }
-    public string? ModelNo { get; set; }
-    public string? VariantNo { get; set; }
-    public string? EqHubId { get; set; }
-    public string? SemiId { get; set; }
-    public string? ModelName { get; set; }
-    public string? ModelSubName { get; set; }
-    public string? ModelSubSubName { get; set; }
-    public Guid TagGuid { get; set; }
-    public string TagNo { get; set; }
-    public string ProjectName { get; set; }
-    public DateTime LastUpdated { get; set; }
+    public string Plant { get; init; }
+    public Guid ProCoSysGuid { get; init; }
+    public string ManufacturerName { get; init; }
+    public string? ModelNo { get; init; }
+    public string? VariantNo { get; init; }
+    public string? EqHubId { get; init; }
+    public string? SemiId { get; init; }
+    public string? ModelName { get; init; }
+    public string? ModelSubName { get; init; }
+    public string? ModelSubSubName { get; init; }
+    public Guid TagGuid { get; init; }
+    public string TagNo { get; init; }
+    public string ProjectName { get; init; }
+    public DateTime LastUpdated { get; init; }
     
     public string EventType => PcsEventConstants.TagEquipmentCreateOrUpdate;
 }

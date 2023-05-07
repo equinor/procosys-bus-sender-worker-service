@@ -6,26 +6,26 @@ namespace Equinor.ProCoSys.BusSenderWorker.Core.Models;
 #pragma warning disable CS8618
 public class McPkgEvent : IMcPkgEventV1
 {
-    public string Plant { get; set; }
-    public Guid ProCoSysGuid { get; set; }
-    public string PlantName { get; set; }
-    public string ProjectName { get; set; }
-    public string McPkgNo { get; set; }
-    public long McPkgId { get; set; }
-    public string CommPkgNo { get; set; }
-    public Guid CommPkgGuid { get; set; }
-    public string? Description { get; set; }
-    public string? Remark { get; set; }
-    public string ResponsibleCode { get; set; }
-    public string? ResponsibleDescription { get; set; }
-    public string? AreaCode { get; set; }
-    public string? AreaDescription { get; set; }
-    public string Discipline { get; set; }
-    public string McStatus { get; set; }
-    public string? Phase { get; set; }
-    public bool IsVoided { get; set; }
-    public DateTime CreatedAt { get; set; }
-    public DateTime LastUpdated { get; set; }
+    public string Plant { get; init; }
+    public Guid ProCoSysGuid { get; init; }
+    public string PlantName { get; init; }
+    public string ProjectName { get; init; }
+    public string McPkgNo { get; init; }
+    public long McPkgId { get; init; }
+    public string CommPkgNo { get; init; }
+    public Guid CommPkgGuid { get; init; }
+    public string? Description { get; init; }
+    public string? Remark { get; init; }
+    public string ResponsibleCode { get; init; }
+    public string? ResponsibleDescription { get; init; }
+    public string? AreaCode { get; init; }
+    public string? AreaDescription { get; init; }
+    public string Discipline { get; init; }
+    public string McStatus { get; init; }
+    public string? Phase { get; init; }
+    public bool IsVoided { get; init; }
+    public DateTime CreatedAt { get; init; }
+    public DateTime LastUpdated { get; init; }
     
     public string EventType => PcsEventConstants.McPkgCreateOrUpdate;
 }

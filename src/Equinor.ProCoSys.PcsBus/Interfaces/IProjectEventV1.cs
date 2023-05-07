@@ -6,10 +6,10 @@ namespace Equinor.ProCoSys.PcsServiceBus.Interfaces;
 [UsedImplicitly]
 public interface IProjectEventV1 : IHasEventType
 {
-    string Plant { get; set; }
-    Guid ProCoSysGuid { get; set; }
-    string ProjectName { get; set; }
-    bool IsClosed { get; set; }
-    string? Description { get; set; }
-    DateTime LastUpdated { get; set; }
+    string Plant { get; init; }
+    Guid ProCoSysGuid { get; init; }
+    string ProjectName { get; init; }
+    bool IsClosed { get; init; }
+    string? Description { get; init; }
+    DateTime LastUpdated { get; init; }
 }

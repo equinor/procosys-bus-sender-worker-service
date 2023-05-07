@@ -6,31 +6,31 @@ namespace Equinor.ProCoSys.BusSenderWorker.Core.Models;
 
 public class CommPkgEvent : ICommPkgEventV1
 {
-    public string Plant { get; set; }
-    public Guid ProCoSysGuid { get; set; }
-    public string PlantName { get; set; }
-    public string ProjectName { get; set; }
-    public string CommPkgNo { get; set; }
-    public long CommPkgId { get; set; }
-    public string Description { get; set; }
-    public string CommPkgStatus { get; set; }
-    public bool IsVoided { get; set; }
-    public DateTime LastUpdated { get; set; }
-    public DateTime CreatedAt { get; set; }
-    public string? DescriptionOfWork { get; set; }
-    public string? Remark { get; set; }
-    public string ResponsibleCode { get; set; }
-    public string? ResponsibleDescription { get; set; }
-    public string? AreaCode { get; set; }
-    public string? AreaDescription { get; set; }
-    public string? Phase { get; set; }
-    public string? CommissioningIdentifier { get; set; }
-    public bool? Demolition { get; set; }
-    public string? Priority1 { get; set; }
-    public string? Priority2 { get; set; }
-    public string? Priority3 { get; set; }
-    public string? Progress { get; set; }
-    public string? DCCommPkgStatus { get; set; }
+    public string Plant { get; init; }
+    public Guid ProCoSysGuid { get; init; }
+    public string PlantName { get; init; }
+    public string ProjectName { get; init; }
+    public string CommPkgNo { get; init; }
+    public long CommPkgId { get; init; }
+    public string Description { get; init; }
+    public string CommPkgStatus { get; init; }
+    public bool IsVoided { get; init; }
+    public DateTime LastUpdated { get; init; }
+    public DateTime CreatedAt { get; init; }
+    public string? DescriptionOfWork { get; init; }
+    public string? Remark { get; init; }
+    public string ResponsibleCode { get; init; }
+    public string? ResponsibleDescription { get; init; }
+    public string? AreaCode { get; init; }
+    public string? AreaDescription { get; init; }
+    public string? Phase { get; init; }
+    public string? CommissioningIdentifier { get; init; }
+    public bool? Demolition { get; init; }
+    public string? Priority1 { get; init; }
+    public string? Priority2 { get; init; }
+    public string? Priority3 { get; init; }
+    public string? Progress { get; init; }
+    public string? DCCommPkgStatus { get; init; }
     
     public string EventType => PcsEventConstants.CommPkgCreateOrUpdate;
 }

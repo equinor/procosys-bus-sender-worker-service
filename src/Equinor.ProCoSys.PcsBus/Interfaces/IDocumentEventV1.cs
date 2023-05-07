@@ -4,24 +4,24 @@ namespace Equinor.ProCoSys.PcsServiceBus.Interfaces;
 
 public interface IDocumentEventV1 : IHasEventType
 {
-    string Plant { get; set; }
-    Guid ProCoSysGuid { get; set; }
-    string ProjectName { get; set; }
-    long DocumentId { get; set; }   
-    string DocumentNo { get; set; }
-    string? Title { get; set; }
-    string? AcceptanceCode { get; set; }
-    string? Archive { get; set; }
-    string? AccessCode { get; set; }
-    string? Complex { get; set; }
-    string? DocumentType { get; set; }
-    string? DisciplineId { get; set; }
-    string? DocumentCategory { get; set; }
-    string? HandoverStatus { get; set; }
-    string? RegisterType { get; set; }
-    int? RevisionNo { get; set; }
-    string? RevisionStatus { get; set; }
-    string? ResponsibleContractor { get; set; }
-    DateTime LastUpdated { get; set; }
-    DateOnly? RevisionDate { get; set; }
+    string Plant { get; init; }
+    Guid ProCoSysGuid { get; init; }
+    string ProjectName { get; init; }
+    long DocumentId { get; init; }   
+    string DocumentNo { get; init; }
+    string? Title { get; init; }
+    string? AcceptanceCode { get; init; }
+    string? Archive { get; init; }
+    string? AccessCode { get; init; }
+    string? Complex { get; init; }
+    string? DocumentType { get; init; }
+    string? DisciplineId { get; init; }
+    string? DocumentCategory { get; init; }
+    string? HandoverStatus { get; init; }
+    string? RegisterType { get; init; }
+    int? RevisionNo { get; init; }
+    string? RevisionStatus { get; init; }
+    string? ResponsibleContractor { get; init; }
+    DateTime LastUpdated { get; init; }
+    DateOnly? RevisionDate { get; init; }
 }
