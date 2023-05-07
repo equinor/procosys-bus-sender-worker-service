@@ -4,6 +4,7 @@ using Equinor.ProCoSys.PcsServiceBus.Interfaces;
 
 namespace Equinor.ProCoSys.BusSenderWorker.Core.Models;
 #pragma warning disable CS8618
+
 public class DocumentEvent : IDocumentEventV1
 {
     public string Plant { get; init; }

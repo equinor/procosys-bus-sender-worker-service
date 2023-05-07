@@ -39,7 +39,6 @@ public class WorkOrderChecklistQuery
         {
             whereClause = $"where wotc.wo_id = {woId} and wotc.tagcheck_id = {tagCheckId}";
         }
-
         return whereClause;
     }
 }

@@ -4,8 +4,7 @@ using Equinor.ProCoSys.PcsServiceBus.Interfaces;
 
 namespace Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 
-public interface IDapperRepository
+public interface IEventRepository
 {
-    Task<IEnumerable<T>> Query<T>(string queryString, string? objectId) where T : IHasEventType;
     Task<T?> QuerySingle<T>(string queryString, string objectId) where T : IHasEventType;
 }

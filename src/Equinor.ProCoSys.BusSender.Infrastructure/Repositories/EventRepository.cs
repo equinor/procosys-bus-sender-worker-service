@@ -13,34 +13,17 @@ using Microsoft.Extensions.Logging;
 
 namespace Equinor.ProCoSys.BusSenderWorker.Infrastructure.Repositories;
 
-internal class DapperRepository : IDapperRepository
+internal class EventRepository : IEventRepository
 {
     private readonly BusSenderServiceContext _context;
-    private readonly ILogger<DapperRepository> _logger;
+    private readonly ILogger<EventRepository> _logger;
 
-    public DapperRepository(BusSenderServiceContext context, ILogger<DapperRepository> logger)
+    public EventRepository(BusSenderServiceContext context, ILogger<EventRepository> logger)
     {
         _context = context;
         _logger = logger;
     }
-
-    public async Task<IEnumerable<T>> Query<T>(string queryString, string? objectId) where T : IHasEventType
-    {
-        var connection = _context.Database.GetDbConnection();
-        if (_context.Database.GetDbConnection().State != ConnectionState.Open)
-        {
-            await _context.Database.OpenConnectionAsync();
-        }
-
-        var events = connection.Query<T>(queryString).ToList();
-        if (events.Count == 0)
-        {
-            _logger.LogError("Object/Entity with id {ObjectId} did not return anything", objectId);
-            return Enumerable.Empty<T>();
-        }
-        return events;
-    }
-
+    
     public async Task<T?> QuerySingle<T>(string queryString, string objectId) where T : IHasEventType
     {
         var connection = _context.Database.GetDbConnection();

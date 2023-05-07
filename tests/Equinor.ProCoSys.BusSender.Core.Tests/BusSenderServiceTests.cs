@@ -28,7 +28,7 @@ public class BusSenderServiceTests
     private List<BusEvent> _busEvents;
     private Mock<IBusEventRepository> _busEventRepository;
     private Mock<ITagDetailsRepository> _tagDetailsRepositoryMock;
-    private Mock<IDapperRepository> _dapperRepositoryMock;
+    private Mock<IEventRepository> _dapperRepositoryMock;
     private Mock<BusEventService> _busEventServiceMock;
     private List<ServiceBusMessage> _messagesInTopicClient4;
     private ServiceBusMessageBatch _mockWoMessageBatch;
@@ -84,7 +84,7 @@ public class BusSenderServiceTests
         _busEventRepository = new Mock<IBusEventRepository>();
         _tagDetailsRepositoryMock = new Mock<ITagDetailsRepository>();
         
-        _dapperRepositoryMock = new Mock<IDapperRepository>();
+        _dapperRepositoryMock = new Mock<IEventRepository>();
         _busEventServiceMock = new Mock<BusEventService>(_tagDetailsRepositoryMock.Object, _dapperRepositoryMock.Object) { CallBase = true };
         _iUnitOfWork = new Mock<IUnitOfWork>();
 

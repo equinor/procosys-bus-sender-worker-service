@@ -8,7 +8,7 @@ public class BusEvent
     public long Id { get; set; }
     public string Event { get; set; }
     public string Message { get; set; }
-    public DateTime Created { get; set; }
+    public DateTime Created { get; init; }
     public Status Status { get; set; }
 
     //untracked

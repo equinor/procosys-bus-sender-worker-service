@@ -84,9 +84,9 @@ public class BusSenderService : IBusSenderService
         var unProcessedEvents = events.Where(busEvent => busEvent.Status == Status.UnProcessed).ToList();
         _logger.LogInformation("Amount of messages to process: {count} ", unProcessedEvents.Count);
 
-        foreach (var e in unProcessedEvents.Where(e => IsSimpleMessage(e) || e.Event == TagTopic.TopicName))
+        foreach (var simpleUnprocessedBusEvent in unProcessedEvents.Where(e => IsSimpleMessage(e) || e.Event == TagTopic.TopicName))
         {
-            await UpdateEventBasedOnTopic(e);
+            await UpdateEventBasedOnTopic(simpleUnprocessedBusEvent);
         }
 
         _logger.LogInformation("Update loop finished at at {sw} ms", dsw.ElapsedMilliseconds);
@@ -185,10 +185,10 @@ public class BusSenderService : IBusSenderService
         => events.Where(IsSimpleMessage)
             .GroupBy(e => (e.Event, e.Message));
 
-    private static bool IsSimpleMessage(BusEvent e)
-        => long.TryParse(e.Message, out _)
-           || Guid.TryParse(e.Message, out _)
-           || BusEventService.CanGetTwoIdsFromMessage(e.Message.Split(","), out _, out _);
+    private static bool IsSimpleMessage(BusEvent busEvent)
+        => long.TryParse(busEvent.Message, out _)
+           || Guid.TryParse(busEvent.Message, out _)
+           || BusEventService.CanGetTwoIdsFromMessage(busEvent.Message.Split(","), out _, out _);
 
 
     private void TrackMessage(BusEvent busEvent)
@@ -206,7 +206,7 @@ public class BusSenderService : IBusSenderService
 
     private async Task UpdateEventBasedOnTopic(BusEvent busEvent)
     {
-        _logger.LogDebug("Started update for {event}", busEvent.Event);
+        _logger.LogDebug("Started update for {Event}", busEvent.Event);
         var sw = Stopwatch.StartNew();
         switch (busEvent.Event)
         {

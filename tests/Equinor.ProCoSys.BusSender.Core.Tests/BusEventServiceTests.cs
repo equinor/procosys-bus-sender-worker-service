@@ -17,13 +17,13 @@ public class BusEventServiceTests
 {
     private IBusEventService _dut;
     private Mock<ITagDetailsRepository> _tagDetailsRepositoryMock;
-    private Mock<IDapperRepository> _dapperRepositoryMock;
+    private Mock<IEventRepository> _dapperRepositoryMock;
 
     [TestInitialize]
     public void Setup()
     {
         _tagDetailsRepositoryMock = new Mock<ITagDetailsRepository>();
-        _dapperRepositoryMock = new Mock<IDapperRepository>();
+        _dapperRepositoryMock = new Mock<IEventRepository>();
         _dut = new BusEventService(_tagDetailsRepositoryMock.Object,
             _dapperRepositoryMock.Object);
     }

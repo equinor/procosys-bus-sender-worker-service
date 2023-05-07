@@ -43,5 +43,4 @@ public class DocumentQuery
             left join library com on com.library_id = d.complex_id
         {whereClause}";
     }
-
 }

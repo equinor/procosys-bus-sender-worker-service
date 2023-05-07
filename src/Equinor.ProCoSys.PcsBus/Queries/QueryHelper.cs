@@ -47,7 +47,6 @@ public  static class QueryHelper
         {
             whereClause = $"where {shortHand}.{idColumn} = '{guid}'";
         }
-
         return whereClause;
     }
 }

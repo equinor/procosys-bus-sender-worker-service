@@ -7,29 +7,27 @@ public class SwcrQuery
         DetectFaultyPlantInput(plant);
         var whereClause = CreateWhereClause(swcrId, plant, "sw", "swcr_id");
 
-        return @$"select
-            '{{""Plant"" : ""' || sw.projectschema ||
-            '"", ""ProCoSysGuid"" : ""' || sw.procosys_guid ||
-            '"", ""ProjectName"" : ""' || p.NAME ||
-            '"", ""SwcrNo"" : ""' || sw.SWCRNO ||
-            '"", ""SwcrId"" : ""' || sw.SWCR_ID ||
-            '"", ""CommPkgGuid"" : ""' || c.procosys_guid ||
-            '"", ""CommPkgNo"" : ""' || c.COMMPKGNO ||
-            '"", ""Description"" : ""' || regexp_replace(sw.problemdescription, '([""\])', '\\\1') ||
-            '"", ""Modification"" : ""' || regexp_replace(sw.modificationdescription, '([""\])', '\\\1') ||
-            '"", ""Priority"" : ""' || pri.code ||
-            '"", ""System"" : ""' || sys.code ||
-            '"", ""ControlSystem"" : ""' || cs.code ||
-            '"", ""Contract"" : ""' || con.code ||
-            '"", ""Supplier"" : ""' || sup.code ||
-            '"", ""Node"" : ""' ||  regexp_replace(n.NODENO, '([""\])', '\\\1') ||
-            '"", ""Status"" : ""' ||  STATUSFORSWCR(sw.swcr_id) || 
-            '"", ""CreatedAt"" : ""' || TO_CHAR(e.createdat, 'yyyy-mm-dd hh24:mi:ss')  ||
-            '"", ""IsVoided"" : ""' || decode(e.IsVoided,'Y', 'true', 'N', 'false')  ||
-            '"", ""LastUpdated"" : ""' || TO_CHAR(sw.LAST_UPDATED, 'yyyy-mm-dd hh24:mi:ss')  ||
-            '"", ""DueDate"" : ""' || TO_CHAR(sw.plannedfinishdate, 'yyyy-mm-dd hh24:mi:ss')  ||
-            '"", ""EstimatedManHours"" : ""' || sw.estimatedmhrs  ||
-            '""}}' as message
+        return @$"select 
+            sw.projectschema AS Plant,
+            sw.procosys_guid AS ProCoSysGuid,
+            p.NAME AS ProjectName,
+            sw.SWCRNO AS SwcrNo,
+            sw.SWCR_ID AS SwcrId,
+            c.procosys_guid AS CommPkgGuid,
+            c.COMMPKGNO AS CommPkgNo,
+            sw.problemdescription AS Description,
+            sw.modificationdescription AS Modification,
+            pri.code AS Priority,
+            sys.code AS System,
+            cs.code AS ControlSystem,
+            con.code AS Contract,
+            sup.code AS Supplier,
+            n.NODENO AS Node,
+            STATUSFORSWCR(sw.swcr_id) AS Status,
+            e.createdat AS CreatedAt,
+            e.IsVoided AS IsVoided,
+            sw.LAST_UPDATED AS LastUpdated,
+            sw.plannedfinishdate AS DueDate
         from swcr sw
             join element e on  E.ELEMENT_ID = sw.swcr_ID
             join projectschema ps ON ps.projectschema = sw.projectschema
