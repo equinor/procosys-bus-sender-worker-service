@@ -19,14 +19,14 @@ public class BusSenderMessageRepository : IBusSenderMessageRepository
         _logger = logger;
     }
 
-    public async Task<string> GetCallOffMessage(long callOffId) => 
+    public async Task<string> GetCallOffMessage(long callOffId) =>
         await ExecuteQuery(CallOffQuery.GetQuery(callOffId), callOffId.ToString());
 
-    public async Task<string> GetCheckListMessage(long checkListId) => 
+    public async Task<string> GetCheckListMessage(long checkListId) =>
         await ExecuteQuery(ChecklistQuery.GetQuery(checkListId), checkListId.ToString());
 
     public async Task<string> GetCommPkgQueryMessage(long commPkgId, long documentId) =>
-        await ExecuteQuery(QueryCommPkgQuery.GetQuery(commPkgId,documentId), commPkgId+","+documentId);
+        await ExecuteQuery(QueryCommPkgQuery.GetQuery(commPkgId, documentId), commPkgId + "," + documentId);
 
     public async Task<string> GetCommPkgOperationMessage(long commPkgId) =>
         await ExecuteQuery(CommPkgOperationQuery.GetQuery(commPkgId), commPkgId.ToString());
@@ -36,26 +36,27 @@ public class BusSenderMessageRepository : IBusSenderMessageRepository
 
     public async Task<string> GetTaskMessage(long taskId) =>
         await ExecuteQuery(TaskQuery.GetQuery(taskId), taskId.ToString());
+
     public async Task<string> GetSwcrOtherReferenceMessage(string guid) =>
-    await ExecuteQuery(SwcrOtherReferencesQuery.GetQuery(guid), guid);
+        await ExecuteQuery(SwcrOtherReferencesQuery.GetQuery(guid), guid);
 
     public async Task<string> GetSwcrTypeMessage(string guid) =>
-    await ExecuteQuery(SwcrTypeQuery.GetQuery(guid), guid);
+        await ExecuteQuery(SwcrTypeQuery.GetQuery(guid), guid);
 
     public async Task<string> GetSwcrAttachmentMessage(string guid) =>
-    await ExecuteQuery(SwcrAttachmentQuery.GetQuery(guid), guid);
+        await ExecuteQuery(SwcrAttachmentQuery.GetQuery(guid), guid);
 
     public async Task<string> GetActionMessage(long actionId) =>
-    await ExecuteQuery(ActionQuery.GetQuery(actionId), actionId.ToString());
+        await ExecuteQuery(ActionQuery.GetQuery(actionId), actionId.ToString());
 
     public async Task<string> GetTagEquipmentMessage(string guid) =>
-    await ExecuteQuery(TagEquipmentQuery.GetQuery(guid), guid);
+        await ExecuteQuery(TagEquipmentQuery.GetQuery(guid), guid);
 
     public async Task<string> GetCommPkgTaskMessage(long commPkgId, long taskId) =>
         await ExecuteQuery(CommPkgTaskQuery.GetQuery(commPkgId, taskId), commPkgId + "," + taskId);
 
-    public async Task<string> GetMilestoneMessage(long elementId,long milestoneId) =>
-        await ExecuteQuery(MilestonesQuery.GetQuery(elementId, milestoneId),elementId+","+milestoneId);
+    public async Task<string> GetMilestoneMessage(long elementId, long milestoneId) =>
+        await ExecuteQuery(MilestonesQuery.GetQuery(elementId, milestoneId), elementId + "," + milestoneId);
 
     public async Task<string> GetMilestoneMessage(string guid) =>
         await ExecuteQuery(MilestonesQuery.GetQuery(guid), guid);
@@ -63,8 +64,8 @@ public class BusSenderMessageRepository : IBusSenderMessageRepository
     public async Task<string> GetLibraryFieldMessage(string guid) =>
         await ExecuteQuery(LibraryFieldQuery.GetQuery(guid), guid);
 
-    public async Task<string> GetLoopContentMessage(long loopContentId) => 
-        await ExecuteQuery(LoopContentQuery.GetQuery(loopContentId),loopContentId.ToString());
+    public async Task<string> GetLoopContentMessage(long loopContentId) =>
+        await ExecuteQuery(LoopContentQuery.GetQuery(loopContentId), loopContentId.ToString());
 
     public async Task<string> GetPipingRevisionMessage(long pipeRevisionId) =>
         await ExecuteQuery(PipingRevisionQuery.GetQuery(pipeRevisionId), pipeRevisionId.ToString());
@@ -100,7 +101,7 @@ public class BusSenderMessageRepository : IBusSenderMessageRepository
         await ExecuteQuery(WorkOrderQuery.GetQuery(workOrderId), workOrderId.ToString());
 
     public async Task<string> GetWorkOrderCutOffMessage(long workOrderId, string cutoffWeek) =>
-        await ExecuteQuery(WorkOrderCutoffQuery.GetQuery(workOrderId, cutoffWeek ), $"{workOrderId},{cutoffWeek}");
+        await ExecuteQuery(WorkOrderCutoffQuery.GetQuery(workOrderId, cutoffWeek), $"{workOrderId},{cutoffWeek}");
 
     public async Task<string> GetWorkOrderMilestoneMessage(long woId, long milestoneId) =>
         await ExecuteQuery(WorkOrderMilestoneQuery.GetQuery(woId, milestoneId), $"{woId},{milestoneId}");
@@ -108,31 +109,32 @@ public class BusSenderMessageRepository : IBusSenderMessageRepository
     private async Task<string> ExecuteQuery(string queryString, string objectId)
     {
         var dbConnection = _context.Database.GetDbConnection();
-        await using var command = dbConnection.CreateCommand();
-        command.CommandText = queryString;
-        var shouldCloseConnection = false;
-
-        if (dbConnection.State != ConnectionState.Open)
+        var connectionWasClosed = dbConnection.State != ConnectionState.Open;
+        if (connectionWasClosed)
         {
             await _context.Database.OpenConnectionAsync();
-            shouldCloseConnection = true;
         }
-       
-        var result = (string) await command.ExecuteScalarAsync();
-
-        if (result is null)
+        try
         {
-            _logger.LogError("Object/Entity with id {objectId} did not return anything", objectId);
-            return null;
+            await using var command = dbConnection.CreateCommand();
+            command.CommandText = queryString;
+
+            var result = (string)await command.ExecuteScalarAsync();
+
+            if (result is null)
+            {
+                _logger.LogError("Object/Entity with id {ObjectId} did not return anything", objectId);
+                return null;
+            }
+            return result;
         }
-
-
-        //If we open it, we have to close it.
-        if (shouldCloseConnection)
+        finally
         {
-            await _context.Database.CloseConnectionAsync();
+            //If we open it, we have to close it.
+            if (connectionWasClosed)
+            {
+                await _context.Database.CloseConnectionAsync();
+            }
         }
-
-        return result;
     }
 }
