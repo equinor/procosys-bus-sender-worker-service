@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data;
 using System.Threading.Tasks;
 using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 using Equinor.ProCoSys.BusSenderWorker.Infrastructure.Data;
@@ -20,30 +21,47 @@ public class TagDetailsRepository : ITagDetailsRepository
 
     public async Task<string?> GetDetailsStringByTagId(long tagId)
     {
-        await using var command = _context.Database.GetDbConnection().CreateCommand();
-        command.CommandText = GetTagDetailsQuery(tagId);
-        await _context.Database.OpenConnectionAsync();
-        await using var result = await command.ExecuteReaderAsync();
-
-        if (!result.HasRows)
+        var dbConnection = _context.Database.GetDbConnection();
+        var connectionWasClosed = dbConnection.State != ConnectionState.Open;
+        if (connectionWasClosed)
         {
-            _logger.LogInformation($"Tag with id {tagId} did not have any tagDetails");
-            return "{}";
+            await _context.Database.OpenConnectionAsync();
         }
-
-        if (!await result.ReadAsync() || result[0] is DBNull)
+        try
         {
-            return "{}";
+            await using var command = _context.Database.GetDbConnection().CreateCommand();
+            command.CommandText = GetTagDetailsQuery(tagId);
+            
+            await using var result = await command.ExecuteReaderAsync();
+
+            if (!result.HasRows)
+            {
+                _logger.LogInformation($"Tag with id {tagId} did not have any tagDetails");
+                return "{}";
+            }
+
+            if (!await result.ReadAsync() || result[0] is DBNull)
+            {
+                return "{}";
+            }
+
+            var tagDetails = (string)result[0];
+
+            if (await result.ReadAsync())
+            {
+                _logger.LogError("TagDetails returned more than 1 row, this should not happen.");
+            }
+
+            return "{" + tagDetails + "}";
         }
-
-        var tagDetails = (string)result[0];
-
-        if (await result.ReadAsync())
+        finally
         {
-            _logger.LogError("TagDetails returned more than 1 row, this should not happen.");
+            //If we open it, we have to close it.
+            if (connectionWasClosed)
+            {
+                await _context.Database.CloseConnectionAsync();
+            }
         }
-
-        return "{" + tagDetails + "}";
     }
 
     private static string GetTagDetailsQuery(long tagId) =>
