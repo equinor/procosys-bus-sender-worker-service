@@ -23,21 +23,33 @@ internal class EventRepository : IEventRepository
         _context = context;
         _logger = logger;
     }
-    
+
     public async Task<T?> QuerySingle<T>(string queryString, string objectId) where T : IHasEventType
     {
         var connection = _context.Database.GetDbConnection();
-        if (_context.Database.GetDbConnection().State != ConnectionState.Open)
+        var connectionWasClosed = connection.State != ConnectionState.Open;
+        if (connectionWasClosed)
         {
             await _context.Database.OpenConnectionAsync();
         }
 
-        var events = connection.Query<T>(queryString).ToList();
-        if (events.Count == 0)
+        try
         {
-            _logger.LogError("Object/Entity with id {ObjectId} did not return anything", objectId);
-            return default;
+            var events = connection.Query<T>(queryString).ToList();
+            if (events.Count == 0)
+            {
+                _logger.LogError("Object/Entity with id {ObjectId} did not return anything", objectId);
+                return default;
+            }
+            return events.Single();
         }
-        return events.Single(); 
+        finally
+        {
+            //If we open it, we have to close it.
+            if (connectionWasClosed)
+            {
+                await _context.Database.CloseConnectionAsync();
+            }
+        }
     }
 }
