@@ -19,7 +19,7 @@ public class TagDetailsRepository : ITagDetailsRepository
         _logger = logger;
     }
 
-    public async Task<string?> GetDetailsStringByTagId(long tagId)
+    public async Task<string> GetDetailsStringByTagId(long tagId)
     {
         var dbConnection = _context.Database.GetDbConnection();
         var connectionWasClosed = dbConnection.State != ConnectionState.Open;
@@ -36,7 +36,7 @@ public class TagDetailsRepository : ITagDetailsRepository
 
             if (!result.HasRows)
             {
-                _logger.LogInformation($"Tag with id {tagId} did not have any tagDetails");
+                _logger.LogInformation("Tag with id {TagId} did not have any tagDetails", tagId);
                 return "{}";
             }
 
@@ -49,7 +49,7 @@ public class TagDetailsRepository : ITagDetailsRepository
 
             if (await result.ReadAsync())
             {
-                _logger.LogError("TagDetails returned more than 1 row, this should not happen.");
+                _logger.LogError("TagDetails returned more than 1 row, this should not happen");
             }
 
             return "{" + tagDetails + "}";
