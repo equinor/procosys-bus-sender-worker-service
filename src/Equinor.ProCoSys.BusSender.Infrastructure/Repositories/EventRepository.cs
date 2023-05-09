@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
+﻿using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
 using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
-using Equinor.ProCoSys.BusSenderWorker.Core.Models;
 using Equinor.ProCoSys.BusSenderWorker.Infrastructure.Data;
 using Equinor.ProCoSys.PcsServiceBus.Interfaces;
 using Microsoft.EntityFrameworkCore;
