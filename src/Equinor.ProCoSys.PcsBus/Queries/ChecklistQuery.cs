@@ -9,11 +9,11 @@ public class ChecklistQuery
 
         return @$"select
             tc.projectschema as Plant, 
-            hextoraw(tc.procosys_guid) as ProCoSysGuid, 
+            tc.procosys_guid as ProCoSysGuid, 
             p.name as ProjectName, 
             t.tagno as TagNo, 
             t.tag_id as TagId, 
-            hextoraw(t.procosys_guid) as TagGuid, 
+            t.procosys_guid as TagGuid, 
             t.register_id as TagRegisterId, 
             tc.tagcheck_id as ChecklistId, 
             reg.code as TagCategory, 
@@ -26,7 +26,7 @@ public class ChecklistQuery
             mccr_disc.code as FormularDiscipline, 
             pir.testrevisionno as Revision, 
             prm.mcpkgno as PipingRevisionMcPkNo, 
-            hextoraw(prm.procosys_guid) as PipingRevisionMcPkGuid, 
+            prm.procosys_guid as PipingRevisionMcPkGuid, 
             r.code as Responsible, 
             status.code as Status, 
             tc.updatedat as UpdatedAt,
