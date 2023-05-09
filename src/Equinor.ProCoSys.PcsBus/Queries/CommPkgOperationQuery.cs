@@ -8,7 +8,7 @@ public class CommPkgOperationQuery
         var whereClause = CreateWhereClause(commPkId, plant, "co","commpkg_id");
 
         return $@"select 
-        co.projectschema as Plant
+        co.projectschema as Plant,
         c.procosys_guid as ProCoSysGuid,
         p.NAME as ProjectName,
         c.commpkgno as CommPkgNo,
@@ -25,8 +25,8 @@ public class CommPkgOperationQuery
         co.commissioningresp  as CommissioningResp,
         co.valveblindinglist  as ValveBlindingList,
         co.LAST_UPDATED AS LastUpdated
-    from ElementContent AS co
-        join CommPkg c ON co.Element_Id = c.Element_Id
+    from commpkg_operation co
+        join CommPkg c ON c.COMMPKG_ID = co.COMMPKG_ID
         join Project p ON c.Project_Id = p.Project_Id
     {whereClause}";
     }

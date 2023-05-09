@@ -31,7 +31,6 @@ public class CallOffQuery
         co.last_updated as LastUpdated,
         co.isVoided as IsVoided,
         co.createdat as CreatedAt
-        as message
         from calloff co
             join purchaseorder po on po.package_id = co.package_id       
             left join responsible r on r.responsible_id = co.responsible_id

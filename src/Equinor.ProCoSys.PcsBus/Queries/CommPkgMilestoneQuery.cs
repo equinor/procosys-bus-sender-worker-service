@@ -8,10 +8,10 @@ public class CommPkgMilestoneQuery
         var whereClause = CreateWhereClauseForGuid(guid, plant, "e", "procosys_guid");
 
         return @$"SELECT e.projectschema AS Plant,
-            HEXTORAW(e.procosys_guid) AS ProCoSysGuid,
+            e.procosys_guid AS ProCoSysGuid,
             ps.TITLE AS PlantName,
             p.name AS ProjectName,
-            HEXTORAW(c.procosys_guid) AS CommPkgGuid,
+            c.procosys_guid AS CommPkgGuid,
             c.commpkgno AS CommPkgNo,
             milestone.code AS Code,
             e.actualdate AS ActualDate,
@@ -26,7 +26,7 @@ public class CommPkgMilestoneQuery
             join projectschema ps on ps.projectschema = e.projectschema
             join library milestone on milestone.library_id = e.milestone_id
             join commpkg c on c.commpkg_id = e.element_id
-            left join project p on p.project_id = COALESCE(c.project_id,m.project_id)
+            left join project p on p.project_id =c.project_id
             left join V$Certificate cert on cert.certificate_id = e.certificate_id
         {whereClause}";
     }

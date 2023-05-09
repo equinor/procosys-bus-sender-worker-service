@@ -2,7 +2,7 @@
 
 public class TagEquipmentQuery
 {
-    public static string GetQuery(string tagEquipmentTypeGuid, string plant= null)
+    public static string GetQuery(string tagEquipmentTypeGuid, string? plant = null)
     {
         DetectFaultyPlantInput(plant);
         var whereClause = CreateWhereClauseForGuid(tagEquipmentTypeGuid, plant, "te", "procosys_guid");
