@@ -224,7 +224,7 @@ public class BusSenderService : IBusSenderService
         _telemetryClient.TrackMetric("BusSender Topic",
             1, "Plant",
             "ProjectName",
-            message?.Plant?[4..],
+            message?.Plant?[4..] ?? "NoPlant",
             message?.ProjectName?.Replace('$', '_') ?? "NoProject");
 
     private async Task UpdateEventBasedOnTopic(BusEvent busEvent)
