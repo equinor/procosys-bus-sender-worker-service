@@ -19,7 +19,7 @@ public class TaskQuery
             ec.ProCoSys_Guid as ProCoSysGuid,
             ec2.ProCoSys_Guid as TaskParentProCoSysGuid,
             subQuery.ProjectName as ProjectName,
-            subQuery.DocumentId
+            subQuery.DocumentId,
             ec.Title as Title,
             SUBSTR(
                 (

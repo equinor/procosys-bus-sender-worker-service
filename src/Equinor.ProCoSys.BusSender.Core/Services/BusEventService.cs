@@ -63,7 +63,7 @@ public class BusEventService : IBusEventService
                     checklistId.ToString()))
             : throw new Exception($"Failed to extract checklistId from message: {message}");
 
-    public async Task<string> CreateCommPkgMessage(string message)
+    public async Task<string?> CreateCommPkgMessage(string message)
         => long.TryParse(message, out var commPkgId)
             ? JsonSerializer.Serialize(
                 await _eventRepository.QuerySingle<CommPkgEvent>(CommPkgQuery.GetQuery(commPkgId),
@@ -107,7 +107,7 @@ public class BusEventService : IBusEventService
         long.TryParse(message, out var documentId)
             ? JsonSerializer.Serialize(
                 await _eventRepository.QuerySingle<DocumentEvent>(DocumentQuery.GetQuery(documentId),
-                    documentId.ToString()))
+                    documentId.ToString()), DefaultSerializerHelper.SerializerOptions)
             : throw new Exception($"Failed to extract documentId from message: {message}");
 
     public async Task<string?> CreateHeatTraceMessage(string message)

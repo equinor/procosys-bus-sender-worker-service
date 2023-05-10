@@ -232,15 +232,11 @@ public class BusSenderServiceTests
     public async Task HandleBusEvents_ShouldHandleGuidSimpleMessages()
     {
         //Arrange
-        var guid = "E9414BA9930E5FF6E0532510000AA1AB";
+        const string guid = "E9414BA9930E5FF6E0532510000AA1AB";
         var commPri = new BusEvent { Event = LibraryFieldTopic.TopicName, Message = guid, Status = Status.UnProcessed };
   
-        const string jsonMessage =
-            "{\"Plant\" : \"AnyValidPlant\", \"ProjectName\" : \"AnyProjectName\", \"WoNo\" : \"SomeWoNo\"}";
-
         _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk())
             .Returns(() => Task.FromResult(new List<BusEvent> { commPri }));
-     
 
         var topicClientMock = new Mock<ServiceBusSender>();
         _busSender.Add(LibraryFieldTopic.TopicName, topicClientMock.Object);

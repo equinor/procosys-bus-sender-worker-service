@@ -37,7 +37,7 @@ public class TagEvent : ITagEventV1
     public bool IsVoided { get; init; }
     public DateTime LastUpdated { get; init; }
 
-    public string TagDetails { get; set; }
+    public string? TagDetails { get; set; }
     
     public string EventType => PcsEventConstants.TagCreateOrUpdate;
 }
