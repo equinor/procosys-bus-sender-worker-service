@@ -67,8 +67,8 @@ public class TagDetailsRepository : ITagDetailsRepository
     private static string GetTagDetailsQuery(long tagId) =>
         @$"
             select listagg('""'|| colName ||'"":""'|| regexp_replace(val, '([""\])', '\\\1') ||'""'
-            || case when colname2 is not null then ',' || '""'|| colName2 ||'"":""'|| val2 ||'""'else null end
-            || case when colname3 is not null then ',' || '""'|| colName3 ||'"":""'|| val3 ||'""'else null end,
+            || case when colname2 is not null then ',' || '""'|| colName2 ||'"":""'|| val2 ||'""' end
+            || case when colname3 is not null then ',' || '""'|| colName3 ||'"":""'|| val3 ||'""' end,
             ',')
             within group (order by colName, colName2,colName3) as tagDetails
             from (
@@ -86,13 +86,13 @@ public class TagDetailsRepository : ITagDetailsRepository
             tag.procosys_guid as val2,
             tag.procosys_guid as val3
             from defineelementfield def
-            left join field f on def.field_id = f.field_id
-            left join library unit on unit.library_id = f.unit_id
-            join elementfield val on (val.field_id = def.field_id and val.element_id = {tagId})
-            join tag t on t.tag_id = val.element_id 
-            left join library libval on libval.library_id = val.library_id
-            left join library reg on reg.library_id = def.register_id
-            left join tag on tag.tag_id = val.tag_id
+                left join field f on def.field_id = f.field_id
+                left join library unit on unit.library_id = f.unit_id
+                join elementfield val on (val.field_id = def.field_id and val.element_id = {tagId})
+                join tag t on t.tag_id = val.element_id 
+                left join library libval on libval.library_id = val.library_id
+                left join library reg on reg.library_id = def.register_id
+                left join tag on tag.tag_id = val.tag_id
             where def.elementtype = 'TAG'
             and (def.register_id is null or def.register_id = t.register_id)
             and not def.isvoided = 'Y'
