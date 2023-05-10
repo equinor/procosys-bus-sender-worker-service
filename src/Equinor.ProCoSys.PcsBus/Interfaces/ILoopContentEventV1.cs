@@ -13,4 +13,3 @@ public interface ILoopContentEventV1 : IHasEventType
     string RegisterCode { get; init; }
     DateTime LastUpdated { get; init; }
 }
-

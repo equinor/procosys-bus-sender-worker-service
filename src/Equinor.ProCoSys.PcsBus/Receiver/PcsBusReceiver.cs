@@ -11,12 +11,12 @@ namespace Equinor.ProCoSys.PcsServiceBus.Receiver;
 
 public class PcsBusReceiver : IHostedService
 {
-    private readonly ILogger<PcsBusReceiver> _logger;
-    private readonly IPcsServiceBusProcessors _serviceBusProcessors;
     private readonly IBusReceiverServiceFactory _busReceiverServiceFactory;
     private readonly ILeaderElectorService _leaderElectorService;
-    private Timer? _timer;
+    private readonly ILogger<PcsBusReceiver> _logger;
     private readonly Guid _receiverId = Guid.NewGuid();
+    private readonly IPcsServiceBusProcessors _serviceBusProcessors;
+    private Timer? _timer;
 
     public PcsBusReceiver(
         ILogger<PcsBusReceiver> logger,
@@ -35,9 +35,18 @@ public class PcsBusReceiver : IHostedService
         }
     }
 
+    private bool IsLeader { get; set; }
+
     public Task StartAsync(CancellationToken cancellationToken)
     {
         _timer = new Timer(CanProceedAsLeaderCheckAsync, null, 5000, Timeout.Infinite);
+
+        return Task.CompletedTask;
+    }
+
+    public Task StopAsync(CancellationToken cancellationToken)
+    {
+        _serviceBusProcessors.CloseAllAsync();
 
         return Task.CompletedTask;
     }
@@ -67,16 +76,29 @@ public class PcsBusReceiver : IHostedService
         }
     }
 
-    private async Task TryBecomeLeaderAsync()
+    // Use this handler to examine the exceptions received on the message pump.
+    private Task ExceptionReceivedHandler(ProcessErrorEventArgs exceptionReceivedEventArgs)
     {
-        var canProceedAsLeader = await _leaderElectorService.CanProceedAsLeader(_receiverId);
+        _logger.LogError($"Message handler encountered an exception {exceptionReceivedEventArgs.Exception}");
+        _logger.LogError($"- Fully Qualified namespace: {exceptionReceivedEventArgs.FullyQualifiedNamespace}");
+        _logger.LogError($"- Entity Path: {exceptionReceivedEventArgs.EntityPath}");
+        _logger.LogError($"- Error Source: {exceptionReceivedEventArgs.ErrorSource}");
+        return Task.CompletedTask;
+    }
 
-        if (canProceedAsLeader)
+    public async Task ProcessMessagesAsync(IPcsServiceBusProcessor processor, ProcessMessageEventArgs args)
+    {
+        try
         {
-            _logger.LogInformation($"CanProceedAsLeaderCheckAsync, lease obtained at: {DateTimeOffset.Now}");
-            IsLeader = true;
-            _serviceBusProcessors.RegisterPcsEventHandlers(ProcessMessagesAsync, ExceptionReceivedHandler);
-            StartMessageReceiving();
+            var messageJson = Encoding.UTF8.GetString(args.Message.Body);
+
+            var busReceiverService = _busReceiverServiceFactory.GetServiceInstance();
+            await busReceiverService.ProcessMessageAsync(processor.PcsTopic, messageJson, args.CancellationToken);
+            await args.CompleteMessageAsync(args.Message);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error processing message");
         }
     }
 
@@ -97,42 +119,20 @@ public class PcsBusReceiver : IHostedService
         }
     }
 
-    private bool IsLeader { get; set; }
-
     private void StartMessageReceiving() => _serviceBusProcessors.StartProcessingAsync();
 
     private void StopMessageReceiving() => _serviceBusProcessors.UnRegisterPcsMessageHandler();
 
-    public async Task ProcessMessagesAsync(IPcsServiceBusProcessor processor, ProcessMessageEventArgs args)
+    private async Task TryBecomeLeaderAsync()
     {
-        try
+        var canProceedAsLeader = await _leaderElectorService.CanProceedAsLeader(_receiverId);
+
+        if (canProceedAsLeader)
         {
-            var messageJson = Encoding.UTF8.GetString(args.Message.Body);
-
-            var busReceiverService = _busReceiverServiceFactory.GetServiceInstance();
-            await busReceiverService.ProcessMessageAsync(processor.PcsTopic, messageJson, args.CancellationToken);
-            await args.CompleteMessageAsync(args.Message);
+            _logger.LogInformation($"CanProceedAsLeaderCheckAsync, lease obtained at: {DateTimeOffset.Now}");
+            IsLeader = true;
+            _serviceBusProcessors.RegisterPcsEventHandlers(ProcessMessagesAsync, ExceptionReceivedHandler);
+            StartMessageReceiving();
         }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error processing message");
-        }
-    }
-
-    public Task StopAsync(CancellationToken cancellationToken)
-    {
-        _serviceBusProcessors.CloseAllAsync();
-
-        return Task.CompletedTask;
-    }
-
-    // Use this handler to examine the exceptions received on the message pump.
-    private Task ExceptionReceivedHandler(ProcessErrorEventArgs exceptionReceivedEventArgs)
-    {
-        _logger.LogError($"Message handler encountered an exception {exceptionReceivedEventArgs.Exception}");
-        _logger.LogError($"- Fully Qualified namespace: {exceptionReceivedEventArgs.FullyQualifiedNamespace}");
-        _logger.LogError($"- Entity Path: {exceptionReceivedEventArgs.EntityPath}");
-        _logger.LogError($"- Error Source: {exceptionReceivedEventArgs.ErrorSource}");
-        return Task.CompletedTask;
     }
 }

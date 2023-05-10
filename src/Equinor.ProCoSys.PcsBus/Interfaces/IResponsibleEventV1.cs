@@ -12,5 +12,4 @@ public interface IResponsibleEventV1 : IHasEventType
     string? Description { get; init; }
     bool IsVoided { get; init; }
     DateTime LastUpdated { get; init; }
-    
 }

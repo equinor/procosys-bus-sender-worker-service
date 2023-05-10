@@ -15,4 +15,3 @@ public interface IWorkOrderMilestoneEventV1 : IHasEventType
     string? SignedByAzureOid { get; }
     DateTime LastUpdated { get; }
 }
-

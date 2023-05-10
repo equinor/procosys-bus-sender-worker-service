@@ -16,21 +16,21 @@ public class CommPkgMilestoneEventTests
         var commPkgMilestoneEventInterfaceType = typeof(ICommPkgMilestoneEventV1);
         var expectedProperties = new Dictionary<string, Type>
         {
-            {"Plant", typeof(string)},
-            {"ProCoSysGuid", typeof(Guid)},
-            {"PlantName", typeof(string)},
-            {"ProjectName", typeof(string)},
-            {"CommPkgGuid", typeof(Guid)},
-            {"CommPkgNo", typeof(string)},
-            {"Code", typeof(string)},
-            {"ActualDate", typeof(DateTime?)},
-            {"PlannedDate", typeof(DateOnly?)},
-            {"ForecastDate", typeof(DateOnly?)},
-            {"Remark", typeof(string)},
-            {"IsSent", typeof(bool?)},
-            {"IsAccepted", typeof(bool?)},
-            {"IsRejected", typeof(bool?)},
-            {"LastUpdated", typeof(DateTime)},
+            { "Plant", typeof(string) },
+            { "ProCoSysGuid", typeof(Guid) },
+            { "PlantName", typeof(string) },
+            { "ProjectName", typeof(string) },
+            { "CommPkgGuid", typeof(Guid) },
+            { "CommPkgNo", typeof(string) },
+            { "Code", typeof(string) },
+            { "ActualDate", typeof(DateTime?) },
+            { "PlannedDate", typeof(DateOnly?) },
+            { "ForecastDate", typeof(DateOnly?) },
+            { "Remark", typeof(string) },
+            { "IsSent", typeof(bool?) },
+            { "IsAccepted", typeof(bool?) },
+            { "IsRejected", typeof(bool?) },
+            { "LastUpdated", typeof(DateTime) },
         };
 
         // Act

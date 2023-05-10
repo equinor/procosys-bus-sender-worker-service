@@ -16,20 +16,20 @@ public class SwcrSignatureEventTests
         var swcrSignatureEventInterfaceType = typeof(ISwcrSignatureEventV1);
         var expectedProperties = new Dictionary<string, Type>
         {
-            {"Plant", typeof(string)},
-            {"ProCoSysGuid", typeof(Guid)},
-            {"SwcrSignatureId", typeof(long)},
-            {"ProjectName", typeof(string)},
-            {"SwcrNo", typeof(string)},
-            {"SwcrGuid", typeof(Guid)},
-            {"SignatureRoleCode", typeof(string)},
-            {"SignatureRoleDescription", typeof(string)},
-            {"Sequence", typeof(int)},
-            {"SignedByAzureOid", typeof(Guid?)},
-            {"FunctionalRoleCode", typeof(string)},
-            {"FunctionalRoleDescription", typeof(string)},
-            {"SignedDate", typeof(DateTime?)},
-            {"LastUpdated", typeof(DateTime)}
+            { "Plant", typeof(string) },
+            { "ProCoSysGuid", typeof(Guid) },
+            { "SwcrSignatureId", typeof(long) },
+            { "ProjectName", typeof(string) },
+            { "SwcrNo", typeof(string) },
+            { "SwcrGuid", typeof(Guid) },
+            { "SignatureRoleCode", typeof(string) },
+            { "SignatureRoleDescription", typeof(string) },
+            { "Sequence", typeof(int) },
+            { "SignedByAzureOid", typeof(Guid?) },
+            { "FunctionalRoleCode", typeof(string) },
+            { "FunctionalRoleDescription", typeof(string) },
+            { "SignedDate", typeof(DateTime?) },
+            { "LastUpdated", typeof(DateTime) }
         };
 
         // Act

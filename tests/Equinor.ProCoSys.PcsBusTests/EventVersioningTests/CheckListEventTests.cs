@@ -9,7 +9,6 @@ namespace Equinor.ProCoSys.PcsServiceBusTests.EventVersioningTests;
 [TestClass]
 public class CheckListEventTests
 {
-
     /** If this tests fails, its most likely because the versioning contract is breached. Consider creating a new version instead of
         modifying the existing one.
         If new properties are added to the interface (non breaking), this test should be updated with the new properties,
@@ -22,32 +21,32 @@ public class CheckListEventTests
         var checklistEventInterfaceType = typeof(IChecklistEventV1);
         var expectedProperties = new Dictionary<string, Type>
         {
-            {"Plant", typeof(string)},
-            {"ProCoSysGuid", typeof(Guid)},
-            {"ProjectName", typeof(string)},
-            {"TagNo", typeof(string)},
-            {"TagId", typeof(long)},
-            {"TagGuid", typeof(Guid)},
-            {"TagRegisterId", typeof(long)},
-            {"ChecklistId", typeof(long)},
-            {"TagCategory", typeof(string)},
-            {"SheetNo", typeof(string)},
-            {"SubSheetNo", typeof(string)},
-            {"FormularType", typeof(string)},
-            {"FormularGroup", typeof(string)},
-            {"FormPhase", typeof(string)},
-            {"SystemModule", typeof(string)},
-            {"FormularDiscipline", typeof(string)},
-            {"Revision", typeof(string)},
-            {"PipingRevisionMcPkNo", typeof(string)},
-            {"PipingRevisionMcPkGuid", typeof(Guid?)},
-            {"Responsible", typeof(string)},
-            {"Status", typeof(string)},
-            {"UpdatedAt", typeof(DateTime?)},
-            {"LastUpdated", typeof(DateTime)},
-            {"CreatedAt", typeof(DateTime)},
-            {"SignedAt", typeof(DateTime?)},
-            {"VerifiedAt", typeof(DateTime?)},
+            { "Plant", typeof(string) },
+            { "ProCoSysGuid", typeof(Guid) },
+            { "ProjectName", typeof(string) },
+            { "TagNo", typeof(string) },
+            { "TagId", typeof(long) },
+            { "TagGuid", typeof(Guid) },
+            { "TagRegisterId", typeof(long) },
+            { "ChecklistId", typeof(long) },
+            { "TagCategory", typeof(string) },
+            { "SheetNo", typeof(string) },
+            { "SubSheetNo", typeof(string) },
+            { "FormularType", typeof(string) },
+            { "FormularGroup", typeof(string) },
+            { "FormPhase", typeof(string) },
+            { "SystemModule", typeof(string) },
+            { "FormularDiscipline", typeof(string) },
+            { "Revision", typeof(string) },
+            { "PipingRevisionMcPkNo", typeof(string) },
+            { "PipingRevisionMcPkGuid", typeof(Guid?) },
+            { "Responsible", typeof(string) },
+            { "Status", typeof(string) },
+            { "UpdatedAt", typeof(DateTime?) },
+            { "LastUpdated", typeof(DateTime) },
+            { "CreatedAt", typeof(DateTime) },
+            { "SignedAt", typeof(DateTime?) },
+            { "VerifiedAt", typeof(DateTime?) },
         };
         // Act
         var actualProperties = checklistEventInterfaceType.GetProperties()
@@ -59,6 +58,5 @@ public class CheckListEventTests
         {
             Assert.AreEqual(expectedProperty.Value, actualProperties[expectedProperty.Key]);
         }
-
     }
 }

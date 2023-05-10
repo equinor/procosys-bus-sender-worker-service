@@ -2,6 +2,7 @@
 #pragma warning disable CS8618
 public class SwcrTopic
 {
+    public const string TopicName = "swcr";
     public string SWCRNO { get; set; }
     public string SWCRId { get; set; }
     public string CommPkgNo { get; set; }
@@ -15,6 +16,4 @@ public class SwcrTopic
     public string EstimatedHours { get; set; }
     public string Node { get; set; }
     public bool IsVoided { get; set; }
-
-    public const string TopicName = "swcr";
 }

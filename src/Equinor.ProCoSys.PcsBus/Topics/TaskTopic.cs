@@ -2,6 +2,7 @@
 #pragma warning disable CS8618
 public class TaskTopic
 {
+    public const string TopicName = "task";
     public string Plant { get; set; }
     public string ProCoSysGuid { get; set; }
     public string TaskParentProCoSysGuid { get; set; }
@@ -13,6 +14,4 @@ public class TaskTopic
     public string LastUpdated { get; set; }
     public string SignedAt { get; set; }
     public string SignedBy { get; set; }
-
-    public const string TopicName = "task";
 }

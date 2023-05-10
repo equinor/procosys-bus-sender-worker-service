@@ -7,6 +7,18 @@ namespace Equinor.ProCoSys.BusSenderWorker.Core.Telemetry;
 
 public class ConsoleTelemetryClient : ITelemetryClient
 {
+    public void Flush()
+    {
+    }
+
+    public void TrackMetric(string name, double metric) =>
+        Console.WriteLine($"Metric:\t{name}:{Environment.NewLine}\t{metric}");
+
+    public void TrackMetric(string name, double metric, string dimension1Name, string dimension2Name,
+        string? dimension1Value, string dimension2Value) =>
+        Console.WriteLine(
+            $"Metric:\t{name}:{Environment.NewLine}\t{metric}{Environment.NewLine}\t{dimension1Name}: {dimension1Value}{Environment.NewLine}\t\t{dimension2Name}: {dimension2Value}");
+
     public void TrackEvent(string name, Dictionary<string, string> properties)
     {
         var builder = new StringBuilder();
@@ -24,16 +36,7 @@ public class ConsoleTelemetryClient : ITelemetryClient
         Console.WriteLine(builder.ToString());
     }
 
-    public void TrackMetric(string name, double metric) =>
-        Console.WriteLine($"Metric:\t{name}:{Environment.NewLine}\t{metric}");
-
     public void TrackMetric(string name, double metric, string dimension1Name, string dimension1Value) =>
-        Console.WriteLine($"Metric:\t{name}:{Environment.NewLine}\t{metric}{Environment.NewLine}\t{dimension1Name}: {dimension1Value}");
-
-    public void TrackMetric(string name, double metric, string dimension1Name, string dimension2Name, string? dimension1Value, string dimension2Value) =>
-        Console.WriteLine($"Metric:\t{name}:{Environment.NewLine}\t{metric}{Environment.NewLine}\t{dimension1Name}: {dimension1Value}{Environment.NewLine}\t\t{dimension2Name}: {dimension2Value}");
-
-    public void Flush()
-    {
-    }
+        Console.WriteLine(
+            $"Metric:\t{name}:{Environment.NewLine}\t{metric}{Environment.NewLine}\t{dimension1Name}: {dimension1Value}");
 }

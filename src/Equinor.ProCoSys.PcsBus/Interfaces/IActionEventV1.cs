@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 namespace Equinor.ProCoSys.PcsServiceBus.Interfaces;
 
 [UsedImplicitly]
-public interface IActionEventV1 :IHasEventType
+public interface IActionEventV1 : IHasEventType
 {
     string Plant { get; init; }
     Guid ProCoSysGuid { get; init; }

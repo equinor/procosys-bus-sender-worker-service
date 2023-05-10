@@ -2,6 +2,7 @@
 #pragma warning disable CS8618
 public class CommPkgOperationTopic
 {
+    public const string TopicName = "commpkgoperation";
     public string Plant { get; set; }
     public string ProjectName { get; set; }
     public string CommPkgNo { get; set; }
@@ -17,6 +18,4 @@ public class CommPkgOperationTopic
     public bool CommissioningResp { get; set; }
     public string ValveBlindingList { get; set; }
     public string LastUpdated { get; set; }
-
-    public const string TopicName = "commpkgoperation";
 }

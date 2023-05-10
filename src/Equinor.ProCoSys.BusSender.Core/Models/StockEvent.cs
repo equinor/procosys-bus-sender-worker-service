@@ -7,12 +7,11 @@ namespace Equinor.ProCoSys.BusSenderWorker.Core.Models;
 
 public class StockEvent : IStockEventV1
 {
+    public string EventType => PcsEventConstants.StockCreateOrUpdate;
+    public string Description { get; init; }
+    public DateTime LastUpdated { get; init; }
     public string Plant { get; init; }
     public Guid ProCoSysGuid { get; init; }
     public long StockId { get; init; }
     public string StockNo { get; init; }
-    public string Description { get; init; }
-    public DateTime LastUpdated { get; init; }
-    
-    public string EventType => PcsEventConstants.StockCreateOrUpdate;
 }

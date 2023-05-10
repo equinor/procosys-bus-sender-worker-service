@@ -16,12 +16,12 @@ public class ProjectEventVersioningTests
         var projectEventInterfaceType = typeof(IProjectEventV1);
         var expectedProperties = new Dictionary<string, Type>
         {
-            {"Plant", typeof(string)},
-            {"ProCoSysGuid", typeof(Guid)},
-            {"ProjectName", typeof(string)},
-            {"IsClosed", typeof(bool)},
-            {"Description", typeof(string)},
-            {"LastUpdated", typeof(DateTime)},
+            { "Plant", typeof(string) },
+            { "ProCoSysGuid", typeof(Guid) },
+            { "ProjectName", typeof(string) },
+            { "IsClosed", typeof(bool) },
+            { "Description", typeof(string) },
+            { "LastUpdated", typeof(DateTime) },
         };
 
         // Act

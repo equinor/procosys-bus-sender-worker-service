@@ -53,5 +53,4 @@ public class CommPkgEventTests
             Assert.AreEqual(expectedProperty.Value, actualProperties[expectedProperty.Key]);
         }
     }
-
 }

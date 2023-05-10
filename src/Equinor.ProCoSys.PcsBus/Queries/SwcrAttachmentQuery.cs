@@ -2,7 +2,7 @@
 
 public class SwcrAttachmentQuery
 {
-    public static string GetQuery(string swcrAttachmentGuid, string? plant= null)
+    public static string GetQuery(string swcrAttachmentGuid, string? plant = null)
     {
         DetectFaultyPlantInput(plant);
         var whereClause = CreateWhereClauseForGuid(swcrAttachmentGuid, plant, "a", "procosys_guid");

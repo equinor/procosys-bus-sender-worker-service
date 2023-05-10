@@ -4,6 +4,7 @@ namespace Equinor.ProCoSys.PcsServiceBus.Topics;
 #pragma warning disable CS8618
 public class TagTopic
 {
+    public const string TopicName = "tag";
     public string Plant { get; set; }
     public string ProCoSysGuid { get; set; }
     public string PlantName { get; set; }
@@ -34,5 +35,4 @@ public class TagTopic
     public string LastUpdated { get; set; }
     public bool IsVoided { get; set; }
     public string Behavior { get; set; }
-    public const string TopicName = "tag";
 }

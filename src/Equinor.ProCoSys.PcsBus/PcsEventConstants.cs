@@ -148,7 +148,7 @@ public static class PcsEventConstants
     ///     Event that is fired when a new loop tag is created or updated
     /// </summary>
     public const string LoopTagCreateOrUpdate = "loopTagCreatedOrUpdated";
-    
+
     /// <summary>
     ///     Event that is fired when a new query is created or updated
     /// </summary>
@@ -173,7 +173,7 @@ public static class PcsEventConstants
     ///    Event that is fired when a new swcr attachment is created or updated
     /// </summary>
     public const string SwcrAttachmentCreateOrUpdate = "swcrAttachmentCreatedOrUpdated";
-    
+
     /// <summary>
     ///    Event that is fired when a new swcr signature is created or updated
     /// </summary>
@@ -189,7 +189,7 @@ public static class PcsEventConstants
     /// </summary>
     public const string WorkOrderChecklistCreateOrUpdate = "workOrderChecklistCreatedOrUpdated";
 
-    
+
     /// <summary>
     ///    Event that is fired when a new workorder material is created or updated
     /// </summary>

@@ -4,6 +4,7 @@ namespace Equinor.ProCoSys.PcsServiceBus.Topics;
 #pragma warning disable CS8618
 public class ResponsibleTopic
 {
+    public const string TopicName = "responsible";
     public string Plant { get; set; }
     public Guid ProCoSysGuid { get; set; }
     public string Behavior { get; set; }
@@ -12,6 +13,4 @@ public class ResponsibleTopic
     public string Description { get; set; }
     public string Code { get; set; }
     public string CodeOld { get; set; }
-    
-    public const string TopicName = "responsible";
 }

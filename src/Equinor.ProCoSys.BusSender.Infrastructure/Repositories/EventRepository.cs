@@ -38,6 +38,7 @@ internal class EventRepository : IEventRepository
                 _logger.LogError("Object/Entity with id {ObjectId} did not return anything", objectId);
                 return default;
             }
+
             return events.Single();
         }
         finally

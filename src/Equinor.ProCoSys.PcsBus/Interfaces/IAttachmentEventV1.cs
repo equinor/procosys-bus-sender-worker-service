@@ -12,10 +12,9 @@ public interface IAttachmentEventV1 : IHasEventType
     string Plant { get; init; }
     Guid ProCoSysGuid { get; init; }
     Guid? SwcrGuid { get; init; }
-    string Title { get; init; }  
+    string Title { get; init; }
     string ClassificationCode { get; init; }
     string Uri { get; init; }
     string FileName { get; init; }
     DateTime LastUpdated { get; init; }
-    
 }

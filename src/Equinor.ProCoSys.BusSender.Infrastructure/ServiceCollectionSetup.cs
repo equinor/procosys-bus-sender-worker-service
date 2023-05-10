@@ -20,10 +20,7 @@ public static class ServiceCollectionSetup
     private const int MaxOpenCursors = 200;
 
     private static readonly LoggerFactory LoggerFactory =
-        new(new[]
-        {
-            new Microsoft.Extensions.Logging.Debug.DebugLoggerProvider()
-        });
+        new(new[] { new Microsoft.Extensions.Logging.Debug.DebugLoggerProvider() });
 
     public static IServiceCollection AddDbContext(this IServiceCollection services, string connectionString)
         => services.AddDbContext<BusSenderServiceContext>(options =>
@@ -41,6 +38,6 @@ public static class ServiceCollectionSetup
         => services.AddSingleton<IEntryPointService, EntryPointService>()
             .AddScoped<ITelemetryClient, ApplicationInsightsTelemetryClient>()
             .AddScoped<IBusSenderService, BusSenderService>()
-            .AddScoped<IBusEventService,BusEventService>()
-            .AddScoped<IEventRepository,EventRepository>();
+            .AddScoped<IBusEventService, BusEventService>()
+            .AddScoped<IEventRepository, EventRepository>();
 }

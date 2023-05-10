@@ -12,8 +12,8 @@ namespace Equinor.ProCoSys.BusSenderWorker.Infrastructure.Repositories;
 
 public class BusEventRepository : IBusEventRepository
 {
-    private readonly int _messageChunkSize;
     private readonly DbSet<BusEvent> _busEvents;
+    private readonly int _messageChunkSize;
 
     public BusEventRepository(BusSenderServiceContext context, IConfiguration configuration)
     {

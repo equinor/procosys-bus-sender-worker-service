@@ -10,5 +10,5 @@ public interface ISwcrOtherReferenceEventV1 : IHasEventType
     Guid SwcrGuid { get; init; }
     string Code { get; init; }
     string? Description { get; init; }
-    DateTime LastUpdated { get; init; } 
+    DateTime LastUpdated { get; init; }
 }

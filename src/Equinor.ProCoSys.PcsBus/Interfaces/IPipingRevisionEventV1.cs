@@ -24,4 +24,3 @@ public interface IPipingRevisionEventV1 : IHasEventType
     Guid? CallOffGuid { get; init; }
     DateTime LastUpdated { get; init; }
 }
-

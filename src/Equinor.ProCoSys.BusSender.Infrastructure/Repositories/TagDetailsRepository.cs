@@ -27,11 +27,12 @@ public class TagDetailsRepository : ITagDetailsRepository
         {
             await _context.Database.OpenConnectionAsync();
         }
+
         try
         {
             await using var command = _context.Database.GetDbConnection().CreateCommand();
             command.CommandText = GetTagDetailsQuery(tagId);
-            
+
             await using var result = await command.ExecuteReaderAsync();
 
             if (!result.HasRows)

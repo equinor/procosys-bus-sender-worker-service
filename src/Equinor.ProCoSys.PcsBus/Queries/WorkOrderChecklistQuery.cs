@@ -2,6 +2,26 @@
 
 public class WorkOrderChecklistQuery
 {
+    private static string CreateWhereClause(long? tagCheckId, long? woId, string? plant)
+    {
+        var whereClause = "";
+        if (tagCheckId != null && woId != null && plant != null)
+        {
+            whereClause =
+                $"where wotc.projectschema = '{plant}' and wotc.wo_id = {woId} and wotc.tagcheck_id = {tagCheckId}";
+        }
+        else if (plant != null)
+        {
+            whereClause = $"where wotc.projectschema = '{plant}'";
+        }
+        else if (tagCheckId != null && woId != null)
+        {
+            whereClause = $"where wotc.wo_id = {woId} and wotc.tagcheck_id = {tagCheckId}";
+        }
+
+        return whereClause;
+    }
+
     public static string GetQuery(long? tagCheckId, long? woId, string? plant = null)
     {
         DetectFaultyPlantInput(plant);
@@ -22,23 +42,5 @@ public class WorkOrderChecklistQuery
             join tagcheck tc on tc.tagcheck_id = wotc.tagcheck_id
             join project p ON p.project_id = wo.project_id
         {whereClause}";
-    }
-
-    private static string CreateWhereClause(long? tagCheckId, long? woId, string? plant)
-    {
-        var whereClause = "";
-        if (tagCheckId != null && woId != null && plant != null)
-        {
-            whereClause = $"where wotc.projectschema = '{plant}' and wotc.wo_id = {woId} and wotc.tagcheck_id = {tagCheckId}";
-        }
-        else if (plant != null)
-        {
-            whereClause = $"where wotc.projectschema = '{plant}'";
-        }
-        else if (tagCheckId != null && woId != null)
-        {
-            whereClause = $"where wotc.wo_id = {woId} and wotc.tagcheck_id = {tagCheckId}";
-        }
-        return whereClause;
     }
 }

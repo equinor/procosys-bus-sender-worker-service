@@ -2,6 +2,7 @@
 #pragma warning disable CS8618
 public class WoMaterialTopic
 {
+    public const string TopicName = "womaterial";
     public string Plant { get; set; }
     public string ProjectName { get; set; }
     public string WoNo { get; set; }
@@ -21,6 +22,4 @@ public class WoMaterialTopic
     public string MaterialStatus { get; set; }
     public string StockLocation { get; set; }
     public string LastUpdated { get; set; }
-
-    public const string TopicName = "womaterial";
 }

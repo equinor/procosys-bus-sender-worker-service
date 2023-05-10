@@ -1,5 +1,7 @@
 ﻿// ReSharper disable StringLiteralTypo
+
 namespace Equinor.ProCoSys.PcsServiceBus.Queries;
+
 public class LibraryQuery
 {
     public static string GetQuery(long? libraryId, string? plant = null)

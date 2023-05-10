@@ -16,16 +16,16 @@ public class CommPkgQueryEventTests
         var commPkgQueryEventInterfaceType = typeof(ICommPkgQueryEventV1);
         var expectedProperties = new Dictionary<string, Type>
         {
-            {"Plant", typeof(string)},
-            {"ProCoSysGuid", typeof(Guid)},
-            {"ProjectName", typeof(string)},
-            {"CommPkgId", typeof(long)},
-            {"CommPkgGuid", typeof(Guid)},
-            {"CommPkgNo", typeof(string)},
-            {"DocumentId", typeof(long)},
-            {"QueryNo", typeof(string)},
-            {"QueryGuid", typeof(Guid)},
-            {"LastUpdated", typeof(DateTime)},
+            { "Plant", typeof(string) },
+            { "ProCoSysGuid", typeof(Guid) },
+            { "ProjectName", typeof(string) },
+            { "CommPkgId", typeof(long) },
+            { "CommPkgGuid", typeof(Guid) },
+            { "CommPkgNo", typeof(string) },
+            { "DocumentId", typeof(long) },
+            { "QueryNo", typeof(string) },
+            { "QueryGuid", typeof(Guid) },
+            { "LastUpdated", typeof(DateTime) },
         };
 
 

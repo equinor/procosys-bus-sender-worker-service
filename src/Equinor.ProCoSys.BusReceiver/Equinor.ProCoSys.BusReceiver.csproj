@@ -11,15 +11,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Azure.WebJobs.Extensions" Version="4.0.1" />
-    <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.Storage" Version="5.1.1" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.AzureAppConfiguration" Version="6.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
-    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.18.1" />
-    <PackageReference Include="System.Text.Encodings.Web" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Azure.WebJobs.Extensions" Version="4.0.1"/>
+    <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.Storage" Version="5.1.1"/>
+    <PackageReference Include="Microsoft.Extensions.Configuration.AzureAppConfiguration" Version="6.0.0"/>
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1"/>
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.18.1"/>
+    <PackageReference Include="System.Text.Encodings.Web" Version="6.0.0"/>
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Equinor.ProCoSys.PcsBus\Equinor.ProCoSys.PcsServiceBus.csproj" />
+    <ProjectReference Include="..\Equinor.ProCoSys.PcsBus\Equinor.ProCoSys.PcsServiceBus.csproj"/>
   </ItemGroup>
 </Project>

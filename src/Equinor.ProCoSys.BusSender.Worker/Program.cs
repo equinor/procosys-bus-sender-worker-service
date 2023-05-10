@@ -15,17 +15,10 @@ namespace Equinor.ProCoSys.BusSender.Worker;
 
 public class Program
 {
-    public IConfiguration Configuration { get; }
-
     public Program(IConfiguration configuration)
         => Configuration = configuration;
 
-    public static async Task Main(string[] args)
-    {
-        using var host = CreateHostBuilder(args).Build();
-        ILogger? logger = host.Services.GetService<ILogger<Program>>();
-        await host.RunAsync();
-    }
+    public IConfiguration Configuration { get; }
 
     public static IHostBuilder CreateHostBuilder(string[] args)
     {
@@ -41,7 +34,7 @@ public class Program
                     config.AddAzureAppConfiguration(options =>
                     {
                         var connectionString = settings["ConnectionStrings:AppConfig"];
-                        
+
                         options.Connect(connectionString)
                             .ConfigureKeyVault(kv =>
                             {
@@ -102,10 +95,9 @@ public class Program
         {
             logging.ClearProviders();
             logging.AddConsole();
-        
+
             logging.AddApplicationInsightsWebJobs(c
                 => c.ConnectionString = context.Configuration["ApplicationInsights:ConnectionString"]);
-            
         });
 
         builder.UseContentRoot(Directory.GetCurrentDirectory())
@@ -113,12 +105,13 @@ public class Program
             {
                 if (hostContext.Configuration["IsLocal"] == "True")
                 {
-                    var localConnectionString = hostContext.Configuration["ProcosysDb"]; 
+                    var localConnectionString = hostContext.Configuration["ProcosysDb"];
                     services.AddDbContext(localConnectionString);
                 }
                 else
                 {
-                    var rep = new BlobRepository(hostContext.Configuration["BlobStorage:ConnectionString"], hostContext.Configuration["BlobStorage:ContainerName"]);
+                    var rep = new BlobRepository(hostContext.Configuration["BlobStorage:ConnectionString"],
+                        hostContext.Configuration["BlobStorage:ContainerName"]);
                     var walletPath = hostContext.Configuration["WalletFileDir"];
                     Directory.CreateDirectory(walletPath);
                     rep.Download(hostContext.Configuration["BlobStorage:WalletFileName"], walletPath + "\\cwallet.sso");
@@ -128,7 +121,7 @@ public class Program
                     services.AddApplicationInsightsTelemetryWorkerService(o =>
                         o.ConnectionString = hostContext.Configuration["ApplicationInsights:ConnectionString"]);
                 }
-                
+
                 services.AddTopicClients(
                     hostContext.Configuration["ServiceBusConnectionString"],
                     hostContext.Configuration["TopicNames"]);
@@ -138,5 +131,12 @@ public class Program
             });
 
         return builder;
+    }
+
+    public static async Task Main(string[] args)
+    {
+        using var host = CreateHostBuilder(args).Build();
+        ILogger? logger = host.Services.GetService<ILogger<Program>>();
+        await host.RunAsync();
     }
 }

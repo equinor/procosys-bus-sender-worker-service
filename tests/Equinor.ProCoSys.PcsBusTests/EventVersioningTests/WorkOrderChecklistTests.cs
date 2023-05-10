@@ -16,15 +16,15 @@ public class WorkOrderChecklistEventTests
         var workOrderChecklistEventInterfaceType = typeof(IWorkOrderChecklistEventV1);
         var expectedProperties = new Dictionary<string, Type>
         {
-            {"Plant", typeof(string)},
-            {"ProCoSysGuid", typeof(Guid)},
-            {"ProjectName", typeof(string)},
-            {"ChecklistId", typeof(long)},
-            {"ChecklistGuid", typeof(Guid)},
-            {"WoId", typeof(long)},
-            {"WoGuid", typeof(Guid)},
-            {"WoNo", typeof(string)},
-            {"LastUpdated", typeof(DateTime)},
+            { "Plant", typeof(string) },
+            { "ProCoSysGuid", typeof(Guid) },
+            { "ProjectName", typeof(string) },
+            { "ChecklistId", typeof(long) },
+            { "ChecklistGuid", typeof(Guid) },
+            { "WoId", typeof(long) },
+            { "WoGuid", typeof(Guid) },
+            { "WoNo", typeof(string) },
+            { "LastUpdated", typeof(DateTime) },
         };
 
         // Act

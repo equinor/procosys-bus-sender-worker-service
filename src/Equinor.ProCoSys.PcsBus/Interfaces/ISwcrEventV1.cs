@@ -1,4 +1,5 @@
 ﻿using System;
+
 namespace Equinor.ProCoSys.PcsServiceBus.Interfaces;
 
 public interface ISwcrEventV1 : IHasEventType

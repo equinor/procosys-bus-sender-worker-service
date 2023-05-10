@@ -2,7 +2,7 @@
 
 public class TaskQuery
 {
-    public static string GetQuery(long? taskId, string? plant= null)
+    public static string GetQuery(long? taskId, string? plant = null)
     {
         DetectFaultyPlantInput(plant);
         var whereClause = CreateWhereClause(taskId, plant, "ec", "element_id");

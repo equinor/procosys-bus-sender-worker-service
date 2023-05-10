@@ -2,6 +2,7 @@
 #pragma warning disable CS8618
 public class PipingRevisionTopic
 {
+    public const string TopicName = "piperevision";
     public string Plant { get; set; }
     public string ProjectName { get; set; }
     public string McPkgNo { get; set; }
@@ -15,6 +16,4 @@ public class PipingRevisionTopic
     public string PurchaseOrderNo { get; set; }
     public string CallOffNo { get; set; }
     public string LastUpdated { get; set; }
-
-    public const string TopicName = "piperevision";
 }

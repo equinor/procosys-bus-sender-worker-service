@@ -16,14 +16,14 @@ public class AttachmentEventTests
         var attachmentEventInterfaceType = typeof(IAttachmentEventV1);
         var expectedProperties = new Dictionary<string, Type>
         {
-            {"Plant", typeof(string)},
-            {"ProCoSysGuid", typeof(Guid)},
-            {"SwcrGuid", typeof(Guid?)},
-            {"Title", typeof(string)},
-            {"ClassificationCode", typeof(string)},
-            {"Uri", typeof(string)},
-            {"FileName", typeof(string)},
-            {"LastUpdated", typeof(DateTime)},
+            { "Plant", typeof(string) },
+            { "ProCoSysGuid", typeof(Guid) },
+            { "SwcrGuid", typeof(Guid?) },
+            { "Title", typeof(string) },
+            { "ClassificationCode", typeof(string) },
+            { "Uri", typeof(string) },
+            { "FileName", typeof(string) },
+            { "LastUpdated", typeof(DateTime) },
         };
 
         // Act
@@ -36,6 +36,5 @@ public class AttachmentEventTests
         {
             Assert.AreEqual(expectedProperty.Value, actualProperties[expectedProperty.Key]);
         }
-           
     }
 }

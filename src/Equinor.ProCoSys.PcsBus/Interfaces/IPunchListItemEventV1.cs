@@ -3,7 +3,6 @@ using JetBrains.Annotations;
 
 namespace Equinor.ProCoSys.PcsServiceBus.Interfaces;
 
-
 [UsedImplicitly]
 public interface IPunchListItemEventV1 : IHasEventType
 {

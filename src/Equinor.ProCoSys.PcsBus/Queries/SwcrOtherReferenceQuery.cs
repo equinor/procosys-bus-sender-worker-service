@@ -2,7 +2,7 @@
 
 public class SwcrOtherReferenceQuery
 {
-    public static string GetQuery(string swcrOtherReferencesGuid, string? plant= null)
+    public static string GetQuery(string swcrOtherReferencesGuid, string? plant = null)
     {
         DetectFaultyPlantInput(plant);
         var whereClause = CreateWhereClauseForGuid(swcrOtherReferencesGuid, plant, "slr", "procosys_guid");

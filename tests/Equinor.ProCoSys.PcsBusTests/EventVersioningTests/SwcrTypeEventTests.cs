@@ -16,12 +16,12 @@ public class SwcrTypeEventTests
         var swcrTypeEventInterfaceType = typeof(ISwcrTypeEventV1);
         var expectedProperties = new Dictionary<string, Type>
         {
-            {"Plant", typeof(string)},
-            {"ProCoSysGuid", typeof(Guid)},
-            {"LibraryGuid", typeof(Guid)},
-            {"SwcrGuid", typeof(Guid)},
-            {"Code", typeof(string)},
-            {"LastUpdated", typeof(DateTime)},
+            { "Plant", typeof(string) },
+            { "ProCoSysGuid", typeof(Guid) },
+            { "LibraryGuid", typeof(Guid) },
+            { "SwcrGuid", typeof(Guid) },
+            { "Code", typeof(string) },
+            { "LastUpdated", typeof(DateTime) },
         };
 
         // Act

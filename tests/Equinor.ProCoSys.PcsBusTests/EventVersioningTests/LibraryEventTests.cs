@@ -16,16 +16,16 @@ public class LibraryEventVersioningTests
         var libraryEventInterfaceType = typeof(ILibraryEventV1);
         var expectedProperties = new Dictionary<string, Type>
         {
-            {"Plant", typeof(string)},
-            {"ProCoSysGuid", typeof(Guid)},
-            {"LibraryId", typeof(long)},
-            {"ParentId", typeof(int?)},
-            {"ParentGuid", typeof(Guid?)},
-            {"Code", typeof(string)},
-            {"Description", typeof(string)},
-            {"IsVoided", typeof(bool)},
-            {"Type", typeof(string)},
-            {"LastUpdated", typeof(DateTime)},
+            { "Plant", typeof(string) },
+            { "ProCoSysGuid", typeof(Guid) },
+            { "LibraryId", typeof(long) },
+            { "ParentId", typeof(int?) },
+            { "ParentGuid", typeof(Guid?) },
+            { "Code", typeof(string) },
+            { "Description", typeof(string) },
+            { "IsVoided", typeof(bool) },
+            { "Type", typeof(string) },
+            { "LastUpdated", typeof(DateTime) },
         };
 
         // Act

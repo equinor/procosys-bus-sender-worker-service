@@ -16,16 +16,16 @@ public class ResponsibleEventTests
         var responsibleEventInterfaceType = typeof(IResponsibleEventV1);
         var expectedProperties = new Dictionary<string, Type>
         {
-            {"Plant", typeof(string)},
-            {"ProCoSysGuid", typeof(Guid)},
-            {"ResponsibleId", typeof(long)},
-            {"Code", typeof(string)},
-            {"ResponsibleGroup", typeof(string)},
-            {"Description", typeof(string)},
-            {"IsVoided", typeof(bool)},
-            {"LastUpdated", typeof(DateTime)},
+            { "Plant", typeof(string) },
+            { "ProCoSysGuid", typeof(Guid) },
+            { "ResponsibleId", typeof(long) },
+            { "Code", typeof(string) },
+            { "ResponsibleGroup", typeof(string) },
+            { "Description", typeof(string) },
+            { "IsVoided", typeof(bool) },
+            { "LastUpdated", typeof(DateTime) },
         };
-        
+
         // Act
         var actualProperties = responsibleEventInterfaceType.GetProperties()
             .ToDictionary(p => p.Name, p => p.PropertyType);

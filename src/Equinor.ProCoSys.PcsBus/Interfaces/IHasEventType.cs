@@ -2,5 +2,5 @@
 
 public interface IHasEventType
 {
-    public string EventType { get; } 
+    public string EventType { get; }
 }

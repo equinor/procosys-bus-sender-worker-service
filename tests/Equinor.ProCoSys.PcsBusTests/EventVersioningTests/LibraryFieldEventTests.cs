@@ -16,20 +16,20 @@ public class LibraryFieldEventVersioningTests
         var libraryFieldEventInterfaceType = typeof(ILibraryFieldEventV1);
         var expectedProperties = new Dictionary<string, Type>
         {
-            {"Plant", typeof(string)},
-            {"ProCoSysGuid", typeof(Guid)},
-            {"LibraryGuid", typeof(Guid)},
-            {"LibraryType", typeof(string)},
-            {"Code", typeof(string)},
-            {"ColumnName", typeof(string)},
-            {"ColumnType", typeof(string)},
-            {"StringValue", typeof(string)},
-            {"DateValue", typeof(DateOnly?)},
-            {"NumberValue", typeof(double?)},
-            {"LibraryValueGuid", typeof(Guid?)},
-            {"LastUpdated", typeof(DateTime)},
+            { "Plant", typeof(string) },
+            { "ProCoSysGuid", typeof(Guid) },
+            { "LibraryGuid", typeof(Guid) },
+            { "LibraryType", typeof(string) },
+            { "Code", typeof(string) },
+            { "ColumnName", typeof(string) },
+            { "ColumnType", typeof(string) },
+            { "StringValue", typeof(string) },
+            { "DateValue", typeof(DateOnly?) },
+            { "NumberValue", typeof(double?) },
+            { "LibraryValueGuid", typeof(Guid?) },
+            { "LastUpdated", typeof(DateTime) },
         };
-        
+
         // Act
         var actualProperties = libraryFieldEventInterfaceType.GetProperties()
             .ToDictionary(p => p.Name, p => p.PropertyType);

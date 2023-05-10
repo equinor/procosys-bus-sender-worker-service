@@ -5,6 +5,7 @@ namespace Equinor.ProCoSys.PcsServiceBus.Topics;
 #pragma warning disable CS8618
 public class CommPkgTopic
 {
+    public const string TopicName = "commpkg";
     public string Plant { get; set; }
     public Guid ProCoSysGuid { get; set; }
     public string Behavior { get; set; }
@@ -30,5 +31,4 @@ public class CommPkgTopic
     public string Priority3 { get; set; }
     public List<string> ProjectNames { get; set; }
     public string LastUpdated { get; set; }
-    public const string TopicName = "commpkg";
 }

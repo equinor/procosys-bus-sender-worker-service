@@ -7,7 +7,7 @@ public interface IDocumentEventV1 : IHasEventType
     string Plant { get; init; }
     Guid ProCoSysGuid { get; init; }
     string ProjectName { get; init; }
-    long DocumentId { get; init; }   
+    long DocumentId { get; init; }
     string DocumentNo { get; init; }
     string? Title { get; init; }
     string? AcceptanceCode { get; init; }

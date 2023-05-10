@@ -32,6 +32,6 @@ public interface ITagEventV1 : IHasEventType
     Guid? MountedOnGuid { get; init; }
     bool IsVoided { get; init; }
     DateTime LastUpdated { get; init; }
-    
+
     string? TagDetails { get; set; }
 }

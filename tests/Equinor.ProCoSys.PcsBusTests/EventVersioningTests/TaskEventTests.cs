@@ -16,19 +16,19 @@ namespace Equinor.ProCoSys.PcsServiceBusTests.EventVersioningTests
             var taskEventInterfaceType = typeof(ITaskEventV1);
             var expectedProperties = new Dictionary<string, Type>
             {
-                {"Plant", typeof(string)},
-                {"ProCoSysGuid", typeof(Guid)},
-                {"TaskParentProCoSysGuid", typeof(Guid?)},
-                {"ProjectName", typeof(string)},
-                {"DocumentId", typeof(int)},
-                {"Title", typeof(string)},
-                {"TaskId", typeof(string)},
-                {"ElementContentGuid", typeof(Guid)},
-                {"Description", typeof(string)},
-                {"Comments", typeof(string)},
-                {"LastUpdated", typeof(DateTime)},
-                {"SignedAt", typeof(DateTime?)},
-                {"SignedBy", typeof(Guid?)},
+                { "Plant", typeof(string) },
+                { "ProCoSysGuid", typeof(Guid) },
+                { "TaskParentProCoSysGuid", typeof(Guid?) },
+                { "ProjectName", typeof(string) },
+                { "DocumentId", typeof(int) },
+                { "Title", typeof(string) },
+                { "TaskId", typeof(string) },
+                { "ElementContentGuid", typeof(Guid) },
+                { "Description", typeof(string) },
+                { "Comments", typeof(string) },
+                { "LastUpdated", typeof(DateTime) },
+                { "SignedAt", typeof(DateTime?) },
+                { "SignedBy", typeof(Guid?) },
             };
 
             // Act

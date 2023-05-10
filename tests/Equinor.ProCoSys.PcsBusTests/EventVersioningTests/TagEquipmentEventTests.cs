@@ -16,20 +16,20 @@ public class TagEquipmentEventTests
         var tagEquipmentEventInterfaceType = typeof(ITagEquipmentEventV1);
         var expectedProperties = new Dictionary<string, Type>
         {
-            {"Plant", typeof(string)},
-            {"ProCoSysGuid", typeof(Guid)},
-            {"ManufacturerName", typeof(string)},
-            {"ModelNo", typeof(string)},
-            {"VariantNo", typeof(string)},
-            {"EqHubId", typeof(string)},
-            {"SemiId", typeof(string)},
-            {"ModelName", typeof(string)},
-            {"ModelSubName", typeof(string)},
-            {"ModelSubSubName", typeof(string)},
-            {"TagGuid", typeof(Guid)},
-            {"TagNo", typeof(string)},
-            {"ProjectName", typeof(string)},
-            {"LastUpdated", typeof(DateTime)}
+            { "Plant", typeof(string) },
+            { "ProCoSysGuid", typeof(Guid) },
+            { "ManufacturerName", typeof(string) },
+            { "ModelNo", typeof(string) },
+            { "VariantNo", typeof(string) },
+            { "EqHubId", typeof(string) },
+            { "SemiId", typeof(string) },
+            { "ModelName", typeof(string) },
+            { "ModelSubName", typeof(string) },
+            { "ModelSubSubName", typeof(string) },
+            { "TagGuid", typeof(Guid) },
+            { "TagNo", typeof(string) },
+            { "ProjectName", typeof(string) },
+            { "LastUpdated", typeof(DateTime) }
         };
 
         // Act

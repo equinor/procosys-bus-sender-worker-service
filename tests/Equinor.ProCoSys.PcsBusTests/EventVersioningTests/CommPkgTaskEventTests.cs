@@ -16,13 +16,13 @@ public class CommPkgTaskEventTests
         var commPkgTaskEventInterfaceType = typeof(ICommPkgTaskEventV1);
         var expectedProperties = new Dictionary<string, Type>
         {
-            {"Plant", typeof(string)},
-            {"ProjectName", typeof(string)},
-            {"ProCoSysGuid", typeof(Guid)},
-            {"TaskGuid", typeof(Guid)},
-            {"CommPkgGuid", typeof(Guid)},
-            {"CommPkgNo", typeof(string)},
-            {"LastUpdated", typeof(DateTime)},
+            { "Plant", typeof(string) },
+            { "ProjectName", typeof(string) },
+            { "ProCoSysGuid", typeof(Guid) },
+            { "TaskGuid", typeof(Guid) },
+            { "CommPkgGuid", typeof(Guid) },
+            { "CommPkgNo", typeof(string) },
+            { "LastUpdated", typeof(DateTime) },
         };
 
         // Act

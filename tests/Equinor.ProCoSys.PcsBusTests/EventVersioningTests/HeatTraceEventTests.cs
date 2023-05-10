@@ -16,17 +16,17 @@ public class HeatTraceEventTests
         var heatTraceEventInterfaceType = typeof(IHeatTraceEventV1);
         var expectedProperties = new Dictionary<string, Type>
         {
-            {"Plant", typeof(string)},
-            {"ProCoSysGuid", typeof(Guid)},
-            {"HeatTraceId", typeof(long)},
-            {"CableId", typeof(long)},
-            {"CableGuid", typeof(Guid)},
-            {"CableNo", typeof(string)},
-            {"TagId", typeof(long)},
-            {"TagGuid", typeof(Guid)},
-            {"TagNo", typeof(string)},
-            {"SpoolNo", typeof(string)},
-            {"LastUpdated", typeof(DateTime)},
+            { "Plant", typeof(string) },
+            { "ProCoSysGuid", typeof(Guid) },
+            { "HeatTraceId", typeof(long) },
+            { "CableId", typeof(long) },
+            { "CableGuid", typeof(Guid) },
+            { "CableNo", typeof(string) },
+            { "TagId", typeof(long) },
+            { "TagGuid", typeof(Guid) },
+            { "TagNo", typeof(string) },
+            { "SpoolNo", typeof(string) },
+            { "LastUpdated", typeof(DateTime) },
         };
 
         // Act
@@ -40,5 +40,4 @@ public class HeatTraceEventTests
             Assert.AreEqual(expectedProperty.Value, actualProperties[expectedProperty.Key]);
         }
     }
-    
 }

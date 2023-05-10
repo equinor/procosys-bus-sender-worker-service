@@ -16,12 +16,12 @@ public class StockEventTests
         var stockEventInterfaceType = typeof(IStockEventV1);
         var expectedProperties = new Dictionary<string, Type>
         {
-            {"Plant", typeof(string)},
-            {"ProCoSysGuid", typeof(Guid)},
-            {"StockId", typeof(long)},
-            {"StockNo", typeof(string)},
-            {"Description", typeof(string)},
-            {"LastUpdated", typeof(DateTime)},
+            { "Plant", typeof(string) },
+            { "ProCoSysGuid", typeof(Guid) },
+            { "StockId", typeof(long) },
+            { "StockNo", typeof(string) },
+            { "Description", typeof(string) },
+            { "LastUpdated", typeof(DateTime) },
         };
 
         // Act

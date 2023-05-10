@@ -2,7 +2,7 @@
 
 public static class PipingRevisionQuery
 {
-    public static string GetQuery(long? pipeRevId,string? plant = null)
+    public static string GetQuery(long? pipeRevId, string? plant = null)
     {
         DetectFaultyPlantInput(plant);
         var whereClause = CreateWhereClause(pipeRevId, plant, "pr", "pipingrevision_id");

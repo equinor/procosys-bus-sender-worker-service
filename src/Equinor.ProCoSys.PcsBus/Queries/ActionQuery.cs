@@ -1,4 +1,5 @@
 ﻿// ReSharper disable StringLiteralTypo
+
 using System.Diagnostics.CodeAnalysis;
 
 namespace Equinor.ProCoSys.PcsServiceBus.Queries;

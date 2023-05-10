@@ -16,13 +16,13 @@ public class SwcrOtherReferenceEventTests
         var swcrOtherReferenceEventInterfaceType = typeof(ISwcrOtherReferenceEventV1);
         var expectedProperties = new Dictionary<string, Type>
         {
-            {"Plant", typeof(string)},
-            {"ProCoSysGuid", typeof(Guid)},
-            {"LibraryGuid", typeof(Guid)},
-            {"SwcrGuid", typeof(Guid)},
-            {"Code", typeof(string)},
-            {"Description", typeof(string)},
-            {"LastUpdated", typeof(DateTime)},
+            { "Plant", typeof(string) },
+            { "ProCoSysGuid", typeof(Guid) },
+            { "LibraryGuid", typeof(Guid) },
+            { "SwcrGuid", typeof(Guid) },
+            { "Code", typeof(string) },
+            { "Description", typeof(string) },
+            { "LastUpdated", typeof(DateTime) },
         };
 
         // Act

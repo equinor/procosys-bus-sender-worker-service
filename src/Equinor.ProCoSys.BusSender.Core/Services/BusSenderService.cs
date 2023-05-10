@@ -19,13 +19,13 @@ namespace Equinor.ProCoSys.BusSenderWorker.Core.Services;
 
 public class BusSenderService : IBusSenderService
 {
-    private readonly IPcsBusSender _pcsBusSender;
     private readonly IBusEventRepository _busEventRepository;
-    private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<BusSenderService> _logger;
-    private readonly ITelemetryClient _telemetryClient;
+    private readonly IPcsBusSender _pcsBusSender;
     private readonly IBusEventService _service;
     private readonly Stopwatch _sw;
+    private readonly ITelemetryClient _telemetryClient;
+    private readonly IUnitOfWork _unitOfWork;
 
     public BusSenderService(IPcsBusSender pcsBusSender,
         IBusEventRepository busEventRepository,
@@ -41,6 +41,12 @@ public class BusSenderService : IBusSenderService
         _telemetryClient = telemetryClient;
         _service = service;
         _sw = new Stopwatch();
+    }
+
+    public async Task CloseConnections()
+    {
+        _logger.LogInformation("BusSenderService stop reader and close all connections");
+        await _pcsBusSender.CloseAllAsync();
     }
 
     public async Task HandleBusEvents()
@@ -68,43 +74,6 @@ public class BusSenderService : IBusSenderService
 
         _logger.LogDebug("BusSenderService DoWorkerJob finished");
         _telemetryClient.Flush();
-    }
-
-    public async Task CloseConnections()
-    {
-        _logger.LogInformation("BusSenderService stop reader and close all connections");
-        await _pcsBusSender.CloseAllAsync();
-    }
-
-    private async Task ProcessBusEvents(List<BusEvent> events)
-    {
-        events = SetDuplicatesToSkipped(events);
-        var dsw = Stopwatch.StartNew();
-
-        var unProcessedEvents = events.Where(busEvent => busEvent.Status == Status.UnProcessed).ToList();
-        _logger.LogInformation("Amount of messages to process: {Count} ", unProcessedEvents.Count);
-
-        foreach (var simpleUnprocessedBusEvent in unProcessedEvents.Where(e => IsSimpleMessage(e) || e.Event == TagTopic.TopicName))
-        {
-            await UpdateEventBasedOnTopic(simpleUnprocessedBusEvent);
-        }
-
-        _logger.LogInformation("Update loop finished at at {Sw} ms", dsw.ElapsedMilliseconds);
-        await _unitOfWork.SaveChangesAsync();
-
-
-        /***
-         * Group by topic and then create a queue of messages per topic
-         */
-        var topicQueues = events.Where(busEvent => busEvent.Status == Status.UnProcessed)
-            .GroupBy(e => BusEventToTopicMapper.Map(e.Event)).Select(group =>
-            {
-                Queue<BusEvent> messages = new();
-                group.ToList().ForEach(be => messages.Enqueue(be));
-                return (group.Key, messages);
-            }).ToList();
-
-        await BatchAndSendPerTopic(topicQueues);
     }
 
     private async Task BatchAndSendPerTopic(List<(string Key, Queue<BusEvent> messages)> eventGroups)
@@ -154,22 +123,19 @@ public class BusSenderService : IBusSenderService
         }
     }
 
-    private static List<BusEvent> SetDuplicatesToSkipped(List<BusEvent> events)
+    /***
+     * Takes a function to create a message, caller needs to make sure that event has the correct topic for the function.
+     */
+    private static async Task CreateAndSetMessage(BusEvent busEvent, Func<string, Task<string?>> createMessageFunction)
     {
-        var duplicateGroupings = FilterOnSimpleMessagesAndGroupDuplicates(events);
-        foreach (var group in duplicateGroupings)
+        var message = await createMessageFunction(busEvent.Message);
+        if (message == null)
         {
-            SetAllButOneEventToSkipped(group);
+            busEvent.Status = Status.NotFound;
         }
-
-        return events;
-    }
-
-    private static void SetAllButOneEventToSkipped(IEnumerable<BusEvent> group)
-    {
-        foreach (var busEvent in group.SkipLast(1))
+        else
         {
-            busEvent.Status = Status.Skipped;
+            busEvent.MessageToSend = message;
         }
     }
 
@@ -190,6 +156,56 @@ public class BusSenderService : IBusSenderService
            || Guid.TryParse(busEvent.Message, out _)
            || BusEventService.CanGetTwoIdsFromMessage(busEvent.Message.Split(","), out _, out _);
 
+    private async Task ProcessBusEvents(List<BusEvent> events)
+    {
+        events = SetDuplicatesToSkipped(events);
+        var dsw = Stopwatch.StartNew();
+
+        var unProcessedEvents = events.Where(busEvent => busEvent.Status == Status.UnProcessed).ToList();
+        _logger.LogInformation("Amount of messages to process: {Count} ", unProcessedEvents.Count);
+
+        foreach (var simpleUnprocessedBusEvent in unProcessedEvents.Where(e =>
+                     IsSimpleMessage(e) || e.Event == TagTopic.TopicName))
+        {
+            await UpdateEventBasedOnTopic(simpleUnprocessedBusEvent);
+        }
+
+        _logger.LogInformation("Update loop finished at at {Sw} ms", dsw.ElapsedMilliseconds);
+        await _unitOfWork.SaveChangesAsync();
+
+
+        /***
+         * Group by topic and then create a queue of messages per topic
+         */
+        var topicQueues = events.Where(busEvent => busEvent.Status == Status.UnProcessed)
+            .GroupBy(e => BusEventToTopicMapper.Map(e.Event)).Select(group =>
+            {
+                Queue<BusEvent> messages = new();
+                group.ToList().ForEach(be => messages.Enqueue(be));
+                return (group.Key, messages);
+            }).ToList();
+
+        await BatchAndSendPerTopic(topicQueues);
+    }
+
+    private static void SetAllButOneEventToSkipped(IEnumerable<BusEvent> group)
+    {
+        foreach (var busEvent in group.SkipLast(1))
+        {
+            busEvent.Status = Status.Skipped;
+        }
+    }
+
+    private static List<BusEvent> SetDuplicatesToSkipped(List<BusEvent> events)
+    {
+        var duplicateGroupings = FilterOnSimpleMessagesAndGroupDuplicates(events);
+        foreach (var group in duplicateGroupings)
+        {
+            SetAllButOneEventToSkipped(group);
+        }
+
+        return events;
+    }
 
     private void TrackMessage(BusEvent busEvent)
     {
@@ -203,6 +219,13 @@ public class BusSenderService : IBusSenderService
 
         TrackMetric(message);
     }
+
+    private void TrackMetric(BusEventMessage? message) =>
+        _telemetryClient.TrackMetric("BusSender Topic",
+            1, "Plant",
+            "ProjectName",
+            message?.Plant?[4..],
+            message?.ProjectName?.Replace('$', '_') ?? "NoProject");
 
     private async Task UpdateEventBasedOnTopic(BusEvent busEvent)
     {
@@ -365,27 +388,4 @@ public class BusSenderService : IBusSenderService
         _logger.LogDebug("Update for  {Event} took {Ms} ms", busEvent.Event, sw.ElapsedMilliseconds);
         sw.Stop();
     }
-
-    /***
-     * Takes a function to create a message, caller needs to make sure that event has the correct topic for the function.
-     */
-    private static async Task CreateAndSetMessage(BusEvent busEvent, Func<string, Task<string?>> createMessageFunction)
-    {
-        var message = await createMessageFunction(busEvent.Message);
-        if (message == null)
-        {
-            busEvent.Status = Status.NotFound;
-        }
-        else
-        {
-            busEvent.MessageToSend = message;
-        }
-    }
-
-    private void TrackMetric(BusEventMessage? message) =>
-        _telemetryClient.TrackMetric("BusSender Topic", 
-            1, "Plant", 
-            "ProjectName", 
-            message?.Plant?[4..],
-            message?.ProjectName?.Replace('$', '_') ?? "NoProject");
 }

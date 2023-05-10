@@ -10,8 +10,7 @@ namespace Equinor.ProCoSys.PcsServiceBus.Receiver;
 public class PcsServiceBusProcessors : IPcsServiceBusProcessors
 {
     private readonly List<IPcsServiceBusProcessor> _serviceBusProcessors = new();
-    public int RenewLeaseInterval { get; }
-   
+
 
     public PcsServiceBusProcessors(int renewLeaseInterval)
     {
@@ -23,8 +22,6 @@ public class PcsServiceBusProcessors : IPcsServiceBusProcessors
         RenewLeaseInterval = renewLeaseInterval;
     }
 
-    public void Add(IPcsServiceBusProcessor pcsServiceBusProcessor) => _serviceBusProcessors.Add(pcsServiceBusProcessor);
-
     public async Task CloseAllAsync()
     {
         foreach (var s in _serviceBusProcessors)
@@ -33,11 +30,14 @@ public class PcsServiceBusProcessors : IPcsServiceBusProcessors
         }
     }
 
-    public void RegisterPcsEventHandlers(Func<IPcsServiceBusProcessor, ProcessMessageEventArgs, Task> messageHandler, Func<ProcessErrorEventArgs, Task> errorHandler) =>
+    public void RegisterPcsEventHandlers(Func<IPcsServiceBusProcessor, ProcessMessageEventArgs, Task> messageHandler,
+        Func<ProcessErrorEventArgs, Task> errorHandler) =>
         _serviceBusProcessors.ForEach(s =>
         {
-            s.RegisterPcsEventHandlers(messageHandler,errorHandler);
+            s.RegisterPcsEventHandlers(messageHandler, errorHandler);
         });
+
+    public int RenewLeaseInterval { get; }
 
     public async void StartProcessingAsync()
     {
@@ -48,6 +48,8 @@ public class PcsServiceBusProcessors : IPcsServiceBusProcessors
     }
 
     public void UnRegisterPcsMessageHandler() =>
-         _serviceBusProcessors.ForEach(s => s.StopProcessingAsync());
+        _serviceBusProcessors.ForEach(s => s.StopProcessingAsync());
 
+    public void Add(IPcsServiceBusProcessor pcsServiceBusProcessor) =>
+        _serviceBusProcessors.Add(pcsServiceBusProcessor);
 }

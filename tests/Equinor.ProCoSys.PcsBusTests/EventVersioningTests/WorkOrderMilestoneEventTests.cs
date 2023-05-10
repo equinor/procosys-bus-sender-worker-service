@@ -21,22 +21,22 @@ public class WorkOrderMilestoneEventVersioningTests
         var workOrderMilestoneEventInterfaceType = typeof(IWorkOrderMilestoneEventV1);
         var expectedProperties = new Dictionary<string, Type>
         {
-            {"Plant", typeof(string)},
-            {"ProCoSysGuid", typeof(Guid)},
-            {"ProjectName", typeof(string)},
-            {"WoId", typeof(long)},
-            {"WoGuid", typeof(Guid?)},
-            {"WoNo", typeof(string)},
-            {"Code", typeof(string)},
-            {"MilestoneDate", typeof(DateOnly?)},
-            {"SignedByAzureOid", typeof(string)},
-            {"LastUpdated", typeof(DateTime)},
+            { "Plant", typeof(string) },
+            { "ProCoSysGuid", typeof(Guid) },
+            { "ProjectName", typeof(string) },
+            { "WoId", typeof(long) },
+            { "WoGuid", typeof(Guid?) },
+            { "WoNo", typeof(string) },
+            { "Code", typeof(string) },
+            { "MilestoneDate", typeof(DateOnly?) },
+            { "SignedByAzureOid", typeof(string) },
+            { "LastUpdated", typeof(DateTime) },
         };
 
         // Act
         var actualProperties = workOrderMilestoneEventInterfaceType.GetProperties()
             .ToDictionary(p => p.Name, p => p.PropertyType);
-        
+
 
         // Assert
         CollectionAssert.AreEquivalent(expectedProperties.Keys, actualProperties.Keys);
@@ -44,6 +44,5 @@ public class WorkOrderMilestoneEventVersioningTests
         {
             Assert.AreEqual(expectedProperty.Value, actualProperties[expectedProperty.Key]);
         }
-        
     }
 }

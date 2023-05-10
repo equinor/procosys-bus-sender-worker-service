@@ -11,7 +11,8 @@ namespace Equinor.ProCoSys.PcsServiceBus;
 
 public static class IServiceCollectionExtensions
 {
-    public static IServiceCollection AddPcsServiceBusIntegration(this IServiceCollection services, Action<PcsServiceBusConfig> options)
+    public static IServiceCollection AddPcsServiceBusIntegration(this IServiceCollection services,
+        Action<PcsServiceBusConfig> options)
     {
         var optionsBuilder = new PcsServiceBusConfig();
         options(optionsBuilder);
@@ -20,7 +21,8 @@ public static class IServiceCollectionExtensions
 
         if (optionsBuilder.LeaderElectorUrl != null)
         {
-            services.AddSingleton<ILeaderElectorService>(new LeaderElectorService(new HttpClient(), optionsBuilder.LeaderElectorUrl));
+            services.AddSingleton<ILeaderElectorService>(new LeaderElectorService(new HttpClient(),
+                optionsBuilder.LeaderElectorUrl));
         }
         else
         {
@@ -31,15 +33,32 @@ public static class IServiceCollectionExtensions
         return services;
     }
 
+    public static void AddTopicClients(this IServiceCollection services, string serviceBusConnectionString,
+        string topicNames)
+    {
+        var topics = topicNames.Split(',');
+        var pcsBusSender = new PcsBusSender();
+        var options = new ServiceBusClientOptions { EnableCrossEntityTransactions = true };
+        var client = new ServiceBusClient(serviceBusConnectionString, options);
+        foreach (var topicName in topics)
+        {
+            if (!string.IsNullOrWhiteSpace(topicName))
+            {
+                var serviceBusSender = client.CreateSender(topicName);
+                pcsBusSender.Add(topicName, serviceBusSender);
+            }
+        }
+
+        services.AddSingleton<IPcsBusSender>(pcsBusSender);
+    }
+
     private static PcsServiceBusProcessors CreateSubscriptionProcessors(PcsServiceBusConfig options)
     {
         var pcsProcessors = new PcsServiceBusProcessors(options.RenewLeaseIntervalMilliseconds);
         var client = new ServiceBusClient(options.ConnectionString);
         var processorOptions = new ServiceBusProcessorOptions
         {
-            MaxConcurrentCalls = 1,
-            AutoCompleteMessages = false,
-            ReceiveMode = ServiceBusReceiveMode.PeekLock
+            MaxConcurrentCalls = 1, AutoCompleteMessages = false, ReceiveMode = ServiceBusReceiveMode.PeekLock
         };
 
         options.Subscriptions.ForEach(
@@ -57,22 +76,5 @@ public static class IServiceCollectionExtensions
                         topicInfo.pcsTopic));
             });
         return pcsProcessors;
-    }
-
-    public static void AddTopicClients(this IServiceCollection services, string serviceBusConnectionString, string topicNames)
-    {
-        var topics = topicNames.Split(',');
-        var pcsBusSender = new PcsBusSender();
-        var options = new ServiceBusClientOptions { EnableCrossEntityTransactions = true };
-        var client = new ServiceBusClient(serviceBusConnectionString, options);
-        foreach (var topicName in topics)
-        {
-            if (!string.IsNullOrWhiteSpace(topicName))
-            {
-                var serviceBusSender = client.CreateSender(topicName);
-                pcsBusSender.Add(topicName, serviceBusSender);
-            }
-        }
-        services.AddSingleton<IPcsBusSender>(pcsBusSender);
     }
 }

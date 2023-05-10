@@ -15,22 +15,6 @@ public class PcsBusSender : IPcsBusSender
 
     public PcsBusSender() => _busSenders = new List<KeyValuePair<string, ServiceBusSender>>();
 
-    public void Add(string topicName, ServiceBusSender sender) => _busSenders.Add(new KeyValuePair<string, ServiceBusSender>(topicName, sender));
-
-    public async Task SendAsync(string topic, string jsonMessage)
-    {
-        var message = new ServiceBusMessage(Encoding.UTF8.GetBytes(jsonMessage));
-        var sender = _busSenders.SingleOrDefault(t => t.Key == topic).Value;
-        if (sender == null)
-        {
-            throw new Exception($"Unable to find TopicClient for topic: {topic}");
-        }
-
-        using var ts = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
-        await sender.SendMessageAsync(message);
-        ts.Complete();
-    }
-
     public async Task CloseAllAsync()
     {
         foreach (var topicClient in _busSenders)
@@ -46,8 +30,23 @@ public class PcsBusSender : IPcsBusSender
         {
             throw new Exception($"Unable to find TopicClient for topic: {topic}");
         }
+
         var serviceBusMessageBatch = await sender.CreateMessageBatchAsync();
         return serviceBusMessageBatch;
+    }
+
+    public async Task SendAsync(string topic, string jsonMessage)
+    {
+        var message = new ServiceBusMessage(Encoding.UTF8.GetBytes(jsonMessage));
+        var sender = _busSenders.SingleOrDefault(t => t.Key == topic).Value;
+        if (sender == null)
+        {
+            throw new Exception($"Unable to find TopicClient for topic: {topic}");
+        }
+
+        using var ts = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+        await sender.SendMessageAsync(message);
+        ts.Complete();
     }
 
     public async Task SendMessagesAsync(ServiceBusMessageBatch messageBatch, string topic)
@@ -60,4 +59,7 @@ public class PcsBusSender : IPcsBusSender
 
         await sender.SendMessagesAsync(messageBatch);
     }
+
+    public void Add(string topicName, ServiceBusSender sender) =>
+        _busSenders.Add(new KeyValuePair<string, ServiceBusSender>(topicName, sender));
 }

@@ -2,7 +2,7 @@
 
 public class DocumentQuery
 {
-    public static string GetQuery(long? documentId, string? plant= null)
+    public static string GetQuery(long? documentId, string? plant = null)
     {
         DetectFaultyPlantInput(plant);
         var whereClause = CreateWhereClause(documentId, plant, "d", "document_id");

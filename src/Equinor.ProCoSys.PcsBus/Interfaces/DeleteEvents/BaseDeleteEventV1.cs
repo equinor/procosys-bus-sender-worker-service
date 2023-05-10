@@ -6,5 +6,4 @@ public interface BaseDeleteEventV1 : IHasEventType
 {
     string Plant { get; }
     Guid ProCoSysGuid { get; }
-
 }

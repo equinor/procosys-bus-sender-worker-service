@@ -23,5 +23,6 @@ public class BusSenderServiceContext : DbContext, IUnitOfWork
     public Task<int> SaveChangesAsync() => base.SaveChangesAsync();
 
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder) => modelBuilder.ApplyConfiguration(new BusEventConfiguration());
+    protected override void OnModelCreating(ModelBuilder modelBuilder) =>
+        modelBuilder.ApplyConfiguration(new BusEventConfiguration());
 }

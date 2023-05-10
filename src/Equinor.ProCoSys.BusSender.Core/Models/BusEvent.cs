@@ -1,4 +1,5 @@
 ﻿using System;
+
 #pragma warning disable CS8618
 
 namespace Equinor.ProCoSys.BusSenderWorker.Core.Models;

@@ -5,24 +5,36 @@ namespace Equinor.ProCoSys.PcsServiceBus;
 
 public class PcsServiceBusConfig
 {
+    public string? ConnectionString { get; set; }
+
+    public bool ReadFromDeadLetterQueue { get; set; }
+
+    public List<(string pcsTopic, string? topicPath, string subscrition)> Subscriptions { get; } = new();
+
+    public int RenewLeaseIntervalMilliseconds { get; private set; }
+
+    public Uri? LeaderElectorUrl { get; private set; }
+
     public PcsServiceBusConfig UseBusConnection(string connectionString)
     {
         ConnectionString = connectionString;
         return this;
     }
 
-    public string? ConnectionString { get; set; }
-
-    public bool ReadFromDeadLetterQueue { get; set; }
     public PcsServiceBusConfig WithLeaderElector(string leaderElectorUri)
     {
         LeaderElectorUrl = new Uri(leaderElectorUri);
         return this;
     }
 
-    public List<(string pcsTopic, string? topicPath, string subscrition)> Subscriptions { get; } = new();
-
-    public int RenewLeaseIntervalMilliseconds { get; private set; }
+    /// <summary>
+    /// If true, topic messages will be fetched from Dead Letter Queue instead of normal. This is for special cases, use with caution!
+    /// </summary>
+    public PcsServiceBusConfig WithReadFromDeadLetterQueue(bool readFromDeadLetterQueue)
+    {
+        ReadFromDeadLetterQueue = readFromDeadLetterQueue;
+        return this;
+    }
 
     public PcsServiceBusConfig WithRenewLeaseInterval(int renewLeaseIntervalMilliseconds)
     {
@@ -41,16 +53,4 @@ public class PcsServiceBusConfig
         Subscriptions.Add(new ValueTuple<string, string?, string>(pcsTopic, topicPath, subscriptionName));
         return this;
     }
-
-    public Uri? LeaderElectorUrl { get; private set; }
-
-    /// <summary>
-    /// If true, topic messages will be fetched from Dead Letter Queue instead of normal. This is for special cases, use with caution!
-    /// </summary>
-    public PcsServiceBusConfig WithReadFromDeadLetterQueue(bool readFromDeadLetterQueue)
-    {
-        ReadFromDeadLetterQueue = readFromDeadLetterQueue;
-        return this;
-    }
-
 }
