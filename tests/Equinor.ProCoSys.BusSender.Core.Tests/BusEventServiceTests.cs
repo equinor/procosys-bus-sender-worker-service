@@ -1727,10 +1727,9 @@ public class BusEventServiceTests
     public async Task CreateWorkOrderMaterialMessage_ValidMessage_ReturnsSerializedWorkOrderMaterialMessage()
     {
         // Arrange
-        const string message = "1234";
-        const long workOrderId = 1234L;
+        const string message = "5a643eeb-0b7a-4b9e-9b1a-0e6b7b7b6b6b";
 
-        var queryString = WorkOrderMaterialQuery.GetQuery(workOrderId);
+        var queryString = WorkOrderMaterialQuery.GetQuery(message);
 
         var workOrderMaterialEvent = new WorkOrderMaterialEvent
         {
@@ -1748,7 +1747,7 @@ public class BusEventServiceTests
             StockId = 24680,
             Quantity = 42.0,
             UnitName = "UN",
-            UnitDescription = "Unit Description",
+            UnitDescription = "\u003cp\u003eyeyeey\u003c/p\u003e",
             AdditionalInformation = "Additional Info",
             RequiredDate = DateOnly.FromDateTime(DateTime.Now.AddDays(10)),
             EstimatedAvailableDate = DateOnly.FromDateTime(DateTime.Now.AddDays(20)),

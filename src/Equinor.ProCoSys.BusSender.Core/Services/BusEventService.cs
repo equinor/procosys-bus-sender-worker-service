@@ -277,10 +277,10 @@ public class BusEventService : IBusEventService
             : throw new Exception($"Failed to extract Wo or Checklist Id from message: {message}");
 
     public async Task<string?> CreateWorkOrderMaterialMessage(string message) =>
-        long.TryParse(message, out var workOrderId)
+        Guid.TryParse(message, out _)
             ? JsonSerializer.Serialize(
                 await _eventRepository.QuerySingle<WorkOrderMaterialEvent>(
-                    WorkOrderMaterialQuery.GetQuery(workOrderId), message),DefaultSerializerHelper.SerializerOptions)
+                    WorkOrderMaterialQuery.GetQuery(message), message),DefaultSerializerHelper.SerializerOptions)
             : throw new Exception($"Failed to extract workOrderId from message: {message}");
 
     public async Task<string?> CreateWorkOrderMilestoneMessage(string message)
@@ -298,7 +298,7 @@ public class BusEventService : IBusEventService
 
     public async Task<string?> CreateWorkOrderCutoffMessage(string message)
     {
-        var woInfo = message.Split(","); // woId,cutoffweek
+        var woInfo = message.Split(","); // woId,cutoffWeek
         if (woInfo.Length != 2)
         {
             throw new Exception($"Failed to extract workOrderId and cutoff week from message: {message}");
