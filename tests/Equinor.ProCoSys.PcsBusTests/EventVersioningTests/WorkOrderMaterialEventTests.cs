@@ -37,18 +37,16 @@ public class WorkOrderMaterialEventTests
             { "Available", typeof(bool?) },
             { "MaterialStatus", typeof(string) },
             { "StockLocation", typeof(string) },
-            { "LastUpdated", typeof(DateTime) },
+            { "LastUpdated", typeof(DateTime) }
         };
 
         // Act
-        var actualProperties = workOrderMaterialEventInterfaceType.GetProperties()
+        Dictionary<string, Type> actualProperties = workOrderMaterialEventInterfaceType.GetProperties()
             .ToDictionary(p => p.Name, p => p.PropertyType);
 
         // Assert
         CollectionAssert.AreEquivalent(expectedProperties.Keys, actualProperties.Keys);
-        foreach (var expectedProperty in expectedProperties)
-        {
+        foreach (KeyValuePair<string, Type> expectedProperty in expectedProperties)
             Assert.AreEqual(expectedProperty.Value, actualProperties[expectedProperty.Key]);
-        }
     }
 }

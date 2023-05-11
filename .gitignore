@@ -7,3 +7,4 @@ obj/
 /.idea/
 /.adr-dir
 /PcsServiceBus.sln.DotSettings.user
+secrets/

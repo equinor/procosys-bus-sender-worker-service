@@ -32,18 +32,16 @@ public class CommPkgOperationEventTests
             { "PmRoutine", typeof(bool) },
             { "CommissioningResp", typeof(bool) },
             { "ValveBlindingList", typeof(bool?) },
-            { "LastUpdated", typeof(DateTime) },
+            { "LastUpdated", typeof(DateTime) }
         };
 
         // Act
-        var actualProperties = commPkgOperationEventInterfaceType.GetProperties()
+        Dictionary<string, Type> actualProperties = commPkgOperationEventInterfaceType.GetProperties()
             .ToDictionary(p => p.Name, p => p.PropertyType);
 
         // Assert
         CollectionAssert.AreEquivalent(expectedProperties.Keys, actualProperties.Keys);
-        foreach (var expectedProperty in expectedProperties)
-        {
+        foreach (KeyValuePair<string, Type> expectedProperty in expectedProperties)
             Assert.AreEqual(expectedProperty.Value, actualProperties[expectedProperty.Key]);
-        }
     }
 }

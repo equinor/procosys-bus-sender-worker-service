@@ -40,17 +40,15 @@ public class CommPkgEventTests
             { "Priority2", typeof(string) },
             { "Priority3", typeof(string) },
             { "Progress", typeof(string) },
-            { "DCCommPkgStatus", typeof(string) },
+            { "DCCommPkgStatus", typeof(string) }
         };
         // Act
-        var actualProperties = commPkgEventInterfaceType.GetProperties()
+        Dictionary<string, Type> actualProperties = commPkgEventInterfaceType.GetProperties()
             .ToDictionary(p => p.Name, p => p.PropertyType);
 
         // Assert
         CollectionAssert.AreEquivalent(expectedProperties.Keys, actualProperties.Keys);
-        foreach (var expectedProperty in expectedProperties)
-        {
+        foreach (KeyValuePair<string, Type> expectedProperty in expectedProperties)
             Assert.AreEqual(expectedProperty.Value, actualProperties[expectedProperty.Key]);
-        }
     }
 }

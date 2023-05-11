@@ -22,18 +22,16 @@ public class SwcrOtherReferenceEventTests
             { "SwcrGuid", typeof(Guid) },
             { "Code", typeof(string) },
             { "Description", typeof(string) },
-            { "LastUpdated", typeof(DateTime) },
+            { "LastUpdated", typeof(DateTime) }
         };
 
         // Act
-        var actualProperties = swcrOtherReferenceEventInterfaceType.GetProperties()
+        Dictionary<string, Type> actualProperties = swcrOtherReferenceEventInterfaceType.GetProperties()
             .ToDictionary(p => p.Name, p => p.PropertyType);
 
         // Assert
         CollectionAssert.AreEquivalent(expectedProperties.Keys, actualProperties.Keys);
-        foreach (var expectedProperty in expectedProperties)
-        {
+        foreach (KeyValuePair<string, Type> expectedProperty in expectedProperties)
             Assert.AreEqual(expectedProperty.Value, actualProperties[expectedProperty.Key]);
-        }
     }
 }

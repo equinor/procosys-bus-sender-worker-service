@@ -25,18 +25,16 @@ public class LibraryEventVersioningTests
             { "Description", typeof(string) },
             { "IsVoided", typeof(bool) },
             { "Type", typeof(string) },
-            { "LastUpdated", typeof(DateTime) },
+            { "LastUpdated", typeof(DateTime) }
         };
 
         // Act
-        var actualProperties = libraryEventInterfaceType.GetProperties()
+        Dictionary<string, Type> actualProperties = libraryEventInterfaceType.GetProperties()
             .ToDictionary(p => p.Name, p => p.PropertyType);
 
         // Assert
         CollectionAssert.AreEquivalent(expectedProperties.Keys, actualProperties.Keys);
-        foreach (var expectedProperty in expectedProperties)
-        {
+        foreach (KeyValuePair<string, Type> expectedProperty in expectedProperties)
             Assert.AreEqual(expectedProperty.Value, actualProperties[expectedProperty.Key]);
-        }
     }
 }

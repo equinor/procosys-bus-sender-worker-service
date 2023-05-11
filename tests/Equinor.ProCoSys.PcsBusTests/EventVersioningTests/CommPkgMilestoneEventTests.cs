@@ -30,18 +30,16 @@ public class CommPkgMilestoneEventTests
             { "IsSent", typeof(bool?) },
             { "IsAccepted", typeof(bool?) },
             { "IsRejected", typeof(bool?) },
-            { "LastUpdated", typeof(DateTime) },
+            { "LastUpdated", typeof(DateTime) }
         };
 
         // Act
-        var actualProperties = commPkgMilestoneEventInterfaceType.GetProperties()
+        Dictionary<string, Type> actualProperties = commPkgMilestoneEventInterfaceType.GetProperties()
             .ToDictionary(p => p.Name, p => p.PropertyType);
 
         // Assert
         CollectionAssert.AreEquivalent(expectedProperties.Keys, actualProperties.Keys);
-        foreach (var expectedProperty in expectedProperties)
-        {
+        foreach (KeyValuePair<string, Type> expectedProperty in expectedProperties)
             Assert.AreEqual(expectedProperty.Value, actualProperties[expectedProperty.Key]);
-        }
     }
 }

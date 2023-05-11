@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Equinor.ProCoSys.PcsServiceBus;
 using Equinor.ProCoSys.PcsServiceBus.Interfaces;
 

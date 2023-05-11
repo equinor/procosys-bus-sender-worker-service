@@ -24,18 +24,16 @@ public class WorkOrderChecklistEventTests
             { "WoId", typeof(long) },
             { "WoGuid", typeof(Guid) },
             { "WoNo", typeof(string) },
-            { "LastUpdated", typeof(DateTime) },
+            { "LastUpdated", typeof(DateTime) }
         };
 
         // Act
-        var actualProperties = workOrderChecklistEventInterfaceType.GetProperties()
+        Dictionary<string, Type> actualProperties = workOrderChecklistEventInterfaceType.GetProperties()
             .ToDictionary(p => p.Name, p => p.PropertyType);
 
         // Assert
         CollectionAssert.AreEquivalent(expectedProperties.Keys, actualProperties.Keys);
-        foreach (var expectedProperty in expectedProperties)
-        {
+        foreach (KeyValuePair<string, Type> expectedProperty in expectedProperties)
             Assert.AreEqual(expectedProperty.Value, actualProperties[expectedProperty.Key]);
-        }
     }
 }

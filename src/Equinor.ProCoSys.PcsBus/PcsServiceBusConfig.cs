@@ -5,16 +5,6 @@ namespace Equinor.ProCoSys.PcsServiceBus;
 
 public class PcsServiceBusConfig
 {
-    public string? ConnectionString { get; set; }
-
-    public bool ReadFromDeadLetterQueue { get; set; }
-
-    public List<(string pcsTopic, string? topicPath, string subscrition)> Subscriptions { get; } = new();
-
-    public int RenewLeaseIntervalMilliseconds { get; private set; }
-
-    public Uri? LeaderElectorUrl { get; private set; }
-
     public PcsServiceBusConfig UseBusConnection(string connectionString)
     {
         ConnectionString = connectionString;
@@ -28,7 +18,8 @@ public class PcsServiceBusConfig
     }
 
     /// <summary>
-    /// If true, topic messages will be fetched from Dead Letter Queue instead of normal. This is for special cases, use with caution!
+    ///     If true, topic messages will be fetched from Dead Letter Queue instead of normal. This is for special cases, use
+    ///     with caution!
     /// </summary>
     public PcsServiceBusConfig WithReadFromDeadLetterQueue(bool readFromDeadLetterQueue)
     {
@@ -53,4 +44,14 @@ public class PcsServiceBusConfig
         Subscriptions.Add(new ValueTuple<string, string?, string>(pcsTopic, topicPath, subscriptionName));
         return this;
     }
+
+    public string? ConnectionString { get; set; }
+
+    public bool ReadFromDeadLetterQueue { get; set; }
+
+    public List<(string pcsTopic, string? topicPath, string subscrition)> Subscriptions { get; } = new();
+
+    public int RenewLeaseIntervalMilliseconds { get; private set; }
+
+    public Uri? LeaderElectorUrl { get; private set; }
 }

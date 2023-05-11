@@ -6,11 +6,13 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Equinor.ProCoSys.PcsServiceBusTests.EventVersioningTests;
 
-/**If this tests fails, its most likely because the versioning contract is breached. Consider creating a new version instead of
-modifying the existing one.
-If new properties are added to the interface (non breaking), this test should be updated with the new properties,
-it should however not fail.
-**/
+/**
+ * If this tests fails, its most likely because the versioning contract is breached. Consider creating a new version instead of
+ * modifying the existing one.
+ * If new properties are added to the interface (non breaking), this test should be updated with the new properties,
+ * it should however not fail.
+ * *
+ */
 [TestClass]
 public class WorkOrderMilestoneEventVersioningTests
 {
@@ -30,19 +32,17 @@ public class WorkOrderMilestoneEventVersioningTests
             { "Code", typeof(string) },
             { "MilestoneDate", typeof(DateOnly?) },
             { "SignedByAzureOid", typeof(string) },
-            { "LastUpdated", typeof(DateTime) },
+            { "LastUpdated", typeof(DateTime) }
         };
 
         // Act
-        var actualProperties = workOrderMilestoneEventInterfaceType.GetProperties()
+        Dictionary<string, Type> actualProperties = workOrderMilestoneEventInterfaceType.GetProperties()
             .ToDictionary(p => p.Name, p => p.PropertyType);
 
 
         // Assert
         CollectionAssert.AreEquivalent(expectedProperties.Keys, actualProperties.Keys);
-        foreach (var expectedProperty in expectedProperties)
-        {
+        foreach (KeyValuePair<string, Type> expectedProperty in expectedProperties)
             Assert.AreEqual(expectedProperty.Value, actualProperties[expectedProperty.Key]);
-        }
     }
 }

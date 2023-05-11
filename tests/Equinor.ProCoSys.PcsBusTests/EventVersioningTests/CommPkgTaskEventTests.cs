@@ -22,18 +22,16 @@ public class CommPkgTaskEventTests
             { "TaskGuid", typeof(Guid) },
             { "CommPkgGuid", typeof(Guid) },
             { "CommPkgNo", typeof(string) },
-            { "LastUpdated", typeof(DateTime) },
+            { "LastUpdated", typeof(DateTime) }
         };
 
         // Act
-        var actualProperties = commPkgTaskEventInterfaceType.GetProperties()
+        Dictionary<string, Type> actualProperties = commPkgTaskEventInterfaceType.GetProperties()
             .ToDictionary(p => p.Name, p => p.PropertyType);
 
         // Assert
         CollectionAssert.AreEquivalent(expectedProperties.Keys, actualProperties.Keys);
-        foreach (var expectedProperty in expectedProperties)
-        {
+        foreach (KeyValuePair<string, Type> expectedProperty in expectedProperties)
             Assert.AreEqual(expectedProperty.Value, actualProperties[expectedProperty.Key]);
-        }
     }
 }

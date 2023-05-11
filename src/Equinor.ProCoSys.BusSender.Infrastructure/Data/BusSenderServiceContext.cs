@@ -19,8 +19,9 @@ public class BusSenderServiceContext : DbContext, IUnitOfWork
         SqlMapper.AddTypeHandler(typeof(DateOnly), DateOnlyHandler.Default);
     }
 
-    public virtual DbSet<BusEvent> BusEvents { get; set; } = null!;
     public Task<int> SaveChangesAsync() => base.SaveChangesAsync();
+
+    public virtual DbSet<BusEvent> BusEvents { get; set; } = null!;
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder) =>

@@ -1,20 +1,19 @@
-﻿using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
-using Equinor.ProCoSys.BusSenderWorker.Core.Models;
-using Equinor.ProCoSys.BusSenderWorker.Core.Services;
-using Equinor.ProCoSys.BusSenderWorker.Core.Telemetry;
-using Equinor.ProCoSys.PcsServiceBus.Sender;
-using Microsoft.Extensions.Logging;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
-using Equinor.ProCoSys.PcsServiceBus.Queries;
+using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
+using Equinor.ProCoSys.BusSenderWorker.Core.Models;
+using Equinor.ProCoSys.BusSenderWorker.Core.Services;
+using Equinor.ProCoSys.BusSenderWorker.Core.Telemetry;
+using Equinor.ProCoSys.PcsServiceBus.Sender;
 using Equinor.ProCoSys.PcsServiceBus.Topics;
+using Microsoft.Extensions.Logging;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using Range = Moq.Range;
 
 namespace Equinor.ProCoSys.BusSenderWorker.Core.Tests;
@@ -146,8 +145,7 @@ public class BusSenderServiceTests
         var wo2 = new BusEvent { Event = WorkOrderTopic.TopicName, Message = "10000", Status = Status.UnProcessed };
         var wo3 = new BusEvent { Event = WorkOrderTopic.TopicName, Message = "10001", Status = Status.UnProcessed };
 
-        var wo = new WorkOrderEvent()
-            { Plant = "AnyValidPlant", ProjectName = "AnyProjectName", WoNo = "Some0x0bWoNo" };
+        var wo = new WorkOrderEvent { Plant = "AnyValidPlant", ProjectName = "AnyProjectName", WoNo = "Some0x0bWoNo" };
 
         _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk())
             .Returns(() => Task.FromResult(new List<BusEvent> { wo1, wo2, wo3 }));
@@ -173,8 +171,7 @@ public class BusSenderServiceTests
         var wo2 = new BusEvent { Event = WorkOrderTopic.TopicName, Message = "10000", Status = Status.UnProcessed };
         var wo3 = new BusEvent { Event = WorkOrderTopic.TopicName, Message = "10001", Status = Status.UnProcessed };
 
-        var wo = new WorkOrderEvent()
-            { Plant = "AnyValidPlant", ProjectName = "AnyProjectName", WoNo = "SomeWoNo" };
+        var wo = new WorkOrderEvent { Plant = "AnyValidPlant", ProjectName = "AnyProjectName", WoNo = "SomeWoNo" };
 
 
         _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk())
@@ -249,8 +246,7 @@ public class BusSenderServiceTests
         var wo2 = new BusEvent { Event = WorkOrderTopic.TopicName, Message = "10000", Status = Status.UnProcessed };
         var wo3 = new BusEvent { Event = WorkOrderTopic.TopicName, Message = "10000", Status = Status.UnProcessed };
 
-        var wo = new WorkOrderEvent()
-            { Plant = "AnyValidPlant", ProjectName = "AnyProjectName", WoNo = "SomeWoNo" };
+        var wo = new WorkOrderEvent { Plant = "AnyValidPlant", ProjectName = "AnyProjectName", WoNo = "SomeWoNo" };
 
 
         _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk())

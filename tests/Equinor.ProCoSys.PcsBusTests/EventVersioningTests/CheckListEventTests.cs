@@ -9,11 +9,13 @@ namespace Equinor.ProCoSys.PcsServiceBusTests.EventVersioningTests;
 [TestClass]
 public class CheckListEventTests
 {
-    /** If this tests fails, its most likely because the versioning contract is breached. Consider creating a new version instead of
-        modifying the existing one.
-        If new properties are added to the interface (non breaking), this test should be updated with the new properties,
-        it should however not fail.
-    **/
+    /**
+     * If this tests fails, its most likely because the versioning contract is breached. Consider creating a new version instead of
+     * modifying the existing one.
+     * If new properties are added to the interface (non breaking), this test should be updated with the new properties,
+     * it should however not fail.
+     * *
+     */
     [TestMethod]
     public void ICheckListEventV1_InterfacePropertiesAndMethods_DoNotChange()
     {
@@ -46,17 +48,15 @@ public class CheckListEventTests
             { "LastUpdated", typeof(DateTime) },
             { "CreatedAt", typeof(DateTime) },
             { "SignedAt", typeof(DateTime?) },
-            { "VerifiedAt", typeof(DateTime?) },
+            { "VerifiedAt", typeof(DateTime?) }
         };
         // Act
-        var actualProperties = checklistEventInterfaceType.GetProperties()
+        Dictionary<string, Type> actualProperties = checklistEventInterfaceType.GetProperties()
             .ToDictionary(p => p.Name, p => p.PropertyType);
 
         // Assert
         CollectionAssert.AreEquivalent(expectedProperties.Keys, actualProperties.Keys);
-        foreach (var expectedProperty in expectedProperties)
-        {
+        foreach (KeyValuePair<string, Type> expectedProperty in expectedProperties)
             Assert.AreEqual(expectedProperty.Value, actualProperties[expectedProperty.Key]);
-        }
     }
 }

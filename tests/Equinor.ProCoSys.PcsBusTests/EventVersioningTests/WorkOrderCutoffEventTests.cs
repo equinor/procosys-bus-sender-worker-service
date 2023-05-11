@@ -41,18 +41,16 @@ public class WorkOrderCutoffEventTests
             { "EstimatedHours", typeof(double?) },
             { "ManHoursExpendedLastWeek", typeof(double?) },
             { "ManHoursEarnedLastWeek", typeof(double?) },
-            { "ProjectProgress", typeof(double?) },
+            { "ProjectProgress", typeof(double?) }
         };
 
         // Act
-        var actualProperties = workOrderCutoffEventInterfaceType.GetProperties()
+        Dictionary<string, Type> actualProperties = workOrderCutoffEventInterfaceType.GetProperties()
             .ToDictionary(p => p.Name, p => p.PropertyType);
 
         // Assert
         CollectionAssert.AreEquivalent(expectedProperties.Keys, actualProperties.Keys);
-        foreach (var expectedProperty in expectedProperties)
-        {
+        foreach (KeyValuePair<string, Type> expectedProperty in expectedProperties)
             Assert.AreEqual(expectedProperty.Value, actualProperties[expectedProperty.Key]);
-        }
     }
 }

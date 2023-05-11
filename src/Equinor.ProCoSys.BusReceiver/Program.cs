@@ -7,6 +7,14 @@ namespace Equinor.ProCoSys.BusReceiver;
 
 public class Program
 {
+    public static async Task Main(string[] args)
+    {
+        using var host = CreateHostBuilder(args).Build();
+        ILogger? logger = host.Services.GetService<ILogger<Program>>();
+        AppDomain.CurrentDomain.ProcessExit += (_, _) => OnProcessExit(logger);
+        await host.RunAsync();
+    }
+
     private static IHostBuilder CreateHostBuilder(string[] args)
     {
         var builder = Host.CreateDefaultBuilder(args)
@@ -37,14 +45,6 @@ public class Program
                 services.BuildServiceProvider();
             });
         return builder;
-    }
-
-    public static async Task Main(string[] args)
-    {
-        using var host = CreateHostBuilder(args).Build();
-        ILogger? logger = host.Services.GetService<ILogger<Program>>();
-        AppDomain.CurrentDomain.ProcessExit += (_, _) => OnProcessExit(logger);
-        await host.RunAsync();
     }
 
     private static void OnProcessExit(ILogger? logger)

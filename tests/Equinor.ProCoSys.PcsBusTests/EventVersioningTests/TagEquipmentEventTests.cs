@@ -39,8 +39,6 @@ public class TagEquipmentEventTests
         // Assert
         CollectionAssert.AreEquivalent(expectedProperties.Keys, actualProperties.Keys);
         foreach (KeyValuePair<string, Type> expectedProperty in expectedProperties)
-        {
             Assert.AreEqual(expectedProperty.Value, actualProperties[expectedProperty.Key]);
-        }
     }
 }

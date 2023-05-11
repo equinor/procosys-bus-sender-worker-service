@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Equinor.ProCoSys.PcsServiceBus.Interfaces;
 
 namespace Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;

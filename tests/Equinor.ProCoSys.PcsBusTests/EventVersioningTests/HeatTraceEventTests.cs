@@ -26,18 +26,16 @@ public class HeatTraceEventTests
             { "TagGuid", typeof(Guid) },
             { "TagNo", typeof(string) },
             { "SpoolNo", typeof(string) },
-            { "LastUpdated", typeof(DateTime) },
+            { "LastUpdated", typeof(DateTime) }
         };
 
         // Act
-        var actualProperties = heatTraceEventInterfaceType.GetProperties()
+        Dictionary<string, Type> actualProperties = heatTraceEventInterfaceType.GetProperties()
             .ToDictionary(p => p.Name, p => p.PropertyType);
 
         // Assert
         CollectionAssert.AreEquivalent(expectedProperties.Keys, actualProperties.Keys);
-        foreach (var expectedProperty in expectedProperties)
-        {
+        foreach (KeyValuePair<string, Type> expectedProperty in expectedProperties)
             Assert.AreEqual(expectedProperty.Value, actualProperties[expectedProperty.Key]);
-        }
     }
 }

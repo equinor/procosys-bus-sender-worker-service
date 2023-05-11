@@ -9,11 +9,13 @@ namespace Equinor.ProCoSys.PcsServiceBusTests.EventVersioningTests;
 [TestClass]
 public class WorkOrderEventVersioningTests
 {
-    /**If this tests fails, its most likely because the versioning contract is breached. Consider creating a new version instead of
-    modifying the existing one.
-    If new properties are added to the interface (non breaking), this test should be updated with the new properties,
-    it should however not fail.
-    **/
+    /**
+     * If this tests fails, its most likely because the versioning contract is breached. Consider creating a new version instead of
+     * modifying the existing one.
+     * If new properties are added to the interface (non breaking), this test should be updated with the new properties,
+     * it should however not fail.
+     * *
+     */
     [TestMethod]
     public void IWorkOrderEventV1_InterfacePropertiesAndMethods_DoNotChange()
     {
@@ -62,18 +64,16 @@ public class WorkOrderEventVersioningTests
             { "ActualFinishedAtDate", typeof(DateOnly?) },
             { "CreatedAt", typeof(DateTime) },
             { "IsVoided", typeof(bool) },
-            { "LastUpdated", typeof(DateTime) },
+            { "LastUpdated", typeof(DateTime) }
         };
 
         // Act
-        var actualProperties = workOrderEventInterfaceType.GetProperties()
+        Dictionary<string, Type> actualProperties = workOrderEventInterfaceType.GetProperties()
             .ToDictionary(p => p.Name, p => p.PropertyType);
 
         // Assert
         CollectionAssert.AreEquivalent(expectedProperties.Keys, actualProperties.Keys);
-        foreach (var expectedProperty in expectedProperties)
-        {
+        foreach (KeyValuePair<string, Type> expectedProperty in expectedProperties)
             Assert.AreEqual(expectedProperty.Value, actualProperties[expectedProperty.Key]);
-        }
     }
 }

@@ -3,7 +3,8 @@
 public class WorkOrderMaterialQuery
 {
     /// <summary>
-    /// Call with either workOrderId, plantId or both. Not advised to call without either as result set could get very large
+    ///     Call with either workOrderId, plantId or both. Not advised to call without either as result set could get very
+    ///     large
     /// </summary>
     public static string GetQuery(string? guid, string? plant = null)
     {

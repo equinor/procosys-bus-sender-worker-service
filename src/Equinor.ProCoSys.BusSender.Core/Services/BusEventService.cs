@@ -36,6 +36,15 @@ public class BusEventService : IBusEventService
         return JsonSerializer.Serialize(tagTopic);
     }
 
+    public static bool CanGetTwoIdsFromMessage(IReadOnlyList<string> array, out long id1, out long id2)
+    {
+        id1 = 0;
+        id2 = 0;
+        return array.Count == 2
+               && long.TryParse(array[0], out id1)
+               && long.TryParse(array[1], out id2);
+    }
+
     public async Task<string?> CreateActionMessage(string message)
     {
         if (!long.TryParse(message, out var actionId))
@@ -341,14 +350,5 @@ public class BusEventService : IBusEventService
         message = Regex.Replace(message, @"\p{C}+", string.Empty);
 
         return message;
-    }
-
-    public static bool CanGetTwoIdsFromMessage(IReadOnlyList<string> array, out long id1, out long id2)
-    {
-        id1 = 0;
-        id2 = 0;
-        return array.Count == 2
-               && long.TryParse(array[0], out id1)
-               && long.TryParse(array[1], out id2);
     }
 }

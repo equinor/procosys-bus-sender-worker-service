@@ -25,6 +25,10 @@ public class ApplicationInsightsTelemetryClient : ITelemetryClient
 
     public void Flush() => _ai.Flush();
 
+    public void TrackEvent(string name, Dictionary<string, string> properties) =>
+        _ai
+            .TrackEvent(name, properties);
+
     public void TrackMetric(string name, double metric) =>
         _ai
             .GetMetric(name)
@@ -35,10 +39,6 @@ public class ApplicationInsightsTelemetryClient : ITelemetryClient
         _ai
             .GetMetric(name, dimension1Name, dimension2Name)
             .TrackValue(metric, dimension1Value, dimension2Value);
-
-    public void TrackEvent(string name, Dictionary<string, string> properties) =>
-        _ai
-            .TrackEvent(name, properties);
 
     public void TrackMetric(string name, double metric, string dimension1Name, string dimension1Value) =>
         _ai

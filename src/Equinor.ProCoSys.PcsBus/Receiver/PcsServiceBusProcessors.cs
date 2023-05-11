@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
 using Equinor.ProCoSys.PcsServiceBus.Receiver.Interfaces;
@@ -22,6 +21,9 @@ public class PcsServiceBusProcessors : IPcsServiceBusProcessors
         RenewLeaseInterval = renewLeaseInterval;
     }
 
+    public void Add(IPcsServiceBusProcessor pcsServiceBusProcessor) =>
+        _serviceBusProcessors.Add(pcsServiceBusProcessor);
+
     public async Task CloseAllAsync()
     {
         foreach (var s in _serviceBusProcessors)
@@ -37,8 +39,6 @@ public class PcsServiceBusProcessors : IPcsServiceBusProcessors
             s.RegisterPcsEventHandlers(messageHandler, errorHandler);
         });
 
-    public int RenewLeaseInterval { get; }
-
     public async void StartProcessingAsync()
     {
         foreach (var s in _serviceBusProcessors)
@@ -50,6 +50,5 @@ public class PcsServiceBusProcessors : IPcsServiceBusProcessors
     public void UnRegisterPcsMessageHandler() =>
         _serviceBusProcessors.ForEach(s => s.StopProcessingAsync());
 
-    public void Add(IPcsServiceBusProcessor pcsServiceBusProcessor) =>
-        _serviceBusProcessors.Add(pcsServiceBusProcessor);
+    public int RenewLeaseInterval { get; }
 }

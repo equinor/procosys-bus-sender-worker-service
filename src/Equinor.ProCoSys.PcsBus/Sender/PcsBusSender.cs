@@ -15,6 +15,9 @@ public class PcsBusSender : IPcsBusSender
 
     public PcsBusSender() => _busSenders = new List<KeyValuePair<string, ServiceBusSender>>();
 
+    public void Add(string topicName, ServiceBusSender sender) =>
+        _busSenders.Add(new KeyValuePair<string, ServiceBusSender>(topicName, sender));
+
     public async Task CloseAllAsync()
     {
         foreach (var topicClient in _busSenders)
@@ -59,7 +62,4 @@ public class PcsBusSender : IPcsBusSender
 
         await sender.SendMessagesAsync(messageBatch);
     }
-
-    public void Add(string topicName, ServiceBusSender sender) =>
-        _busSenders.Add(new KeyValuePair<string, ServiceBusSender>(topicName, sender));
 }

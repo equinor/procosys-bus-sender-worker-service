@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
 using Equinor.ProCoSys.PcsServiceBus.Receiver.Interfaces;
@@ -15,8 +14,6 @@ public class PcsServiceBusProcessor : ServiceBusProcessor, IPcsServiceBusProcess
         : base(client, topicName, subscriptionName, options) =>
         PcsTopic = pcsTopic;
 
-    public string PcsTopic { get; }
-
     public void RegisterPcsEventHandlers(Func<IPcsServiceBusProcessor, ProcessMessageEventArgs, Task> handler,
         Func<ProcessErrorEventArgs, Task> errorHandler)
     {
@@ -30,4 +27,6 @@ public class PcsServiceBusProcessor : ServiceBusProcessor, IPcsServiceBusProcess
     public Task StopProcessingAsync() => base.StopProcessingAsync();
 
     private Task? HandleMessage(ProcessMessageEventArgs events) => _pcsHandler?.Invoke(this, events);
+
+    public string PcsTopic { get; }
 }

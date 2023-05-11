@@ -35,7 +35,21 @@ public class PcsBusReceiver : IHostedService
         }
     }
 
-    private bool IsLeader { get; set; }
+    public async Task ProcessMessagesAsync(IPcsServiceBusProcessor processor, ProcessMessageEventArgs args)
+    {
+        try
+        {
+            var messageJson = Encoding.UTF8.GetString(args.Message.Body);
+
+            var busReceiverService = _busReceiverServiceFactory.GetServiceInstance();
+            await busReceiverService.ProcessMessageAsync(processor.PcsTopic, messageJson, args.CancellationToken);
+            await args.CompleteMessageAsync(args.Message);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error processing message");
+        }
+    }
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
@@ -86,22 +100,6 @@ public class PcsBusReceiver : IHostedService
         return Task.CompletedTask;
     }
 
-    public async Task ProcessMessagesAsync(IPcsServiceBusProcessor processor, ProcessMessageEventArgs args)
-    {
-        try
-        {
-            var messageJson = Encoding.UTF8.GetString(args.Message.Body);
-
-            var busReceiverService = _busReceiverServiceFactory.GetServiceInstance();
-            await busReceiverService.ProcessMessageAsync(processor.PcsTopic, messageJson, args.CancellationToken);
-            await args.CompleteMessageAsync(args.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error processing message");
-        }
-    }
-
     private async Task RenewLeaseAsync()
     {
         var canProceedAsLeader = await _leaderElectorService.CanProceedAsLeader(_receiverId);
@@ -135,4 +133,6 @@ public class PcsBusReceiver : IHostedService
             StartMessageReceiving();
         }
     }
+
+    private bool IsLeader { get; set; }
 }

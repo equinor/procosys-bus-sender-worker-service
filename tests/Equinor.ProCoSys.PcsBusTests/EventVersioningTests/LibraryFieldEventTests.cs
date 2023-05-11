@@ -27,18 +27,16 @@ public class LibraryFieldEventVersioningTests
             { "DateValue", typeof(DateOnly?) },
             { "NumberValue", typeof(double?) },
             { "LibraryValueGuid", typeof(Guid?) },
-            { "LastUpdated", typeof(DateTime) },
+            { "LastUpdated", typeof(DateTime) }
         };
 
         // Act
-        var actualProperties = libraryFieldEventInterfaceType.GetProperties()
+        Dictionary<string, Type> actualProperties = libraryFieldEventInterfaceType.GetProperties()
             .ToDictionary(p => p.Name, p => p.PropertyType);
 
         // Assert
         CollectionAssert.AreEquivalent(expectedProperties.Keys, actualProperties.Keys);
-        foreach (var expectedProperty in expectedProperties)
-        {
+        foreach (KeyValuePair<string, Type> expectedProperty in expectedProperties)
             Assert.AreEqual(expectedProperty.Value, actualProperties[expectedProperty.Key]);
-        }
     }
 }

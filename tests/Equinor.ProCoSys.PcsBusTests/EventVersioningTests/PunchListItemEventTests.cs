@@ -48,18 +48,16 @@ public class PunchListItemEventTests
             { "ClearedAt", typeof(DateTime?) },
             { "RejectedAt", typeof(DateTime?) },
             { "VerifiedAt", typeof(DateTime?) },
-            { "CreatedAt", typeof(DateTime) },
+            { "CreatedAt", typeof(DateTime) }
         };
 
         // Act
-        var actualProperties = punchListItemEventInterfaceType.GetProperties()
+        Dictionary<string, Type> actualProperties = punchListItemEventInterfaceType.GetProperties()
             .ToDictionary(p => p.Name, p => p.PropertyType);
 
         // Assert
         CollectionAssert.AreEquivalent(expectedProperties.Keys, actualProperties.Keys);
-        foreach (var expectedProperty in expectedProperties)
-        {
+        foreach (KeyValuePair<string, Type> expectedProperty in expectedProperties)
             Assert.AreEqual(expectedProperty.Value, actualProperties[expectedProperty.Key]);
-        }
     }
 }

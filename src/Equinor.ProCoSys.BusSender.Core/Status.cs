@@ -7,5 +7,5 @@ public enum Status
     Failed = 2,
     Sent = 3,
     Skipped = 4,
-    NotFound = 5,
+    NotFound = 5
 }

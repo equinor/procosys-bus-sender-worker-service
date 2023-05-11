@@ -37,17 +37,15 @@ public class CallOffEventTests
             { "PackageActualDelivery", typeof(DateOnly?) },
             { "PackageClosed", typeof(DateOnly?) },
             { "McDossierSent", typeof(DateOnly?) },
-            { "McDossierReceived", typeof(DateOnly?) },
+            { "McDossierReceived", typeof(DateOnly?) }
         };
         // Act
-        var actualProperties = actionEventInterfaceType.GetProperties()
+        Dictionary<string, Type> actualProperties = actionEventInterfaceType.GetProperties()
             .ToDictionary(p => p.Name, p => p.PropertyType);
 
         // Assert
         CollectionAssert.AreEquivalent(expectedProperties.Keys, actualProperties.Keys);
-        foreach (var expectedProperty in expectedProperties)
-        {
+        foreach (KeyValuePair<string, Type> expectedProperty in expectedProperties)
             Assert.AreEqual(expectedProperty.Value, actualProperties[expectedProperty.Key]);
-        }
     }
 }

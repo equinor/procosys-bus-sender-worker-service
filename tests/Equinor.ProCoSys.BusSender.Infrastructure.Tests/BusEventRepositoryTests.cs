@@ -1,4 +1,8 @@
-﻿using Equinor.ProCoSys.BusSenderWorker.Core;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Equinor.ProCoSys.BusSenderWorker.Core;
 using Equinor.ProCoSys.BusSenderWorker.Core.Models;
 using Equinor.ProCoSys.BusSenderWorker.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -6,9 +10,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MockQueryable.Moq;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Equinor.ProCoSys.BusSenderWorker.Infrastructure.Tests;
 
@@ -25,7 +26,7 @@ public class BusEventRepositoryTests : RepositoryTestBase
     [TestMethod]
     public void GetEarliestUnProcessedEventChunk_ShouldReturnCorrectItemSequenceAndNumberOfItems()
     {
-        var result = _dut.GetEarliestUnProcessedEventChunk();
+        Task<List<BusEvent>> result = _dut.GetEarliestUnProcessedEventChunk();
         Assert.AreEqual(5, result.Result.Count);
         Assert.AreEqual(_earliestEvent, result.Result[0]);
         Assert.AreEqual(_secondToLatestEvent, result.Result[4]);
@@ -74,7 +75,7 @@ public class BusEventRepositoryTests : RepositoryTestBase
                 Created = DateTime.Now.AddMinutes(-30), Event = "T", Status = Status.UnProcessed, Id = 4,
                 Message = "Message 30 minutes ago not sent"
             },
-            _earliestEvent,
+            _earliestEvent
         };
 
         _busEventSetMock = _busEvents.AsQueryable().BuildMockDbSet();

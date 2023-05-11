@@ -1,16 +1,15 @@
-﻿using Equinor.ProCoSys.PcsServiceBus.Receiver;
-using Equinor.ProCoSys.PcsServiceBus.Receiver.Interfaces;
-using Microsoft.Extensions.Logging;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
-
+using Equinor.ProCoSys.PcsServiceBus.Receiver;
+using Equinor.ProCoSys.PcsServiceBus.Receiver.Interfaces;
+using Microsoft.Extensions.Logging;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 
 namespace Equinor.ProCoSys.PcsServiceBusTests;
 
@@ -36,8 +35,8 @@ public class PcsBusReceiverTests
             { "ParentId", "parent-id-123" }
         };
         var serviceBusReceivedMessage = ServiceBusModelFactory.ServiceBusReceivedMessage(
-            body: BinaryData.FromString(
-                $"{{\"Plant\" : \"asdf\", \"ProjectName\" : \"ew2f\", \"Description\" : \"sdf\"}}"),
+            BinaryData.FromString(
+                "{\"Plant\" : \"asdf\", \"ProjectName\" : \"ew2f\", \"Description\" : \"sdf\"}"),
             properties: applicationProperties,
             deliveryCount: 1);
         var messageEventArgs =
@@ -51,16 +50,6 @@ public class PcsBusReceiverTests
         _busReceiverService.Verify(
             b => b.ProcessMessageAsync(pcsProcessor.Object.PcsTopic,
                 Encoding.UTF8.GetString(messageEventArgs.Message.Body), It.IsAny<CancellationToken>()), Times.Once);
-    }
-
-    private static void SetLockToken(ProcessMessageEventArgs message, Guid lockToken)
-    {
-        var systemProperties = message.CancellationToken;
-        var type = systemProperties.GetType();
-        type.GetMethod("set_LockTokenGuid", BindingFlags.Instance | BindingFlags.NonPublic)
-            ?.Invoke(systemProperties, new object[] { lockToken });
-        type.GetMethod("set_SequenceNumber", BindingFlags.Instance | BindingFlags.NonPublic)
-            ?.Invoke(systemProperties, new object[] { 0 });
     }
 
     [TestInitialize]
@@ -161,5 +150,15 @@ public class PcsBusReceiverTests
         _dut.StopAsync(new CancellationToken());
 
         _processors.Verify(c => c.CloseAllAsync(), Times.Once);
+    }
+
+    private static void SetLockToken(ProcessMessageEventArgs message, Guid lockToken)
+    {
+        var systemProperties = message.CancellationToken;
+        var type = systemProperties.GetType();
+        type.GetMethod("set_LockTokenGuid", BindingFlags.Instance | BindingFlags.NonPublic)
+            ?.Invoke(systemProperties, new object[] { lockToken });
+        type.GetMethod("set_SequenceNumber", BindingFlags.Instance | BindingFlags.NonPublic)
+            ?.Invoke(systemProperties, new object[] { 0 });
     }
 }

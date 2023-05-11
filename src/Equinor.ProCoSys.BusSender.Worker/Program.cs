@@ -18,8 +18,6 @@ public class Program
     public Program(IConfiguration configuration)
         => Configuration = configuration;
 
-    public IConfiguration Configuration { get; }
-
     public static IHostBuilder CreateHostBuilder(string[] args)
     {
         var builder = Host.CreateDefaultBuilder(args)
@@ -29,7 +27,7 @@ public class Program
                 var settings = config.Build();
 
                 var azConfig = settings.GetValue<bool>("UseAzureAppConfiguration");
-                if (azConfig)
+                if (azConfig && settings["IsLocal"] != "True")
                 {
                     config.AddAzureAppConfiguration(options =>
                     {
@@ -50,14 +48,21 @@ public class Program
                     });
                 }
 
-                else if (settings["EnvironmentName"] == "Local")
+                else if (settings["IsLocal"] == "True" && azConfig)
                 {
                     config.AddAzureAppConfiguration(options =>
                     {
-                        options.Connect(settings["AppConfig"])
+                        var tenantId = settings["AZURE_TENANT_ID"];
+                        var clientId = settings["AZURE_CLIENT_ID"];
+                        var clientSecret = settings["AZURE_CLIENT_SECRET"];
+
+                        var credential = new ClientSecretCredential(tenantId, clientId, clientSecret);
+
+                        var connectionString = settings["ConnectionStrings:AppConfig"];
+                        options.Connect(connectionString)
                             .ConfigureKeyVault(kv =>
                             {
-                                kv.SetCredential(new DefaultAzureCredential());
+                                kv.SetCredential(credential);
                             })
                             .ConfigureRefresh(opt =>
                             {
@@ -139,4 +144,6 @@ public class Program
         ILogger? logger = host.Services.GetService<ILogger<Program>>();
         await host.RunAsync();
     }
+
+    public IConfiguration Configuration { get; }
 }

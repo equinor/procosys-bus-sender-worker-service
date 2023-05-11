@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
 
 namespace Equinor.ProCoSys.PcsServiceBus.Sender.Interfaces;

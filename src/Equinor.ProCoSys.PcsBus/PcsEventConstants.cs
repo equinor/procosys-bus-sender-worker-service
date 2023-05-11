@@ -165,38 +165,38 @@ public static class PcsEventConstants
     public const string StockCreateOrUpdate = "stockCreatedOrUpdated";
 
     /// <summary>
-    ///    Event that is fired when a new swcrOtherReference is created or updated
+    ///     Event that is fired when a new swcrOtherReference is created or updated
     /// </summary>
     public const string SwcrOtherReferenceCreateOrUpdate = "swcrOtherReferenceCreatedOrUpdated";
 
     /// <summary>
-    ///    Event that is fired when a new swcr attachment is created or updated
+    ///     Event that is fired when a new swcr attachment is created or updated
     /// </summary>
     public const string SwcrAttachmentCreateOrUpdate = "swcrAttachmentCreatedOrUpdated";
 
     /// <summary>
-    ///    Event that is fired when a new swcr signature is created or updated
+    ///     Event that is fired when a new swcr signature is created or updated
     /// </summary>
     public const string SwcrSignatureCreateOrUpdate = "swcrSignatureCreatedOrUpdated";
 
     /// <summary>
-    ///    Event that is fired when a new swcr type is created or updated
+    ///     Event that is fired when a new swcr type is created or updated
     /// </summary>
     public const string SwcrTypeCreateOrUpdate = "swcrTypeCreatedOrUpdated";
 
     /// <summary>
-    ///    Event that is fired when a new workorderChecklist is created or updated
+    ///     Event that is fired when a new workorderChecklist is created or updated
     /// </summary>
     public const string WorkOrderChecklistCreateOrUpdate = "workOrderChecklistCreatedOrUpdated";
 
 
     /// <summary>
-    ///    Event that is fired when a new workorder material is created or updated
+    ///     Event that is fired when a new workorder material is created or updated
     /// </summary>
     public const string WorkOrderMaterialCreateOrUpdate = "workOrderMaterialCreatedOrUpdated";
 
     /// <summary>
-    ///    Event that is fired when a new tag equipment  is created or updated
+    ///     Event that is fired when a new tag equipment  is created or updated
     /// </summary>
     public const string TagEquipmentCreateOrUpdate = "tagEquipmentCreatedOrUpdated";
 }

@@ -23,18 +23,16 @@ public class ResponsibleEventTests
             { "ResponsibleGroup", typeof(string) },
             { "Description", typeof(string) },
             { "IsVoided", typeof(bool) },
-            { "LastUpdated", typeof(DateTime) },
+            { "LastUpdated", typeof(DateTime) }
         };
 
         // Act
-        var actualProperties = responsibleEventInterfaceType.GetProperties()
+        Dictionary<string, Type> actualProperties = responsibleEventInterfaceType.GetProperties()
             .ToDictionary(p => p.Name, p => p.PropertyType);
 
         // Assert
         CollectionAssert.AreEquivalent(expectedProperties.Keys, actualProperties.Keys);
-        foreach (var expectedProperty in expectedProperties)
-        {
+        foreach (KeyValuePair<string, Type> expectedProperty in expectedProperties)
             Assert.AreEqual(expectedProperty.Value, actualProperties[expectedProperty.Key]);
-        }
     }
 }
