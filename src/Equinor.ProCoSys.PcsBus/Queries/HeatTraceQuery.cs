@@ -1,15 +1,17 @@
 ﻿// ReSharper disable StringLiteralTypo
 
+using Dapper;
+
 namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 
 public static class HeatTraceQuery
 {
-    public static string GetQuery(long? heatTraceId, string? plant = null)
+    public static (string queryString, DynamicParameters parameters) GetQuery(long? heatTraceId, string? plant = null)
     {
         DetectFaultyPlantInput(plant);
         var whereClause = CreateWhereClause(heatTraceId, plant, "ht", "id");
 
-        return @$"select
+        var query = @$"select
             ht.projectschema as Plant,
             ht.procosys_guid as ProCoSysGuid,
             ht.id as HeatTraceId,
@@ -24,6 +26,8 @@ public static class HeatTraceQuery
         from htjboxcableservice ht
             join tag cable on cable.tag_id = ht.cable_id
             join tag t on t.tag_id = ht.tag_id              
-        {whereClause}";
+        {whereClause.clause}";
+        
+        return (query, whereClause.parameters);
     }
 }

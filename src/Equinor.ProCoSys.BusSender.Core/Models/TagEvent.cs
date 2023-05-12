@@ -34,7 +34,7 @@ public class TagEvent : ITagEventV1
     public string? Status { get; init; }
     public string? System { get; init; }
 
-    public string? TagDetails { get; set; }
+    public string? TagDetails { get; init; }
     public string? TagFunctionCode { get; init; }
     public long TagId { get; init; }
     public string TagNo { get; init; }

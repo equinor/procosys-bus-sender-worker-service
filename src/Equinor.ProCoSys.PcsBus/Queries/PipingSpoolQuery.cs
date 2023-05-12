@@ -1,13 +1,15 @@
-﻿namespace Equinor.ProCoSys.PcsServiceBus.Queries;
+﻿using Dapper;
+
+namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 
 public class PipingSpoolQuery
 {
-    public static string GetQuery(long? pipingSpoolId, string? plant = null)
+    public static (string queryString, DynamicParameters parameters) GetQuery(long? pipingSpoolId, string? plant = null)
     {
         DetectFaultyPlantInput(plant);
         var whereClause = CreateWhereClause(pipingSpoolId, plant, "ps", "pipingspool_id");
 
-        return @$"select
+        var query = @$"select
             ps.projectschema as Plant,
             ps.procosys_guid as ProCoSysGuid,
             p.name as ProjectName,
@@ -38,6 +40,8 @@ public class PipingSpoolQuery
             join project p on p.project_id = m.project_id
             left join document iso on iso.document_id = ps.document_id
             join tag t on t.tag_id = ps.tag_id
-        {whereClause}";
+        {whereClause.clause}";
+        
+        return (query, whereClause.parameters);
     }
 }

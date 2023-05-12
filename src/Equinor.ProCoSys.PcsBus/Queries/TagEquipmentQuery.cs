@@ -1,13 +1,15 @@
-﻿namespace Equinor.ProCoSys.PcsServiceBus.Queries;
+﻿using Dapper;
+
+namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 
 public class TagEquipmentQuery
 {
-    public static string GetQuery(string tagEquipmentTypeGuid, string? plant = null)
+    public static (string queryString, DynamicParameters parameters) GetQuery(string tagEquipmentTypeGuid, string? plant = null)
     {
         DetectFaultyPlantInput(plant);
-        var whereClause = CreateWhereClauseForGuid(tagEquipmentTypeGuid, plant, "te", "procosys_guid");
+        var whereClause = CreateWhereClause(tagEquipmentTypeGuid, plant, "te", "procosys_guid");
 
-        return @$"select
+        var query = @$"select
             te.procosys_guid AS ProCoSysGuid,
             te.ProjectSchema AS Plant,
             te.MANUFACTURER_NAME AS ManufacturerName,
@@ -25,6 +27,8 @@ public class TagEquipmentQuery
         from TAGEQUIPMENT te
             left join TAG t ON te.TAG_ID = t.TAG_ID
             left join PROJECT p ON t.PROJECT_ID = p.PROJECT_ID
-        {whereClause}";
+        {whereClause.clause}";
+        
+        return (query, whereClause.parameters);
     }
 }

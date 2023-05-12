@@ -1,4 +1,6 @@
-﻿namespace Equinor.ProCoSys.PcsServiceBus.Queries;
+﻿using Dapper;
+
+namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 
 public class WorkOrderMaterialQuery
 {
@@ -6,12 +8,12 @@ public class WorkOrderMaterialQuery
     ///     Call with either workOrderId, plantId or both. Not advised to call without either as result set could get very
     ///     large
     /// </summary>
-    public static string GetQuery(string? guid, string? plant = null)
+    public static (string queryString, DynamicParameters parameters) GetQuery(string? guid, string? plant = null)
     {
         DetectFaultyPlantInput(plant);
-        var whereClause = CreateWhereClauseForGuid(guid, plant, "wm", "procosys_guid");
+        var whereClause = CreateWhereClause(guid, plant, "wm", "procosys_guid");
 
-        return @$"select
+        var query = @$"select
             wm.projectschema as Plant,
             wm.procosys_guid as ProCoSysGuid,
             p.NAME as ProjectName,
@@ -42,6 +44,8 @@ public class WorkOrderMaterialQuery
             left join library sl on sl.library_id = wm.stocklocation_id
             left join unit u on u.unit_id = wm.unit_id 
             left join library tl on tl.library_id = t.register_id
-        {whereClause}";
+        {whereClause.clause}";
+        
+        return (query, whereClause.parameters);
     }
 }

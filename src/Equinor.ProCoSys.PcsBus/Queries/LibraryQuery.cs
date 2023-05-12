@@ -1,15 +1,17 @@
 ﻿// ReSharper disable StringLiteralTypo
 
+using Dapper;
+
 namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 
 public class LibraryQuery
 {
-    public static string GetQuery(long? libraryId, string? plant = null)
+    public static (string query, DynamicParameters parameters) GetQuery(long? libraryId, string? plant = null)
     {
         DetectFaultyPlantInput(plant);
         var whereClause = CreateWhereClause(libraryId, plant, "l", "library_id");
 
-        return @$"select
+        var query = @$"select
             l.projectschema as Plant,
             l.procosys_guid as ProCoSysGuid,
             l.library_id as LibraryId,
@@ -22,6 +24,8 @@ public class LibraryQuery
             l.LAST_UPDATED as LastUpdated
         from library l
             left join library lp on l.parent_id = lp.library_id
-        {whereClause}";
+        {whereClause.clause}";
+        
+        return (query,whereClause.parameters);
     }
 }

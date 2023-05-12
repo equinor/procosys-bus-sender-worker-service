@@ -33,5 +33,5 @@ public interface ITagEventV1 : IHasEventType
     bool IsVoided { get; init; }
     DateTime LastUpdated { get; init; }
 
-    string? TagDetails { get; set; }
+    string? TagDetails { get; init; }
 }

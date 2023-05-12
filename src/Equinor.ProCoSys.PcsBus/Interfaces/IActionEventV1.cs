@@ -9,7 +9,7 @@ public interface IActionEventV1 : IHasEventType
     string Plant { get; init; }
     Guid ProCoSysGuid { get; init; }
     Guid ElementContentGuid { get; init; }
-    string CommPkgNo { get; init; }
+    string? CommPkgNo { get; init; }
     Guid? CommPkgGuid { get; init; }
     string? SwcrNo { get; init; }
     Guid? SwcrGuid { get; init; }

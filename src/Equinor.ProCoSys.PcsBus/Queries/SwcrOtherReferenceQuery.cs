@@ -1,13 +1,15 @@
-﻿namespace Equinor.ProCoSys.PcsServiceBus.Queries;
+﻿using Dapper;
+
+namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 
 public class SwcrOtherReferenceQuery
 {
-    public static string GetQuery(string swcrOtherReferencesGuid, string? plant = null)
+    public static (string queryString, DynamicParameters parameters) GetQuery(string swcrOtherReferencesGuid, string? plant = null)
     {
         DetectFaultyPlantInput(plant);
-        var whereClause = CreateWhereClauseForGuid(swcrOtherReferencesGuid, plant, "slr", "procosys_guid");
+        var whereClause = CreateWhereClause(swcrOtherReferencesGuid, plant, "slr", "procosys_guid");
 
-        return @$"select
+        var query = @$"select
             slr.ProjectSchema as Plant,
             slr.PROCOSYS_GUID as ProCoSysGuid,
             l.PROCOSYS_GUID as LibraryGuid,
@@ -18,6 +20,8 @@ public class SwcrOtherReferenceQuery
         from SWCRLIBRARYREFERENCE slr
                 join SWCR s ON s.SWCR_ID = slr.SWCR_ID
                 join LIBRARY l ON slr.LIBRARY_ID = l.LIBRARY_ID
-        {whereClause}";
+        {whereClause.clause}";
+        
+        return (query, whereClause.parameters);
     }
 }

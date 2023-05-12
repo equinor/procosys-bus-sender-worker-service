@@ -1,12 +1,14 @@
-﻿namespace Equinor.ProCoSys.PcsServiceBus.Queries;
+﻿using Dapper;
+
+namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 
 public class LibraryFieldQuery
 {
-    public static string GetQuery(string libraryFieldGuid, string? plant = null)
+    public static (string queryString, DynamicParameters parameters) GetQuery(string libraryFieldGuid, string? plant = null)
     {
         DetectFaultyPlantInput(plant);
-        var whereClause = CreateWhereClauseForGuid(libraryFieldGuid, plant, "lf", "procosys_guid");
-        return $@"select   
+        var whereClause = CreateWhereClause(libraryFieldGuid, plant, "lf", "procosys_guid");
+        var query = $@"select   
             lf.projectschema as Plant,
             lf.procosys_guid as ProCoSysGuid,
             l.procosys_guid as LibraryGuid,
@@ -24,6 +26,7 @@ public class LibraryFieldQuery
             join definelibraryfield dlf on dlf.id = lf.definelibraryfield_id
             join field field on field.field_id = dlf.field_id
             left join library lv on lv.library_id = lf.value_id
-        {whereClause}";
+        {whereClause.clause}";
+        return (query, whereClause.parameters);
     }
 }

@@ -18,7 +18,7 @@ public class Program
     public Program(IConfiguration configuration)
         => Configuration = configuration;
 
-    public static IHostBuilder CreateHostBuilder(string[] args)
+    private static IHostBuilder CreateHostBuilder(string[] args)
     {
         var builder = Host.CreateDefaultBuilder(args)
             .ConfigureAppConfiguration((context, config) =>
@@ -27,7 +27,7 @@ public class Program
                 var settings = config.Build();
 
                 var azConfig = settings.GetValue<bool>("UseAzureAppConfiguration");
-                if (azConfig && settings["IsLocal"] != "True")
+                if (azConfig)
                 {
                     config.AddAzureAppConfiguration(options =>
                     {

@@ -1,13 +1,15 @@
-﻿namespace Equinor.ProCoSys.PcsServiceBus.Queries;
+﻿using Dapper;
+
+namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 
 public class CommPkgMilestoneQuery
 {
-    public static string GetQuery(string? guid, string? plant = null)
+    public static (string queryString, DynamicParameters parameters) GetQuery(string? guid, string? plant = null)
     {
         DetectFaultyPlantInput(plant);
-        var whereClause = CreateWhereClauseForGuid(guid, plant, "e", "procosys_guid");
+        var whereClause = CreateWhereClause(guid, plant, "e", "procosys_guid");
 
-        return @$"SELECT e.projectschema AS Plant,
+        return (@$"SELECT e.projectschema AS Plant,
             e.procosys_guid AS ProCoSysGuid,
             ps.TITLE AS PlantName,
             p.name AS ProjectName,
@@ -28,6 +30,6 @@ public class CommPkgMilestoneQuery
             join commpkg c on c.commpkg_id = e.element_id
             left join project p on p.project_id =c.project_id
             left join V$Certificate cert on cert.certificate_id = e.certificate_id
-        {whereClause}";
+        {whereClause.clause}", whereClause.parameters);
     }
 }

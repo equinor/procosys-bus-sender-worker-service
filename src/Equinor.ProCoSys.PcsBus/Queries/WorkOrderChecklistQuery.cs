@@ -1,13 +1,15 @@
-﻿namespace Equinor.ProCoSys.PcsServiceBus.Queries;
+﻿using Dapper;
+
+namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 
 public class WorkOrderChecklistQuery
 {
-    public static string GetQuery(long? tagCheckId, long? woId, string? plant = null)
+    public static (string queryString, DynamicParameters parameters) GetQuery(long? tagCheckId, long? woId, string? plant = null)
     {
         DetectFaultyPlantInput(plant);
         var whereClause = CreateWhereClause(tagCheckId, woId, plant);
 
-        return @$"select
+        var query = @$"select
             wotc.projectschema as Plant,
             wotc.procosys_guid as ProCoSysGuid,
             p.NAME as ProjectName,
@@ -21,26 +23,34 @@ public class WorkOrderChecklistQuery
             join wo on wo.wo_id = wotc.wo_id
             join tagcheck tc on tc.tagcheck_id = wotc.tagcheck_id
             join project p ON p.project_id = wo.project_id
-        {whereClause}";
+        {whereClause.clause}";
+       
+        return (query, whereClause.parameters);
     }
 
-    private static string CreateWhereClause(long? tagCheckId, long? woId, string? plant)
+    private static (string clause, DynamicParameters parameters) CreateWhereClause(long? tagCheckId, long? woId, string? plant)
     {
         var whereClause = "";
-        if (tagCheckId != null && woId != null && plant != null)
+        var parameters = new DynamicParameters();
+
+        if (tagCheckId.HasValue && woId.HasValue)
         {
-            whereClause =
-                $"where wotc.projectschema = '{plant}' and wotc.wo_id = {woId} and wotc.tagcheck_id = {tagCheckId}";
+            whereClause = "where wotc.wo_id=:WoId AND wotc.tagcheck_id=:TagCheckId";
+            parameters.Add(":WoId", woId);
+            parameters.Add(":TagCheckId", tagCheckId);
+
+            if (plant != null)
+            {
+                whereClause += " AND wotc.projectschema=:Plant";
+                parameters.Add(":Plant", plant);
+            }
         }
         else if (plant != null)
         {
-            whereClause = $"where wotc.projectschema = '{plant}'";
-        }
-        else if (tagCheckId != null && woId != null)
-        {
-            whereClause = $"where wotc.wo_id = {woId} and wotc.tagcheck_id = {tagCheckId}";
+            whereClause = "where wotc.projectschema=:Plant";
+            parameters.Add(":Plant", plant);
         }
 
-        return whereClause;
+        return (whereClause, parameters);
     }
 }

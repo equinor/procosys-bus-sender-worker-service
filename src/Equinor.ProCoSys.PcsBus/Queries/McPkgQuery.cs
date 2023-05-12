@@ -1,13 +1,15 @@
-﻿namespace Equinor.ProCoSys.PcsServiceBus.Queries;
+﻿using Dapper;
+
+namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 
 public static class McPkgQuery
 {
-    public static string GetQuery(long? mcpkgId, string? plant = null)
+    public static (string queryString, DynamicParameters parameters) GetQuery(long? mcpkgId, string? plant = null)
     {
         DetectFaultyPlantInput(plant);
         var whereClause = CreateWhereClause(mcpkgId, plant, "m", "mcpkg_id");
 
-        return @$"select
+        var query = @$"select
             e.projectschema as Plant,
             m.procosys_guid as ProCoSysGuid,
             ps.TITLE as PlantName,
@@ -38,6 +40,7 @@ public static class McPkgQuery
             left join library mcstatus on mcstatus.library_id = m.mcstatus_id
             left join library phase on phase.library_id = m.mcpkgphase_id
             left join responsible resp on resp.responsible_id = m.responsible_id
-        {whereClause}";
+        {whereClause.clause}";
+        return (query, whereClause.parameters);
     }
 }

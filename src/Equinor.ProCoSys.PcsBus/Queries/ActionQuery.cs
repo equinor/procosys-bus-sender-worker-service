@@ -1,18 +1,19 @@
 ﻿// ReSharper disable StringLiteralTypo
 
 using System.Diagnostics.CodeAnalysis;
+using Dapper;
 
 namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 
 [SuppressMessage("ReSharper", "StringLiteralTypo")]
 public class ActionQuery
 {
-    public static string GetQuery(long? actionId, string? plant = null)
+    public static (string queryString, DynamicParameters parameters) GetQuery(long? actionId, string? plant = null)
     {
         DetectFaultyPlantInput(plant);
         var whereClause = CreateWhereClause(actionId, plant, "ec", "element_id");
 
-        return @$"select
+        var query = @$"select
             ec.ProjectSchema as Plant,
             ec.PROCOSYS_GUID as ProCoSysGuid,
             ec.Id as ElementContentGuid,
@@ -69,6 +70,7 @@ public class ActionQuery
             left join person responsibleperson ON responsibleperson.PERSON_ID = action.RESPONSIBLE_PERSON_ID
             left join LIBRARY responsiblefunrole ON responsiblefunrole.LIBRARY_ID = action.RESPONSIBLE_FUNCTIONALROLE_ID
             left join LIBRARY actionfuncrole ON actionfuncrole.LIBRARY_ID = ACTION.ACTIONBY_FUNCTIONALROLE_ID
-        {whereClause}";
+        {whereClause.clause}";
+        return (query, whereClause.parameters);
     }
 }

@@ -1,14 +1,16 @@
-﻿namespace Equinor.ProCoSys.PcsServiceBus.Queries;
+﻿using Dapper;
+
+namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 
 public class CallOffQuery
 {
-    public static string GetQuery(long? tagCheckId, string? plant = null)
+    public static (string query, DynamicParameters parameters) GetQuery(long? tagCheckId, string? plant = null)
     {
         DetectFaultyPlantInput(plant);
         var whereClause = CreateWhereClause(tagCheckId, plant, "co", "calloff_id");
-        whereClause += " and co.calloffno is not null";
+        whereClause.clause += " and co.calloffno is not null";
 
-        return @$"select
+        var query = @$"select
         co.projectschema as Plant,
         co.procosys_guid as ProCoSysGuid,
         co.calloff_id as CallOffId,
@@ -36,6 +38,8 @@ public class CallOffQuery
             left join responsible r on r.responsible_id = co.responsible_id
             left join library contractor on contractor.library_id = co.contractor_id
             left join library supplier on supplier.library_id = co.supplier_id
-        {whereClause}";
+        {whereClause.clause}";
+        
+        return (query,whereClause.parameters);
     }
 }

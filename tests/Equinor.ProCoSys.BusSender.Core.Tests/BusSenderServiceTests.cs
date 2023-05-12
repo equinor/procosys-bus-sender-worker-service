@@ -5,6 +5,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
+using Dapper;
 using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 using Equinor.ProCoSys.BusSenderWorker.Core.Models;
 using Equinor.ProCoSys.BusSenderWorker.Core.Services;
@@ -58,9 +59,11 @@ public class BusSenderServiceTests
         _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk())
             .Returns(() => Task.FromResult(new List<BusEvent> { wcl1, wcl2, wcl3, wcDelete }));
 
-        _dapperRepositoryMock.Setup(wcl => wcl.QuerySingle<WorkOrderChecklistEvent>(It.IsAny<string>(), "10001,1003"))
+        _dapperRepositoryMock.Setup(wcl => wcl.QuerySingle<WorkOrderChecklistEvent>(
+                It.IsAny<(string queryString, DynamicParameters parameters)>(), "10001,1003"))
             .Returns(() => Task.FromResult(workOrderChecklistEvent1));
-        _dapperRepositoryMock.Setup(wcl => wcl.QuerySingle<WorkOrderChecklistEvent>(It.IsAny<string>(), "1003,10001"))
+        _dapperRepositoryMock.Setup(wcl => wcl.QuerySingle<WorkOrderChecklistEvent>(
+                It.IsAny<(string queryString, DynamicParameters parameters)>(), "1003,10001"))
             .Returns(() => Task.FromResult(workOrderChecklistEvent2));
 
         var topicClientMockWoCl = new Mock<ServiceBusSender>();
@@ -149,9 +152,11 @@ public class BusSenderServiceTests
 
         _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk())
             .Returns(() => Task.FromResult(new List<BusEvent> { wo1, wo2, wo3 }));
-        _dapperRepositoryMock.Setup(wr => wr.QuerySingle<WorkOrderEvent>(It.IsAny<string>(), "10000"))
+        _dapperRepositoryMock.Setup(wr => wr.QuerySingle<WorkOrderEvent>(
+                It.IsAny<(string queryString, DynamicParameters parameters)>(), "10000"))
             .Returns(() => Task.FromResult(wo));
-        _dapperRepositoryMock.Setup(wr => wr.QuerySingle<WorkOrderEvent>(It.IsAny<string>(), "10001"))
+        _dapperRepositoryMock.Setup(wr => wr.QuerySingle<WorkOrderEvent>(
+                It.IsAny<(string queryString, DynamicParameters parameters)>(), "10001"))
             .Returns(() => Task.FromResult(wo));
 
         //Act
@@ -176,11 +181,14 @@ public class BusSenderServiceTests
 
         _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk())
             .Returns(() => Task.FromResult(new List<BusEvent> { wo1, wo2, wo3 }));
-        _dapperRepositoryMock.Setup(wr => wr.QuerySingle<WorkOrderEvent>(It.IsAny<string>(), wo1.ToString()))
+        _dapperRepositoryMock.Setup(wr => wr.QuerySingle<WorkOrderEvent>(
+                It.IsAny<(string queryString, DynamicParameters parameters)>(), wo1.ToString()))
             .Returns(() => Task.FromResult(wo));
-        _dapperRepositoryMock.Setup(wr => wr.QuerySingle<WorkOrderEvent>(It.IsAny<string>(), wo2.ToString()))
+        _dapperRepositoryMock.Setup(wr => wr.QuerySingle<WorkOrderEvent>(
+                It.IsAny<(string queryString, DynamicParameters parameters)>(), wo2.ToString()))
             .Returns(() => Task.FromResult(wo));
-        _dapperRepositoryMock.Setup(wr => wr.QuerySingle<WorkOrderEvent>(It.IsAny<string>(), wo3.ToString()))
+        _dapperRepositoryMock.Setup(wr => wr.QuerySingle<WorkOrderEvent>(
+                It.IsAny<(string queryString, DynamicParameters parameters)>(), wo3.ToString()))
             .Returns(() => Task.FromResult(wo));
 
         //Act
@@ -251,18 +259,22 @@ public class BusSenderServiceTests
 
         _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk())
             .Returns(() => Task.FromResult(new List<BusEvent> { wo1, wo2, wo3 }));
-        _dapperRepositoryMock.Setup(wr => wr.QuerySingle<WorkOrderEvent>(It.IsAny<string>(), wo1.ToString()))
+        _dapperRepositoryMock.Setup(wr => wr.QuerySingle<WorkOrderEvent>(
+                It.IsAny<(string queryString, DynamicParameters parameters)>(), wo1.ToString()))
             .Returns(() => Task.FromResult(wo));
-        _dapperRepositoryMock.Setup(wr => wr.QuerySingle<WorkOrderEvent>(It.IsAny<string>(), wo2.ToString()))
+        _dapperRepositoryMock.Setup(wr => wr.QuerySingle<WorkOrderEvent>(
+                It.IsAny<(string queryString, DynamicParameters parameters)>(), wo2.ToString()))
             .Returns(() => Task.FromResult(wo));
-        _dapperRepositoryMock.Setup(wr => wr.QuerySingle<WorkOrderEvent>(It.IsAny<string>(), wo3.ToString()))
+        _dapperRepositoryMock.Setup(wr => wr.QuerySingle<WorkOrderEvent>(
+                It.IsAny<(string queryString, DynamicParameters parameters)>(), wo3.ToString()))
             .Returns(() => Task.FromResult(wo));
 
         //Act
         await _dut.HandleBusEvents();
 
         //Assert
-        _dapperRepositoryMock.Verify(dr => dr.QuerySingle<WorkOrderEvent>(It.IsAny<string>(), It.IsAny<string>()),
+        _dapperRepositoryMock.Verify(dr => dr.QuerySingle<WorkOrderEvent>(
+                It.IsAny<(string queryString, DynamicParameters parameters)>(), It.IsAny<string>()),
             Times.Once);
         _topicClientMockWo.Verify(
             t => t.SendMessagesAsync(It.IsAny<ServiceBusMessageBatch>(), It.IsAny<CancellationToken>()), Times.Once);

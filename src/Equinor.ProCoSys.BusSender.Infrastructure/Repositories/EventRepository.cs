@@ -21,7 +21,7 @@ internal class EventRepository : IEventRepository
         _logger = logger;
     }
 
-    public async Task<T?> QuerySingle<T>(string queryString, string objectId) where T : IHasEventType
+    public async Task<T?> QuerySingle<T>((string queryString, DynamicParameters parameters) query, string objectId) where T : IHasEventType
     {
         var connection = _context.Database.GetDbConnection();
         var connectionWasClosed = connection.State != ConnectionState.Open;
@@ -32,7 +32,7 @@ internal class EventRepository : IEventRepository
 
         try
         {
-            var events = connection.Query<T>(queryString).ToList();
+            var events = connection.Query<T>(query.queryString, query.parameters).ToList();
             if (events.Count == 0)
             {
                 _logger.LogError("Object/Entity with id {ObjectId} did not return anything", objectId);

@@ -1,13 +1,15 @@
-﻿namespace Equinor.ProCoSys.PcsServiceBus.Queries;
+﻿using Dapper;
+
+namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 
 public static class PipingRevisionQuery
 {
-    public static string GetQuery(long? pipeRevId, string? plant = null)
+    public static (string queryString, DynamicParameters parameters) GetQuery(long? pipeRevId, string? plant = null)
     {
         DetectFaultyPlantInput(plant);
         var whereClause = CreateWhereClause(pipeRevId, plant, "pr", "pipingrevision_id");
 
-        return @$"select
+        var query = @$"select
             pr.projectschema as Plant,
             pr.procosys_guid as ProCoSysGuid,
             pr.pipingrevision_id as PipingRevisionId,
@@ -31,6 +33,7 @@ public static class PipingRevisionQuery
             left join document ti on ti.document_id = pr.document_id
             left join purchaseorder po on po.package_id = pr.package_id
             left join calloff co on co.calloff_id = pr.calloff_id
-        {whereClause}";
+        {whereClause.clause}";
+        return (query, whereClause.parameters);
     }
 }

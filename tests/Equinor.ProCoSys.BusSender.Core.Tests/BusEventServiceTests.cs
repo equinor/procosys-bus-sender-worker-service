@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Dapper;
 using Equinor.ProCoSys.BusSenderWorker.Core.Extensions;
 using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 using Equinor.ProCoSys.BusSenderWorker.Core.Models;
@@ -25,7 +26,7 @@ public class BusEventServiceTests
         // Arrange
         const string message = "123";
         const long actionId = 123L;
-        var queryString = ActionQuery.GetQuery(actionId);
+        var query = ActionQuery.GetQuery(actionId);
         var actionEvent = new ActionEvent
         {
             Plant = "Plant1",
@@ -58,7 +59,9 @@ public class BusEventServiceTests
             SignedBy = Guid.NewGuid()
         };
 
-        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<ActionEvent>(queryString, message))
+        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<ActionEvent>(
+                It.Is<(string queryString, DynamicParameters)>( qs => qs.queryString == query.queryString)
+                ,message))
             .ReturnsAsync(actionEvent);
 
         // Act
@@ -109,7 +112,7 @@ public class BusEventServiceTests
         // Arrange
         const string message = "123";
         const long callOffId = 123L;
-        var queryString = CallOffQuery.GetQuery(callOffId);
+        var query = CallOffQuery.GetQuery(callOffId);
         var callOffEvent = new CallOffEvent
         {
             Plant = "Plant1",
@@ -136,7 +139,9 @@ public class BusEventServiceTests
             McDossierReceived = DateOnly.MinValue
         };
 
-        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<CallOffEvent>(queryString, message))
+        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<CallOffEvent>(
+            It.Is<(string queryString, DynamicParameters)>( qs => qs.queryString == query.query),
+                message))
             .ReturnsAsync(callOffEvent);
 
         // Act
@@ -195,14 +200,17 @@ public class BusEventServiceTests
             SubSheetNo = "SubSheet1",
             FormularType = "Type1",
             FormularGroup = "Group1",
-            FormPhase = "Phase1",
+            FormPhaseCode = "Phase1",
+            FormPhaseGuid = new Guid(),
             SystemModule = "Module1",
             FormularDiscipline = "Discipline1",
             Revision = "Revision1",
             PipingRevisionMcPkNo = "PRMP-123",
             PipingRevisionMcPkGuid = Guid.NewGuid(),
-            Responsible = "Responsible1",
-            Status = "Status1",
+            ResponsibleCode = "Responsible1",
+            ResponsibleGuid = new Guid(),
+            StatusCode = "Status1",
+            StatusGuid = new Guid(),
             UpdatedAt = DateTime.UtcNow,
             LastUpdated = DateTime.UtcNow,
             CreatedAt = DateTime.UtcNow,
@@ -210,7 +218,9 @@ public class BusEventServiceTests
             VerifiedAt = DateTime.UtcNow
         };
 
-        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<ChecklistEvent>(queryString, message))
+        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<ChecklistEvent>(
+            It.Is<(string queryString, DynamicParameters)>( qs => qs.queryString == queryString.query),
+                message))
             .ReturnsAsync(checklistEvent);
 
         // Act
@@ -235,14 +245,17 @@ public class BusEventServiceTests
         Assert.AreEqual(checklistEvent.SubSheetNo, deserializedResult.SubSheetNo);
         Assert.AreEqual(checklistEvent.FormularType, deserializedResult.FormularType);
         Assert.AreEqual(checklistEvent.FormularGroup, deserializedResult.FormularGroup);
-        Assert.AreEqual(checklistEvent.FormPhase, deserializedResult.FormPhase);
+        Assert.AreEqual(checklistEvent.FormPhaseCode, deserializedResult.FormPhaseCode);
+        Assert.AreEqual(checklistEvent.FormPhaseGuid, deserializedResult.FormPhaseGuid);
         Assert.AreEqual(checklistEvent.SystemModule, deserializedResult.SystemModule);
         Assert.AreEqual(checklistEvent.FormularDiscipline, deserializedResult.FormularDiscipline);
         Assert.AreEqual(checklistEvent.Revision, deserializedResult.Revision);
         Assert.AreEqual(checklistEvent.PipingRevisionMcPkNo, deserializedResult.PipingRevisionMcPkNo);
         Assert.AreEqual(checklistEvent.PipingRevisionMcPkGuid, deserializedResult.PipingRevisionMcPkGuid);
-        Assert.AreEqual(checklistEvent.Responsible, deserializedResult.Responsible);
-        Assert.AreEqual(checklistEvent.Status, deserializedResult.Status);
+        Assert.AreEqual(checklistEvent.ResponsibleCode, deserializedResult.ResponsibleCode);
+        Assert.AreEqual(checklistEvent.ResponsibleGuid, deserializedResult.ResponsibleGuid);
+        Assert.AreEqual(checklistEvent.StatusCode, deserializedResult.StatusCode);
+        Assert.AreEqual(checklistEvent.StatusGuid, deserializedResult.StatusGuid);
         Assert.AreEqual(checklistEvent.UpdatedAt, deserializedResult.UpdatedAt);
         Assert.AreEqual(checklistEvent.LastUpdated, deserializedResult.LastUpdated);
         Assert.AreEqual(checklistEvent.CreatedAt, deserializedResult.CreatedAt);
@@ -287,7 +300,9 @@ public class BusEventServiceTests
             DCCommPkgStatus = "DCStatus1"
         };
 
-        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<CommPkgEvent>(queryString, message))
+        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<CommPkgEvent>(
+                It.Is<(string queryString, DynamicParameters)>( qs => qs.queryString == queryString.query),
+                message))
             .ReturnsAsync(commPkgEvent);
 
         // Act
@@ -333,7 +348,8 @@ public class BusEventServiceTests
         // Arrange
         const string message = "5f643eeb-b114-4fc4-b884-ade3f6ea63ce";
         const string commPkgGuid = "5f643eeb-b114-4fc4-b884-ade3f6ea63ce";
-        var queryString = CommPkgMilestoneQuery.GetQuery(commPkgGuid);
+        var query = CommPkgMilestoneQuery.GetQuery(commPkgGuid);
+
         var commPkgMilestoneEvent = new CommPkgMilestoneEvent
         {
             Plant = "Plant1",
@@ -353,7 +369,9 @@ public class BusEventServiceTests
             LastUpdated = DateTime.UtcNow
         };
 
-        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<CommPkgMilestoneEvent>(queryString, message))
+        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<CommPkgMilestoneEvent>(
+                It.Is<(string queryString, DynamicParameters)>( qs => qs.queryString == query.queryString),
+                message))
             .ReturnsAsync(commPkgMilestoneEvent);
 
         // Act
@@ -389,7 +407,7 @@ public class BusEventServiceTests
         // Arrange
         const string message = "123";
         const long commPkgId = 123L;
-        var queryString = CommPkgOperationQuery.GetQuery(commPkgId);
+        var query = CommPkgOperationQuery.GetQuery(commPkgId);
         var commPkgOperationEvent = new CommPkgOperationEvent
         {
             Plant = "Plant1",
@@ -411,7 +429,9 @@ public class BusEventServiceTests
             LastUpdated = DateTime.UtcNow
         };
 
-        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<CommPkgOperationEvent>(queryString, message))
+        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<CommPkgOperationEvent>(
+                It.Is<(string queryString, DynamicParameters)>( qs => qs.queryString == query.queryString),
+                message))
             .ReturnsAsync(commPkgOperationEvent);
 
         // Act
@@ -450,7 +470,7 @@ public class BusEventServiceTests
         const string message = "123,456";
         const long commPkgId = 123L;
         const long documentId = 456L;
-        var queryString = CommPkgQueryQuery.GetQuery(commPkgId, documentId);
+        var query = CommPkgQueryQuery.GetQuery(commPkgId, documentId);
         var commPkgQueryEvent = new CommPkgQueryEvent
         {
             Plant = "Plant1",
@@ -466,7 +486,9 @@ public class BusEventServiceTests
         };
 
 
-        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<CommPkgQueryEvent>(queryString, message))
+        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<CommPkgQueryEvent>(
+                It.Is<(string, DynamicParameters)>( qs => qs.Item1 == query.queryString),
+                message))
             .ReturnsAsync(commPkgQueryEvent);
 
         // Act
@@ -498,7 +520,7 @@ public class BusEventServiceTests
         const string message = "123,456";
         const long commPkgId = 123L;
         const long taskId = 456L;
-        var queryString = CommPkgTaskQuery.GetQuery(commPkgId, taskId);
+        var query = CommPkgTaskQuery.GetQuery(commPkgId, taskId);
 
         var commPkgTaskEvent = new CommPkgTaskEvent
         {
@@ -512,7 +534,9 @@ public class BusEventServiceTests
         };
 
 
-        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<CommPkgTaskEvent>(queryString, message))
+        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<CommPkgTaskEvent>(
+                It.Is<(string, DynamicParameters)>( qs => qs.Item1 == query.queryString),
+                message))
             .ReturnsAsync(commPkgTaskEvent);
 
         // Act
@@ -540,7 +564,7 @@ public class BusEventServiceTests
         // Arrange
         const string message = "123";
         const long heatTraceId = 123L;
-        var queryString = HeatTraceQuery.GetQuery(heatTraceId);
+        var query = HeatTraceQuery.GetQuery(heatTraceId);
 
         var heatTraceEvent = new HeatTraceEvent
         {
@@ -558,7 +582,9 @@ public class BusEventServiceTests
         };
 
 
-        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<HeatTraceEvent>(queryString, message))
+        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<HeatTraceEvent>(
+                It.Is<(string, DynamicParameters)>( qs => qs.Item1 == query.queryString), 
+                message))
             .ReturnsAsync(heatTraceEvent);
 
         // Act
@@ -590,7 +616,7 @@ public class BusEventServiceTests
         // Arrange
         const string message = "5f643eeb-b114-4fc4-b884-ade3f6ea63ce";
         const string libraryFieldGuid = "5f643eeb-b114-4fc4-b884-ade3f6ea63ce";
-        var queryString = LibraryFieldQuery.GetQuery(libraryFieldGuid);
+        var query = LibraryFieldQuery.GetQuery(libraryFieldGuid);
         var libraryFieldEvent = new LibraryFieldEvent
         {
             Plant = "Plant1",
@@ -607,7 +633,9 @@ public class BusEventServiceTests
             LastUpdated = DateTime.UtcNow
         };
 
-        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<LibraryFieldEvent>(queryString, message))
+        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<LibraryFieldEvent>(
+            It.Is<(string, DynamicParameters)>( qs => qs.Item1 == query.queryString),
+            message))
             .ReturnsAsync(libraryFieldEvent);
 
         // Act
@@ -640,7 +668,7 @@ public class BusEventServiceTests
         //Arrange
         const string message = "123";
         const long libraryId = 123L;
-        var queryString = LibraryQuery.GetQuery(libraryId);
+        var query = LibraryQuery.GetQuery(libraryId);
 
 
         var libraryEvent = new LibraryEvent
@@ -657,7 +685,9 @@ public class BusEventServiceTests
             LastUpdated = DateTime.UtcNow
         };
 
-        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<LibraryEvent>(queryString, message))
+        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<LibraryEvent>(
+                It.Is<(string, DynamicParameters)>( qs => qs.Item1 == query.query),
+                 message))
             .ReturnsAsync(libraryEvent);
 
         // Act
@@ -688,7 +718,7 @@ public class BusEventServiceTests
         // Arrange
         const string message = "123";
         const long loopId = 123L;
-        var queryString = LoopContentQuery.GetQuery(loopId);
+        var query = LoopContentQuery.GetQuery(loopId);
 
         // Arrange
         var loopContentEvent = new LoopContentEvent
@@ -703,7 +733,9 @@ public class BusEventServiceTests
             LastUpdated = DateTime.UtcNow
         };
 
-        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<LoopContentEvent>(queryString, message))
+        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<LoopContentEvent>(
+                It.Is<(string, DynamicParameters)>(qs => qs.Item1 == query.queryString),
+                message))
             .ReturnsAsync(loopContentEvent);
 
         // Act
@@ -732,7 +764,7 @@ public class BusEventServiceTests
         // Arrange
         const string message = "123";
         const long mcPkgId = 123L;
-        var queryString = McPkgQuery.GetQuery(mcPkgId);
+        var query = McPkgQuery.GetQuery(mcPkgId);
 
         var mcPkgEvent = new McPkgEvent
         {
@@ -758,7 +790,9 @@ public class BusEventServiceTests
             LastUpdated = DateTime.UtcNow
         };
 
-        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<McPkgEvent>(queryString, message))
+        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<McPkgEvent>(
+            It.Is<(string, DynamicParameters)>( qs => qs.Item1 == query.queryString),
+            message))
             .ReturnsAsync(mcPkgEvent);
 
         // Act
@@ -798,10 +832,10 @@ public class BusEventServiceTests
     {
         // Arrange
         const string message = "5f643eeb-b114-4fc4-b884-ade3f6ea63ce";
-        ;
+        
         const string mcPkgGuid = "5f643eeb-b114-4fc4-b884-ade3f6ea63ce";
-        ;
-        var queryString = McPkgMilestoneQuery.GetQuery(mcPkgGuid);
+        
+        var query = McPkgMilestoneQuery.GetQuery(mcPkgGuid);
 
         var mcPkgMilestoneEvent = new McPkgMilestoneEvent
         {
@@ -822,7 +856,9 @@ public class BusEventServiceTests
             LastUpdated = DateTime.UtcNow
         };
 
-        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<McPkgMilestoneEvent>(queryString, message))
+        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<McPkgMilestoneEvent>(
+                It.Is<(string, DynamicParameters)>( qs => qs.Item1 == query.queryString),
+                message))
             .ReturnsAsync(mcPkgMilestoneEvent);
 
         // Act
@@ -858,7 +894,7 @@ public class BusEventServiceTests
         // Arrange
         const string message = "12345";
         const long revisionId = 12345L;
-        var queryString = PipingRevisionQuery.GetQuery(revisionId);
+        var query = PipingRevisionQuery.GetQuery(revisionId);
 
         var pipingRevisionEvent = new PipingRevisionEvent
         {
@@ -881,7 +917,9 @@ public class BusEventServiceTests
             LastUpdated = DateTime.UtcNow
         };
 
-        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<PipingRevisionEvent>(queryString, message))
+        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<PipingRevisionEvent>(
+                It.Is<(string, DynamicParameters)>( qs => qs.Item1 == query.queryString),
+                message))
             .ReturnsAsync(pipingRevisionEvent);
 
         // Act
@@ -919,7 +957,7 @@ public class BusEventServiceTests
         // Arrange
         const string message = "12345";
         const long spoolId = 12345L;
-        var queryString = PipingSpoolQuery.GetQuery(spoolId);
+        var query = PipingSpoolQuery.GetQuery(spoolId);
 
         var pipingSpoolEvent = new PipingSpoolEvent
         {
@@ -949,7 +987,9 @@ public class BusEventServiceTests
             LastUpdated = DateTime.UtcNow
         };
 
-        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<PipingSpoolEvent>(queryString, message))
+        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<PipingSpoolEvent>(
+                It.Is<(string, DynamicParameters)>( qs => qs.Item1 == query.queryString),
+                message))
             .ReturnsAsync(pipingSpoolEvent);
 
         // Act
@@ -994,7 +1034,7 @@ public class BusEventServiceTests
         // Arrange
         const string message = "12345";
         const long projectId = 12345L;
-        var queryString = ProjectQuery.GetQuery(projectId);
+        var query = ProjectQuery.GetQuery(projectId);
 
         var projectEvent = new ProjectEvent
         {
@@ -1006,7 +1046,9 @@ public class BusEventServiceTests
             LastUpdated = DateTime.UtcNow
         };
 
-        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<ProjectEvent>(queryString, message))
+        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<ProjectEvent>(
+                It.Is<(string, DynamicParameters)>( qs => qs.Item1 == query.queryString),
+                message))
             .ReturnsAsync(projectEvent);
 
         // Act
@@ -1033,7 +1075,7 @@ public class BusEventServiceTests
         // Arrange
         const string message = "12345";
         const long punchListItemId = 12345L;
-        var queryString = PunchListItemQuery.GetQuery(punchListItemId);
+        var query = PunchListItemQuery.GetQuery(punchListItemId);
 
         var punchListItemEvent = new PunchListItemEvent
         {
@@ -1072,7 +1114,9 @@ public class BusEventServiceTests
             CreatedAt = DateTime.UtcNow.AddDays(-7)
         };
 
-        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<PunchListItemEvent>(queryString, message))
+        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<PunchListItemEvent>(
+                It.Is<(string, DynamicParameters)>( qs => qs.Item1 == query.queryString),
+                message))
             .ReturnsAsync(punchListItemEvent);
 
         // Act
@@ -1125,7 +1169,7 @@ public class BusEventServiceTests
         // Arrange
         const string message = "12345";
         const long queryId = 12345L;
-        var queryString = QueryQuery.GetQuery(queryId);
+        var query = QueryQuery.GetQuery(queryId);
         var queryEvent = new QueryEvent
         {
             Plant = "GardenOfMystery",
@@ -1150,7 +1194,9 @@ public class BusEventServiceTests
             LastUpdated = DateTime.UtcNow
         };
 
-        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<QueryEvent>(queryString, message))
+        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<QueryEvent>(
+                It.Is<(string, DynamicParameters)>( qs => qs.Item1 == query.queryString),
+                message))
             .ReturnsAsync(queryEvent);
 
         // Act
@@ -1191,7 +1237,7 @@ public class BusEventServiceTests
         // Arrange
         const string message = "12345";
         const long queryId = 12345L;
-        var queryString = QuerySignatureQuery.GetQuery(queryId);
+        var query = QuerySignatureQuery.GetQuery(queryId);
         var querySignatureEvent = new QuerySignatureEvent
         {
             Plant = "GardenOfMystery",
@@ -1202,7 +1248,9 @@ public class BusEventServiceTests
             LastUpdated = DateTime.UtcNow
         };
 
-        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<QuerySignatureEvent>(queryString, message))
+        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<QuerySignatureEvent>(
+                It.Is<(string, DynamicParameters)>( qs => qs.Item1 == query.queryString),
+                message))
             .ReturnsAsync(querySignatureEvent);
 
         // Act
@@ -1230,7 +1278,7 @@ public class BusEventServiceTests
         // Arrange
         const string message = "12345";
         const long responsibleId = 12345L;
-        var queryString = ResponsibleQuery.GetQuery(responsibleId);
+        var query = ResponsibleQuery.GetQuery(responsibleId);
         var responsibleEvent = new ResponsibleEvent
         {
             Plant = "MysteriousIsland",
@@ -1243,7 +1291,9 @@ public class BusEventServiceTests
             LastUpdated = DateTime.UtcNow
         };
 
-        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<ResponsibleEvent>(queryString, message))
+        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<ResponsibleEvent>(
+                It.Is<(string, DynamicParameters)>( qs => qs.Item1 == query.queryString),
+                message))
             .ReturnsAsync(responsibleEvent);
 
         // Act
@@ -1272,7 +1322,7 @@ public class BusEventServiceTests
         // Arrange
         const string message = "12345";
         const long stockId = 12345L;
-        var queryString = StockQuery.GetQuery(stockId);
+        var query = StockQuery.GetQuery(stockId);
         var stockEvent = new StockEvent
         {
             Plant = "EnchantedForest",
@@ -1283,7 +1333,9 @@ public class BusEventServiceTests
             LastUpdated = DateTime.UtcNow
         };
 
-        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<StockEvent>(queryString, message))
+        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<StockEvent>(
+                It.Is<(string, DynamicParameters)>( qs => qs.Item1 == query.queryString),
+                message))
             .ReturnsAsync(stockEvent);
 
         // Act
@@ -1307,7 +1359,7 @@ public class BusEventServiceTests
     {
         // Arrange
         const string message = "5f643eeb-b114-4fc4-b884-ade3f6ea63ce";
-        var queryString = SwcrAttachmentQuery.GetQuery(message);
+        var query = SwcrAttachmentQuery.GetQuery(message);
         var swcrAttachmentEvent = new SwcrAttachmentEvent
         {
             Plant = "EnchantedForest",
@@ -1320,7 +1372,9 @@ public class BusEventServiceTests
             LastUpdated = DateTime.UtcNow
         };
 
-        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<SwcrAttachmentEvent>(queryString, message))
+        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<SwcrAttachmentEvent>(
+                It.Is<(string, DynamicParameters)>( qs => qs.Item1 == query.queryString),
+                message))
             .ReturnsAsync(swcrAttachmentEvent);
 
         // Act
@@ -1347,7 +1401,7 @@ public class BusEventServiceTests
         // Arrange
         const string message = "12345";
         const long swcrId = 12345L;
-        var queryString = SwcrQuery.GetQuery(swcrId);
+        var query = SwcrQuery.GetQuery(swcrId);
         var swcrEvent = new SwcrEvent
         {
             Plant = "Plant1",
@@ -1373,7 +1427,9 @@ public class BusEventServiceTests
             EstimatedManHours = 100.0f
         };
 
-        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<SwcrEvent>(queryString, message))
+        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<SwcrEvent>(
+                It.Is<(string, DynamicParameters)>( qs => qs.Item1 == query.queryString),
+                message))
             .ReturnsAsync(swcrEvent);
 
         // Act
@@ -1414,7 +1470,7 @@ public class BusEventServiceTests
     {
         // Arrange
         const string message = "5f643eeb-0b7a-4b9e-9b1a-0e6b7b7b6b6b";
-        var queryString = SwcrOtherReferenceQuery.GetQuery(message);
+        var query = SwcrOtherReferenceQuery.GetQuery(message);
         var swcrOtherReferenceEvent = new SwcrOtherReferenceEvent
         {
             Plant = "EnchantedForest",
@@ -1426,7 +1482,9 @@ public class BusEventServiceTests
             LastUpdated = DateTime.UtcNow
         };
 
-        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<SwcrOtherReferenceEvent>(queryString, message))
+        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<SwcrOtherReferenceEvent>(
+                It.Is<(string, DynamicParameters)>( qs => qs.Item1 == query.queryString),
+                message))
             .ReturnsAsync(swcrOtherReferenceEvent);
 
         // Act
@@ -1453,7 +1511,7 @@ public class BusEventServiceTests
         // Arrange
         const string message = "1234";
         var swcrSignatureId = long.Parse(message);
-        var queryString = SwcrSignatureQuery.GetQuery(swcrSignatureId);
+        var query = SwcrSignatureQuery.GetQuery(swcrSignatureId);
         var swcrSignatureEvent = new SwcrSignatureEvent
         {
             Plant = "EnchantedForest",
@@ -1472,7 +1530,9 @@ public class BusEventServiceTests
             LastUpdated = DateTime.UtcNow
         };
 
-        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<SwcrSignatureEvent>(queryString, message))
+        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<SwcrSignatureEvent>(
+                It.Is<(string, DynamicParameters)>( qs => qs.Item1 == query.queryString),
+                message))
             .ReturnsAsync(swcrSignatureEvent);
 
         // Act
@@ -1505,8 +1565,7 @@ public class BusEventServiceTests
     {
         // Arrange
         const string message = "5a643eeb-0b7a-4b9e-9b1a-0e6b7b7b6b6b";
-        var queryString = SwcrTypeQuery.GetQuery(message);
-
+        var query = SwcrTypeQuery.GetQuery(message);
         var swcrTypeEvent = new SwcrTypeEvent
         {
             Plant = "EnchantedForest",
@@ -1517,7 +1576,9 @@ public class BusEventServiceTests
             LastUpdated = DateTime.UtcNow
         };
 
-        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<SwcrTypeEvent>(queryString, message))
+        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<SwcrTypeEvent>(
+                It.Is<(string, DynamicParameters)>( qs => qs.Item1 == query.queryString),
+                message))
             .ReturnsAsync(swcrTypeEvent);
 
         // Act
@@ -1543,8 +1604,7 @@ public class BusEventServiceTests
         // Arrange
         const string message = "123456";
         var taskId = long.Parse(message);
-        var queryString = TaskQuery.GetQuery(taskId);
-
+        var query = TaskQuery.GetQuery(taskId);
         var taskEvent = new TaskEvent
         {
             Plant = "MysteriousIsland",
@@ -1563,7 +1623,9 @@ public class BusEventServiceTests
         };
 
 
-        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<TaskEvent>(queryString, message))
+        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<TaskEvent>(
+                It.Is<(string, DynamicParameters)>( qs => qs.Item1 == query.queryString),
+                message))
             .ReturnsAsync(taskEvent);
 
         // Act
@@ -1597,7 +1659,7 @@ public class BusEventServiceTests
         const string message = "4321,1234";
         const long workOrderId = 1234L;
         const long checkListId = 4321L;
-        var queryString = WorkOrderChecklistQuery.GetQuery(checkListId, workOrderId);
+        var query = WorkOrderChecklistQuery.GetQuery(checkListId, workOrderId);
 
         var workOrderChecklistEvent = new WorkOrderChecklistEvent
         {
@@ -1612,7 +1674,9 @@ public class BusEventServiceTests
             LastUpdated = DateTime.UtcNow
         };
 
-        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<WorkOrderChecklistEvent>(queryString, message))
+        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<WorkOrderChecklistEvent>(
+                It.Is<(string, DynamicParameters)>( qs => qs.Item1 == query.queryString),
+                message))
             .ReturnsAsync(workOrderChecklistEvent);
 
         // Act
@@ -1642,7 +1706,7 @@ public class BusEventServiceTests
         const string message = "1234,03052023";
         const long workOrderId = 1234L;
         const string cutoffWeek = "03052023";
-        var queryString = WorkOrderCutoffQuery.GetQuery(workOrderId, cutoffWeek);
+        var query = WorkOrderCutoffQuery.GetQuery(workOrderId, cutoffWeek);
 
         var workOrderCutoffEvent = new WorkOrderCutoffEvent
         {
@@ -1674,7 +1738,9 @@ public class BusEventServiceTests
             ProjectProgress = 75.0
         };
 
-        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<WorkOrderCutoffEvent>(queryString, message))
+        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<WorkOrderCutoffEvent>(
+                It.Is<(string, DynamicParameters)>( qs => qs.Item1 == query.queryString),
+                message))
             .ReturnsAsync(workOrderCutoffEvent);
 
         // Act
@@ -1720,7 +1786,7 @@ public class BusEventServiceTests
         // Arrange
         const string message = "5a643eeb-0b7a-4b9e-9b1a-0e6b7b7b6b6b";
 
-        var queryString = WorkOrderMaterialQuery.GetQuery(message);
+        var query = WorkOrderMaterialQuery.GetQuery(message);
 
         var workOrderMaterialEvent = new WorkOrderMaterialEvent
         {
@@ -1748,7 +1814,9 @@ public class BusEventServiceTests
             LastUpdated = DateTime.Now
         };
 
-        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<WorkOrderMaterialEvent>(queryString, message))
+        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<WorkOrderMaterialEvent>(
+                It.Is<(string, DynamicParameters)>( qs => qs.Item1 == query.queryString),
+                message))
             .ReturnsAsync(workOrderMaterialEvent);
 
         // Act
@@ -1789,8 +1857,7 @@ public class BusEventServiceTests
     {
         // Arrange
         const string message = "1234";
-        var queryString = WorkOrderQuery.GetQuery(long.Parse(message));
-
+        var query = WorkOrderQuery.GetQuery(long.Parse(message));
         var workOrderEvent = new WorkOrderEvent
         {
             Plant = "ThePlant",
@@ -1835,7 +1902,9 @@ public class BusEventServiceTests
             LastUpdated = DateTime.Now
         };
 
-        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<WorkOrderEvent>(queryString, message))
+        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<WorkOrderEvent>(
+                It.Is<(string, DynamicParameters)>( qs => qs.Item1 == query.queryString),
+                message))
             .ReturnsAsync(workOrderEvent);
 
         // Act
@@ -1896,9 +1965,7 @@ public class BusEventServiceTests
         const string message = "1234,4321";
         const long workOrderId = 1234L;
         const long milestoneId = 4321L;
-
-        var queryString = WorkOrderMilestoneQuery.GetQuery(workOrderId, milestoneId);
-
+        var query = WorkOrderMilestoneQuery.GetQuery(workOrderId, milestoneId);
         var workOrderMilestoneEvent = new WorkOrderMilestoneEvent
         {
             Plant = "ThePlant",
@@ -1913,7 +1980,9 @@ public class BusEventServiceTests
             LastUpdated = DateTime.Now
         };
 
-        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<WorkOrderMilestoneEvent>(queryString, message))
+        _dapperRepositoryMock.Setup(repo => repo.QuerySingle<WorkOrderMilestoneEvent>(
+                It.Is<(string, DynamicParameters)>( qs => qs.Item1 == query.queryString),
+                message))
             .ReturnsAsync(workOrderMilestoneEvent);
 
         // Act

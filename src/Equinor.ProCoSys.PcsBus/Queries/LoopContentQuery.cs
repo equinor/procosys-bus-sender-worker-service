@@ -1,13 +1,15 @@
-﻿namespace Equinor.ProCoSys.PcsServiceBus.Queries;
+﻿using Dapper;
+
+namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 
 public class LoopContentQuery
 {
-    public static string GetQuery(long? loopTagId, string? plant = null)
+    public static (string queryString, DynamicParameters parameters) GetQuery(long? loopTagId, string? plant = null)
     {
         DetectFaultyPlantInput(plant);
-        var whereClause = CreateWhereClause(loopTagId, plant, "lt", "looptag_id");
+        var whereClauseTuple = CreateWhereClause(loopTagId, plant, "lt", "looptag_id");
 
-        return @$"select
+        var query = @$"select
             lt.projectschema as Plant,
             lt.procosys_guid as ProCoSysGuid,
             lt.looptag_id as LoopTagId,
@@ -20,6 +22,7 @@ public class LoopContentQuery
             join tag t on t.tag_id = lt.tag_id
             join tag t2 on t2.tag_id = lt.looptag_id
             join library register on register.library_id = t.register_id
-        {whereClause}";
+        {whereClauseTuple.clause}";
+        return (query, whereClauseTuple.parameters);
     }
 }

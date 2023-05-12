@@ -1,13 +1,15 @@
-﻿namespace Equinor.ProCoSys.PcsServiceBus.Queries;
+﻿using Dapper;
+
+namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 
 public class PunchListItemQuery
 {
-    public static string GetQuery(long? punchListItemId, string? plant = null)
+    public static (string queryString, DynamicParameters parameters) GetQuery(long? punchListItemId, string? plant = null)
     {
         DetectFaultyPlantInput(plant);
         var whereClause = CreateWhereClause(punchListItemId, plant, "pl", "punchlistitem_id");
 
-        return @$"select
+        var query = @$"select
             pl.projectschema as Plant,
             pl.procosys_guid as ProCoSysGuid,
             p.name as ProjectName,
@@ -59,6 +61,8 @@ public class PunchListItemQuery
             left join wo orgwo on orgwo.wo_id = pl.originalwo_id
             left join swcr on swcr.swcr_id = pl.swcr_id
             left join document doc on doc.document_id = pl.drawing_id
-        {whereClause}";
+        {whereClause.clause}";
+        
+        return (query, whereClause.parameters);
     }
 }

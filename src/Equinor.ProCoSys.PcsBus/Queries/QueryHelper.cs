@@ -1,46 +1,59 @@
 ﻿using System;
 using System.Linq;
+using Dapper;
 
 namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 
 public static class QueryHelper
 {
-    public static string CreateWhereClause(long? id, string? plant, string shortHand, string? idColumn)
+    public static (string clause, DynamicParameters parameters) CreateWhereClause(long? id, string? plant, string shortHand, string? idColumn)
     {
         var whereClause = "";
-        if (id != null && plant != null)
+        var parameters = new DynamicParameters();
+
+        if (id.HasValue && plant != null)
         {
-            whereClause = $"where {shortHand}.projectschema = '{plant}' and {shortHand}.{idColumn} = {id}";
+            whereClause = $"where {shortHand}.ProjectSchema=:Plant AND {shortHand}.{idColumn}=:Id";
+            parameters.Add(":Plant", plant);
+            parameters.Add(":Id", id);
         }
         else if (plant != null)
         {
-            whereClause = $"where {shortHand}.projectschema = '{plant}'";
+            whereClause = $"where {shortHand}.ProjectSchema=:Plant";
+            parameters.Add(":Plant", plant);
         }
-        else if (id != null)
+        else if (id.HasValue)
         {
-            whereClause = $"where {shortHand}.{idColumn} = {id}";
+            whereClause = $"where {shortHand}.{idColumn}=:Id";
+            parameters.Add(":Id", id);
         }
 
-        return whereClause;
+        return (whereClause, parameters);
     }
 
-    public static string CreateWhereClauseForGuid(string? guid, string? plant, string shortHand, string idColumn)
+    public static (string clause, DynamicParameters parameters) CreateWhereClause(string? guid, string? plant, string shortHand, string idColumn)
     {
         var whereClause = "";
+        var parameters = new DynamicParameters();
+
         if (guid != null && plant != null)
         {
-            whereClause = $"where {shortHand}.projectschema = '{plant}' and {shortHand}.{idColumn} = '{guid}'";
+            whereClause = $"where {shortHand}.ProjectSchema=:Plant AND {shortHand}.{idColumn}=:Guid";
+            parameters.Add(":Plant", plant);
+            parameters.Add(":Guid", guid);
         }
         else if (plant != null)
         {
-            whereClause = $"where {shortHand}.projectschema = '{plant}'";
+            whereClause = $"where {shortHand}.ProjectSchema=:Plant";
+            parameters.Add(":Plant", plant);
         }
         else if (guid != null)
         {
-            whereClause = $"where {shortHand}.{idColumn} = '{guid}'";
+            whereClause = $"where {shortHand}.{idColumn}=:Guid";
+            parameters.Add(":Guid", guid);
         }
 
-        return whereClause;
+        return (whereClause, parameters);
     }
 
     public static void DetectFaultyPlantInput(string? plant)

@@ -1,18 +1,20 @@
-﻿namespace Equinor.ProCoSys.PcsServiceBus.Queries;
+﻿using Dapper;
+
+namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 
 public class SwcrSignatureQuery
 {
-    public static string GetQuery(long? swcrSignatureId, string? plant = null)
+    public static (string queryString, DynamicParameters parameters) GetQuery(long? swcrSignatureId, string? plant = null)
     {
         DetectFaultyPlantInput(plant);
         var whereClause = CreateWhereClause(swcrSignatureId, plant, "sign", "swcrsignature_id");
 
-        return @$"select
+        var query = @$"select
             sign.projectschema as Plant,
             sign.procosys_guid as ProCoSysGuid,
             sign.swcrsignature_id as SwcrSignatureId,
             p.NAME as ProjectName,
-            s.swcrno as SWCRNO,
+            s.swcrno as SwcrNo,
             s.procosys_guid as SwcrGuid,
             sr.code as SignatureRoleCode,
             sr.description as SignatureRoleDescription,
@@ -29,6 +31,8 @@ public class SwcrSignatureQuery
             join library sr ON sr.library_id = sign.signaturerole_id
             left join person p ON p.person_id = sign.signedby_id
             left join library fr On fr.library_id = sign.functionalrole_id
-        {whereClause}";
+        {whereClause.clause}";
+        
+        return (query, whereClause.parameters);
     }
 }

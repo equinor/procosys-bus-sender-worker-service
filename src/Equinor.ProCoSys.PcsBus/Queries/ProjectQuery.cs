@@ -1,13 +1,15 @@
-﻿namespace Equinor.ProCoSys.PcsServiceBus.Queries;
+﻿using Dapper;
+
+namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 
 public class ProjectQuery
 {
-    public static string GetQuery(long? projectId, string? plant = null)
+    public static (string queryString, DynamicParameters parameters) GetQuery(long? projectId, string? plant = null)
     {
         DetectFaultyPlantInput(plant);
         var whereClause = CreateWhereClause(projectId, plant, "p", "project_id");
 
-        return @$"select
+        var query = @$"select
             p.projectschema as Plant,
             p.procosys_guid as ProCoSysGuid,
             p.NAME as ProjectName,
@@ -15,6 +17,8 @@ public class ProjectQuery
             p.DESCRIPTION as Description,
             p.last_updated as LastUpdated
         from project p
-        {whereClause}";
+        {whereClause.clause}";
+        
+        return (query, whereClause.parameters);
     }
 }

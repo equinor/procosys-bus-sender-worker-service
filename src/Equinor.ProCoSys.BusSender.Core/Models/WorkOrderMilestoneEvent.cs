@@ -8,14 +8,14 @@ namespace Equinor.ProCoSys.BusSenderWorker.Core.Models;
 public class WorkOrderMilestoneEvent : IWorkOrderMilestoneEventV1
 {
     public string EventType => PcsEventConstants.WorkOrderMilestoneCreateOrUpdate;
-    public string Code { get; set; }
-    public DateTime LastUpdated { get; set; }
-    public DateOnly? MilestoneDate { get; set; }
-    public string Plant { get; set; }
-    public Guid ProCoSysGuid { get; set; }
-    public string ProjectName { get; set; }
-    public string? SignedByAzureOid { get; set; }
-    public Guid? WoGuid { get; set; }
-    public long WoId { get; set; }
-    public string WoNo { get; set; }
+    public string Code { get; init; }
+    public DateTime LastUpdated { get; init; }
+    public DateOnly? MilestoneDate { get; init; }
+    public string Plant { get; init; }
+    public Guid ProCoSysGuid { get; init; }
+    public string ProjectName { get; init; }
+    public string? SignedByAzureOid { get; init; }
+    public Guid? WoGuid { get; init; }
+    public long WoId { get; init; }
+    public string WoNo { get; init; }
 }

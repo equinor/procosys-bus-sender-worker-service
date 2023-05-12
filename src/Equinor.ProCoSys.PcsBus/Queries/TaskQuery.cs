@@ -1,8 +1,10 @@
-﻿namespace Equinor.ProCoSys.PcsServiceBus.Queries;
+﻿using Dapper;
+
+namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 
 public class TaskQuery
 {
-    public static string GetQuery(long? taskId, string? plant = null)
+    public static (string queryString, DynamicParameters parameters) GetQuery(long? taskId, string? plant = null)
     {
         DetectFaultyPlantInput(plant);
         var whereClause = CreateWhereClause(taskId, plant, "ec", "element_id");
@@ -11,10 +13,10 @@ public class TaskQuery
          * This is to filter out elementcontents that are in fact not Tasks connected to commPackages.
          * It is done in a where clause instead of inner join to avoid duplicates.
          */
-        whereClause +=
+        whereClause.clause +=
             " and EXISTS(select 1 from ElementReference er where ec.Element_id = er.ToElement_id and er.Association= 'Task' and er.FromElement_Role = 'CommPkg')";
 
-        return @$"select
+        var query = @$"select
             ec.ProjectSchema as Plant,
             ec.ProCoSys_Guid as ProCoSysGuid,
             ec2.ProCoSys_Guid as TaskParentProCoSysGuid,
@@ -46,7 +48,7 @@ public class TaskQuery
             LEFT JOIN ElementContent ec2 ON ec.Parent_Id = ec2.Element_Id
             LEFT JOIN ElementSignature es ON es.Element_Id = ec.Element_Id
             LEFT JOIN Person p ON es.SignedBy_Id = p.Person_Id
-        {whereClause}
+        {whereClause.clause}
          and subQuery.DocumentId = (
             SELECT MIN(e.element_id) AS rootElement_Id
             FROM ELEMENTCONTENT e
@@ -55,5 +57,6 @@ public class TaskQuery
             GROUP BY e.parent_id
             HAVING parent_id IS NULL
         )";
+        return (query, whereClause.parameters);
     }
 }

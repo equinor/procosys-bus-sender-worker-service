@@ -1,15 +1,16 @@
 ﻿using System;
+using Dapper;
 
 namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 
 public class CommPkgTaskQuery
 {
-    public static string GetQuery(long? commPkgId, long? taskId, string? plant = null)
+    public static (string queryString, DynamicParameters parameters) GetQuery(long? commPkgId, long? taskId, string? plant = null)
     {
         DetectFaultyPlantInput(plant);
         var whereClause = CreateWhereClause(commPkgId, taskId, plant);
 
-        return @$"select
+        var queryString = @$"select
             c.ProjectSchema as Plant,
             p.Title as ProjectName,
             er.procosys_guid as ProCoSysGuid,
@@ -21,32 +22,40 @@ public class CommPkgTaskQuery
             join CommPkg c ON er.FromElement_Id = c.CommPkg_Id
             join Project p ON  c.Project_Id = p.Project_Id
             join ElementContent ec ON er.ToElement_Id = ec.Element_Id
-        {whereClause}";
+        {whereClause.clause}";
+        
+        return (queryString,whereClause.parameters);
     }
 
-    private static string CreateWhereClause(long? commPkgId, long? taskId, string? plant)
+    private static (string clause, DynamicParameters parameters) CreateWhereClause(long? commPkgId, long? taskId, string? plant)
     {
         var whereClause = "";
-        if (commPkgId != null && taskId != null && plant != null)
+        var parameters = new DynamicParameters();
+
+        if (commPkgId.HasValue && taskId.HasValue)
         {
-            whereClause =
-                $"where er.ProjectSchema='{plant}' AND er.FromElement_Id = {commPkgId} AND er.ToElement_Id={taskId} AND er.Association='Task'";
+            whereClause += "where er.FromElement_Id=:CommPkgId AND er.ToElement_Id=:TaskId";
+            parameters.Add(":CommPkgId", commPkgId);
+            parameters.Add(":TaskId", taskId);
+        
+            if (plant != null)
+            {
+                whereClause += " AND er.ProjectSchema=:Plant";
+                parameters.Add(":Plant", plant);
+            }
+        
+            whereClause += " AND er.Association='Task'";
         }
         else if (plant != null)
         {
-            whereClause = $"where er.ProjectSchema='{plant}' AND er.Association='Task'";
+            whereClause = "where er.ProjectSchema=:Plant AND er.Association='Task'";
+            parameters.Add(":Plant", plant);
         }
-        else if (commPkgId != null && taskId != null)
+        else if (commPkgId.HasValue || taskId.HasValue)
         {
-            whereClause =
-                $"where er.FromElement_Id={commPkgId} AND er.ToElement_Id = {taskId} AND er.Association='Task'";
-        }
-        else if (commPkgId != null || taskId != null)
-        {
-            throw new Exception(
-                "Message can not contain partial id match, need both commPkgId and taskId to find correct db entry");
+            throw new Exception("Message cannot contain partial id match, need both commPkgId and taskId to find correct db entry");
         }
 
-        return whereClause;
+        return (whereClause, parameters);
     }
 }

@@ -4,44 +4,43 @@ namespace Equinor.ProCoSys.PcsServiceBus.Interfaces;
 
 public interface IWorkOrderEventV1 : IHasEventType
 {
-    string Plant { get; }
-    Guid ProCoSysGuid { get; }
-    string ProjectName { get; }
-    string WoNo { get; }
-    long WoId { get; }
-    string? CommPkgNo { get; }
-    Guid? CommPkgGuid { get; }
-    string? Title { get; }
-    string? Description { get; }
-    string? MilestoneCode { get; }
-    string? SubMilestoneCode { get; }
-    string? MilestoneDescription { get; }
-    string? CategoryCode { get; }
-    string? MaterialStatusCode { get; }
-    string? HoldByCode { get; }
-    string? DisciplineCode { get; }
-    string? DisciplineDescription { get; }
-    string? ResponsibleCode { get; }
-    string? ResponsibleDescription { get; }
-    string? AreaCode { get; }
-    string? AreaDescription { get; }
-    string? JobStatusCode { get; }
-    string? MaterialComments { get; }
-    string? ConstructionComments { get; }
-    string? TypeOfWorkCode { get; }
-    string? OnShoreOffShoreCode { get; }
-    string? WoTypeCode { get; }
-    string? ProjectProgress { get; }
-    string? ExpendedManHours { get; }
-    string? EstimatedHours { get; }
-    string? RemainingHours { get; }
-    string? WBS { get; }
-    int Progress { get; }
-    DateOnly? PlannedStartAtDate { get; }
-    DateOnly? ActualStartAtDate { get; }
-    DateOnly? PlannedFinishedAtDate { get; }
-    DateOnly? ActualFinishedAtDate { get; }
-    DateTime CreatedAt { get; }
-    bool IsVoided { get; }
-    DateTime LastUpdated { get; }
+    string Plant { get; init; }
+    Guid ProCoSysGuid { get; init; }
+    string ProjectName { get; init; }
+    string WoNo { get; init; }
+    long WoId { get; init; }
+    string? CommPkgNo { get; init; }
+    Guid? CommPkgGuid { get; init; }
+    string? Title { get; init; }
+    string? Description { get; init; }
+    string? MilestoneCode { get; init; }
+    string? SubMilestoneCode { get; init; }
+    string? MilestoneDescription { get; init; }
+    string? CategoryCode { get; init; }
+    string? MaterialStatusCode { get; init; }
+    string? HoldByCode { get; init; }
+    string? DisciplineCode { get; init; }
+    string? DisciplineDescription { get; init; }
+    string? ResponsibleCode { get; init; }
+    string? ResponsibleDescription { get; init; }
+    string? AreaCode { get; init; }
+    string? AreaDescription { get; init; }
+    string? JobStatusCode { get; init; }
+    string? MaterialComments { get; init; }
+    string? ConstructionComments { get; init; }
+    string? TypeOfWorkCode { get; init; }
+    string? OnShoreOffShoreCode { get; init; }
+    string? WoTypeCode { get; init; }
+    string? ProjectProgress { get; init; }
+    string? ExpendedManHours { get; init; }
+    string? EstimatedHours { get; init; }
+    string? RemainingHours { get; init; }
+    string? WBS { get; init; }
+    DateOnly? PlannedStartAtDate { get; init; }
+    DateOnly? ActualStartAtDate { get; init; }
+    DateOnly? PlannedFinishedAtDate { get; init; }
+    DateOnly? ActualFinishedAtDate { get; init; }
+    DateTime CreatedAt { get; init; }
+    bool IsVoided { get; init; }
+    DateTime LastUpdated { get; init; }
 }

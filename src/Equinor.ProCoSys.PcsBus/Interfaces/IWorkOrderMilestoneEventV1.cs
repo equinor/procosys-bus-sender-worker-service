@@ -4,14 +4,14 @@ namespace Equinor.ProCoSys.PcsServiceBus.Interfaces;
 
 public interface IWorkOrderMilestoneEventV1 : IHasEventType
 {
-    string Plant { get; }
-    Guid ProCoSysGuid { get; }
-    string ProjectName { get; }
-    long WoId { get; }
-    Guid? WoGuid { get; }
-    string WoNo { get; }
-    string Code { get; }
-    DateOnly? MilestoneDate { get; }
-    string? SignedByAzureOid { get; }
-    DateTime LastUpdated { get; }
+    string Plant { get; init; }
+    Guid ProCoSysGuid { get; init; }
+    string ProjectName { get; init; }
+    long WoId { get; init; }
+    Guid? WoGuid { get; init; }
+    string WoNo { get; init; }
+    string Code { get; init; }
+    DateOnly? MilestoneDate { get; init; }
+    string? SignedByAzureOid { get; init; }
+    DateTime LastUpdated { get; init; }
 }

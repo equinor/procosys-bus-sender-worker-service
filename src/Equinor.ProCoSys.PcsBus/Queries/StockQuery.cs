@@ -1,13 +1,15 @@
-﻿namespace Equinor.ProCoSys.PcsServiceBus.Queries;
+﻿using Dapper;
+
+namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 
 public class StockQuery
 {
-    public static string GetQuery(long? stockId, string? plant = null)
+    public static (string queryString, DynamicParameters parameters) GetQuery(long? stockId, string? plant = null)
     {
         DetectFaultyPlantInput(plant);
         var whereClause = CreateWhereClause(stockId, plant, "s", "id");
 
-        return @$"select
+        var query = @$"select
             s.projectschema as Plant,
             s.procosys_guid as ProCoSysGuid,
             s.id as StockId,
@@ -15,6 +17,8 @@ public class StockQuery
             s.description as Description,
             s.LAST_UPDATED as LastUpdated
         from stock s
-        {whereClause}";
+        {whereClause.clause}";
+        
+        return (query, whereClause.parameters);
     }
 }

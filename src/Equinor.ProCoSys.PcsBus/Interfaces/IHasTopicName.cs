@@ -2,5 +2,5 @@
 
 public interface IHasTopicName
 {
-    string TopicName { get; }
+    string TopicName { get; init; }
 }

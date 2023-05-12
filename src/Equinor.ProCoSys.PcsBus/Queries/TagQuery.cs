@@ -1,13 +1,15 @@
-﻿namespace Equinor.ProCoSys.PcsServiceBus.Queries;
+﻿using Dapper;
+
+namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 
 public class TagQuery
 {
-    public static string GetQuery(long? tagId, string? plant = null)
+    public static (string query, DynamicParameters parameters) GetQuery(long? tagId, string? plant = null)
     {
         DetectFaultyPlantInput(plant);
         var whereClause = CreateWhereClause(tagId, plant, "t", "tag_id");
 
-        return @$"select
+        var query = @$"select
             t.projectschema as Plant,
             t.procosys_guid as ProCoSysGuid,
             t.tagno as TagNo,
@@ -71,21 +73,23 @@ public class TagQuery
         from tag t
             join element e on e.element_id = t.tag_id
             join projectschema ps on ps.projectschema = t.projectschema
-            left join mcpkg on mcpkg.mcpkg_id=t.mcpkg_id
+            left join mcpkg on mcpkg.mcpkg_id = t.mcpkg_id
             left join commpkg on commpkg.commpkg_id= COALESCE(mcpkg.commpkg_id,t.commpkg_id)
-            left join project p on p.project_id=t.project_id
+            left join project p on p.project_id = t.project_id
             left join tagfunction tf on tf.tagfunction_id = t.tagfunction_id
-            left join library area on area.library_id=t.area_id
-            left join library discipline on discipline.library_id=t.discipline_id
-            left join library register on register.library_id=t.register_id
+            left join library area on area.library_id = t.area_id
+            left join library discipline on discipline.library_id = t.discipline_id
+            left join library register on register.library_id = t.register_id
             left join library installation on installation.library_id = t.installation_id
-            left join library status on status.library_id=t.status_id
-            left join library system on system.library_id=t.system_id
-            left join calloff  on calloff.calloff_id=t.calloff_id
-            left join purchaseorder on purchaseorder.package_id=calloff.package_id
+            left join library status on status.library_id = t.status_id
+            left join library system on system.library_id = t.system_id
+            left join calloff  on calloff.calloff_id = t.calloff_id
+            left join purchaseorder on purchaseorder.package_id = calloff.package_id
             left join tagfunction on tagfunction.tagfunction_id = t.tagfunction_id     
             left join library ec on ec.library_id = t.engineeringcode_id
-            left join tag mt on t.mountedon_id=mt.tag_id
-        {whereClause}";
+            left join tag mt on t.mountedon_id = mt.tag_id
+        {whereClause.clause}";
+        
+        return (query, whereClause.parameters);
     }
 }

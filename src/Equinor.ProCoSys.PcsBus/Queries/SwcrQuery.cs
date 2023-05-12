@@ -1,13 +1,15 @@
-﻿namespace Equinor.ProCoSys.PcsServiceBus.Queries;
+﻿using Dapper;
+
+namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 
 public class SwcrQuery
 {
-    public static string GetQuery(long? swcrId, string? plant = null)
+    public static (string queryString, DynamicParameters parameters) GetQuery(long? swcrId, string? plant = null)
     {
         DetectFaultyPlantInput(plant);
         var whereClause = CreateWhereClause(swcrId, plant, "sw", "swcr_id");
 
-        return @$"select 
+        var query = @$"select 
             sw.projectschema AS Plant,
             sw.procosys_guid AS ProCoSysGuid,
             p.NAME AS ProjectName,
@@ -27,7 +29,8 @@ public class SwcrQuery
             e.createdat AS CreatedAt,
             e.IsVoided AS IsVoided,
             sw.LAST_UPDATED AS LastUpdated,
-            sw.plannedfinishdate AS DueDate
+            sw.plannedfinishdate AS DueDate,
+            sw.ESTIMATEDMHRS AS EstimatedManHours,
         from swcr sw
             join element e on  E.ELEMENT_ID = sw.swcr_ID
             join projectschema ps ON ps.projectschema = sw.projectschema
@@ -40,6 +43,7 @@ public class SwcrQuery
             left join library sup ON sup.library_id = sw.supplier_id
             left join library act On act.library_id = sw.action_id 
             left join node n ON n.node_id = sw.node_id
-        {whereClause}";
+        {whereClause.clause}";
+        return (query, whereClause.parameters);
     }
 }

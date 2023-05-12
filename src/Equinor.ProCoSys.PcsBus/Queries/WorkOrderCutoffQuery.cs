@@ -1,4 +1,6 @@
-﻿namespace Equinor.ProCoSys.PcsServiceBus.Queries;
+﻿using Dapper;
+
+namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 
 public class WorkOrderCutoffQuery
 {
@@ -6,7 +8,7 @@ public class WorkOrderCutoffQuery
     ///     Call with either workOrderId and cutoffWeek, plantId  or all 3. Not advised to call without either as result set
     ///     could get very large
     /// </summary>
-    public static string GetQuery(long? woId, string? cutoffWeek, string? plant = null, string? month = null)
+    public static (string queryString, DynamicParameters parameters) GetQuery(long? woId, string? cutoffWeek, string? plant = null, string? month = null)
     {
         DetectFaultyPlantInput(plant);
 
@@ -14,14 +16,16 @@ public class WorkOrderCutoffQuery
 
         if (cutoffWeek != null)
         {
-            whereClause += $" and wc.cutoffweek = '{cutoffWeek}'";
+            whereClause.parameters.Add(":CutoffWeek", cutoffWeek);
+            whereClause.clause += $" and wc.cutoffweek = ':CutoffWeek'";
         }
         else if (month != null)
         {
-            whereClause += $" and TO_CHAR(wc.CUTOFFDATE, 'YYYY-MM-DD') like '%-{month}-%'";
+            whereClause.parameters.Add(":Month", month);
+            whereClause.clause += $" and TO_CHAR(wc.CUTOFFDATE, 'YYYY-MM-DD') like '%-:Month-%'";
         }
 
-        return @$"select
+        var query = @$"select
             wc.projectschema as Plant,
             wc.procosys_guid as ProCoSysGuid,
             ps.TITLE as PlantName,
@@ -62,6 +66,8 @@ public class WorkOrderCutoffQuery
             left join library r ON r.library_id = wc.WORESPONSIBLE_id
             left join library jsc ON jsc.library_id = wc.jobstatus_id
             left join library area ON area.library_id = wc.area_id
-        {whereClause}";
+        {whereClause.clause}";
+       
+        return (query,whereClause.parameters);
     }
 }

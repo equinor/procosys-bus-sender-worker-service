@@ -1,13 +1,15 @@
-﻿namespace Equinor.ProCoSys.PcsServiceBus.Queries;
+﻿using Dapper;
+
+namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 
 public class DocumentQuery
 {
-    public static string GetQuery(long? documentId, string? plant = null)
+    public static (string queryString, DynamicParameters parameters) GetQuery(long? documentId, string? plant = null)
     {
         DetectFaultyPlantInput(plant);
         var whereClause = CreateWhereClause(documentId, plant, "d", "document_id");
 
-        return @$"select
+        var query = @$"select
             d.projectschema as Plant,
             d.procosys_guid as ProCoSysGuid,
             p.name as ProjectName,
@@ -41,6 +43,8 @@ public class DocumentQuery
             left join library res on res.library_id = d.responsiblecontractor_id
             left join library acc on acc.library_id = d.accesscode_id
             left join library com on com.library_id = d.complex_id
-        {whereClause}";
+        {whereClause.clause}";
+        
+        return (query, whereClause.parameters);
     }
 }
