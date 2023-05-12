@@ -17,12 +17,12 @@ public class WorkOrderCutoffQuery
         if (cutoffWeek != null)
         {
             whereClause.parameters.Add(":CutoffWeek", cutoffWeek);
-            whereClause.clause += $" and wc.cutoffweek = ':CutoffWeek'";
+            whereClause.clause += " and wc.cutoffweek = :CutoffWeek";
         }
         else if (month != null)
         {
             whereClause.parameters.Add(":Month", month);
-            whereClause.clause += $" and TO_CHAR(wc.CUTOFFDATE, 'YYYY-MM-DD') like '%-:Month-%'";
+            whereClause.clause += " and TO_CHAR(wc.CUTOFFDATE, 'YYYY-MM-DD') like '%-' || :Month || '-%'";
         }
 
         var query = @$"select
