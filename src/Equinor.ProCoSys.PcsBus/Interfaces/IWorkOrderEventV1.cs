@@ -31,7 +31,8 @@ public interface IWorkOrderEventV1 : IHasEventType
     string? TypeOfWorkCode { get; init; }
     string? OnShoreOffShoreCode { get; init; }
     string? WoTypeCode { get; init; }
-    string? ProjectProgress { get; init; }
+    double ProjectProgress { get; init; }
+    int Progress { get; init; }
     string? ExpendedManHours { get; init; }
     string? EstimatedHours { get; init; }
     string? RemainingHours { get; init; }

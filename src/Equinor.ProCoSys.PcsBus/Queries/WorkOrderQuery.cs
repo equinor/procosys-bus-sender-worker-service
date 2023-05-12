@@ -43,6 +43,7 @@ public class WorkOrderQuery
                 osos.CODE as OnShoreOffShoreCode,
                 woc.CODE as WoTypeCode,
                 w.PROJECTPROGRESS as ProjectProgress,
+                w.PROGRESS as Progress,
                 NVL(w.TOTALEXPENDEDMANHOURS, w.expended_mhrs) as ExpendedManHours,
                 (SELECT 
                     ROUND(SUM(quantity * multiplicator * disciplinefactor * normvalue), 1)

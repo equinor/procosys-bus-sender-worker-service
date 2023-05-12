@@ -52,7 +52,7 @@ public class WorkOrderEventVersioningTests
             { "TypeOfWorkCode", typeof(string) },
             { "OnShoreOffShoreCode", typeof(string) },
             { "WoTypeCode", typeof(string) },
-            { "ProjectProgress", typeof(string) },
+            { "ProjectProgress", typeof(double) },
             { "ExpendedManHours", typeof(string) },
             { "EstimatedHours", typeof(string) },
             { "RemainingHours", typeof(string) },

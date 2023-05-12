@@ -1887,7 +1887,7 @@ public class BusEventServiceTests
             TypeOfWorkCode = "TypeOfWorkCode",
             OnShoreOffShoreCode = "OnShoreOffShoreCode",
             WoTypeCode = "WoTypeCode",
-            ProjectProgress = "ProjectProgress",
+            ProjectProgress = 3.2,
             ExpendedManHours = "ExpendedManHours",
             EstimatedHours = "EstimatedHours",
             RemainingHours = "RemainingHours",
