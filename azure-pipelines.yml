@@ -61,7 +61,7 @@ stages:
         or
         ( 
           eq(variables['Build.SourceBranch'], 'refs/heads/master'),
-          eq(variables['Build.SourceBranch'], 'refs/heads/dev')
+          eq(variables['Build.SourceBranch'], 'refs/heads/useorm')
         )
        )
     jobs:
