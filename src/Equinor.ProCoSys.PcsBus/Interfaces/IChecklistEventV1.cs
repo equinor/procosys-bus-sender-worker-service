@@ -25,7 +25,7 @@ public interface IChecklistEventV1 : IHasEventType
     public string FormularDiscipline { get; init; }
     public string? Revision { get; init; }
     public string? PipingRevisionMcPkNo { get; init; }
-    public Guid? PipingRevisionMcPkGuid { get; init; }
+    public Guid? PipingRevisionMcPkgGuid { get; init; }
     public string ResponsibleCode { get; init; }
     public Guid ResponsibleGuid { get; init; }
     public string StatusCode { get; init; }

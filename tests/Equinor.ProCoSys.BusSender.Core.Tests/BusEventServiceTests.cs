@@ -206,7 +206,7 @@ public class BusEventServiceTests
             FormularDiscipline = "Discipline1",
             Revision = "Revision1",
             PipingRevisionMcPkNo = "PRMP-123",
-            PipingRevisionMcPkGuid = Guid.NewGuid(),
+            PipingRevisionMcPkgGuid = Guid.NewGuid(),
             ResponsibleCode = "Responsible1",
             ResponsibleGuid = new Guid(),
             StatusCode = "Status1",
@@ -251,7 +251,7 @@ public class BusEventServiceTests
         Assert.AreEqual(checklistEvent.FormularDiscipline, deserializedResult.FormularDiscipline);
         Assert.AreEqual(checklistEvent.Revision, deserializedResult.Revision);
         Assert.AreEqual(checklistEvent.PipingRevisionMcPkNo, deserializedResult.PipingRevisionMcPkNo);
-        Assert.AreEqual(checklistEvent.PipingRevisionMcPkGuid, deserializedResult.PipingRevisionMcPkGuid);
+        Assert.AreEqual(checklistEvent.PipingRevisionMcPkgGuid, deserializedResult.PipingRevisionMcPkgGuid);
         Assert.AreEqual(checklistEvent.ResponsibleCode, deserializedResult.ResponsibleCode);
         Assert.AreEqual(checklistEvent.ResponsibleGuid, deserializedResult.ResponsibleGuid);
         Assert.AreEqual(checklistEvent.StatusCode, deserializedResult.StatusCode);

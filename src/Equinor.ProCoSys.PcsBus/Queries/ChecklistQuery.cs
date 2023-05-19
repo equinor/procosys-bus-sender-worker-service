@@ -30,7 +30,7 @@ public class ChecklistQuery
             mccr_disc.code as FormularDiscipline, 
             pir.testrevisionno as Revision, 
             prm.mcpkgno as PipingRevisionMcPkNo, 
-            prm.procosys_guid as PipingRevisionMcPkGuid, 
+            prm.procosys_guid as PipingRevisionMcPkgGuid, 
             r.code as ResponsibleCode,
             r.procosys_guid as ResponsibleGuid,
             status.code as StatusCode,

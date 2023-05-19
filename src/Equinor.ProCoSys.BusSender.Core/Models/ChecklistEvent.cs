@@ -15,7 +15,7 @@ public class ChecklistEvent : IChecklistEventV1
     public string FormularGroup { get; init; }
     public string FormularType { get; init; }
     public DateTime LastUpdated { get; init; }
-    public Guid? PipingRevisionMcPkGuid { get; init; }
+    public Guid? PipingRevisionMcPkgGuid { get; init; }
     public string? PipingRevisionMcPkNo { get; init; }
     public string Plant { get; init; }
     public Guid ProCoSysGuid { get; init; }
