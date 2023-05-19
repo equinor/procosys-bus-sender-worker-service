@@ -7,7 +7,7 @@ trigger:
   branches:
     include:
       - master
-      - useorm
+      - dev
 
 variables:
   System.Debug: 'true'
@@ -21,7 +21,7 @@ stages:
       or
       ( 
         eq(variables['Build.SourceBranch'], 'refs/heads/master'),
-        eq(variables['Build.SourceBranch'], 'refs/heads/useorm')
+        eq(variables['Build.SourceBranch'], 'refs/heads/dev')
       )
     jobs:
       - job:
@@ -61,7 +61,7 @@ stages:
         or
         ( 
           eq(variables['Build.SourceBranch'], 'refs/heads/master'),
-          eq(variables['Build.SourceBranch'], 'refs/heads/useorm')
+          eq(variables['Build.SourceBranch'], 'refs/heads/dev')
         )
        )
     jobs:
