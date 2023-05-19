@@ -41,7 +41,7 @@ public class CheckListEventTests
             { "SystemModule", typeof(string) },
             { "FormularDiscipline", typeof(string) },
             { "Revision", typeof(string) },
-            { "PipingRevisionMcPkgNo", typeof(string) },
+            { "PipingRevisionMcPkNo", typeof(string) },
             { "PipingRevisionMcPkgGuid", typeof(Guid?) },
             { "ResponsibleCode", typeof(string) },
             { "ResponsibleGuid", typeof(Guid) },
