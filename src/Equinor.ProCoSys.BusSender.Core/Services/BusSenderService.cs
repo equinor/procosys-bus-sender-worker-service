@@ -308,12 +308,12 @@ public class BusSenderService : IBusSenderService
                     await CreateAndSetMessage(busEvent, _service.CreateCommPkgTaskMessage);
                     break;
                 }
-            case PcsTopicConstants.McPkgMilestone:
+            case "mcpkgmilestone":
                 {
                     await CreateAndSetMessage(busEvent, _service.CreateMcPkgMilestoneMessage);
                     break;
                 }
-            case PcsTopicConstants.CommPkgMilestone:
+            case "commpkgmilestone":
                 {
                     await CreateAndSetMessage(busEvent, _service.CreateCommPkgMilestoneMessage);
                     break;

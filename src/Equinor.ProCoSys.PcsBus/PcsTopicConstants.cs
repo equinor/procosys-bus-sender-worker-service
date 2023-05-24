@@ -16,7 +16,7 @@ public static class PcsTopicConstants
     public const string Library = "Library";
     public const string WorkOrder = "WorkOrder";
     public const string Checklist = "Checklist";
-    public const string McPkgMilestone = "Milestone";
+    public const string McPkgMilestone = "McPkgMilestone";
     public const string WorkOrderCutoff = "WorkOrderCutoff";
     public const string Certificate = "Certificate";
     public const string WoChecklist = "WoChecklist";
