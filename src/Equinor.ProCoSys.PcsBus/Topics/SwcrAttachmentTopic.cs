@@ -1,9 +1,8 @@
-﻿using System.Collections.Generic;
-
-namespace Equinor.ProCoSys.PcsServiceBus.Topics;
-
+﻿namespace Equinor.ProCoSys.PcsServiceBus.Topics;
+#pragma warning disable CS8618
 public class SwcrAttachmentTopic
 {
+    public const string TopicName = "swcrattachment";
     public string Plant { get; set; }
     public string ProCoSysGuid { get; set; }
     public string SwcrGuid { get; set; }
@@ -11,6 +10,4 @@ public class SwcrAttachmentTopic
     public string ClassificationCode { get; set; }
     public string URI { get; set; }
     public string FileName { get; set; }
-
-    public const string TopicName = "swcrattachment";
 }

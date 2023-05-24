@@ -1,42 +1,45 @@
-﻿namespace Equinor.ProCoSys.PcsServiceBus.Queries;
+﻿using Dapper;
+
+namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 
 public class CallOffQuery
 {
-    public static string GetQuery(long? tagCheckId, string plant = null)
+    public static (string query, DynamicParameters parameters) GetQuery(long? tagCheckId, string? plant = null)
     {
         DetectFaultyPlantInput(plant);
         var whereClause = CreateWhereClause(tagCheckId, plant, "co", "calloff_id");
-        whereClause += " and co.calloffno is not null";
+        whereClause.clause += " and co.calloffno is not null";
 
-        return @$"select
-        '{{""Plant"" : ""' || co.projectschema ||
-        '"", ""ProCoSysGuid"" : ""' || co.procosys_guid ||
-        '"", ""CallOffId"" : ""' || co.calloff_id ||
-        '"", ""CallOffNo"" : ""' || regexp_replace(co.calloffno, '([""\])', '\\\1') ||
-        '"", ""PackageId"" : ""' || co.package_id ||
-        '"", ""PurchaseOrderNo"" : ""' || regexp_replace(po.packageno, '([""\])', '\\\1') ||
-        '"", ""IsCompleted"" : ' || decode(co.iscompleted,'Y', 'true', 'N', 'false') ||
-        ', ""UseMcScope"" : ' || decode(co.usemcscope,'Y', 'true', 'N', 'false') ||
-        ', ""Description"" : ""' || regexp_replace(co.description, '([""\])', '\\\1') ||
-        '"", ""ResponsibleCode"" : ""' || regexp_replace(r.code, '([""\])', '\\\1') ||
-        '"", ""ContractorCode"" : ""' || regexp_replace(contractor.code, '([""\])', '\\\1') ||
-        '"", ""SupplierCode"" : ""' || regexp_replace(supplier.code, '([""\])', '\\\1') ||
-        '"", ""EstimatedTagCount"" : ""' || co.estimatedtagcount ||
-        '"", ""FATPlanned"" : ""' || TO_CHAR(co.fat_plannedsent, 'yyyy-mm-dd hh24:mi:ss') ||
-        '"", ""PackagePlannedDelivery"" : ""' || TO_CHAR(co.package_planneddelivery, 'yyyy-mm-dd hh24:mi:ss') ||
-        '"", ""PackageActualDelivery"" : ""' || TO_CHAR(co.package_actualdelivery, 'yyyy-mm-dd hh24:mi:ss') ||
-        '"", ""PackageClosed"" : ""' || TO_CHAR(co.package_closed, 'yyyy-mm-dd hh24:mi:ss') ||
-        '"", ""McDossierSent"" : ""' || TO_CHAR(co.mcdossier_sent, 'yyyy-mm-dd hh24:mi:ss') ||
-        '"", ""McDossierReceived"" : ""' || TO_CHAR(co.mcdossier_received, 'yyyy-mm-dd hh24:mi:ss') ||
-        '"", ""LastUpdated"" : ""' || TO_CHAR(co.last_updated, 'yyyy-mm-dd hh24:mi:ss') ||
-        '"", ""IsVoided"" : ' || decode(co.isVoided,'Y', 'true', 'N', 'false') ||
-        ', ""CreatedAt"" : ""' || TO_CHAR(co.createdat, 'yyyy-mm-dd hh24:mi:ss') ||
-        '""}}' as message
+        var query = @$"select
+        co.projectschema as Plant,
+        co.procosys_guid as ProCoSysGuid,
+        co.calloff_id as CallOffId,
+        co.calloffno as CallOffNo,
+        co.package_id as PackageId,
+        po.packageno as PurchaseOrderNo,
+        co.iscompleted as IsCompleted,
+        co.usemcscope as UseMcScope,
+        co.description as Description,
+        r.code as ResponsibleCode,
+        contractor.code as ContractorCode,
+        supplier.code as SupplierCode,
+        co.estimatedtagcount as EstimatedTagCount,
+        co.fat_plannedsent as FATPlanned,
+        co.package_planneddelivery as PackagePlannedDelivery,
+        co.package_actualdelivery as PackageActualDelivery,
+        co.package_closed as PackageClosed,
+        co.mcdossier_sent as McDossierSent,
+        co.mcdossier_received as McDossierReceived,
+        co.last_updated as LastUpdated,
+        co.isVoided as IsVoided,
+        co.createdat as CreatedAt
         from calloff co
             join purchaseorder po on po.package_id = co.package_id       
             left join responsible r on r.responsible_id = co.responsible_id
             left join library contractor on contractor.library_id = co.contractor_id
             left join library supplier on supplier.library_id = co.supplier_id
-        {whereClause}";
+        {whereClause.clause}";
+        
+        return (query,whereClause.parameters);
     }
 }

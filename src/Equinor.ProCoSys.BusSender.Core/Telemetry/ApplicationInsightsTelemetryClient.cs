@@ -19,9 +19,11 @@ public class ApplicationInsightsTelemetryClient : ITelemetryClient
         _ai = new TelemetryClient(telemetryConfiguration)
         {
             // The InstrumentationKey isn't set through the configuration object. Setting it explicitly works.
-            TelemetryConfiguration = { ConnectionString = telemetryConfiguration.ConnectionString}
+            TelemetryConfiguration = { ConnectionString = telemetryConfiguration.ConnectionString }
         };
     }
+
+    public void Flush() => _ai.Flush();
 
     public void TrackEvent(string name, Dictionary<string, string> properties) =>
         _ai
@@ -32,15 +34,14 @@ public class ApplicationInsightsTelemetryClient : ITelemetryClient
             .GetMetric(name)
             .TrackValue(metric);
 
-    public void TrackMetric(string name, double metric, string dimension1Name, string dimension1Value) =>
-        _ai
-            .GetMetric(name, dimension1Name)
-            .TrackValue(metric, dimension1Value);
-
-    public void TrackMetric(string name, double metric, string dimension1Name, string dimension2Name, string dimension1Value, string dimension2Value) =>
+    public void TrackMetric(string name, double metric, string dimension1Name, string dimension2Name,
+        string? dimension1Value, string dimension2Value) =>
         _ai
             .GetMetric(name, dimension1Name, dimension2Name)
             .TrackValue(metric, dimension1Value, dimension2Value);
 
-    public void Flush() => _ai.Flush();
+    public void TrackMetric(string name, double metric, string dimension1Name, string dimension1Value) =>
+        _ai
+            .GetMetric(name, dimension1Name)
+            .TrackValue(metric, dimension1Value);
 }

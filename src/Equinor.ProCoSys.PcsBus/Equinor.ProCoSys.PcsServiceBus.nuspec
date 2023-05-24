@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<package >
+<package>
   <metadata>
     <id>Equinor.ProCoSys.PcsServiceBus</id>
     <version>$version$</version>
@@ -7,8 +7,8 @@
     <authors>Equinor ASA</authors>
   </metadata>
   <files>
-    <file src="bin\Release\net6.0\Equinor.ProCoSys.PcsServiceBus.dll" target="lib\net7.0\" />
-    <file src="**\*.cs" exclude="bin\**\*.*;obj\**\*.*" target="src\" />
+    <file src="bin\Release\net6.0\Equinor.ProCoSys.PcsServiceBus.dll" target="lib\net7.0\"/>
+    <file src="**\*.cs" exclude="bin\**\*.*;obj\**\*.*" target="src\"/>
   </files>
 
 </package>

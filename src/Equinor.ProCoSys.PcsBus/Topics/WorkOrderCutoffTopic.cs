@@ -1,7 +1,8 @@
 ﻿namespace Equinor.ProCoSys.PcsServiceBus.Topics;
-
+#pragma warning disable CS8618
 public class WorkOrderCutoffTopic
 {
+    public const string TopicName = "wocutoff";
     public string Plant { get; set; }
     public string PlantName { get; set; }
     public string ProjectName { get; set; }
@@ -22,6 +23,4 @@ public class WorkOrderCutoffTopic
     public string ManHoursEarned { get; set; }
     public string ManHoursExpendedLastWeek { get; set; }
     public string ManHoursEarnedLastWeek { get; set; }
-
-    public const string TopicName = "wocutoff";
 }

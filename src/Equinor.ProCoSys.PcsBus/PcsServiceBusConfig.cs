@@ -11,41 +11,15 @@ public class PcsServiceBusConfig
         return this;
     }
 
-    public string ConnectionString { get; set; }
-
-    public bool ReadFromDeadLetterQueue { get; set; }
     public PcsServiceBusConfig WithLeaderElector(string leaderElectorUri)
     {
         LeaderElectorUrl = new Uri(leaderElectorUri);
         return this;
     }
 
-    public List<(PcsTopic pcsTopic, string topicPath, string subscrition)> Subscriptions { get; } = new();
-
-    public int RenewLeaseIntervalMilliSec { get; private set; }
-
-    public PcsServiceBusConfig WithRenewLeaseInterval(int renewLeaseIntervalMilliSec)
-    {
-        RenewLeaseIntervalMilliSec = renewLeaseIntervalMilliSec;
-        return this;
-    }
-
-    public PcsServiceBusConfig WithSubscription(PcsTopic pcsTopic, string subscriptionName)
-    {
-        Subscriptions.Add(new ValueTuple<PcsTopic, string, string>(pcsTopic, null, subscriptionName));
-        return this;
-    }
-
-    public PcsServiceBusConfig WithSubscription(PcsTopic pcsTopic, string topicPath, string subscriptionName)
-    {
-        Subscriptions.Add(new ValueTuple<PcsTopic, string, string>(pcsTopic, topicPath, subscriptionName));
-        return this;
-    }
-
-    public Uri LeaderElectorUrl { get; private set; }
-
     /// <summary>
-    /// If true, topic messages will be fetched from Dead Letter Queue instead of normal. This is for special cases, use with caution!
+    ///     If true, topic messages will be fetched from Dead Letter Queue instead of normal. This is for special cases, use
+    ///     with caution!
     /// </summary>
     public PcsServiceBusConfig WithReadFromDeadLetterQueue(bool readFromDeadLetterQueue)
     {
@@ -53,4 +27,31 @@ public class PcsServiceBusConfig
         return this;
     }
 
+    public PcsServiceBusConfig WithRenewLeaseInterval(int renewLeaseIntervalMilliseconds)
+    {
+        RenewLeaseIntervalMilliseconds = renewLeaseIntervalMilliseconds;
+        return this;
+    }
+
+    public PcsServiceBusConfig WithSubscription(string pcsTopic, string subscriptionName)
+    {
+        Subscriptions.Add(new ValueTuple<string, string?, string>(pcsTopic, null, subscriptionName));
+        return this;
+    }
+
+    public PcsServiceBusConfig WithSubscription(string pcsTopic, string topicPath, string subscriptionName)
+    {
+        Subscriptions.Add(new ValueTuple<string, string?, string>(pcsTopic, topicPath, subscriptionName));
+        return this;
+    }
+
+    public string? ConnectionString { get; set; }
+
+    public bool ReadFromDeadLetterQueue { get; set; }
+
+    public List<(string pcsTopic, string? topicPath, string subscrition)> Subscriptions { get; } = new();
+
+    public int RenewLeaseIntervalMilliseconds { get; private set; }
+
+    public Uri? LeaderElectorUrl { get; private set; }
 }

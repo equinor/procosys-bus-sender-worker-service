@@ -1,31 +1,19 @@
-﻿using Equinor.ProCoSys.PcsServiceBus.Receiver;
+﻿using System;
+using System.Threading.Tasks;
+using Azure.Messaging.ServiceBus;
+using Equinor.ProCoSys.PcsServiceBus.Receiver;
 using Equinor.ProCoSys.PcsServiceBus.Receiver.Interfaces;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-using Azure.Messaging.ServiceBus;
 
 namespace Equinor.ProCoSys.PcsServiceBusTests;
 
 [TestClass]
 public class PcsSubscriptionClientsTests
 {
-    private PcsServiceBusProcessors _dut;
     private Mock<IPcsServiceBusProcessor> _client1;
     private Mock<IPcsServiceBusProcessor> _client2;
-
-    [TestInitialize]
-    public void Setup()
-    {
-        _dut = new PcsServiceBusProcessors(1000);
-        _client1 = new Mock<IPcsServiceBusProcessor>();
-        _client2 = new Mock<IPcsServiceBusProcessor>();
-
-        _dut.Add(_client1.Object);
-        _dut.Add(_client2.Object);
-    }
+    private PcsServiceBusProcessors _dut;
 
     // [TestMethod]
     // public async Task CloseAllAsyncTestAsync()
@@ -43,7 +31,18 @@ public class PcsSubscriptionClientsTests
         var errorHandler = new Mock<Func<ProcessErrorEventArgs, Task>>();
         var options = new ServiceBusProcessorOptions();
         await emptyClients.CloseAllAsync();
-        emptyClients.RegisterPcsEventHandlers(handler.Object,errorHandler.Object);
+        emptyClients.RegisterPcsEventHandlers(handler.Object, errorHandler.Object);
+    }
+
+    [TestInitialize]
+    public void Setup()
+    {
+        _dut = new PcsServiceBusProcessors(1000);
+        _client1 = new Mock<IPcsServiceBusProcessor>();
+        _client2 = new Mock<IPcsServiceBusProcessor>();
+
+        _dut.Add(_client1.Object);
+        _dut.Add(_client2.Object);
     }
 
     private Task Test(ProcessErrorEventArgs arg) => Task.CompletedTask;

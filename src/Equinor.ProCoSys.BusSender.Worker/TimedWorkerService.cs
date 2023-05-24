@@ -10,17 +10,20 @@ namespace Equinor.ProCoSys.BusSender.Worker;
 
 public class TimedWorkerService : IHostedService, IDisposable
 {
-    private readonly ILogger<TimedWorkerService> _logger;
     private readonly IEntryPointService _entryPointService;
-    private Timer? _timer;
+    private readonly ILogger<TimedWorkerService> _logger;
     private readonly int _timeout;
+    private Timer? _timer;
 
-    public TimedWorkerService(ILogger<TimedWorkerService> logger, IEntryPointService entryPointService, IConfiguration configuration)
+    public TimedWorkerService(ILogger<TimedWorkerService> logger, IEntryPointService entryPointService,
+        IConfiguration configuration)
     {
         _logger = logger;
         _entryPointService = entryPointService;
         _timeout = int.Parse(configuration["TimerInterval"]);
     }
+
+    public void Dispose() => _timer?.Dispose();
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
@@ -31,13 +34,21 @@ public class TimedWorkerService : IHostedService, IDisposable
         return Task.CompletedTask;
     }
 
+    public Task StopAsync(CancellationToken cancellationToken)
+    {
+        _logger.LogInformation($"TimedWorkerService stopping at: at: {DateTimeOffset.Now}");
+        _timer?.Change(Timeout.Infinite, 0);
+        _entryPointService.StopService();
+        return Task.CompletedTask;
+    }
+
     private async void DoWork(object? state)
     {
         try
         {
-            _logger.LogDebug($"TimedWorkerService started do work");
+            _logger.LogDebug("TimedWorkerService started do work");
             await _entryPointService.DoWorkerJob();
-            _logger.LogDebug($"TimedWorkerService finished do work");
+            _logger.LogDebug("TimedWorkerService finished do work");
         }
         catch (Exception e)
         {
@@ -48,14 +59,4 @@ public class TimedWorkerService : IHostedService, IDisposable
             _timer?.Change(_timeout, Timeout.Infinite);
         }
     }
-
-    public Task StopAsync(CancellationToken cancellationToken)
-    {
-        _logger.LogInformation($"TimedWorkerService stopping at: at: {DateTimeOffset.Now}");
-        _timer?.Change(Timeout.Infinite, 0);
-        _entryPointService.StopService();
-        return Task.CompletedTask;
-    }
-
-    public void Dispose() => _timer?.Dispose();
 }

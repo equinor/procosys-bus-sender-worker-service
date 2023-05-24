@@ -16,116 +16,116 @@ variables:
   WithoutProxyForTest: 'true'
 
 stages:
-- stage: "Build"
-  condition:  |
-   or
-   ( 
-     eq(variables['Build.SourceBranch'], 'refs/heads/master'),
-     eq(variables['Build.SourceBranch'], 'refs/heads/dev')
-   )
-  jobs:
-  - job:
-    workspace:
-      clean: all
-    pool:
-      vmImage: $(vmImageName)
+  - stage: "Build"
+    condition: |
+      or
+      ( 
+        eq(variables['Build.SourceBranch'], 'refs/heads/master'),
+        eq(variables['Build.SourceBranch'], 'refs/heads/dev')
+      )
+    jobs:
+      - job:
+        workspace:
+          clean: all
+        pool:
+          vmImage: $(vmImageName)
+        
+        steps:
+          - task: DotNetCoreCLI@2
+            displayName: Restore
+            inputs:
+              command: restore
+              projects: '**/*.csproj'
 
-    steps:
-    - task: DotNetCoreCLI@2
-      displayName: Restore
-      inputs:
-        command: restore
-        projects: '**/*.csproj'
+          - task: DotNetCoreCLI@2
+            displayName: Build
+            inputs:
+              command: build
+              projects: '**/*.csproj'
+              arguments: '--configuration $(buildConfiguration)'
 
-    - task: DotNetCoreCLI@2
-      displayName: Build
-      inputs:
-        command: build
-        projects: '**/*.csproj'
-        arguments: '--configuration $(buildConfiguration)'
+          - task: DotNetCoreCLI@2
+            displayName: 'dotnet test $(buildConfiguration)'
+            inputs:
+              command: test
+              projects: '**/*[Tt]ests/*.csproj'
+              arguments: '--configuration $(buildConfiguration)'
 
-    - task: DotNetCoreCLI@2
-      displayName: 'dotnet test $(buildConfiguration)'
-      inputs:
-        command: test
-        projects: '**/*[Tt]ests/*.csproj'
-        arguments: '--configuration $(buildConfiguration)'
+  - stage: "PublishAndPack"
+    displayName: 'Publish and Pack'
+    dependsOn: 'Build'
+    condition: |
+      and
+      (
+        succeeded(),
+        or
+        ( 
+          eq(variables['Build.SourceBranch'], 'refs/heads/master'),
+          eq(variables['Build.SourceBranch'], 'refs/heads/dev')
+        )
+       )
+    jobs:
+      - job: PackAndPublish
+        displayName: Pack Worker, then publish both
+        pool:
+          vmImage: $(vmImageName)
+        steps:
+          - checkout: self
 
-- stage: "PublishAndPack"
-  displayName: 'Publish and Pack'
-  dependsOn: 'Build'
-  condition:  |
-   and
-   (
-     succeeded(),
-     or
-     ( 
-       eq(variables['Build.SourceBranch'], 'refs/heads/master'),
-       eq(variables['Build.SourceBranch'], 'refs/heads/dev')
-     )
-    )
-  jobs:
-  - job: PackAndPublish
-    displayName: Pack Worker, then publish both
-    pool:
-      vmImage: $(vmImageName)
-    steps:
-    - checkout: self
-    
-    - task: DotNetCoreCLI@2
-      displayName: Restore
-      inputs:
-        command: restore
-        projects: '**/*.csproj' 
-          
-    - task: PowerShell@2
-      name: getVersion # Name of the pipeline variable used as prefix in referenace. Example $(getVersion.packageVersion)
-      displayName: 'get version from Equinor.ProCoSys.PcsServiceBus.csproj'
-      inputs:
-        targetType: inline
-        pwsh: true
-        script: |
-          # Set powershell variables
-          $path = "src/Equinor.ProCoSys.PcsBus/Equinor.ProCoSys.PcsServiceBus.csproj"
-          $xPath = "/Project/PropertyGroup"
-          $element = "VersionPrefix"
-          $variableName = "packageVersion" # Name of the pipeline variable used as suffix in referenace. Example $(getVersion.packageVersion)
+          - task: DotNetCoreCLI@2
+            displayName: Restore
+            inputs:
+              command: restore
+              projects: '**/*.csproj'
 
-          # Get version from XML file
-          # Check if file contains data
-          $i = Get-Content $path
-          if (!$i) {Write-Host "invalid filepath or file is empty"}
-          else {Write-Host "File validated OK"}
+          - task: PowerShell@2
+            name: getVersion # Name of the pipeline variable used as prefix in referenace. Example $(getVersion.packageVersion)
+            displayName: 'get version from Equinor.ProCoSys.PcsServiceBus.csproj'
+            inputs:
+              targetType: inline
+              pwsh: true
+              script: |
+                # Set powershell variables
+                $path = "src/Equinor.ProCoSys.PcsBus/Equinor.ProCoSys.PcsServiceBus.csproj"
+                $xPath = "/Project/PropertyGroup"
+                $element = "VersionPrefix"
+                $variableName = "packageVersion" # Name of the pipeline variable used as suffix in referenace. Example $(getVersion.packageVersion)
+                
+                # Get version from XML file
+                # Check if file contains data
+                $i = Get-Content $path
+                if (!$i) {Write-Host "invalid filepath or file is empty"}
+                else {Write-Host "File validated OK"}
+                
+                $xmlData = [xml](Get-Content $path) # Get content from xml file
+                
+                $version = ($xmlData.ChildNodes.SelectNodes("$xPath") | Select-Object $element).$element
+                if (!$version) {Write-Host "Could not read xml value"} # Validates if value can be read from xml
+                
+                # Set variable
+                "##vso[task.setvariable variable=$variableName;isOutput=true]$($version)"
+                Write-Host "Setting variable named $variableName with value $($version)" # Use as prefix in variale referenace
 
-          $xmlData = [xml](Get-Content $path) # Get content from xml file
+          - task: DotNetCoreCLI@2
+            displayName: 'NuGet pack'
+            inputs:
+              command: pack
+              packagesToPack: 'src/Equinor.ProCoSys.PcsBus/Equinor.ProCoSys.PcsServiceBus.csproj'
+              packDestination: '$(Build.ArtifactStagingDirectory)\packages\releases'
+              includeReferencedProjects: true
+              version: $(getVersion.packageVersion)
 
-          $version = ($xmlData.ChildNodes.SelectNodes("$xPath") | Select-Object $element).$element
-          if (!$version) {Write-Host "Could not read xml value"} # Validates if value can be read from xml
+          - publish: '$(Build.ArtifactStagingDirectory)'
+            artifact: 'packages'
 
-          # Set variable
-          "##vso[task.setvariable variable=$variableName;isOutput=true]$($version)"
-          Write-Host "Setting variable named $variableName with value $($version)" # Use as prefix in variale referenace
+          - task: NuGetAuthenticate@0
+            displayName: 'NuGet Authenticate'
 
-    - task: DotNetCoreCLI@2
-      displayName: 'NuGet pack'
-      inputs:
-        command: pack
-        packagesToPack: 'src/Equinor.ProCoSys.PcsBus/Equinor.ProCoSys.PcsServiceBus.csproj'
-        packDestination: '$(Build.ArtifactStagingDirectory)\packages\releases'
-        includeReferencedProjects: true
-        version: $(getVersion.packageVersion)
-
-    - publish: '$(Build.ArtifactStagingDirectory)'
-      artifact: 'packages'
-
-    - task: NuGetAuthenticate@0
-      displayName: 'NuGet Authenticate'
-
-    - task: DotNetCoreCLI@2
-      displayName: 'NuGet push release'
-      inputs:
-        command: push
-        feedsToUse: 'select'
-        packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg'
-        publishVstsFeed: 'ProCoSysOfficial'
-        allowPackageConflicts: true      
+          - task: DotNetCoreCLI@2
+            displayName: 'NuGet push release'
+            inputs:
+              command: push
+              feedsToUse: 'select'
+              packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg'
+              publishVstsFeed: 'ProCoSysOfficial'
+              allowPackageConflicts: true      

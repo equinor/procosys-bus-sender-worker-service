@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 
 namespace Equinor.ProCoSys.PcsServiceBus.Topics;
-
+#pragma warning disable CS8618
 public class PunchListItemTopic
 {
+    public const string TopicName = "punchlistitem";
     public string Plant { get; set; }
     public string PlantName { get; set; }
     public string ProjectName { get; set; }
@@ -17,5 +18,4 @@ public class PunchListItemTopic
     public string ResponsibleDescription { get; set; }
     public string FormType { get; set; }
     public string Category { get; set; }
-    public const string TopicName = "punchlistitem";
 }

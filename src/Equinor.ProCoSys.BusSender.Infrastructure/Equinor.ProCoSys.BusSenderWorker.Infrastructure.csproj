@@ -2,25 +2,27 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Azure.Storage.Blobs" Version="12.15.1" />
-    <PackageReference Include="Microsoft.ApplicationInsights" Version="2.21.0" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Logging.ApplicationInsights" Version="2.21.0" />
+    <PackageReference Include="Azure.Storage.Blobs" Version="12.15.1"/>
+    <PackageReference Include="Dapper" Version="2.0.123"/>
+    <PackageReference Include="Microsoft.ApplicationInsights" Version="2.21.0"/>
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1"/>
+    <PackageReference Include="Microsoft.Extensions.Logging.ApplicationInsights" Version="2.21.0"/>
 
     <!-- This is added explicitly due to System.Text.Encodings.Web 4.7.1.
     Vulnerabily introduced in Azure.Storage.Blobs" Version="12.15.1"
     If newer version fixes it, we should remove
     -->
-    <PackageReference Include="System.Text.Encodings.Web" Version="6.0.0" />
-    
+    <PackageReference Include="System.Text.Encodings.Web" Version="6.0.0"/>
+
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Equinor.ProCoSys.BusSender.Core\Equinor.ProCoSys.BusSenderWorker.Core.csproj" />
-    <ProjectReference Include="..\Equinor.ProCoSys.PcsBus\Equinor.ProCoSys.PcsServiceBus.csproj" />
+    <ProjectReference Include="..\Equinor.ProCoSys.BusSender.Core\Equinor.ProCoSys.BusSenderWorker.Core.csproj"/>
+    <ProjectReference Include="..\Equinor.ProCoSys.PcsBus\Equinor.ProCoSys.PcsServiceBus.csproj"/>
   </ItemGroup>
 
 </Project>

@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 
 namespace Equinor.ProCoSys.PcsServiceBus.Topics;
-
+#pragma warning disable CS8618
 public class McPkgTopic
 {
+    public const string TopicName = "mcpkg";
     public string Plant { get; set; }
     public string ProjectName { get; set; }
     public Guid ProCoSysGuid { get; set; }
@@ -27,6 +28,4 @@ public class McPkgTopic
     public string LastUpdated { get; set; }
     public string CreatedAt { get; set; }
     public bool IsVoided { get; set; }
-
-    public const string TopicName = "mcpkg";
 }

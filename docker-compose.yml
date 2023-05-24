@@ -1,8 +1,10 @@
-version: '3.4'
+version: '3.8'
 
 services:
   equinor.procosys.bussender.worker:
     image: ${DOCKER_REGISTRY-}equinorprocosysbussenderworker
+    environment:
+      - ConnectionString=/secrets/app_config_connection_string
     build:
       context: .
       dockerfile: src/Equinor.ProCoSys.BusSender.Worker/Dockerfile

@@ -1,23 +1,26 @@
-﻿namespace Equinor.ProCoSys.PcsServiceBus.Queries;
+﻿using Dapper;
+
+namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 
 public class ResponsibleQuery
 {
-    public static string GetQuery(long? responsibleId, string plant = null)
+    public static (string queryString, DynamicParameters parameters) GetQuery(long? responsibleId, string? plant = null)
     {
         DetectFaultyPlantInput(plant);
         var whereClause = CreateWhereClause(responsibleId, plant, "r", "responsible_id");
 
-        return @$"select
-            '{{""Plant"" : ""' || r.projectschema ||
-            '"", ""ProCoSysGuid"" : ""' || r.procosys_guid ||
-            '"", ""ResponsibleId"" : ""' || r.responsible_id || 
-            '"", ""Code"" : ""' || regexp_replace(r.code, '([""\])', '\\\1') ||
-            '"", ""ResponsibleGroup"" : ""' || regexp_replace(r.responsiblegroup, '([""\])', '\\\1') ||
-            '"", ""Description"" : ""' || regexp_replace(r.description, '([""\])', '\\\1') || 
-            '"", ""IsVoided"" : ""' || decode(r.isVoided,'Y', 'true', 'N', 'false') ||
-            '"", ""LastUpdated"" : ""' || TO_CHAR(r.LAST_UPDATED, 'yyyy-mm-dd hh24:mi:ss') ||
-            '""}}'  as message
+        var query = @$"select
+            r.projectschema as Plant,
+            r.procosys_guid as ProCoSysGuid,
+            r.responsible_id as ResponsibleId,
+            r.code as Code,
+            r.responsiblegroup as ResponsibleGroup,
+            r.description as Description,
+            r.isVoided as IsVoided,
+            r.LAST_UPDATED as LastUpdated
         from responsible r
-        {whereClause}";
+        {whereClause.clause}";
+        
+        return (query, whereClause.parameters);
     }
 }

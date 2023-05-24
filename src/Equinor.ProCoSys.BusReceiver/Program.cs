@@ -3,7 +3,6 @@ using Equinor.ProCoSys.PcsServiceBus;
 using Equinor.ProCoSys.PcsServiceBus.Receiver;
 using Equinor.ProCoSys.PcsServiceBus.Receiver.Interfaces;
 
-
 namespace Equinor.ProCoSys.BusReceiver;
 
 public class Program
@@ -16,15 +15,12 @@ public class Program
         await host.RunAsync();
     }
 
-    private static void OnProcessExit(ILogger? logger)
-        => logger?.LogInformation($"Sync stopped at: {DateTimeOffset.Now}");
-
-    public static IHostBuilder CreateHostBuilder(string[] args)
+    private static IHostBuilder CreateHostBuilder(string[] args)
     {
         var builder = Host.CreateDefaultBuilder(args)
-            .ConfigureAppConfiguration((context, config) =>
+            .ConfigureAppConfiguration((_, config) =>
             {
-                var settings = config.Build();
+                config.Build();
             });
 
         builder.ConfigureWebJobs(b =>
@@ -42,13 +38,15 @@ public class Program
                 services.AddSingleton<IBusReceiverServiceFactory, ScopedBusReceiverServiceFactory>();
                 services.AddPcsServiceBusIntegration(options => options
                     .UseBusConnection(hostContext.Configuration["ServiceBusConnectionString"])
-                   // .WithLeaderElector("uri")
                     .WithRenewLeaseInterval(4000)
-                    .WithSubscription(PcsTopic.Tag, "test_tag")
+                    .WithSubscription(PcsTopicConstants.Tag, "test_tag")
                 );
 
                 services.BuildServiceProvider();
             });
         return builder;
     }
+
+    private static void OnProcessExit(ILogger? logger)
+        => logger?.LogInformation("Sync stopped at: {Now}", DateTimeOffset.Now);
 }

@@ -1,7 +1,8 @@
 ﻿namespace Equinor.ProCoSys.PcsServiceBus.Topics;
-
+#pragma warning disable CS8618
 public class DocumentTopic
 {
+    public const string TopicName = "document";
     public string Plant { get; set; }
     public string ProjectName { get; set; }
     public string DocumentId { get; set; }
@@ -21,6 +22,4 @@ public class DocumentTopic
     public string ResponsibleContractor { get; set; }
     public string LastUpdated { get; set; }
     public string RevisionDate { get; set; }
-
-    public const string TopicName = "document";
 }
