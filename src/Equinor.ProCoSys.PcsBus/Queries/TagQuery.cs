@@ -38,6 +38,7 @@ public class TagQuery
             t.mountedon_id as MountedOn,
             mt.procosys_guid as MountedOnGuid,
             t.LAST_UPDATED as LastUpdated,
+            '{{' || 
             (select listagg('""'|| colName ||'"":""'|| regexp_replace(val, '([""\])', '\\\1') ||'""'
             || case when colname2 is not null then ',' || '""'|| colName2 ||'"":""'|| val2 ||'""' end
             || case when colname3 is not null then ',' || '""'|| colName3 ||'"":""'|| val3 ||'""' end,
@@ -69,7 +70,7 @@ public class TagQuery
                 AND NOT (DEF.ISVOIDED = 'Y')
                 AND F.COLUMNTYPE in ('NUMBER','DATE','STRING', 'LIBRARY','TAG')
                 AND f.projectschema ='{plant}'))
-            as TagDetails
+                || '}}' as TagDetails
         from tag t
             join element e on e.element_id = t.tag_id
             join projectschema ps on ps.projectschema = t.projectschema
