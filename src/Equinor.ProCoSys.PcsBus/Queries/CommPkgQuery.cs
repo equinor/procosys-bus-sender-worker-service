@@ -25,7 +25,7 @@ public class CommPkgQuery
         l.DESCRIPTION as AreaDescription,
         phase.code as Phase,
         identifier.code as CommissioningIdentifier,
-        e.isVoided = 'Y' as IsVoided,
+        e.isVoided as IsVoided,
         c.DEMOLITION as Demolition,
         e.CREATEDAT as CreatedAt,
         pri1.code as Priority1,
