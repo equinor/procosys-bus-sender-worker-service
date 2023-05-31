@@ -4,7 +4,7 @@ namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 
 public class LibraryFieldQuery
 {
-    public static (string queryString, DynamicParameters parameters) GetQuery(string libraryFieldGuid, string? plant = null)
+    public static (string queryString, DynamicParameters parameters) GetQuery(string? libraryFieldGuid, string? plant = null)
     {
         DetectFaultyPlantInput(plant);
         var whereClause = CreateWhereClause(libraryFieldGuid, plant, "lf", "procosys_guid");

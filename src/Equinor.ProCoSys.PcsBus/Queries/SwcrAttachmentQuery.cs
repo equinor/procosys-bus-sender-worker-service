@@ -4,7 +4,7 @@ namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 
 public class SwcrAttachmentQuery
 {
-    public static (string queryString, DynamicParameters parameters) GetQuery(string swcrAttachmentGuid, string? plant = null)
+    public static (string queryString, DynamicParameters parameters) GetQuery(string? swcrAttachmentGuid, string? plant = null)
     {
         DetectFaultyPlantInput(plant);
         var whereClause = CreateWhereClause(swcrAttachmentGuid, plant, "a", "procosys_guid");

@@ -4,7 +4,7 @@ namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 
 public class SwcrTypeQuery
 {
-    public static (string queryString, DynamicParameters parameters) GetQuery(string swcrTypeGuid, string? plant = null)
+    public static (string queryString, DynamicParameters parameters) GetQuery(string? swcrTypeGuid, string? plant = null)
     {
         DetectFaultyPlantInput(plant);
         var whereClause = CreateWhereClause(swcrTypeGuid, plant, "elr", "procosys_guid");
