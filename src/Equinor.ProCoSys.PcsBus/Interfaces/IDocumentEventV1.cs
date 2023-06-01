@@ -19,7 +19,7 @@ public interface IDocumentEventV1 : IHasEventType
     string? DocumentCategory { get; init; }
     string? HandoverStatus { get; init; }
     string? RegisterType { get; init; }
-    int? RevisionNo { get; init; }
+    string? RevisionNo { get; init; }
     string? RevisionStatus { get; init; }
     string? ResponsibleContractor { get; init; }
     DateTime LastUpdated { get; init; }

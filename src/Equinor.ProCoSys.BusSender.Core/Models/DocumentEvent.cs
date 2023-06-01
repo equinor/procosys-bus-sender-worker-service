@@ -24,7 +24,7 @@ public class DocumentEvent : IDocumentEventV1
     public string? RegisterType { get; init; }
     public string? ResponsibleContractor { get; init; }
     public DateOnly? RevisionDate { get; init; }
-    public int? RevisionNo { get; init; }
+    public string? RevisionNo { get; init; }
     public string? RevisionStatus { get; init; }
     public string? Title { get; init; }
     public string EventType => PcsEventConstants.DocumentCreateOrUpdate;
