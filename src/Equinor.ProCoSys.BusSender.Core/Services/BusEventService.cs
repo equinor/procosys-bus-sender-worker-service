@@ -333,6 +333,13 @@ public class BusEventService : IBusEventService
         return JsonSerializer.Serialize(workOrderMilestoneEvent, DefaultSerializerHelper.SerializerOptions);
     }
 
+    public async Task<string?> CreateHeatTracePipeTestMessage(string message) =>
+        Guid.TryParse(message, out _)
+            ? JsonSerializer.Serialize(
+                await _eventRepository.QuerySingle<HeatTracePipeTestEvent>(
+                    HeatTracePipeTestQuery.GetQuery(message), message), DefaultSerializerHelper.SerializerOptions)
+            : throw new Exception($"Failed to extract or parse guid HeatTracePipeTest from message {message}");
+ 
     public string? WashString(string? message)
     {
         if (string.IsNullOrEmpty(message))

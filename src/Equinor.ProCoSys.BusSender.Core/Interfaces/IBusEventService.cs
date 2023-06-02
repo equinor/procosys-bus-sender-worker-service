@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.IO;
+using System.Threading.Tasks;
 
 namespace Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 
@@ -41,5 +42,6 @@ public interface IBusEventService
     Task<string?> CreateWorkOrderMaterialMessage(string busEventMessage);
     Task<string?> CreateWorkOrderMessage(string busEventMessage);
     Task<string?> CreateWorkOrderMilestoneMessage(string message);
+    Task<string?> CreateHeatTracePipeTestMessage(string message);
     string? WashString(string? message);
 }

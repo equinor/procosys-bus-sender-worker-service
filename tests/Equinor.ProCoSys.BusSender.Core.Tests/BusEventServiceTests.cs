@@ -19,6 +19,15 @@ public class BusEventServiceTests
     private Mock<IEventRepository> _dapperRepositoryMock;
     private IBusEventService _dut;
     private Mock<ITagDetailsRepository> _tagDetailsRepositoryMock;
+    
+    [TestInitialize]
+    public void Setup()
+    {
+        _tagDetailsRepositoryMock = new Mock<ITagDetailsRepository>();
+        _dapperRepositoryMock = new Mock<IEventRepository>();
+        _dut = new BusEventService(_tagDetailsRepositoryMock.Object,
+            _dapperRepositoryMock.Object);
+    }
 
     [TestMethod]
     public async Task CreateActionMessage_ValidMessage_ReturnsSerializedActionEvent()
@@ -1965,11 +1974,11 @@ public class BusEventServiceTests
         const string message = "1234,4321";
         const long workOrderId = 1234L;
         const long milestoneId = 4321L;
-        var query = WorkOrderMilestoneQuery.GetQuery(workOrderId, milestoneId);
+        var (queryString, _) = WorkOrderMilestoneQuery.GetQuery(workOrderId, milestoneId);
         var workOrderMilestoneEvent = new WorkOrderMilestoneEvent
         {
             Plant = "ThePlant",
-            ProCoSysGuid = Guid.NewGuid(),
+            ProCoSysGuid = Guid.NewGuid(),  
             ProjectName = "TheEnigmaticProject",
             WoId = 12345,
             WoGuid = Guid.NewGuid(),
@@ -1981,7 +1990,7 @@ public class BusEventServiceTests
         };
 
         _dapperRepositoryMock.Setup(repo => repo.QuerySingle<WorkOrderMilestoneEvent>(
-                It.Is<(string, DynamicParameters)>( qs => qs.Item1 == query.queryString),
+                It.Is<(string, DynamicParameters)>( qs => qs.Item1 == queryString),
                 message))
             .ReturnsAsync(workOrderMilestoneEvent);
 
@@ -2004,6 +2013,44 @@ public class BusEventServiceTests
         Assert.AreEqual(workOrderMilestoneEvent.MilestoneDate, deserializedResult.MilestoneDate);
         Assert.AreEqual(workOrderMilestoneEvent.SignedByAzureOid, deserializedResult.SignedByAzureOid);
         Assert.AreEqual(workOrderMilestoneEvent.LastUpdated.Date, deserializedResult.LastUpdated.Date);
+    }
+
+    [TestMethod]
+    public async Task CreateHeatTracePipeTestMessage_ValidMessage_ReturnsSerializedHeatTracePipeTestEvent()
+    {
+    // Arrange
+    const string message = "5a643eeb-0b7a-4b9e-9b1a-0e6b7b7b6b6b";
+        
+    var (queryString, _) = HeatTracePipeTestQuery.GetQuery(message);
+    var heatTracePipeTestEvent = new HeatTracePipeTestEvent
+    {
+        Plant = "TestPlant",
+        ProCoSysGuid = Guid.NewGuid(),
+        TagGuid = Guid.NewGuid(),
+        Name = "TestName",
+        LastUpdated = DateTime.Now,
+    };
+    
+    _dapperRepositoryMock.Setup(repo => repo.QuerySingle<HeatTracePipeTestEvent>(
+        It.Is<(string, DynamicParameters)>(qs => qs.Item1 == queryString),
+        message))
+        .ReturnsAsync(heatTracePipeTestEvent);
+        
+    // Act
+    var result = await _dut.CreateHeatTracePipeTestMessage(message);
+    
+    
+    // Assert
+    Assert.IsNotNull(result);
+    var deserializedResult =
+        JsonSerializer.Deserialize<HeatTracePipeTestEvent>(result, DefaultSerializerHelper.SerializerOptions);
+        
+    Assert.AreEqual(heatTracePipeTestEvent.Plant, deserializedResult.Plant);
+    Assert.AreEqual(heatTracePipeTestEvent.ProCoSysGuid, deserializedResult.ProCoSysGuid);
+    Assert.AreEqual(heatTracePipeTestEvent.TagGuid, deserializedResult.TagGuid);
+    Assert.AreEqual(heatTracePipeTestEvent.Name, deserializedResult.Name);
+    Assert.AreEqual(heatTracePipeTestEvent.LastUpdated.Date, deserializedResult.LastUpdated.Date);
+    
     }
 
     [TestMethod]
@@ -2058,12 +2105,5 @@ public class BusEventServiceTests
         Assert.IsNotNull(deserializedTagTopic.CommPkgGuid);
     }
 
-    [TestInitialize]
-    public void Setup()
-    {
-        _tagDetailsRepositoryMock = new Mock<ITagDetailsRepository>();
-        _dapperRepositoryMock = new Mock<IEventRepository>();
-        _dut = new BusEventService(_tagDetailsRepositoryMock.Object,
-            _dapperRepositoryMock.Object);
-    }
+
 }
