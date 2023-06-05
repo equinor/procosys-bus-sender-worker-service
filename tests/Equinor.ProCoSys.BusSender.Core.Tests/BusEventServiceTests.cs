@@ -725,9 +725,8 @@ public class BusEventServiceTests
     public async Task CreateLoopContentMessage_ValidMessage_ReturnsSerializedLoopContentEvent()
     {
         // Arrange
-        const string message = "123";
-        const long loopId = 123L;
-        var query = LoopContentQuery.GetQuery(loopId);
+        const string message = "5f643eeb-b114-4fc4-b884-ade3f6ea63ce";
+        var query = LoopContentQuery.GetQuery(message);
 
         // Arrange
         var loopContentEvent = new LoopContentEvent

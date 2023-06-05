@@ -146,10 +146,10 @@ public class BusEventService : IBusEventService
             : throw new Exception($"Failed to extract checklistId from message: {message}");
 
     public async Task<string?> CreateLoopContentMessage(string message)
-        => long.TryParse(message, out var loopContentId)
+        => Guid.TryParse(message, out _)
             ? JsonSerializer.Serialize(
                 await _eventRepository.QuerySingle<LoopContentEvent>(
-                    LoopContentQuery.GetQuery(loopContentId), message))
+                    LoopContentQuery.GetQuery(message), message))
             : throw new Exception($"Failed to extract LoopContent from message: {message}");
 
     public async Task<string?> CreateMcPkgMessage(string message) =>

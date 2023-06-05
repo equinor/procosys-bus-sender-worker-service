@@ -4,10 +4,10 @@ namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 
 public class LoopContentQuery
 {
-    public static (string queryString, DynamicParameters parameters) GetQuery(long? loopTagId, string? plant = null)
+    public static (string queryString, DynamicParameters parameters) GetQuery(string? loopTagGuid, string? plant = null)
     {
         DetectFaultyPlantInput(plant);
-        var whereClauseTuple = CreateWhereClause(loopTagId, plant, "lt", "looptag_id");
+        var whereClauseTuple = CreateWhereClause(loopTagGuid, plant, "lt", "procosys_guid");
 
         var query = @$"select
             lt.projectschema as Plant,
