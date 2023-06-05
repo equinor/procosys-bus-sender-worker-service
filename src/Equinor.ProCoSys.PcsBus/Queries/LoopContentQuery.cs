@@ -7,7 +7,7 @@ public class LoopContentQuery
     public static (string queryString, DynamicParameters parameters) GetQuery(string? loopTagGuid, string? plant = null)
     {
         DetectFaultyPlantInput(plant);
-        var whereClauseTuple = CreateWhereClause(loopTagGuid, plant, "lt", "looptag_id");
+        var whereClauseTuple = CreateWhereClause(loopTagGuid, plant, "lt", "procosys_guid");
 
         var query = @$"select
             lt.projectschema as Plant,
