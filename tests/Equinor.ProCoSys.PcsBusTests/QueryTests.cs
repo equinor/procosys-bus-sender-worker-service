@@ -152,8 +152,8 @@ public class QueryTests
         {
             typeof(LoopContentQuery),
             typeof(ILoopContentEventV1),
-            new[] { typeof(long?), typeof(string) },
-            new object[] { 1L, "testPlant" }
+            new[] { typeof(string), typeof(string) },
+            new object[] { "abc", "testPlant" }
         };
         
         yield return new object[]
