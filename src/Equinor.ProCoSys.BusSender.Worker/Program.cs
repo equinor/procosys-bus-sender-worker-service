@@ -5,6 +5,7 @@ using Azure.Identity;
 using Equinor.ProCoSys.BusSenderWorker.Infrastructure;
 using Equinor.ProCoSys.BusSenderWorker.Infrastructure.Repositories;
 using Equinor.ProCoSys.PcsServiceBus;
+using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 using Microsoft.Extensions.DependencyInjection;
@@ -132,6 +133,17 @@ public class Program
                     hostContext.Configuration["TopicNames"]);
                 services.AddRepositories();
                 services.AddServices();
+
+                services.AddMassTransit(x =>
+                {
+                    x.UsingAzureServiceBus((context,cfg) =>
+                    {
+                        cfg.Host("ServiceBusConnectionString");
+                        cfg.ConfigureEndpoints(context);
+                    });
+
+                });
+                
                 services.AddHostedService<TimedWorkerService>();
             });
 
