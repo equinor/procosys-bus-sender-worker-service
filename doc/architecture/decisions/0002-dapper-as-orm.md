@@ -8,7 +8,7 @@ Accepted
 
 ## Context
 
-We are moving from queries returning a finnished json string, to a query that should map to typed objects to then be
+We are moving from queries returning a finished json string, to a query that should map to typed objects to then be
 serialized.
 
 ## Decision
