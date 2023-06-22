@@ -12,7 +12,6 @@ public class BusEvent
     public string Message { get; set; }
     public DateTime Created { get; init; }
     
-    [JsonIgnore]
     public Status Status { get; set; }
 
     //untracked
