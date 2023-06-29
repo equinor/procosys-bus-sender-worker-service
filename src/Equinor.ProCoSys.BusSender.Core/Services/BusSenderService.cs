@@ -383,6 +383,11 @@ public class BusSenderService : IBusSenderService
                     await CreateAndSetMessage(busEvent, _service.CreateWorkOrderMaterialMessage);
                     break;
                 }
+            case "heattracepipetest":
+                {
+                    await CreateAndSetMessage(busEvent, _service.CreateHeatTracePipeTestMessage);
+                    break;
+                }
         }
 
         _logger.LogDebug("Update for  {Event} took {Ms} ms", busEvent.Event, sw.ElapsedMilliseconds);
