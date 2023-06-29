@@ -1,7 +1,9 @@
 ﻿using System.Diagnostics;
-using Equinor.ProCoSys.PcsServiceBus;
+using Equinor.ProCoSys.BusReceiver.Consumers;
+using Equinor.ProCoSys.MessageContracts.Punch;
 using Equinor.ProCoSys.PcsServiceBus.Receiver;
 using Equinor.ProCoSys.PcsServiceBus.Receiver.Interfaces;
+using MassTransit;
 
 namespace Equinor.ProCoSys.BusReceiver;
 
@@ -36,11 +38,31 @@ public class Program
                 services.AddAzureAppConfiguration();
                 services.AddScoped<IBusReceiverService, BusReceiverService>();
                 services.AddSingleton<IBusReceiverServiceFactory, ScopedBusReceiverServiceFactory>();
-                services.AddPcsServiceBusIntegration(options => options
-                    .UseBusConnection(hostContext.Configuration["ServiceBusConnectionString"])
-                    .WithRenewLeaseInterval(4000)
-                    .WithSubscription(PcsTopicConstants.Tag, "test_tag")
-                );
+
+                services.AddMassTransit(x =>
+                {
+                    x.AddConsumer<PunchCreatedConsumer>();
+                    x.UsingAzureServiceBus((context, cfg) =>
+                    {
+                        var connectionString = hostContext.Configuration["ServiceBusConnectionString"];
+                        cfg.Host(connectionString);
+                        
+                        cfg.Message<IPunchCreatedV1>(topologyConf 
+                             => topologyConf.SetEntityName("punch-created-message"));
+
+                        cfg.SubscriptionEndpoint<IPunchCreatedV1>("pcs-main",e =>
+                        {
+                            e.Consumer<PunchCreatedConsumer>(context);
+                            e.RequiresSession = true;
+                        });
+
+                    });
+                });
+                // services.AddPcsServiceBusIntegration(options => options
+                //     .UseBusConnection(hostContext.Configuration["ServiceBusConnectionString"])
+                //     .WithRenewLeaseInterval(4000)
+                //     .WithSubscription(PcsTopicConstants.Tag, "test_tag")
+                // );
 
                 services.BuildServiceProvider();
             });
