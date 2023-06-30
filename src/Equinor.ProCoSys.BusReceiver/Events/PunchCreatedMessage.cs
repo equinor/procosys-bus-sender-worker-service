@@ -1,4 +1,4 @@
-﻿using Equinor.ProCoSys.MessageContracts.Punch;
+﻿using Equinor.ProCoSys.Completion.MessageContracts.Punch;
 
 namespace Equinor.ProCoSys.BusReceiver.Events;
 

@@ -1,5 +1,5 @@
 ﻿// ReSharper disable once CheckNamespace
-namespace Equinor.ProCoSys.MessageContracts.Punch;
+namespace Equinor.ProCoSys.Completion.MessageContracts.Punch;
 
 public interface IPunchCreatedV1 
 {

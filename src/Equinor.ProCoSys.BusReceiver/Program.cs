@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 using Equinor.ProCoSys.BusReceiver.Consumers;
-using Equinor.ProCoSys.MessageContracts.Punch;
+using Equinor.ProCoSys.Completion.MessageContracts.Punch;
 using Equinor.ProCoSys.PcsServiceBus.Receiver;
 using Equinor.ProCoSys.PcsServiceBus.Receiver.Interfaces;
 using MassTransit;
@@ -48,7 +48,7 @@ public class Program
                         cfg.Host(connectionString);
                         
                         cfg.Message<IPunchCreatedV1>(topologyConf 
-                             => topologyConf.SetEntityName("punch-created-message"));
+                             => topologyConf.SetEntityName("punch-created"));
 
                         cfg.SubscriptionEndpoint<IPunchCreatedV1>("pcs-main",e =>
                         {
