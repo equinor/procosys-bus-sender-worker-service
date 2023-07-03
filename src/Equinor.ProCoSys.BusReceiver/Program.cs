@@ -58,12 +58,7 @@ public class Program
 
                     });
                 });
-                // services.AddPcsServiceBusIntegration(options => options
-                //     .UseBusConnection(hostContext.Configuration["ServiceBusConnectionString"])
-                //     .WithRenewLeaseInterval(4000)
-                //     .WithSubscription(PcsTopicConstants.Tag, "test_tag")
-                // );
-
+                
                 services.BuildServiceProvider();
             });
         return builder;
