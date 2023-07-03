@@ -19,6 +19,16 @@ public class BusEventServiceTests
     private Mock<IEventRepository> _dapperRepositoryMock;
     private IBusEventService _dut;
     private Mock<ITagDetailsRepository> _tagDetailsRepositoryMock;
+    
+    
+    [TestInitialize]
+    public void Setup()
+    {
+        _tagDetailsRepositoryMock = new Mock<ITagDetailsRepository>();
+        _dapperRepositoryMock = new Mock<IEventRepository>();
+        _dut = new BusEventService(_tagDetailsRepositoryMock.Object,
+            _dapperRepositoryMock.Object);
+    }
 
     [TestMethod]
     public async Task CreateActionMessage_ValidMessage_ReturnsSerializedActionEvent()
@@ -2057,12 +2067,4 @@ public class BusEventServiceTests
         Assert.IsNotNull(deserializedTagTopic.CommPkgGuid);
     }
 
-    [TestInitialize]
-    public void Setup()
-    {
-        _tagDetailsRepositoryMock = new Mock<ITagDetailsRepository>();
-        _dapperRepositoryMock = new Mock<IEventRepository>();
-        _dut = new BusEventService(_tagDetailsRepositoryMock.Object,
-            _dapperRepositoryMock.Object);
-    }
 }
