@@ -16,7 +16,7 @@ public class ActionEvent : IActionEventV1
     public Guid? CategoryGuid { get; init; }
     public string? Comments { get; init; }
     public Guid? CommPkgGuid { get; init; }
-    public string CommPkgNo { get; init; }
+    public string? CommPkgNo { get; init; }
     public DateOnly? Deadline { get; init; }
     public string? Description { get; init; }
     public Guid? DocumentGuid { get; init; }

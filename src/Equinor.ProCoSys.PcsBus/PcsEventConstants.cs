@@ -199,4 +199,9 @@ public static class PcsEventConstants
     ///     Event that is fired when a new tag equipment  is created or updated
     /// </summary>
     public const string TagEquipmentCreateOrUpdate = "tagEquipmentCreatedOrUpdated";
+
+    /// <summary>
+    ///     Event that is fired when a new heat trace pipe test is created or updated
+    /// </summary>
+    public const string HeatTracePipeTestEventType = "heatTracePipeTestCreatedOrUpdated";
 }
