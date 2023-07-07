@@ -69,7 +69,7 @@ public class PcsBusReceiver : IHostedService
     {
         try
         {
-            _logger.LogDebug($"CanProceedAsLeaderCheckAsync started do work at: {DateTimeOffset.Now}");
+            _logger.LogDebug("CanProceedAsLeaderCheckAsync started do work at: {Now}", DateTimeOffset.Now);
 
             if (IsLeader)
             {
@@ -82,7 +82,7 @@ public class PcsBusReceiver : IHostedService
         }
         catch (Exception e)
         {
-            _logger.LogError(e, $"CanProceedAsLeaderCheckAsync failed at: {DateTimeOffset.Now}");
+            _logger.LogError(e, "CanProceedAsLeaderCheckAsync failed at: {Now}", DateTimeOffset.Now);
         }
         finally
         {
@@ -93,10 +93,10 @@ public class PcsBusReceiver : IHostedService
     // Use this handler to examine the exceptions received on the message pump.
     private Task ExceptionReceivedHandler(ProcessErrorEventArgs exceptionReceivedEventArgs)
     {
-        _logger.LogError($"Message handler encountered an exception {exceptionReceivedEventArgs.Exception}");
-        _logger.LogError($"- Fully Qualified namespace: {exceptionReceivedEventArgs.FullyQualifiedNamespace}");
-        _logger.LogError($"- Entity Path: {exceptionReceivedEventArgs.EntityPath}");
-        _logger.LogError($"- Error Source: {exceptionReceivedEventArgs.ErrorSource}");
+        _logger.LogError("Message handler encountered an exception {Exception}", exceptionReceivedEventArgs.Exception);
+        _logger.LogError("- Fully Qualified namespace: {FullyQualifiedNamespace}", exceptionReceivedEventArgs.FullyQualifiedNamespace);
+        _logger.LogError("- Entity Path: {EntityPath}", exceptionReceivedEventArgs.EntityPath);
+        _logger.LogError("- Error Source: {ErrorSource}", exceptionReceivedEventArgs.ErrorSource);
         return Task.CompletedTask;
     }
 

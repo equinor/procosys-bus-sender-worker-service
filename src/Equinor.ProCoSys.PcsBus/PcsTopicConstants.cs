@@ -35,6 +35,7 @@ public static class PcsTopicConstants
     public const string CallOff = "CallOff";
     public const string CommPkgQuery = "CommPkgQuery";
     public const string HeatTrace = "HeatTrace";
+    public const string HeatTracePipeTest = "HeatTracePipeTest";
     public const string CommPkgMilestone = "CommPkgMilestone";
     public const string TagEquipment = "TagEquipment";
     public const string SwcrType = "SwcrType";

@@ -8,6 +8,7 @@ public class TagQuery
     {
         DetectFaultyPlantInput(plant);
         var whereClause = CreateWhereClause(tagId, plant, "t", "tag_id");
+        var plantClause = plant != null ? $"f.projectschema ='{plant}'" : "f.projectschema = t.projectschema";
 
         var query = @$"select
             t.projectschema as Plant,
@@ -55,7 +56,7 @@ public class TagQuery
                                  LIBVAL.CODE
                                  ) AS VAL,
             t2.PROCOSYS_GUID AS VAL2,
-            t2.PROCOSYS_GUID AS VAL3                                 
+            t2.PROCOSYS_GUID AS VAL3
                 FROM DEFINEELEMENTFIELD DEF
                     LEFT JOIN FIELD F ON DEF.FIELD_ID = F.FIELD_ID
                     LEFT JOIN LIBRARY UNIT ON UNIT.LIBRARY_ID = F.UNIT_ID
@@ -69,7 +70,7 @@ public class TagQuery
                 AND (DEF.REGISTER_ID IS NULL OR DEF.REGISTER_ID = t.register_id)
                 AND NOT (DEF.ISVOIDED = 'Y')
                 AND F.COLUMNTYPE in ('NUMBER','DATE','STRING', 'LIBRARY','TAG')
-                AND f.projectschema ='{plant}'))
+                AND {plantClause}))
                 || '}}' as TagDetails
         from tag t
             join element e on e.element_id = t.tag_id

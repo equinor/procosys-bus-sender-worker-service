@@ -32,7 +32,7 @@ public class QueryTests
         var (actualQuery, _) = (ValueTuple<string, DynamicParameters>)result;
 
         // Get all property names from the interface
-        IEnumerable<string> interfaceProperties = interfaceType.GetProperties().Select(p => p.Name);
+        var interfaceProperties = interfaceType.GetProperties().Select(p => p.Name);
 
         // Assert
         foreach (var property in interfaceProperties)
@@ -339,7 +339,15 @@ public class QueryTests
             new[] { typeof(long?), typeof(string) },
             new object[] { 1L, "testPlant" }
         };
-        
+
+        yield return new object[]
+        {
+            typeof(HeatTracePipeTestQuery),
+            typeof(IHeatTracePipeTestEventV1),
+            new[] { typeof(string), typeof(string) },
+            new object[] { "abc", "testPlant" }
+        };
+
 
     }
 }
