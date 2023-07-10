@@ -43,7 +43,7 @@ public class QueryQuery
         from query q
             join document do ON do.document_id = q.document_id
             join element e on e.element_id = do.document_id
-            left join project p on p.project_id = do.project_id
+            join project p on p.project_id = do.project_id
             left join library dis on dis.library_id = do.discipline_id
             left join library qt on qt.library_id = q.QUERYTYPE_ID
             left join library ci ON ci.library_id = q.COSTIMPACT_ID
