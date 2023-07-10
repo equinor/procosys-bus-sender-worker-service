@@ -27,8 +27,8 @@ public class SwcrSignatureQuery
         from swcrsignature sign
             join swcr s on s.swcr_id = sign.swcr_id
             join projectschema ps ON ps.projectschema = sign.projectschema
-            join project p ON p.project_id = s.project_id
             join library sr ON sr.library_id = sign.signaturerole_id
+            left join project p ON p.project_id = s.project_id
             left join person p ON p.person_id = sign.signedby_id
             left join library fr On fr.library_id = sign.functionalrole_id
         {whereClause.clause}";
