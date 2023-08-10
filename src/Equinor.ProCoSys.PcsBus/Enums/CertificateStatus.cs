@@ -5,5 +5,6 @@ public enum CertificateStatus
     Accepted,
     Rejected,
     Sent,
-    NoCertificate
+    NoCertificate,
+    Voided
 }
