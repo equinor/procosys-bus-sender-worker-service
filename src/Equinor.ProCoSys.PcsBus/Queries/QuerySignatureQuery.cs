@@ -29,11 +29,10 @@ public class QuerySignatureQuery
             q.last_updated as LastUpdated
         from querysignature q
             join document DO ON do.document_id = q.DOCUMENT_ID
-            join project pr ON pr.project_id = do.project_id
             join projectschema ps on ps.projectschema = q.projectschema
             join element em on em.element_id = do.document_id
-            join library dlib on dlib.library_id = do.discipline_id
-            join library sr ON sr.library_id = q.signaturerole_id
+            left join project pr ON pr.project_id = do.project_id
+            left join library sr ON sr.library_id = q.signaturerole_id
             left join person p ON p.person_id = q.signedby_id
             left join library fr On fr.library_id = q.functionalrole_id
             left join library status on status.library_id = q.status_id
