@@ -15,6 +15,7 @@ public class SwcrQuery
             p.NAME AS ProjectName,
             sw.SWCRNO AS SwcrNo,
             sw.SWCR_ID AS SwcrId,
+            sw.Header as Title,
             c.procosys_guid AS CommPkgGuid,
             c.COMMPKGNO AS CommPkgNo,
             sw.problemdescription AS Description,

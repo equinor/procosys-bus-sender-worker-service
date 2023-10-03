@@ -8,6 +8,7 @@ public interface ISwcrEventV1 : IHasEventType
     Guid ProCoSysGuid { get; init; }
     string? ProjectName { get; init; }
     string SwcrNo { get; init; }
+    string? Title { get; init; }
     long SwcrId { get; init; }
     Guid? CommPkgGuid { get; init; }
     string? CommPkgNo { get; init; }
