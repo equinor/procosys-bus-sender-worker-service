@@ -22,6 +22,7 @@ public class SwcrEventTests
             { "SwcrNo", typeof(string) },
             { "SwcrId", typeof(long) },
             { "CommPkgGuid", typeof(Guid?) },
+            { "Title", typeof(string) },
             { "CommPkgNo", typeof(string) },
             { "Description", typeof(string) },
             { "Modification", typeof(string) },
