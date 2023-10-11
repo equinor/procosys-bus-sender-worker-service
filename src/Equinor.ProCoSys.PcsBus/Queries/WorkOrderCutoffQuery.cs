@@ -1,25 +1,30 @@
-﻿using Dapper;
+﻿using System.Collections.Generic;
+using Dapper;
 
 namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 
 public class WorkOrderCutoffQuery
 {
     /// <summary>
-    ///     Call with either workOrderId and cutoffWeek, plantId  or all 3. Not advised to call without either as result set
+    ///     Call with either workOrderId and cutoffWeek, plantId, projectIds or all 4. Not advised to call without either as result set
     ///     could get very large
     /// </summary>
-    public static (string queryString, DynamicParameters parameters) GetQuery(long? woId, string? cutoffWeek, string? plant = null, string? month = null)
+    public static (string queryString, DynamicParameters parameters) GetQuery(long? woId, string? cutoffWeek, string? plant = null, string? month = null, IEnumerable<long>? projectIds = null)
     {
         DetectFaultyPlantInput(plant);
 
         var whereClause = CreateWhereClause(woId, plant, "wc", "wo_id");
-
+        if (projectIds != null)
+        {
+            whereClause.parameters.Add(":ProjectIds", projectIds);
+            whereClause.clause += " and p.project_id in (:ProjectIds)";
+        }
         if (cutoffWeek != null)
         {
             whereClause.parameters.Add(":CutoffWeek", cutoffWeek);
             whereClause.clause += " and wc.cutoffweek = :CutoffWeek";
         }
-        else if (month != null)
+        if (month != null)
         {
             whereClause.parameters.Add(":Month", month);
             whereClause.clause += " and TO_CHAR(wc.CUTOFFDATE, 'YYYY-MM-DD') like '%-' || :Month || '-%'";

@@ -60,7 +60,7 @@ stages:
           solution: '**/*.sln'
           sourceFolder: '$(System.DefaultWorkingDirectory)/src/$(projectName)/bin/$(buildConfiguration)/net6.0'
           targetFolder: '$(Build.BinariesDirectory)/build/App_Data/jobs/continuous/$(projectName)'
-          versionSpec: '5.11.0'
+          versionSpec: '6.7.0'
           projectName: '$(projectName)'
 
   - stage: test

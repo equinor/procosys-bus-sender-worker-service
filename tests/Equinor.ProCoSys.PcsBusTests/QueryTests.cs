@@ -312,8 +312,8 @@ public class QueryTests
         {
             typeof(WorkOrderCutoffQuery),
             typeof(IWorkOrderCutoffEventV1),
-            new[] { typeof(long?),typeof(string), typeof(string),typeof(string) },
-            new object[] { 123L, "testPlant", null, null}
+            new[] { typeof(long?),typeof(string), typeof(string),typeof(string),typeof(IEnumerable<long>) },
+            new object[] { 123L, "testPlant", null, null, null}
         };
         
         yield return new object[]
