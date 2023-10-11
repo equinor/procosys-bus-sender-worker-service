@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -216,17 +217,16 @@ public class BusSenderService : IBusSenderService
         {
             message.ProjectName = "_";
         }
-
-        TrackMetric(message);
+        _telemetryClient.TrackEvent("BusSender Message", new Dictionary<string, string>
+        {
+            {"Event", busEvent.Event},
+            {"ProCoSysGuid", message?.ProCoSysGuid ?? "NoGuid!!???"},
+            {"Created", busEvent.Created.ToString(CultureInfo.InvariantCulture)},
+            {"ProjectName", message?.ProjectName ?? "NoProject"},
+            {"Plant", message?.Plant ?? "NoPlant"}
+        });
     }
-
-    private void TrackMetric(BusEventMessage? message) =>
-        _telemetryClient.TrackMetric("BusSender Topic",
-            1, "Plant",
-            "ProjectName",
-            message?.Plant?[4..] ?? "NoPlant",
-            message?.ProjectName?.Replace('$', '_') ?? "NoProject");
-
+    
     private async Task UpdateEventBasedOnTopic(BusEvent busEvent)
     {
         _logger.LogDebug("Started update for {Event}", busEvent.Event);
