@@ -31,6 +31,7 @@ public class McPkgEventVersioningTests
             { "AreaCode", typeof(string) },
             { "AreaDescription", typeof(string) },
             { "Discipline", typeof(string) },
+            { "DisciplineCode", typeof(string) },
             { "McStatus", typeof(string) },
             { "Phase", typeof(string) },
             { "IsVoided", typeof(bool) },

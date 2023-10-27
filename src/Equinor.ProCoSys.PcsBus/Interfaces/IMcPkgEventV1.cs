@@ -21,6 +21,7 @@ public interface IMcPkgEventV1 : IHasEventType
     string? AreaCode { get; init; }
     string? AreaDescription { get; init; }
     string Discipline { get; init; }
+    string DisciplineCode { get; init; }
     string McStatus { get; init; }
     string? Phase { get; init; }
     bool IsVoided { get; init; }

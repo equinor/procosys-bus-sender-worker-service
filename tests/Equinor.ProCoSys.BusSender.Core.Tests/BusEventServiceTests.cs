@@ -791,6 +791,7 @@ public class BusEventServiceTests
             AreaCode = "Area1",
             AreaDescription = "AreaDesc1",
             Discipline = "Discipline1",
+            DisciplineCode = "DisciplineCode1",
             McStatus = "Status1",
             Phase = "Phase1",
             IsVoided = false,
