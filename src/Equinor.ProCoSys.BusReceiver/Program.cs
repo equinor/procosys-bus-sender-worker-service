@@ -25,7 +25,6 @@ public class Program
 
         builder.ConfigureWebJobs(b =>
         {
-            b.AddAzureStorageCoreServices();
             b.AddAzureStorageQueues();
             b.AddAzureStorageBlobs();
         });
