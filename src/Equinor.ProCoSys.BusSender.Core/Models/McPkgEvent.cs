@@ -14,6 +14,7 @@ public class McPkgEvent : IMcPkgEventV1
     public DateTime CreatedAt { get; init; }
     public string? Description { get; init; }
     public string Discipline { get; init; }
+    public string DisciplineCode { get; init; }
     public bool IsVoided { get; init; }
     public DateTime LastUpdated { get; init; }
     public long McPkgId { get; init; }

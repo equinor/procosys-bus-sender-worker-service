@@ -25,6 +25,7 @@ public static class McPkgQuery
             area.CODE as AreaCode,
             area.DESCRIPTION as AreaDescription,
             discipline.DESCRIPTION as Discipline,
+            discipline.CODE as DisciplineCode,
             mcstatus.CODE as McStatus,
             phase.CODE as Phase,
             e.isVoided as IsVoided,
