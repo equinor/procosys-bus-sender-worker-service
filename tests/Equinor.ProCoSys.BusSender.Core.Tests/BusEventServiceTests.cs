@@ -791,6 +791,7 @@ public class BusEventServiceTests
             AreaCode = "Area1",
             AreaDescription = "AreaDesc1",
             Discipline = "Discipline1",
+            DisciplineCode = "DisciplineCode1",
             McStatus = "Status1",
             Phase = "Phase1",
             IsVoided = false,
@@ -810,6 +811,8 @@ public class BusEventServiceTests
         Assert.IsNotNull(result);
         var deserializedResult =
             JsonSerializer.Deserialize<McPkgEvent>(result, DefaultSerializerHelper.SerializerOptions);
+        
+        
 
         // Check if the properties are equal
         Assert.AreEqual(mcPkgEvent.Plant, deserializedResult.Plant);
@@ -827,6 +830,7 @@ public class BusEventServiceTests
         Assert.AreEqual(mcPkgEvent.AreaCode, deserializedResult.AreaCode);
         Assert.AreEqual(mcPkgEvent.AreaDescription, deserializedResult.AreaDescription);
         Assert.AreEqual(mcPkgEvent.Discipline, deserializedResult.Discipline);
+        Assert.AreEqual(mcPkgEvent.DisciplineCode, deserializedResult.DisciplineCode);
         Assert.AreEqual(mcPkgEvent.McStatus, deserializedResult.McStatus);
         Assert.AreEqual(mcPkgEvent.Phase, deserializedResult.Phase);
         Assert.AreEqual(mcPkgEvent.IsVoided, deserializedResult.IsVoided);
