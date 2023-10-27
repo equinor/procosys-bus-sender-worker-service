@@ -8,7 +8,6 @@ using Equinor.ProCoSys.BusSenderWorker.Core.Models;
 using Equinor.ProCoSys.BusSenderWorker.Core.Services;
 using Equinor.ProCoSys.PcsServiceBus.Queries;
 using Equinor.ProCoSys.PcsServiceBus.Topics;
-using Microsoft.Azure.Amqp.Framing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
