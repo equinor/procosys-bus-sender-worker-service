@@ -8,6 +8,7 @@ using Equinor.ProCoSys.BusSenderWorker.Core.Models;
 using Equinor.ProCoSys.BusSenderWorker.Core.Services;
 using Equinor.ProCoSys.PcsServiceBus.Queries;
 using Equinor.ProCoSys.PcsServiceBus.Topics;
+using Microsoft.Azure.Amqp.Framing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
@@ -811,6 +812,8 @@ public class BusEventServiceTests
         Assert.IsNotNull(result);
         var deserializedResult =
             JsonSerializer.Deserialize<McPkgEvent>(result, DefaultSerializerHelper.SerializerOptions);
+        
+        
 
         // Check if the properties are equal
         Assert.AreEqual(mcPkgEvent.Plant, deserializedResult.Plant);
@@ -828,6 +831,7 @@ public class BusEventServiceTests
         Assert.AreEqual(mcPkgEvent.AreaCode, deserializedResult.AreaCode);
         Assert.AreEqual(mcPkgEvent.AreaDescription, deserializedResult.AreaDescription);
         Assert.AreEqual(mcPkgEvent.Discipline, deserializedResult.Discipline);
+        Assert.AreEqual(mcPkgEvent.DisciplineCode, deserializedResult.DisciplineCode);
         Assert.AreEqual(mcPkgEvent.McStatus, deserializedResult.McStatus);
         Assert.AreEqual(mcPkgEvent.Phase, deserializedResult.Phase);
         Assert.AreEqual(mcPkgEvent.IsVoided, deserializedResult.IsVoided);
