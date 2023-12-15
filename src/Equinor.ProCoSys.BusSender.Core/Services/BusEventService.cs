@@ -255,14 +255,14 @@ public class BusEventService : IBusEventService
 
     public async Task<string?> CreateProjectMessage(string message)
     {
-        if (!long.TryParse(message, out var projectId))
+        if (!Guid.TryParse(message, out _))
         {
-            throw new Exception($"Failed to extract projectId from message: {message}");
+            throw new Exception($"Failed to extract or parse Project Guid from message {message}");
         }
 
         return JsonSerializer.Serialize(
-            await _eventRepository.QuerySingle<ProjectEvent>(ProjectQuery.GetQuery(projectId),
-                projectId.ToString()));
+            await _eventRepository.QuerySingle<ProjectEvent>(ProjectQuery.GetQuery(message),
+                message));
     }
 
 
