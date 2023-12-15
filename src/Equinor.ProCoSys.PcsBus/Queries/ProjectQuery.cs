@@ -4,10 +4,10 @@ namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 
 public class ProjectQuery
 {
-    public static (string queryString, DynamicParameters parameters) GetQuery(long? projectId, string? plant = null)
+    public static (string queryString, DynamicParameters parameters) GetQuery(string? projectGuid, string? plant = null)
     {
         DetectFaultyPlantInput(plant);
-        var whereClause = CreateWhereClause(projectId, plant, "p", "project_id");
+        var whereClause = CreateWhereClause(projectGuid, plant, "p", "project_id");
 
         var query = @$"select
             p.projectschema as Plant,

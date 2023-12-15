@@ -387,6 +387,11 @@ public class BusSenderService : IBusSenderService
                     await CreateAndSetMessage(busEvent, _service.CreateHeatTracePipeTestMessage);
                     break;
                 }
+            case ProjectTopic.TopicName:
+                {
+                    await CreateAndSetMessage(busEvent, _service.CreateProjectMessage);
+                    break;
+                }
         }
 
         _logger.LogDebug("Update for  {Event} took {Ms} ms", busEvent.Event, sw.ElapsedMilliseconds);

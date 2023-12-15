@@ -192,8 +192,8 @@ public class QueryTests
         {
             typeof(ProjectQuery),
             typeof(IProjectEventV1),
-            new[] { typeof(long?), typeof(string) },
-            new object[] { 1L, "testPlant" }
+            new[] { typeof(string), typeof(string) },
+            new object[] { "1L", "testPlant" }
         };
         
         yield return new object[]

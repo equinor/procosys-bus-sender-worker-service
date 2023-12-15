@@ -1044,9 +1044,8 @@ public class BusEventServiceTests
     public async Task CreateProjectMessage_ValidMessage_ReturnsSerializedProjectEvent()
     {
         // Arrange
-        const string message = "12345";
-        const long projectId = 12345L;
-        var query = ProjectQuery.GetQuery(projectId);
+        const string message = "5f643eeb-b114-4fc4-b884-ade3f6ea63ce";
+        var query = ProjectQuery.GetQuery(message);
 
         var projectEvent = new ProjectEvent
         {
