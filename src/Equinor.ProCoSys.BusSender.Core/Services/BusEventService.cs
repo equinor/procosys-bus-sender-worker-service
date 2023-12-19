@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Dapper;
 using Equinor.ProCoSys.BusSenderWorker.Core.Extensions;
 using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 using Equinor.ProCoSys.BusSenderWorker.Core.Models;
@@ -255,14 +254,14 @@ public class BusEventService : IBusEventService
 
     public async Task<string?> CreateProjectMessage(string message)
     {
-        if (!long.TryParse(message, out var projectId))
+        if (!Guid.TryParse(message, out _))
         {
-            throw new Exception($"Failed to extract projectId from message: {message}");
+            throw new Exception($"Failed to extract or parse Project Guid from message {message}");
         }
 
         return JsonSerializer.Serialize(
-            await _eventRepository.QuerySingle<ProjectEvent>(ProjectQuery.GetQuery(projectId),
-                projectId.ToString()));
+            await _eventRepository.QuerySingle<ProjectEvent>(ProjectQuery.GetQuery(message),
+                message));
     }
 
 

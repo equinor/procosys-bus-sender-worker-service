@@ -29,6 +29,7 @@ public class SwcrSignatureEventTests
             { "FunctionalRoleCode", typeof(string) },
             { "FunctionalRoleDescription", typeof(string) },
             { "SignedDate", typeof(DateTime?) },
+            {"StatusCode", typeof(string) },
             { "LastUpdated", typeof(DateTime) }
         };
 
