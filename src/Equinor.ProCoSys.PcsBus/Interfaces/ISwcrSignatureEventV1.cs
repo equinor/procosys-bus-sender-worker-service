@@ -17,5 +17,6 @@ public interface ISwcrSignatureEventV1 : IHasEventType
     string? FunctionalRoleCode { get; init; }
     string? FunctionalRoleDescription { get; init; }
     DateTime? SignedDate { get; init; }
+    string? StatusCode { get; init; }
     DateTime LastUpdated { get; init; }
 }

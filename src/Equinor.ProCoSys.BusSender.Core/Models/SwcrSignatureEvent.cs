@@ -9,6 +9,8 @@ public class SwcrSignatureEvent : ISwcrSignatureEventV1
     public string EventType => PcsEventConstants.SwcrSignatureCreateOrUpdate;
     public string? FunctionalRoleCode { get; init; }
     public string? FunctionalRoleDescription { get; init; }
+    
+    public string? StatusCode { get; init; }
     public DateTime LastUpdated { get; init; }
 
     public string Plant { get; init; }

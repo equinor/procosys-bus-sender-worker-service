@@ -23,6 +23,7 @@ public class SwcrSignatureQuery
             fr.code as FunctionalRoleCode,
             fr.description as FunctionalRoleDescription,
             sign.signedat as SignedDate,
+            st.code as StatusCode,
             sign.last_updated as LastUpdated
         from swcrsignature sign
             join swcr s on s.swcr_id = sign.swcr_id
@@ -31,6 +32,7 @@ public class SwcrSignatureQuery
             join project p ON p.project_id = s.project_id
             left join person p ON p.person_id = sign.signedby_id
             left join library fr On fr.library_id = sign.functionalrole_id
+            left join library st on st.library_id = sign.status_id
         {whereClause.clause}";
         
         return (query, whereClause.parameters);
