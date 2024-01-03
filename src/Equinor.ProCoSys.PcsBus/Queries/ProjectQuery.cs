@@ -7,7 +7,7 @@ public class ProjectQuery
     public static (string queryString, DynamicParameters parameters) GetQuery(string? projectGuid, string? plant = null)
     {
         DetectFaultyPlantInput(plant);
-        var whereClause = CreateWhereClause(projectGuid, plant, "p", "project_id");
+        var whereClause = CreateWhereClause(projectGuid, plant, "p", "procosys_guid");
 
         var query = @$"select
             p.projectschema as Plant,
@@ -18,7 +18,7 @@ public class ProjectQuery
             p.last_updated as LastUpdated
         from project p
         {whereClause.clause}";
-        
+
         return (query, whereClause.parameters);
     }
 }
