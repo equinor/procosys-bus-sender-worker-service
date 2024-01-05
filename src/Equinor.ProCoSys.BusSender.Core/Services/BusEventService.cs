@@ -171,14 +171,13 @@ public class BusEventService : IBusEventService
     {
         if (!Guid.TryParse(message, out var _))
         {
-            throw new Exception($"Failed to extract personId from message: {message}");
+            throw new Exception($"Failed to extract person guid from message: {message}");
         }
 
         var queryString = PersonQuery.GetQuery(message);
         var personEvents = await _eventRepository.QuerySingle<PersonEvent>(queryString, message);
         return JsonSerializer.Serialize(personEvents, DefaultSerializerHelper.SerializerOptions);
     }
-
 
     public async Task<string?> CreateLibraryFieldMessage(string message)
     {

@@ -13,5 +13,4 @@ public interface IPersonEventV1 : IHasEventType
     string Email { get; init; }
     bool SuperUser { get; init; }
     DateTime LastUpdated { get; init; }
-
 }

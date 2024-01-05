@@ -44,8 +44,8 @@ internal class EventRepository : IEventRepository
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex.Message);
-            return default;
+            _logger.LogError(ex, $"An error occurred while executing query {query.queryString} for Object/Entity with id {objectId}");
+            throw;
         }
         finally
         {
