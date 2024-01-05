@@ -195,7 +195,15 @@ public class QueryTests
             new[] { typeof(string), typeof(string) },
             new object[] { "1L", "testPlant" }
         };
-        
+
+        yield return new object[]
+        {
+            typeof(PersonQuery),
+            typeof(IPersonEventV1),
+            new[] { typeof(string) },
+            new object[] { "1L" }
+        };
+
         yield return new object[]
         {
             typeof(PunchListItemQuery),
