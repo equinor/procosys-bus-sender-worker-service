@@ -232,6 +232,11 @@ public class BusSenderService : IBusSenderService
         var sw = Stopwatch.StartNew();
         switch (busEvent.Event)
         {
+            case PersonTopic.TopicName:
+                {
+                    await CreateAndSetMessage(busEvent, _service.CreatePersonMessage);
+                    break;
+                }
             case HeatTraceTopic.TopicName:
                 {
                     await CreateAndSetMessage(busEvent, _service.CreateHeatTraceMessage);

@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
@@ -40,6 +41,11 @@ internal class EventRepository : IEventRepository
             }
 
             return events.Single();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"An error occurred while executing query {query.queryString} for Object/Entity with id {objectId}");
+            throw;
         }
         finally
         {

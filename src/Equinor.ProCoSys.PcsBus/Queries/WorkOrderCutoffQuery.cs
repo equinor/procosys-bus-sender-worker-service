@@ -9,7 +9,7 @@ public class WorkOrderCutoffQuery
     ///     Call with either workOrderId and cutoffWeek, plantId, projectIds or all 4. Not advised to call without either as result set
     ///     could get very large
     /// </summary>
-    public static (string queryString, DynamicParameters parameters) GetQuery(long? woId, string? cutoffWeek, string? plant = null, string? month = null, IEnumerable<long>? projectIds = null)
+    public static (string queryString, DynamicParameters parameters) GetQuery(long? woId, string? cutoffWeek, string? plant = null, string? weekNumber = null, IEnumerable<long>? projectIds = null)
     {
         DetectFaultyPlantInput(plant);
 
@@ -24,10 +24,10 @@ public class WorkOrderCutoffQuery
             whereClause.parameters.Add(":CutoffWeek", cutoffWeek);
             whereClause.clause += " and wc.cutoffweek = :CutoffWeek";
         }
-        if (month != null)
+        if (weekNumber != null)
         {
-            whereClause.parameters.Add(":Month", month);
-            whereClause.clause += " and TO_CHAR(wc.CUTOFFDATE, 'YYYY-MM-DD') like '%-' || :Month || '-%'";
+            whereClause.parameters.Add(":WeekNumber", weekNumber);
+            whereClause.clause += " and TO_CHAR(wc.CUTOFFWEEK) like '%' || :WeekNumber";
         }
 
         var query = @$"select

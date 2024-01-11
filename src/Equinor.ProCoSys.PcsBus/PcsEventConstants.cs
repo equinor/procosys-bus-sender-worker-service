@@ -120,6 +120,12 @@ public static class PcsEventConstants
     public const string HeatTraceCreateOrUpdate = "heatTraceCreatedOrUpdated";
 
     /// <summary>
+    ///     Event that is fired when an existing Person is updated
+    /// </summary>
+    public const string PersonUpdate = "personUpdated";
+
+
+    /// <summary>
     ///     Event that is fired when a new LibraryField is created or updated
     /// </summary>
     public const string LibraryFieldCreateOrUpdate = "libraryFieldCreatedOrUpdated";

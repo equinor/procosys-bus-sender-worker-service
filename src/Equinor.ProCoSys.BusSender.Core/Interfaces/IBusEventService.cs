@@ -16,6 +16,7 @@ public interface IBusEventService
     Task<string?> CreateCommPkgTaskMessage(string busEventMessage);
     Task<string?> CreateDocumentMessage(string busEventMessage);
     Task<string?> CreateHeatTraceMessage(string busEventMessage);
+    Task<string?> CreatePersonMessage(string busEventMessage);
 
     Task<string?> CreateLibraryFieldMessage(string busEventMessage);
     Task<string?> CreateLibraryMessage(string message);
