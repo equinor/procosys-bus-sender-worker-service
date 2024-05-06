@@ -13,6 +13,7 @@ public class PunchListItemEvent : IPunchListItemEventV1
     public long ChecklistId { get; init; }
     public DateTime? ClearedAt { get; init; }
     public string? ClearingByOrg { get; init; }
+    public Guid? ClearingByOrgGuid { get; init; }
     public DateTime CreatedAt { get; init; }
     public string? Description { get; init; }
     public Guid? DocumentGuid { get; init; }
@@ -35,6 +36,7 @@ public class PunchListItemEvent : IPunchListItemEventV1
     public string? PunchListType { get; init; }
     public string? PunchPriority { get; init; }
     public string? RaisedByOrg { get; init; }
+    public Guid? RaisedByOrgGuid { get; init; }
     public DateTime? RejectedAt { get; init; }
     public Guid? SWCRGuid { get; init; }
     public string? SWCRNo { get; init; }
