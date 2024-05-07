@@ -13,6 +13,7 @@ public class PunchListItemQuery
             pl.projectschema as Plant,
             pl.procosys_guid as ProCoSysGuid,
             p.name as ProjectName,
+            p.procosys_guid as ProjectGuid,
             pl.LAST_UPDATED as LastUpdated,
             pl.PunchListItem_Id as PunchItemNo,
             pl.Description as Description,

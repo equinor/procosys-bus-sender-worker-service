@@ -9,6 +9,7 @@ public interface IPunchListItemEventV1 : IHasEventType
     string Plant { get; init; }
     Guid ProCoSysGuid { get; init; }
     string ProjectName { get; init; }
+    Guid ProjectGuid { get; init; }
     DateTime LastUpdated { get; init; }
     long PunchItemNo { get; init; }
     string? Description { get; init; }

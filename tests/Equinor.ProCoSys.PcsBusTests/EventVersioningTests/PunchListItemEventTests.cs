@@ -19,6 +19,7 @@ public class PunchListItemEventTests
             { "Plant", typeof(string) },
             { "ProCoSysGuid", typeof(Guid) },
             { "ProjectName", typeof(string) },
+            { "ProjectGuid", typeof(Guid) },
             { "LastUpdated", typeof(DateTime) },
             { "PunchItemNo", typeof(long) },
             { "Description", typeof(string) },
