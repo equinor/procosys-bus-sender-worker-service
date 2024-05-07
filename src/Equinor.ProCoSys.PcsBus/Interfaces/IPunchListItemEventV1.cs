@@ -21,8 +21,11 @@ public interface IPunchListItemEventV1 : IHasEventType
     Guid? ClearingByOrgGuid { get; init; }
     DateTime? DueDate { get; init; }
     string? PunchListSorting { get; init; }
+    Guid? SortingGuid { get; init; }
     string? PunchListType { get; init; }
+    Guid? TypeGuid { get; init; }
     string? PunchPriority { get; init; }
+    Guid? PriorityGuid { get; init; }
     string? Estimate { get; init; }
     string? OriginalWoNo { get; init; }
     Guid? OriginalWoGuid { get; init; }
