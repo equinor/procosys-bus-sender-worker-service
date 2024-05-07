@@ -33,11 +33,11 @@ public class PunchListItemEvent : IPunchListItemEventV1
     public string ProjectName { get; init; }
     public long PunchItemNo { get; init; }
     public string? PunchListSorting { get; init; }
-    public Guid? SortingGuid { get; init; }
+    public Guid? PunchListSortingGuid { get; init; }
     public string? PunchListType { get; init; }
-    public Guid? TypeGuid { get; init; }
+    public Guid? PunchListTypeGuid { get; init; }
     public string? PunchPriority { get; init; }
-    public Guid? PriorityGuid { get; init; }
+    public Guid? PunchPriorityGuid { get; init; }
     public string? RaisedByOrg { get; init; }
     public Guid? RaisedByOrgGuid { get; init; }
     public DateTime? RejectedAt { get; init; }
