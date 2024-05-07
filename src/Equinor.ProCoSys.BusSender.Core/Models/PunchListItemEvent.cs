@@ -31,6 +31,7 @@ public class PunchListItemEvent : IPunchListItemEventV1
     public string Plant { get; init; }
     public Guid ProCoSysGuid { get; init; }
     public string ProjectName { get; init; }
+    public Guid ProjectGuid { get; init; }
     public long PunchItemNo { get; init; }
     public string? PunchListSorting { get; init; }
     public Guid? PunchListSortingGuid { get; init; }
