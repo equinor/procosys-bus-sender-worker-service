@@ -28,4 +28,5 @@ public class DocumentEvent : IDocumentEventV1
     public string? RevisionStatus { get; init; }
     public string? Title { get; init; }
     public string EventType => PcsEventConstants.DocumentCreateOrUpdate;
+    public bool IsVoided { get; init; }
 }
