@@ -29,8 +29,10 @@ public class DocumentQuery
             rev.code as RevisionStatus,
             res.code as ResponsibleContractor,
             d.last_Updated as LastUpdated,
-            d.revisiondate as RevisionDate
+            d.revisiondate as RevisionDate,
+            e.IsVoided AS IsVoided
         from document d
+            join element e on  E.ELEMENT_ID = d.document_ID
             left join project p on p.project_id = d.project_id
             left join library RT on RT.library_id = d.register_id
             left join library DT on DT.library_id = d.documenttype_id

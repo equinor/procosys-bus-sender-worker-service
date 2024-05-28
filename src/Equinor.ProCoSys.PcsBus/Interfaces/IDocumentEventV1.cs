@@ -24,4 +24,5 @@ public interface IDocumentEventV1 : IHasEventType
     string? ResponsibleContractor { get; init; }
     DateTime LastUpdated { get; init; }
     DateOnly? RevisionDate { get; init; }
+    bool IsVoided { get; init; }
 }
