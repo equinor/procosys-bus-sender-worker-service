@@ -10,6 +10,7 @@ public interface IPunchListItemEventV1 : IHasEventType
     Guid ProCoSysGuid { get; init; }
     string ProjectName { get; init; }
     Guid ProjectGuid { get; init; }
+    Guid? ModifiedByGuid { get; init; }
     DateTime LastUpdated { get; init; }
     long PunchItemNo { get; init; }
     string? Description { get; init; }
@@ -41,8 +42,16 @@ public interface IPunchListItemEventV1 : IHasEventType
     bool IsVoided { get; init; }
     DateTime? MaterialETA { get; init; }
     string? MaterialExternalNo { get; init; }
+    Guid? ClearedByGuid { get; init; }
     DateTime? ClearedAt { get; init; }
+    Guid? RejectedByGuid { get; init; }
     DateTime? RejectedAt { get; init; }
+    Guid? VerifiedByGuid { get; init; }
     DateTime? VerifiedAt { get; init; }
+    Guid? CreatedByGuid { get; init; }
     DateTime CreatedAt { get; init; }
+    Guid? ActionByGuid { get; init; }
+
+
+
 }

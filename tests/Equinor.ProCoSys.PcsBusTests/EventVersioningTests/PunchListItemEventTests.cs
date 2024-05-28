@@ -54,7 +54,14 @@ public class PunchListItemEventTests
             { "ClearedAt", typeof(DateTime?) },
             { "RejectedAt", typeof(DateTime?) },
             { "VerifiedAt", typeof(DateTime?) },
-            { "CreatedAt", typeof(DateTime) }
+            { "CreatedAt", typeof(DateTime) },
+            { "CreatedByGuid", typeof(Guid?) },
+            { "ModifiedByGuid", typeof(Guid?) },
+            { "VerifiedByGuid", typeof(Guid?) },
+            { "RejectedByGuid", typeof(Guid?) },
+            { "ClearedByGuid", typeof(Guid?) },
+            { "ActionByGuid", typeof(Guid?) }
+
         };
 
         // Act

@@ -48,7 +48,13 @@ public class PunchListItemQuery
             pl.clearedat as ClearedAt,
             pl.rejectedat as RejectedAt,
             pl.verifiedat as VerifiedAt,
-            pl.createdat as CreatedAt
+            pl.createdat as CreatedAt,
+            pc.azure_oid as CreatedByGuid,
+            pc.azure_oid as ModifiedByGuid,
+            pv.azure_oid as VerifiedByGuid,
+            pr.azure_oid as RejectedByGuid,
+            pcl.azure_oid as ClearedByGuid,
+            pa.azure_oid as ActionByGuid
         from punchlistitem pl
             join tagcheck tc on tc.tagcheck_id = pl.tagcheck_id
             join library cat on cat.library_id = pl.Status_Id
@@ -67,6 +73,12 @@ public class PunchListItemQuery
             left join wo orgwo on orgwo.wo_id = pl.originalwo_id
             left join swcr on swcr.swcr_id = pl.swcr_id
             left join document doc on doc.document_id = pl.drawing_id
+            left join Person pc on pc.person_id = pl.createdby_id
+            left join Person pu on pu.person_id = pl.updatedby_id       
+            left join Person pv on pv.person_id = pl.verifiedby_id
+            left join Person pr on pr.person_id = pl.rejectedby_id
+            left join Person pcl on pcl.person_id = pl.clearedby_id
+            left join Person pa on pa.person_id = pl.actionbyperson_id
         {whereClause.clause}";
         
         return (query, whereClause.parameters);
