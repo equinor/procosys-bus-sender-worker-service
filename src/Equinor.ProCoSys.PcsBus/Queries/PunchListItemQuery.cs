@@ -50,7 +50,7 @@ public class PunchListItemQuery
             pl.verifiedat as VerifiedAt,
             pl.createdat as CreatedAt,
             pc.azure_oid as CreatedByGuid,
-            pc.azure_oid as ModifiedByGuid,
+            pu.azure_oid as ModifiedByGuid,
             pv.azure_oid as VerifiedByGuid,
             pr.azure_oid as RejectedByGuid,
             pcl.azure_oid as ClearedByGuid,
