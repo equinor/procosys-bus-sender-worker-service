@@ -397,6 +397,11 @@ public class BusSenderService : IBusSenderService
                     await CreateAndSetMessage(busEvent, _service.CreateProjectMessage);
                     break;
                 }
+            case PunchListItemTopic.TopicName:
+                {
+                    await CreateAndSetMessage(busEvent, _service.CreatePunchListItemMessage);
+                    break;
+                }
         }
 
         _logger.LogDebug("Update for  {Event} took {Ms} ms", busEvent.Event, sw.ElapsedMilliseconds);
