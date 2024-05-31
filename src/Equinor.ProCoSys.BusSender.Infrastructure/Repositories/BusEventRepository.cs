@@ -17,7 +17,7 @@ public class BusEventRepository : IBusEventRepository
 
     public BusEventRepository(BusSenderServiceContext context, IConfiguration configuration)
     {
-        _messageChunkSize = int.Parse(configuration["MessageChunkSize"]);
+        _messageChunkSize = int.Parse(configuration["MessageChunkSize"]?? "200");
         _busEvents = context.BusEvents;
     }
 

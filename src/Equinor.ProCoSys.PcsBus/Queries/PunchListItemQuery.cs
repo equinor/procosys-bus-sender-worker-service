@@ -4,10 +4,22 @@ namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 
 public class PunchListItemQuery
 {
-    public static (string queryString, DynamicParameters parameters) GetQuery(long? punchListItemId, string? plant = null)
+    /// <summary>
+    /// Query to fetch punchlistitems from procosys oracle db, based on input parameters to create where clause
+    /// </summary>
+    /// <param name="punchListItemId"></param>
+    /// <param name="plant"></param>
+    /// <param name="extraClause"> Needs to be in the form " and *your clause here*. The space before and/or is important"</param>
+    /// <returns>Query string, and Dynamic Parameters to be passed to Dapper</returns>
+    public static (string queryString, DynamicParameters parameters) GetQuery(long? punchListItemId, string? plant = null, string? extraClause = null)
     {
         DetectFaultyPlantInput(plant);
         var whereClause = CreateWhereClause(punchListItemId, plant, "pl", "punchlistitem_id");
+
+        if(extraClause != null)
+        {
+            whereClause.clause += extraClause;
+        }
 
         var query = @$"select
             pl.projectschema as Plant,
