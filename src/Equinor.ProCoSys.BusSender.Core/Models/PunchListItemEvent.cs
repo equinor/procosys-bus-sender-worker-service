@@ -15,7 +15,7 @@ public class PunchListItemEvent : IPunchListItemEventV1
     public DateTime? ClearedAt { get; init; }
     public string? ClearingByOrg { get; init; }
     public Guid? ClearingByOrgGuid { get; init; }
-    public Guid CreatedByGuid { get; init; }
+    public Guid? CreatedByGuid { get; init; }
     public DateTime CreatedAt { get; init; }
     public string? Description { get; init; }
     public Guid? DocumentGuid { get; init; }

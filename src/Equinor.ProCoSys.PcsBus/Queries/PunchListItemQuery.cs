@@ -58,12 +58,10 @@ public class PunchListItemQuery
         from punchlistitem pl
             join tagcheck tc on tc.tagcheck_id = pl.tagcheck_id
             join library cat on cat.library_id = pl.Status_Id
-            left join Responsible r ON tc.Responsible_id = r.Responsible_Id
             left join TagFormularType tft ON tc.TagFormularType_Id = tft.TagFormularType_Id
             left join FormularType ft ON tft.FormularType_Id = ft.FormularType_Id
             left join Tag t on tft.Tag_Id = t.tag_id
-            left join library reg on reg.library_id = t.register_id
-            left join Project p on p.project_id=t.project_id
+            left join Project p on p.project_id = t.project_id
             left join wo on wo.wo_id = pl.wo_id
             left join library raised on raised.library_id = pl.raisedbyorg_id
             left join library cleared on cleared.library_id = pl.clearedbyorg_id

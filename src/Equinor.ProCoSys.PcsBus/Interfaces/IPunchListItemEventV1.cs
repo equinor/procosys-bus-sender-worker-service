@@ -48,7 +48,7 @@ public interface IPunchListItemEventV1 : IHasEventType
     DateTime? RejectedAt { get; init; }
     Guid? VerifiedByGuid { get; init; }
     DateTime? VerifiedAt { get; init; }
-    Guid CreatedByGuid { get; init; }
+    Guid? CreatedByGuid { get; init; }
     DateTime CreatedAt { get; init; }
     Guid? ActionByGuid { get; init; }
 
