@@ -19,6 +19,7 @@ public class PunchListItemEventTests
             { "Plant", typeof(string) },
             { "ProCoSysGuid", typeof(Guid) },
             { "ProjectName", typeof(string) },
+            { "ProjectGuid", typeof(Guid) },
             { "LastUpdated", typeof(DateTime) },
             { "PunchItemNo", typeof(long) },
             { "Description", typeof(string) },
@@ -26,11 +27,16 @@ public class PunchListItemEventTests
             { "ChecklistGuid", typeof(Guid) },
             { "Category", typeof(string) },
             { "RaisedByOrg", typeof(string) },
+            { "RaisedByOrgGuid", typeof(Guid?) },
             { "ClearingByOrg", typeof(string) },
+            { "ClearingByOrgGuid", typeof(Guid?) },
             { "DueDate", typeof(DateTime?) },
             { "PunchListSorting", typeof(string) },
+            { "PunchListSortingGuid", typeof(Guid?) },
             { "PunchListType", typeof(string) },
+            { "PunchListTypeGuid", typeof(Guid?) },
             { "PunchPriority", typeof(string) },
+            { "PunchPriorityGuid", typeof(Guid?) },
             { "Estimate", typeof(string) },
             { "OriginalWoNo", typeof(string) },
             { "OriginalWoGuid", typeof(Guid?) },
@@ -48,7 +54,14 @@ public class PunchListItemEventTests
             { "ClearedAt", typeof(DateTime?) },
             { "RejectedAt", typeof(DateTime?) },
             { "VerifiedAt", typeof(DateTime?) },
-            { "CreatedAt", typeof(DateTime) }
+            { "CreatedAt", typeof(DateTime) },
+            { "CreatedByGuid", typeof(Guid?) },
+            { "ModifiedByGuid", typeof(Guid?) },
+            { "VerifiedByGuid", typeof(Guid?) },
+            { "RejectedByGuid", typeof(Guid?) },
+            { "ClearedByGuid", typeof(Guid?) },
+            { "ActionByGuid", typeof(Guid?) }
+
         };
 
         // Act

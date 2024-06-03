@@ -43,4 +43,5 @@ public static class PcsTopicConstants
     public const string SwcrAttachment = "SwcrAttachment";
     public const string LibraryField = "LibraryField";
     public const string Milestone = "Milestone";
+    public const string Person = "Person";
 }

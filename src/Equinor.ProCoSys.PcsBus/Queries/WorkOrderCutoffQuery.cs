@@ -57,7 +57,7 @@ public class WorkOrderCutoffQuery
             wc.EXPENDED_LW as ManHoursExpendedLastWeek,
             wc.EARNED_LW as ManHoursEarnedLastWeek,
             wc.PROJECTPROGRESS as ProjectProgress
-        from wo_cutoff wc
+        from v$wo_cutoff wc
             join wo wo on wo.wo_id = wc.wo_id
             join projectschema ps ON ps.projectschema = wc.projectschema
             join project p ON p.project_id = wc.project_id and p.isvoided = 'N' and p.isclosed = 'N'

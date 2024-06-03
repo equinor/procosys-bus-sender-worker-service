@@ -208,8 +208,8 @@ public class QueryTests
         {
             typeof(PunchListItemQuery),
             typeof(IPunchListItemEventV1),
-            new[] { typeof(long?), typeof(string) },
-            new object[] { 1L, "testPlant" }
+            new[] { typeof(long?), typeof(string), typeof(string) },
+            new object[] { 1L, "testPlant", null }
         };
         
         yield return new object[]

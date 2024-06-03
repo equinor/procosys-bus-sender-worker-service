@@ -13,6 +13,8 @@ using Microsoft.Extensions.Logging;
 
 namespace Equinor.ProCoSys.BusSender.Worker;
 
+
+// ReSharper disable once ClassNeverInstantiated.Global
 public class Program
 {
     public Program(IConfiguration configuration)
@@ -103,6 +105,7 @@ public class Program
 
             logging.AddApplicationInsightsWebJobs(c
                 => c.ConnectionString = context.Configuration["ApplicationInsights:ConnectionString"]);
+            
         });
 
         builder.UseContentRoot(Directory.GetCurrentDirectory())
@@ -110,26 +113,26 @@ public class Program
             {
                 if (hostContext.Configuration["IsLocal"] == "True")
                 {
-                    var localConnectionString = hostContext.Configuration["ProcosysDb"];
+                    var localConnectionString = hostContext.Configuration["ProcosysDb"]!;
                     services.AddDbContext(localConnectionString);
                 }
                 else
                 {
-                    var rep = new BlobRepository(hostContext.Configuration["BlobStorage:ConnectionString"],
-                        hostContext.Configuration["BlobStorage:ContainerName"]);
-                    var walletPath = hostContext.Configuration["WalletFileDir"];
+                    var rep = new BlobRepository(hostContext.Configuration["BlobStorage:ConnectionString"]!,
+                        hostContext.Configuration["BlobStorage:ContainerName"]!);
+                    var walletPath = hostContext.Configuration["WalletFileDir"]!;
                     Directory.CreateDirectory(walletPath);
-                    rep.Download(hostContext.Configuration["BlobStorage:WalletFileName"], walletPath + "\\cwallet.sso");
+                    rep.Download(hostContext.Configuration["BlobStorage:WalletFileName"]!, walletPath + "\\cwallet.sso");
                     Console.WriteLine("Created wallet file at: " + walletPath);
-                    var connectionString = hostContext.Configuration["ConnectionString"];
+                    var connectionString = hostContext.Configuration["ConnectionString"]!;
                     services.AddDbContext(connectionString);
                     services.AddApplicationInsightsTelemetryWorkerService(o =>
                         o.ConnectionString = hostContext.Configuration["ApplicationInsights:ConnectionString"]);
                 }
 
                 services.AddTopicClients(
-                    hostContext.Configuration["ServiceBusConnectionString"],
-                    hostContext.Configuration["TopicNames"]);
+                    hostContext.Configuration["ServiceBusConnectionString"]!,
+                    hostContext.Configuration["TopicNames"]!);
                 services.AddRepositories();
                 services.AddServices();
                 services.AddHostedService<TimedWorkerService>();

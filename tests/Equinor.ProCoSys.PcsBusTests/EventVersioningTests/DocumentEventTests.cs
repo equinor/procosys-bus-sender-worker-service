@@ -35,7 +35,8 @@ public class DocumentEventTests
             {"RevisionStatus", typeof(string)},
             {"ResponsibleContractor", typeof(string)},
             {"LastUpdated", typeof(DateTime)},
-            {"RevisionDate", typeof(DateOnly?)}
+            {"RevisionDate", typeof(DateOnly?)},
+            {"IsVoided", typeof(bool)}
         };
 
         // Act

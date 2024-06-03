@@ -4,15 +4,28 @@ namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 
 public class PunchListItemQuery
 {
-    public static (string queryString, DynamicParameters parameters) GetQuery(long? punchListItemId, string? plant = null)
+    /// <summary>
+    /// Query to fetch punchlistitems from procosys oracle db, based on input parameters to create where clause
+    /// </summary>
+    /// <param name="punchListItemId"></param>
+    /// <param name="plant"></param>
+    /// <param name="extraClause"> Needs to be in the form " and *your clause here*. The space before and/or is important"</param>
+    /// <returns>Query string, and Dynamic Parameters to be passed to Dapper</returns>
+    public static (string queryString, DynamicParameters parameters) GetQuery(long? punchListItemId, string? plant = null, string? extraClause = null)
     {
         DetectFaultyPlantInput(plant);
         var whereClause = CreateWhereClause(punchListItemId, plant, "pl", "punchlistitem_id");
+
+        if(extraClause != null)
+        {
+            whereClause.clause += extraClause;
+        }
 
         var query = @$"select
             pl.projectschema as Plant,
             pl.procosys_guid as ProCoSysGuid,
             p.name as ProjectName,
+            p.procosys_guid as ProjectGuid,
             pl.LAST_UPDATED as LastUpdated,
             pl.PunchListItem_Id as PunchItemNo,
             pl.Description as Description,
@@ -20,11 +33,16 @@ public class PunchListItemQuery
             tc.procosys_guid as ChecklistGuid,
             cat.code as Category,
             raised.code as RaisedByOrg,
+            raised.procosys_guid as RaisedByOrgGuid,
             cleared.code as ClearingByOrg,
+            cleared.procosys_guid as ClearingByOrgGuid,
             pl.duedate as DueDate,
             plsorting.code as PunchListSorting,
+            plsorting.procosys_guid as PunchListSortingGuid,
             pltype.code as PunchListType,
+            pltype.procosys_guid as PunchListTypeGuid,
             plpri.code as PunchPriority,
+            plpri.procosys_guid as PunchPriorityGuid,
             pl.estimate as Estimate,
             orgwo.wono as OriginalWoNo,
             orgwo.procosys_guid as OriginalWoGuid,
@@ -42,16 +60,20 @@ public class PunchListItemQuery
             pl.clearedat as ClearedAt,
             pl.rejectedat as RejectedAt,
             pl.verifiedat as VerifiedAt,
-            pl.createdat as CreatedAt
+            pl.createdat as CreatedAt,
+            pc.azure_oid as CreatedByGuid,
+            pu.azure_oid as ModifiedByGuid,
+            pv.azure_oid as VerifiedByGuid,
+            pr.azure_oid as RejectedByGuid,
+            pcl.azure_oid as ClearedByGuid,
+            pa.azure_oid as ActionByGuid
         from punchlistitem pl
             join tagcheck tc on tc.tagcheck_id = pl.tagcheck_id
             join library cat on cat.library_id = pl.Status_Id
-            left join Responsible r ON tc.Responsible_id = r.Responsible_Id
             left join TagFormularType tft ON tc.TagFormularType_Id = tft.TagFormularType_Id
             left join FormularType ft ON tft.FormularType_Id = ft.FormularType_Id
             left join Tag t on tft.Tag_Id = t.tag_id
-            left join library reg on reg.library_id = t.register_id
-            left join Project p on p.project_id=t.project_id
+            left join Project p on p.project_id = t.project_id
             left join wo on wo.wo_id = pl.wo_id
             left join library raised on raised.library_id = pl.raisedbyorg_id
             left join library cleared on cleared.library_id = pl.clearedbyorg_id
@@ -61,6 +83,12 @@ public class PunchListItemQuery
             left join wo orgwo on orgwo.wo_id = pl.originalwo_id
             left join swcr on swcr.swcr_id = pl.swcr_id
             left join document doc on doc.document_id = pl.drawing_id
+            left join Person pc on pc.person_id = pl.createdby_id
+            left join Person pu on pu.person_id = pl.updatedby_id       
+            left join Person pv on pv.person_id = pl.verifiedby_id
+            left join Person pr on pr.person_id = pl.rejectedby_id
+            left join Person pcl on pcl.person_id = pl.clearedby_id
+            left join Person pa on pa.person_id = pl.actionbyperson_id
         {whereClause.clause}";
         
         return (query, whereClause.parameters);
