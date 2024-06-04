@@ -16,7 +16,8 @@ public class PersonEventVersioningTests
         var personEventInterfaceType = typeof(IPersonEventV1);
         var expectedProperties = new Dictionary<string, Type>
         {
-            { "Guid", typeof(Guid) },
+            { "ProCoSysGuid", typeof(Guid) },
+            { "AzureOid", typeof(Guid?) },
             { "FirstName", typeof(string) },
             { "LastName", typeof(string) },
             { "UserName", typeof(string) },

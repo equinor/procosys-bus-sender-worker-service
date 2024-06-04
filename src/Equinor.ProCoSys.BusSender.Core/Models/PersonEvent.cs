@@ -8,7 +8,8 @@ namespace Equinor.ProCoSys.BusSenderWorker.Core.Models;
 public class PersonEvent : IPersonEventV1
 {
     public string EventType => PcsEventConstants.PersonUpdate;
-    public Guid Guid { get; init; }
+    public Guid ProCoSysGuid { get; init; }
+    public Guid? AzureOid { get; init; }
     public string FirstName { get; init; }
     public string LastName { get; init; }
     public string UserName { get; init; }

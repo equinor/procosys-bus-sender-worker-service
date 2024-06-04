@@ -11,7 +11,8 @@ public static class PersonQuery
         var whereClause = CreateWhereClause(personGuid, null, "p", "azure_oid");
 
         var query = @$"select
-            p.azure_oid as Guid,
+            p.procosys_guid as ProCoSysGuid,
+            p.azure_oid as AzureOid,
             p.firstname as FirstName,
             p.lastname as LastName,
             p.username as UserName,
