@@ -8,7 +8,7 @@ public static class PersonQuery
 {
     public static (string queryString, DynamicParameters parameters) GetQuery(string? personGuid)
     {
-        var whereClause = CreateWhereClause(personGuid, null, "p", "azure_oid");
+        var whereClause = CreateWhereClause(personGuid, null, "p", "procosys_guid");
 
         var query = @$"select
             p.procosys_guid as ProCoSysGuid,
