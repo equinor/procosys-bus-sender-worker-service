@@ -89,7 +89,8 @@ public class PunchListItemQuery
             left join Person pr on pr.person_id = pl.rejectedby_id
             left join Person pcl on pcl.person_id = pl.clearedby_id
             left join Person pa on pa.person_id = pl.actionbyperson_id
-        {whereClause.clause}";
+        {whereClause.clause}
+        ";
         
         return (query, whereClause.parameters);
     }
