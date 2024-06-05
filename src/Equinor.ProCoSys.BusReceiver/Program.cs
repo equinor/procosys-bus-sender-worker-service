@@ -29,14 +29,14 @@ public class Program
             b.AddAzureStorageBlobs();
         });
 
-        builder.UseContentRoot(Path.GetDirectoryName(Process.GetCurrentProcess().MainModule?.FileName))
+        builder.UseContentRoot(Path.GetDirectoryName(Process.GetCurrentProcess().MainModule?.FileName)!)
             .ConfigureServices((hostContext, services) =>
             {
                 services.AddAzureAppConfiguration();
                 services.AddScoped<IBusReceiverService, BusReceiverService>();
                 services.AddSingleton<IBusReceiverServiceFactory, ScopedBusReceiverServiceFactory>();
                 services.AddPcsServiceBusIntegration(options => options
-                    .UseBusConnection(hostContext.Configuration["ServiceBusConnectionString"])
+                    .UseBusConnection(hostContext.Configuration["ServiceBusConnectionString"]!)
                     .WithRenewLeaseInterval(4000)
                     .WithSubscription(PcsTopicConstants.Tag, "test_tag")
                 );
