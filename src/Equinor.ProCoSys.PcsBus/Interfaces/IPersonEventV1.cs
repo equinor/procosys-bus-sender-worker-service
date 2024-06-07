@@ -6,7 +6,8 @@ namespace Equinor.ProCoSys.PcsServiceBus.Interfaces;
 [UsedImplicitly]
 public interface IPersonEventV1 : IHasEventType
 {
-    Guid Guid { get; init; }
+    Guid ProCoSysGuid { get; init; }
+    Guid? AzureOid { get; init; }
     string FirstName { get; init; }
     string LastName { get; init; }
     string UserName { get; init; }
