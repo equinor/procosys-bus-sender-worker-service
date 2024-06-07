@@ -13,7 +13,7 @@ public class IpoInvitationEventTests
     public void IIpoInvitationEventV1_InterfacePropertiesAndMethods_DoNotChange()
     {
         // Arrange
-        var ipoCommentEventInterfaceType = typeof(IIpoInvitationEventV1);
+        var ipoInvitationEventInterfaceType = typeof(IIpoInvitationEventV1);
         var expectedProperties = new Dictionary<string, Type>
         {
             { "ProCoSysGuid", typeof(Guid) },
@@ -37,7 +37,7 @@ public class IpoInvitationEventTests
         };
 
         // Act
-        Dictionary<string, Type> actualProperties = ipoCommentEventInterfaceType.GetProperties()
+        Dictionary<string, Type> actualProperties = ipoInvitationEventInterfaceType.GetProperties()
             .ToDictionary(p => p.Name, p => p.PropertyType);
 
         // Assert

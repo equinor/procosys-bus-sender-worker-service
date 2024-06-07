@@ -13,7 +13,7 @@ public class IpoCommPkgEventTests
     public void IIpoCommPkgEventV1_InterfacePropertiesAndMethods_DoNotChange()
     {
         // Arrange
-        var ipoCommentEventInterfaceType = typeof(IIpoCommPkgV1);
+        var ipoCommPkgEventInterfaceType = typeof(IIpoCommPkgV1);
         var expectedProperties = new Dictionary<string, Type>
         {
             { "Plant", typeof(string) },
@@ -25,7 +25,7 @@ public class IpoCommPkgEventTests
         };
 
         // Act
-        Dictionary<string, Type> actualProperties = ipoCommentEventInterfaceType.GetProperties()
+        Dictionary<string, Type> actualProperties = ipoCommPkgEventInterfaceType.GetProperties()
             .ToDictionary(p => p.Name, p => p.PropertyType);
 
         // Assert
