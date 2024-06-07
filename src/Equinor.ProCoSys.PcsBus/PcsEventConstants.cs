@@ -210,4 +210,30 @@ public static class PcsEventConstants
     ///     Event that is fired when a new heat trace pipe test is created or updated
     /// </summary>
     public const string HeatTracePipeTestEventType = "heatTracePipeTestCreatedOrUpdated";
+
+    /// <summary>
+    ///     Event that is fired when a new ipo invitation is created or updated
+    /// </summary>
+    public const string IpoInvitationEventType = "ipoInvitationCreatedOrUpdated";
+
+    /// <summary>
+    ///     Event that is fired when a new ipo invitation comment is created or updated
+    /// </summary>
+    public const string IpoInvitationCommentEventType = "ipoInvitationCommentCreatedOrUpdated";
+
+    /// <summary>
+    ///     Event that is fired when a new ipo invitation participant is created or updated
+    /// </summary>
+    public const string IpoInvitationParticipantEventType = "ipoInvitationParticipantCreatedOrUpdated";
+
+    /// <summary>
+    ///     Event that is fired when a new ipo invitation mcpkg is created or updated
+    /// </summary>
+    public const string IpoMcPkgEventType = "ipoInvitationMcPkgCreatedOrUpdated";
+
+    /// <summary>
+    ///     Event that is fired when a new ipo invitation commpkg is created or updated
+    /// </summary>
+    public const string IpoCommPkgTestEventType = "ipoInvitationCommPkgCreatedOrUpdated";
+
 }

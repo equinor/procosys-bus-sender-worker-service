@@ -44,4 +44,9 @@ public static class PcsTopicConstants
     public const string LibraryField = "LibraryField";
     public const string Milestone = "Milestone";
     public const string Person = "Person";
+    public const string IpoInvitation = "IpoInvitation";
+    public const string IpoInvitationComment = "IpoInvitationComment";
+    public const string IpoInvitationParticipant = "IpoInvitationParticipant";
+    public const string IpoInvitationMcPkg = "IpoInvitationMcPkg";
+    public const string IpoInvitationCommPkg = "IpoInvitationCommPkg";
 }
