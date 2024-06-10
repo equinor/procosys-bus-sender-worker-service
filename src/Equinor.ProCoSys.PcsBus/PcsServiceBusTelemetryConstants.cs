@@ -5,6 +5,8 @@ public class PcsServiceBusTelemetryConstants
     public const string Event = "Event";
 
     public const string Plant = "Plant";
+    public const string ProCoSysGuid = "ProCoSysGuid";
+    public const string ProjectGuid = "ProjectGuid";
 
     public const string ProjectName = "ProjectName";
     public const string ProjectNameOld = "ProjectNameOld";

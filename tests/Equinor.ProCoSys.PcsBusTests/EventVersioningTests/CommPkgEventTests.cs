@@ -20,6 +20,7 @@ public class CommPkgEventTests
             { "ProCoSysGuid", typeof(Guid) },
             { "PlantName", typeof(string) },
             { "ProjectName", typeof(string) },
+            { "ProjectGuid", typeof(Guid) },
             { "CommPkgNo", typeof(string) },
             { "CommPkgId", typeof(long) },
             { "Description", typeof(string) },
