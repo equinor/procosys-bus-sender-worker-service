@@ -10,6 +10,8 @@ public class CommPkgTopic
     public Guid ProCoSysGuid { get; set; }
     public string Behavior { get; set; }
     public string ProjectName { get; set; }
+    public Guid ProjectGuid { get; set; }
+
     public string ProjectNameOld { get; set; }
     public string CommPkgNo { get; set; }
     public string CommPkgId { get; set; }
