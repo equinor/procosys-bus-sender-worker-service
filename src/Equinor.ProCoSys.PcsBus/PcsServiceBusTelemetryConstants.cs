@@ -7,10 +7,8 @@ public class PcsServiceBusTelemetryConstants
     public const string Plant = "Plant";
     public const string ProCoSysGuid = "ProCoSysGuid";
     public const string ProjectGuid = "ProjectGuid";
-
     public const string ProjectName = "ProjectName";
     public const string ProjectNameOld = "ProjectNameOld";
-    public const string ProjectGuid = "ProjectGuid";
     public const string McPkgNo = "McPkgNo";
     public const string McPkgNoOld = "McPkgNoOld";
     public const string CommPkgNo = "CommPkgNo";
