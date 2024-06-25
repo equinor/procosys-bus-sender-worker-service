@@ -402,7 +402,7 @@ public class BusSenderService : IBusSenderService
                     await CreateAndSetMessage(busEvent, _service.CreatePunchListItemMessage);
                     break;
                 }
-            case NotificationTopic.TopicName:
+            case "notification":
                 {
                     await CreateAndSetMessage(busEvent, _service.CreateNotificationMessage);
                     break;
