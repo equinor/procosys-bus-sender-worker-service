@@ -14,7 +14,6 @@ public class NotificationQuery
             p.name as ProjectName, 
             d.document_id as NotificationId,
             d.documentno as DocumentNo, 
-            d.procosys_guid as DocumentGuid, 
             l.code as NotificationType, 
             d.title as Title
             from notification n

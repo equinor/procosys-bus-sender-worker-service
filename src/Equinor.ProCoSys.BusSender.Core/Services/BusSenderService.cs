@@ -402,6 +402,11 @@ public class BusSenderService : IBusSenderService
                     await CreateAndSetMessage(busEvent, _service.CreatePunchListItemMessage);
                     break;
                 }
+            case NotificationTopic.TopicName:
+                {
+                    await CreateAndSetMessage(busEvent, _service.CreateNotificationMessage);
+                    break;
+                }
         }
 
         _logger.LogDebug("Update for  {Event} took {Ms} ms", busEvent.Event, sw.ElapsedMilliseconds);

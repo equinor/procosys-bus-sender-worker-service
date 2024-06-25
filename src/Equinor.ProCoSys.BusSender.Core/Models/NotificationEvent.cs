@@ -12,7 +12,6 @@ public class NotificationEvent : INotificationEventV1
     public string ProjectName { get; init; }
     public string NotificationId { get; set; }
     public string DocumentNo { get; set; }
-    public Guid DocumentGuid { get; set; }
     public string? NotificationType { get; set; }
     public string? Title { get; set; }
 }

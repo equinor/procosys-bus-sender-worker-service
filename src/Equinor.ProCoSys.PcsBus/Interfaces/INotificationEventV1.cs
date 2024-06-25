@@ -9,7 +9,6 @@ public interface INotificationEventV1 : IHasEventType
     string ProjectName { get; init; }
     public string NotificationId { get; set; }
     string DocumentNo { get; set; }
-    Guid DocumentGuid { get; set; }
     string? NotificationType { get; set; }
     string? Title { get; set; }
 }

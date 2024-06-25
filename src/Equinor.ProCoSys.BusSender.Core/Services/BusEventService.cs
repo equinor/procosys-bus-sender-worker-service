@@ -492,6 +492,20 @@ public class BusEventService : IBusEventService
                 queryStringAndParams, message), DefaultSerializerHelper.SerializerOptions);
     }
 
+    public async Task<string?> CreateNotificationMessage(string message)
+    {
+        if (!long.TryParse(message, out var documentId))
+        {
+            throw new Exception($"Failed to extract documentId from message: {message}");
+        }
+
+        var queryStringAndParams = NotificationQuery.GetQuery(documentId);
+        return JsonSerializer.Serialize(
+            await _eventRepository.QuerySingle<NotificationEvent>(
+                queryStringAndParams, message), DefaultSerializerHelper.SerializerOptions);
+    }
+
+
     public string? WashString(string? message)
     {
         if (string.IsNullOrEmpty(message))
