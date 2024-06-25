@@ -7,7 +7,7 @@ public interface INotificationEventV1 : IHasEventType
     string Plant { get; init; }
     Guid ProCoSysGuid { get; init; }
     string ProjectName { get; init; }
-    string NotificationId { get; set; }
+    long NotificationId { get; set; }
     string NotificationNo { get; set; }
     string? NotificationType { get; set; }
     string? Title { get; set; }

@@ -10,7 +10,7 @@ public class NotificationEvent : INotificationEventV1
     public string Plant { get; init; }
     public Guid ProCoSysGuid { get; init; }
     public string ProjectName { get; init; }
-    public string NotificationId { get; set; }
+    public long NotificationId { get; set; }
     public string NotificationNo { get; set; }
     public string? NotificationType { get; set; }
     public string? Title { get; set; }

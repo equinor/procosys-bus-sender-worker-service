@@ -13,7 +13,7 @@ public class NotificationQuery
             n.projectschema as Plant, 
             p.name as ProjectName, 
             d.document_id as NotificationId,
-            d.documentno as DocumentNo, 
+            d.documentno as NotificationNo, 
             l.code as NotificationType, 
             d.title as Title
             from notification n
