@@ -14,7 +14,6 @@ public class CommPkgQuery
         c.procosys_guid as ProCoSysGuid,
         ps.TITLE as PlantName,
         p.name as ProjectName,
-        p.procosys_guid as ProjectGuid,
         c.COMMPKGNO as CommPkgNo,
         c.COMMPKG_ID as CommPkgId,
         c.DESCRIPTION as Description,
