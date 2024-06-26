@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <VersionPrefix>4.3.16</VersionPrefix>
+    <VersionPrefix>4.3.17</VersionPrefix>
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
     <UserSecretsId>1e187122-6237-4849-9cc4-ed8fc1688809</UserSecretsId>
