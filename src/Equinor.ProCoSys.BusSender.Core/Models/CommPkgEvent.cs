@@ -29,7 +29,6 @@ public class CommPkgEvent : ICommPkgEventV1
     public Guid ProCoSysGuid { get; init; }
     public string? Progress { get; init; }
     public string ProjectName { get; init; }
-    public Guid ProjectGuid { get; init; }
     public string? Remark { get; init; }
     public string ResponsibleCode { get; init; }
     public string? ResponsibleDescription { get; init; }

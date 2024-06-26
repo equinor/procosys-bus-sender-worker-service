@@ -9,7 +9,6 @@ public interface ICommPkgEventV1 : IHasEventType
     string Plant { get; init; }
     Guid ProCoSysGuid { get; init; }
     string PlantName { get; init; }
-    Guid ProjectGuid { get; init; }
     string ProjectName { get; init; }
     string CommPkgNo { get; init; }
     long CommPkgId { get; init; }
