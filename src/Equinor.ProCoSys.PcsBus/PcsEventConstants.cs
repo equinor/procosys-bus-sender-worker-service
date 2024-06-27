@@ -210,4 +210,9 @@ public static class PcsEventConstants
     ///     Event that is fired when a new heat trace pipe test is created or updated
     /// </summary>
     public const string HeatTracePipeTestEventType = "heatTracePipeTestCreatedOrUpdated";
+
+    /// <summary>
+    ///     Event that is fired when a new notification is created or updated
+    /// </summary>
+    public static string NotificationCreateOrUpdate = "notificationCreatedOrUpdated";
 }

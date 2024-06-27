@@ -20,10 +20,14 @@ public class TimedWorkerService : IHostedService, IDisposable
     {
         _logger = logger;
         _entryPointService = entryPointService;
-        _timeout = int.Parse(configuration["TimerInterval"]);
+        _timeout = int.Parse(configuration["TimerInterval"] ?? "1000");
     }
 
-    public void Dispose() => _timer?.Dispose();
+    public void Dispose()
+    {
+        _timer?.Dispose();
+        GC.SuppressFinalize(this);
+    }
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
