@@ -1,13 +1,14 @@
-﻿using Dapper;
+﻿using System;
+using Dapper;
 
 namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 
 public class NotificationWorkOrderQuery
 {
-    public static (string queryString, DynamicParameters parameters) GetQuery(long? documentId, long? workOrderId, string? plant = null)
+    public static (string queryString, DynamicParameters parameters) GetQuery(string? workOrderDocumentGuid, string? plant = null)
     {
         DetectFaultyPlantInput(plant);
-        var whereClause = CreateWhereClause(documentId, workOrderId, plant);
+        var whereClause = CreateWhereClause(workOrderDocumentGuid, plant, "wod", "procosys_guid");
         const string Notification = "NOTIFICATION";
 
         var query = @$"select  
@@ -26,31 +27,5 @@ public class NotificationWorkOrderQuery
         {whereClause.clause}";
 
         return (query, whereClause.parameters);
-    }
-
-    private static (string clause, DynamicParameters parameters) CreateWhereClause(long? documentId, long? workOrderId, string? plant)
-    {
-        var whereClause = "";
-        var parameters = new DynamicParameters();
-
-        if (documentId.HasValue && workOrderId.HasValue)
-        {
-            whereClause = "where wod.wo_id=:WorkOrderId AND wod.document_id=:DocumentId";
-            parameters.Add(":WorkOrderId", workOrderId);
-            parameters.Add(":DocumentId", documentId);
-
-            if (plant != null)
-            {
-                whereClause += " AND wod.projectschema=:Plant";
-                parameters.Add(":Plant", plant);
-            }
-        }
-        else if (plant != null)
-        {
-            whereClause = "where wod.projectschema=:Plant";
-            parameters.Add(":Plant", plant);
-        }
-
-        return (whereClause, parameters);
     }
 }

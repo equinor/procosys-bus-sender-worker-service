@@ -507,12 +507,12 @@ public class BusEventService : IBusEventService
 
     public async Task<string?> CreateNotificationWorkOrderMessage(string message)
     {
-        if (!CanGetTwoIdsFromMessage(message.Split(","), out var documentId, out var workorderId))
+        if (!Guid.TryParse(message, out _))
         {
-            throw new Exception($"Failed to extract documentId or workorderId from message: {message}");
+            throw new Exception($"Failed to extract or parse guid NotificationWorkOrder from message {message}");
         }
 
-        var queryStringAndParams = NotificationWorkOrderQuery.GetQuery(documentId, workorderId);
+        var queryStringAndParams = NotificationWorkOrderQuery.GetQuery(message);
         return JsonSerializer.Serialize(
             await _eventRepository.QuerySingle<NotificationWorkOrderEvent>(
                 queryStringAndParams, message), DefaultSerializerHelper.SerializerOptions);
