@@ -509,7 +509,7 @@ public class BusEventService : IBusEventService
     {
         if (!CanGetTwoIdsFromMessage(message.Split(","), out var documentId, out var workorderId))
         {
-            throw new Exception($"Failed to extract commPkgId or TaskId from message: {message}");
+            throw new Exception($"Failed to extract documentId or workorderId from message: {message}");
         }
 
         var queryStringAndParams = NotificationWorkOrderQuery.GetQuery(documentId, workorderId);
