@@ -507,10 +507,6 @@ public class BusEventService : IBusEventService
 
     public async Task<string?> CreateNotificationWorkOrderMessage(string message)
     {
-        //if (!long.TryParse(message, out var documentId))
-        //{
-        //    throw new Exception($"Failed to extract documentId from message: {message}");
-        //}
         if (!CanGetTwoIdsFromMessage(message.Split(","), out var documentId, out var workorderId))
         {
             throw new Exception($"Failed to extract commPkgId or TaskId from message: {message}");
