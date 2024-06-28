@@ -505,6 +505,23 @@ public class BusEventService : IBusEventService
                 queryStringAndParams, message), DefaultSerializerHelper.SerializerOptions);
     }
 
+    public async Task<string?> CreateNotificationWorkOrderMessage(string message)
+    {
+        //if (!long.TryParse(message, out var documentId))
+        //{
+        //    throw new Exception($"Failed to extract documentId from message: {message}");
+        //}
+        if (!CanGetTwoIdsFromMessage(message.Split(","), out var documentId, out var workorderId))
+        {
+            throw new Exception($"Failed to extract commPkgId or TaskId from message: {message}");
+        }
+
+        var queryStringAndParams = NotificationWorkOrderQuery.GetQuery(documentId, workorderId);
+        return JsonSerializer.Serialize(
+            await _eventRepository.QuerySingle<NotificationWorkOrderEvent>(
+                queryStringAndParams, message), DefaultSerializerHelper.SerializerOptions);
+    }
+
 
     public string? WashString(string? message)
     {

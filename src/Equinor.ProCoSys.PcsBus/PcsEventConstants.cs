@@ -215,4 +215,9 @@ public static class PcsEventConstants
     ///     Event that is fired when a new notification is created or updated
     /// </summary>
     public static string NotificationCreateOrUpdate = "notificationCreatedOrUpdated";
+
+    /// <summary>
+    ///     Event that is fired when a new notificationworkorder is created or updated
+    /// </summary>
+    public static string NotificationWorkOrderCreateOrUpdate = "notificationWorkOrderCreatedOrUpdated";
 }
