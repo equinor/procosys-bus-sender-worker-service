@@ -45,5 +45,7 @@ public interface IBusEventService
     Task<string?> CreateWorkOrderMilestoneMessage(string message);
     Task<string?> CreateHeatTracePipeTestMessage(string message);
     Task<string?> CreateNotificationMessage(string message);
+    Task<string?> CreateNotificationWorkOrderMessage(string message);
+
     string? WashString(string? message);
 }

@@ -505,6 +505,19 @@ public class BusEventService : IBusEventService
                 queryStringAndParams, message), DefaultSerializerHelper.SerializerOptions);
     }
 
+    public async Task<string?> CreateNotificationWorkOrderMessage(string message)
+    {
+        if (!Guid.TryParse(message, out _))
+        {
+            throw new Exception($"Failed to extract or parse guid NotificationWorkOrder from message {message}");
+        }
+
+        var queryStringAndParams = NotificationWorkOrderQuery.GetQuery(message);
+        return JsonSerializer.Serialize(
+            await _eventRepository.QuerySingle<NotificationWorkOrderEvent>(
+                queryStringAndParams, message), DefaultSerializerHelper.SerializerOptions);
+    }
+
 
     public string? WashString(string? message)
     {
