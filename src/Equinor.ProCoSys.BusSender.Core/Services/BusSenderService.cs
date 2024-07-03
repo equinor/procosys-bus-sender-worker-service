@@ -412,6 +412,11 @@ public class BusSenderService : IBusSenderService
                     await CreateAndSetMessage(busEvent, _service.CreateNotificationWorkOrderMessage);
                     break;
                 }
+            case "punchprioritylibraryrelation":
+                {
+                    await CreateAndSetMessage(busEvent, _service.CreatePunchPriorityLibRelationMessage);
+                    break;
+                }
         }
 
         _logger.LogDebug("Update for  {Event} took {Ms} ms", busEvent.Event, sw.ElapsedMilliseconds);

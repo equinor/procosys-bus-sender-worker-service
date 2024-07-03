@@ -220,4 +220,9 @@ public static class PcsEventConstants
     ///     Event that is fired when a new notificationworkorder is created or updated
     /// </summary>
     public static string NotificationWorkOrderCreateOrUpdate = "notificationWorkOrderCreatedOrUpdated";
+    
+    /// <summary>
+    ///    Event that is fired when a new punch priority lib relation is created or updated 
+    /// </summary>
+    public static string PunchPriorityLibRelationCreateOrUpdate = "punchPriorityLibRelationCreateOrUpdate";
 }

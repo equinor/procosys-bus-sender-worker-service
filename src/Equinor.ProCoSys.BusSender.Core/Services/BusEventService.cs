@@ -517,6 +517,18 @@ public class BusEventService : IBusEventService
             await _eventRepository.QuerySingle<NotificationWorkOrderEvent>(
                 queryStringAndParams, message), DefaultSerializerHelper.SerializerOptions);
     }
+    
+    public async Task<string?> CreatePunchPriorityLibRelationMessage(string message)
+    {
+        if (!Guid.TryParse(message, out _))
+        {
+            throw new Exception($"Failed to extract libtolibrelation guid from message: {message}");
+        }
+
+        return JsonSerializer.Serialize(
+            await _eventRepository.QuerySingle<PunchPriorityLibRelationEvent>(
+                PunchPriorityLibraryRelationQuery.GetQuery(message), message));
+    }
 
 
     public string? WashString(string? message)

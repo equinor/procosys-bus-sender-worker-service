@@ -48,4 +48,5 @@ public interface IBusEventService
     Task<string?> CreateNotificationWorkOrderMessage(string message);
 
     string? WashString(string? message);
+    Task<string?> CreatePunchPriorityLibRelationMessage(string message);
 }
