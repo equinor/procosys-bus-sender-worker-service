@@ -6,6 +6,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Equinor.ProCoSys.PcsServiceBusTests.EventVersioningTests;
 
+[TestClass]
 public class PunchPriorityLibRelationEventTest
 {
     [TestMethod]
@@ -17,23 +18,7 @@ public class PunchPriorityLibRelationEventTest
         {
             { "Plant", typeof(string) },
             { "ProCoSysGuid", typeof(Guid) },
-            { "ProjectName", typeof(string) },
-            { "QueryId", typeof(long) },
-            { "QueryNo", typeof(string) },
-            { "Title", typeof(string) },
-            { "DisciplineCode", typeof(string) },
-            { "QueryType", typeof(string) },
-            { "CostImpact", typeof(string) },
-            { "Description", typeof(string) },
-            { "Consequence", typeof(string) },
-            { "ProposedSolution", typeof(string) },
-            { "EngineeringReply", typeof(string) },
-            { "Milestone", typeof(string) },
-            { "ScheduleImpact", typeof(bool) },
-            { "PossibleWarrantyClaim", typeof(bool) },
-            { "IsVoided", typeof(bool) },
-            { "RequiredDate", typeof(DateOnly?) },
-            { "CreatedAt", typeof(DateTime) },
+            { "CommPriorityGuid", typeof(Guid) },
             { "LastUpdated", typeof(DateTime) }
         };
 
