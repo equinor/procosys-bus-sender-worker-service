@@ -2,9 +2,11 @@
 using Equinor.ProCoSys.PcsServiceBus;
 using Equinor.ProCoSys.PcsServiceBus.Interfaces;
 
-#pragma warning disable CS8618
+
 namespace Equinor.ProCoSys.BusSenderWorker.Core.Models;
 
+#pragma warning disable CS8618
+// ReSharper disable once ClassNeverInstantiated.Global
 public class PersonEvent : IPersonEventV1
 {
     public string EventType => PcsEventConstants.PersonUpdate;

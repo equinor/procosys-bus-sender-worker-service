@@ -12,6 +12,34 @@ namespace Equinor.ProCoSys.PcsServiceBusTests;
 public class QueryTests
 {
     /// <summary>
+    /// This test just checks that all interfaces are included in the following test.
+    /// </summary>
+    [TestMethod]
+    public void GetTestData_IncludesAllEventInterfaces()
+    {
+        // Arrange
+        const string assemblyName = "Equinor.ProCoSys.PcsServiceBus";
+        var  assembly =  AppDomain.CurrentDomain.GetAssemblies()
+            .First(a => a.FullName!.Split(',')[0].Equals(assemblyName, StringComparison.OrdinalIgnoreCase));
+        
+        var parentInterface = typeof(IHasEventType);
+        var interfaces = assembly
+            .GetTypes()
+            .Where(t => t.IsInterface && t.GetInterfaces().Contains(parentInterface))
+            .ToArray().ToList();
+
+        // Act
+        // Get the second parameter of the test data, which is the interface type
+        var testedInterfaces = GetTestData().Select(td=> td[1]).ToList();
+        
+        // Assert
+        foreach (var i in interfaces)
+        {
+            Assert.IsTrue(testedInterfaces.Contains(i), $"The interface {i} is not included in the test data, please create a test.");
+        }
+    }
+
+    /// <summary>
     /// This test method is used to check that the queries in namespace <see cref="Equinor.ProCoSys.PcsServiceBus.Queries"/> contains the correct fields corresponding to the interface using them.
     /// For example, CheckListQuery is expected to be used to populate the a class that inherits the IChecklistEventV1 interface.
     /// IChecklistEventV1 contains a property called Plant, so the query should contain a field called Plant.
@@ -58,8 +86,8 @@ public class QueryTests
 
         yield return new object[]
         {
-            typeof(ActionQuery),
-            typeof(IActionEventV1),
+            typeof(NotificationQuery),
+            typeof(INotificationEventV1),
             new[] { typeof(long?), typeof(string) },
             new object[] { 1L, null }
         };
@@ -352,6 +380,22 @@ public class QueryTests
         {
             typeof(HeatTracePipeTestQuery),
             typeof(IHeatTracePipeTestEventV1),
+            new[] { typeof(string), typeof(string) },
+            new object[] { "abc", "testPlant" }
+        };
+        
+        yield return new object[]
+        {
+            typeof(NotificationWorkOrderQuery),
+            typeof(INotificationWorkOrderEventV1),
+            new[] { typeof(string), typeof(string) },
+            new object[] { "abc", "testPlant" }
+        };
+        
+        yield return new object[]
+        {
+            typeof(PunchPriorityLibraryRelationQuery),
+            typeof(IPunchPriorityLibRelationEventV1),
             new[] { typeof(string), typeof(string) },
             new object[] { "abc", "testPlant" }
         };

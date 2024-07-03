@@ -39,6 +39,68 @@ public class BusSenderServiceTests
         _topicClientMock4,
         _topicClientMockWo;
 
+        [TestInitialize]
+    public void Setup()
+    {
+        _busSender = new PcsBusSender();
+        _topicClientMock1 = new Mock<ServiceBusSender>();
+        _topicClientMock1.Setup(t => t.CreateMessageBatchAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(() => ServiceBusModelFactory.ServiceBusMessageBatch(1000, new List<ServiceBusMessage>()));
+        _topicClientMock2 = new Mock<ServiceBusSender>();
+        _topicClientMock2.Setup(t => t.CreateMessageBatchAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(() => ServiceBusModelFactory.ServiceBusMessageBatch(1000, new List<ServiceBusMessage>()));
+        _topicClientMock3 = new Mock<ServiceBusSender>();
+        _topicClientMock3.Setup(t => t.CreateMessageBatchAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(() => ServiceBusModelFactory.ServiceBusMessageBatch(1000, new List<ServiceBusMessage>()));
+        _topicClientMock4 = new Mock<ServiceBusSender>();
+        _topicClientMockWo = new Mock<ServiceBusSender>();
+        _messagesInTopicClient4 = new List<ServiceBusMessage>();
+        _mockWoMessageBatch = ServiceBusModelFactory.ServiceBusMessageBatch(1000, new List<ServiceBusMessage>());
+        _topicClientMockWo.Setup(t => t.CreateMessageBatchAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(() => _mockWoMessageBatch);
+        _topicClientMock4.Setup(t => t.CreateMessageBatchAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(() => ServiceBusModelFactory.ServiceBusMessageBatch(1000, _messagesInTopicClient4));
+        _busSender.Add("topic1", _topicClientMock1.Object);
+        _busSender.Add("topic2", _topicClientMock2.Object);
+        _busSender.Add("topic3", _topicClientMock3.Object);
+        _busSender.Add("topic4", _topicClientMock4.Object);
+        _busSender.Add(WorkOrderTopic.TopicName, _topicClientMockWo.Object);
+
+
+        _busEvents = new List<BusEvent>
+        {
+            new()
+            {
+                Created = DateTime.Now.AddMinutes(-10),
+                Event = "topic2",
+                Status = Status.UnProcessed,
+                Id = 1,
+                Message = "{\"Plant\":\"NGPCS_TEST_BROWN\",\"ProjectName\":\"Message 10 minutes ago not sent\"}"
+            },
+            new()
+            {
+                Created = DateTime.Now.AddMinutes(-10),
+                Event = "topic3",
+                Status = Status.UnProcessed,
+                Id = 1,
+                Message =
+                    "{\"Plant\" : \"PCS$HF_LNG\", \"Responsible\" : \"8460-E015\", \"Description\" : \"	Installere bonding til JBer ved V8 område\"}"
+            }
+        };
+        _busEventRepository = new Mock<IBusEventRepository>();
+        _tagDetailsRepositoryMock = new Mock<ITagDetailsRepository>();
+
+        _dapperRepositoryMock = new Mock<IEventRepository>();
+        _busEventServiceMock = new Mock<BusEventService>(_tagDetailsRepositoryMock.Object, _dapperRepositoryMock.Object)
+            { CallBase = true };
+        _iUnitOfWork = new Mock<IUnitOfWork>();
+
+        _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk()).Returns(() => Task.FromResult(_busEvents));
+        _dut = new BusSenderService(_busSender, _busEventRepository.Object, _iUnitOfWork.Object,
+            new Mock<ILogger<BusSenderService>>().Object,
+            new Mock<ITelemetryClient>().Object, _busEventServiceMock.Object);
+    }
+    
     [TestMethod]
     public async Task HandleBusEvents_ShouldAddMessagesToBatchInCorrectOrder()
     {
@@ -279,69 +341,7 @@ public class BusSenderServiceTests
         _topicClientMockWo.Verify(
             t => t.SendMessagesAsync(It.IsAny<ServiceBusMessageBatch>(), It.IsAny<CancellationToken>()), Times.Once);
     }
-
-    [TestInitialize]
-    public void Setup()
-    {
-        _busSender = new PcsBusSender();
-        _topicClientMock1 = new Mock<ServiceBusSender>();
-        _topicClientMock1.Setup(t => t.CreateMessageBatchAsync(It.IsAny<CancellationToken>()))
-            .ReturnsAsync(() => ServiceBusModelFactory.ServiceBusMessageBatch(1000, new List<ServiceBusMessage>()));
-        _topicClientMock2 = new Mock<ServiceBusSender>();
-        _topicClientMock2.Setup(t => t.CreateMessageBatchAsync(It.IsAny<CancellationToken>()))
-            .ReturnsAsync(() => ServiceBusModelFactory.ServiceBusMessageBatch(1000, new List<ServiceBusMessage>()));
-        _topicClientMock3 = new Mock<ServiceBusSender>();
-        _topicClientMock3.Setup(t => t.CreateMessageBatchAsync(It.IsAny<CancellationToken>()))
-            .ReturnsAsync(() => ServiceBusModelFactory.ServiceBusMessageBatch(1000, new List<ServiceBusMessage>()));
-        _topicClientMock4 = new Mock<ServiceBusSender>();
-        _topicClientMockWo = new Mock<ServiceBusSender>();
-        _messagesInTopicClient4 = new List<ServiceBusMessage>();
-        _mockWoMessageBatch = ServiceBusModelFactory.ServiceBusMessageBatch(1000, new List<ServiceBusMessage>());
-        _topicClientMockWo.Setup(t => t.CreateMessageBatchAsync(It.IsAny<CancellationToken>()))
-            .ReturnsAsync(() => _mockWoMessageBatch);
-        _topicClientMock4.Setup(t => t.CreateMessageBatchAsync(It.IsAny<CancellationToken>()))
-            .ReturnsAsync(() => ServiceBusModelFactory.ServiceBusMessageBatch(1000, _messagesInTopicClient4));
-        _busSender.Add("topic1", _topicClientMock1.Object);
-        _busSender.Add("topic2", _topicClientMock2.Object);
-        _busSender.Add("topic3", _topicClientMock3.Object);
-        _busSender.Add("topic4", _topicClientMock4.Object);
-        _busSender.Add(WorkOrderTopic.TopicName, _topicClientMockWo.Object);
-
-
-        _busEvents = new List<BusEvent>
-        {
-            new()
-            {
-                Created = DateTime.Now.AddMinutes(-10),
-                Event = "topic2",
-                Status = Status.UnProcessed,
-                Id = 1,
-                Message = "{\"Plant\":\"NGPCS_TEST_BROWN\",\"ProjectName\":\"Message 10 minutes ago not sent\"}"
-            },
-            new()
-            {
-                Created = DateTime.Now.AddMinutes(-10),
-                Event = "topic3",
-                Status = Status.UnProcessed,
-                Id = 1,
-                Message =
-                    "{\"Plant\" : \"PCS$HF_LNG\", \"Responsible\" : \"8460-E015\", \"Description\" : \"	Installere bonding til JBer ved V8 område\"}"
-            }
-        };
-        _busEventRepository = new Mock<IBusEventRepository>();
-        _tagDetailsRepositoryMock = new Mock<ITagDetailsRepository>();
-
-        _dapperRepositoryMock = new Mock<IEventRepository>();
-        _busEventServiceMock = new Mock<BusEventService>(_tagDetailsRepositoryMock.Object, _dapperRepositoryMock.Object)
-            { CallBase = true };
-        _iUnitOfWork = new Mock<IUnitOfWork>();
-
-        _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk()).Returns(() => Task.FromResult(_busEvents));
-        _dut = new BusSenderService(_busSender, _busEventRepository.Object, _iUnitOfWork.Object,
-            new Mock<ILogger<BusSenderService>>().Object,
-            new Mock<ITelemetryClient>().Object, _busEventServiceMock.Object);
-    }
-
+    
     [TestMethod]
     public async Task StopService_ShouldCloseOnAllTopicClients()
     {
