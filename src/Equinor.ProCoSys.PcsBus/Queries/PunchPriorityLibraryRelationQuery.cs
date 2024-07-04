@@ -19,7 +19,7 @@ public class PunchPriorityLibraryRelationQuery
             ll.LAST_UPDATED as LastUpdated
         from libtolibrelation ll
             join library l on l.library_id = ll.relatedlibrary_id and l.code = 'PUNCH_PRIORITY'
-            join library l2 on l2.library_id = ll.library_id and l2.librarytype = 'COMM_PRIORITY';
+            join library l2 on l2.library_id = ll.library_id and l2.librarytype = 'COMM_PRIORITY'
         {whereClause.clause}
         "; 
         return (query, whereClause.parameters);
