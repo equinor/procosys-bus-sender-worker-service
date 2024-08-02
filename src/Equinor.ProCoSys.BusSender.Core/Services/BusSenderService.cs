@@ -412,6 +412,11 @@ public class BusSenderService : IBusSenderService
                     await CreateAndSetMessage(busEvent, _service.CreateNotificationWorkOrderMessage);
                     break;
                 }
+            case "notificationsignature":
+                {
+                    await CreateAndSetMessage(busEvent, _service.CreateNotificationSignatureMessage);
+                    break;
+                }
             case "punchprioritylibraryrelation":
                 {
                     await CreateAndSetMessage(busEvent, _service.CreatePunchPriorityLibRelationMessage);
