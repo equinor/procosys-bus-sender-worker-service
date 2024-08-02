@@ -19,7 +19,7 @@ public class NotificationSignatureQuery
                 ns.sequence as Sequence,
                 st.code as Status,
                 sp.azure_oid as SignerPersonOid,
-                fr.description as SignerFunctionalRole,
+                fr.code as SignerFunctionalRoleCode,
                 sb.azure_oid as SignedByOid,
                 ns.signedat as SignedAt,
                 ns.last_updated as LastUpdated

@@ -25,7 +25,7 @@ public class NotificationSignatureTests
             { "Sequence", typeof(long) },
             { "Status", typeof(string) },
             { "SignerPersonOid", typeof(Guid) },
-            { "SignerFunctionalRole", typeof(string) },
+            { "SignerFunctionalRoleCode", typeof(string) },
             { "SignedByOid", typeof(Guid) },
             { "SignedAt", typeof(DateTime) },
             { "LastUpdated", typeof(DateTime) },

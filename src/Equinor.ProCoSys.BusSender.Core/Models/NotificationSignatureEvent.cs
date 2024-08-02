@@ -17,7 +17,7 @@ public class NotificationSignatureEvent : INotificationSignatureEventV1
     public long Sequence { get; init; }
     public string Status { get; init; }
     public Guid SignerPersonOid { get; init; }
-    public string SignerFunctionalRole { get; init; }
+    public string SignerFunctionalRoleCode { get; init; }
     public Guid SignedByOid { get; init; }
     public DateTime SignedAt { get; init; }
     public DateTime LastUpdated { get; init; }
