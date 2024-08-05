@@ -527,7 +527,7 @@ public class BusEventService : IBusEventService
 
         return JsonSerializer.Serialize(
             await _eventRepository.QuerySingle<PunchPriorityLibRelationEvent>(
-                PunchPriorityLibraryRelationQuery.GetQuery(message), message));
+                PunchPriorityLibraryRelationQuery.GetQuery(message), message), DefaultSerializerHelper.SerializerOptions);
     }
 
 
