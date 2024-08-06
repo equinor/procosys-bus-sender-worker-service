@@ -412,6 +412,11 @@ public class BusSenderService : IBusSenderService
                     await CreateAndSetMessage(busEvent, _service.CreateNotificationWorkOrderMessage);
                     break;
                 }
+            case "notificationcommpkg":
+                {
+                    await CreateAndSetMessage(busEvent, _service.CreateNotificationCommPkgMessage);
+                    break;
+                }
             case "punchprioritylibraryrelation":
                 {
                     await CreateAndSetMessage(busEvent, _service.CreatePunchPriorityLibRelationMessage);
