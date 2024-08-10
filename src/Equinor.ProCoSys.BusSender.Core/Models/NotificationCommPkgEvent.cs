@@ -14,5 +14,6 @@ public class NotificationCommPkgEvent : INotificationCommPkgEventV1
     public Guid ProjectGuid { get; init; }
     public Guid NotificationGuid { get; init; }
     public Guid CommPkgGuid { get; init; }
+    public string RelationshipType { get; init; }
     public DateTime LastUpdated { get; init; }
 }

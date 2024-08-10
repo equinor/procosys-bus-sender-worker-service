@@ -10,5 +10,6 @@ public interface INotificationCommPkgEventV1 : IHasEventType
     Guid ProjectGuid { get; init; }
     Guid NotificationGuid { get; init; }
     Guid CommPkgGuid { get; init; }
+    string RelationshipType { get; init; }
     public DateTime LastUpdated { get; init; }
 }

@@ -4,10 +4,10 @@ namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 
 public class NotificationCommPkgOtherQuery
 {
-    public static (string queryString, DynamicParameters parameters) GetQuery(string? workOrderDocumentGuid, string? plant = null)
+    public static (string queryString, DynamicParameters parameters) GetQuery(string? elementReferenceGuid, string? plant = null)
     {
         DetectFaultyPlantInput(plant);
-        var whereClause = CreateWhereClause(workOrderDocumentGuid, plant, "e", "procosys_guid");
+        var whereClause = CreateWhereClause(elementReferenceGuid, plant, "e", "procosys_guid");
         const string Notification = "NOTIFICATION";
 
         var query = @$"select  
@@ -17,7 +17,8 @@ public class NotificationCommPkgOtherQuery
             p.procosys_guid as ProjectGuid,       
             d.procosys_guid as NotificationGuid,
             c.procosys_guid as CommPkgGuid,
-            e.last_updated as LastUpdated
+            e.last_updated as LastUpdated,
+            'OTHER' as RelationshipType
         from elementreference e
             join document d on d.document_id = e.toelement_id
             join commpkg c on c.commpkg_id = e.fromelement_id
