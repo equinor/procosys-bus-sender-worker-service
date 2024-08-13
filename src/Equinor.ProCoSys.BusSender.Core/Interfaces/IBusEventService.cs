@@ -46,6 +46,7 @@ public interface IBusEventService
     Task<string?> CreateHeatTracePipeTestMessage(string message);
     Task<string?> CreateNotificationMessage(string message);
     Task<string?> CreateNotificationWorkOrderMessage(string message);
+    Task<string?> CreateNotificationCommPkgMessage(string message);
 
     string? WashString(string? message);
     Task<string?> CreatePunchPriorityLibRelationMessage(string message);

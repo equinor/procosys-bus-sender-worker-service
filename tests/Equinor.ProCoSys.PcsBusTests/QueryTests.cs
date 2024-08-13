@@ -391,7 +391,23 @@ public class QueryTests
             new[] { typeof(string), typeof(string) },
             new object[] { "abc", "testPlant" }
         };
-        
+
+        yield return new object[]
+        {
+            typeof(NotificationCommPkgOtherQuery),
+            typeof(INotificationCommPkgEventV1),
+            new[] { typeof(string), typeof(string) },
+            new object[] { "abc", "testPlant" }
+        };
+
+        yield return new object[]
+        {
+            typeof(NotificationCommPkgBoundaryQuery),
+            typeof(INotificationCommPkgEventV1),
+            new[] { typeof(string), typeof(string) },
+            new object[] { "abc", "testPlant" }
+        };
+
         yield return new object[]
         {
             typeof(PunchPriorityLibraryRelationQuery),
