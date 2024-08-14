@@ -9,7 +9,7 @@ public interface INotificationSignatureEventV1 : IHasEventType
     string ProjectName { get; init; }
     Guid ProjectGuid { get; init; }
     Guid NotificationGuid { get; init; }
-    string? SignatureRole { get; init; }
+    string? SignatureRoleCode { get; init; }
     long Sequence { get; init; }
     string Status { get; init; }
     Guid? SignerPersonOid { get; init; }
