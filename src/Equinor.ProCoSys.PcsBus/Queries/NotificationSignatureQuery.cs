@@ -10,7 +10,7 @@ public class NotificationSignatureQuery
         var whereClause = CreateWhereClause(notificationSignatureGuid, plant, "ns", "procosys_guid");
 
         var query = $@"select
-                --ns.procosys_guid as ProCoSysGuid, --TODO add field
+                ns.procosys_guid as ProCoSysGuid,
                 ns.projectschema as Plant, 
                 p.name as ProjectName, 
                 p.procosys_guid as ProjectGuid, 
