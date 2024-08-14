@@ -518,6 +518,28 @@ public class BusEventService : IBusEventService
                 queryStringAndParams, message), DefaultSerializerHelper.SerializerOptions);
     }
 
+    public async Task<string?> CreateNotificationCommPkgMessage(string message)
+    {
+        if (!Guid.TryParse(message, out _))
+        {
+            throw new Exception($"Failed to extract or parse guid NotificationCommPkg from message {message}");
+        }
+
+        //Try to find commpkg reference of type 'Other' first
+        var queryStringAndParamsOther = NotificationCommPkgOtherQuery.GetQuery(message);
+        var commPkgEvent = await _eventRepository.QuerySingle<NotificationCommPkgEvent>(queryStringAndParamsOther, message);
+
+        if (commPkgEvent is null)
+        {
+            //Try to find commpkg reference of type 'Boundary'
+            var queryStringAndParamsBoundary = NotificationCommPkgBoundaryQuery.GetQuery(message);
+            commPkgEvent = await _eventRepository.QuerySingle<NotificationCommPkgEvent>(queryStringAndParamsBoundary, message);
+        }
+
+        return JsonSerializer.Serialize(commPkgEvent, DefaultSerializerHelper.SerializerOptions);
+    }
+
+
     public async Task<string?> CreateNotificationSignatureMessage(string message)
     {
         if (!Guid.TryParse(message, out _))
@@ -540,7 +562,7 @@ public class BusEventService : IBusEventService
 
         return JsonSerializer.Serialize(
             await _eventRepository.QuerySingle<PunchPriorityLibRelationEvent>(
-                PunchPriorityLibraryRelationQuery.GetQuery(message), message));
+                PunchPriorityLibraryRelationQuery.GetQuery(message), message), DefaultSerializerHelper.SerializerOptions);
     }
 
 

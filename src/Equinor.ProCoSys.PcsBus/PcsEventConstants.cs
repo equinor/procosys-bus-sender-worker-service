@@ -222,6 +222,11 @@ public static class PcsEventConstants
     public static string NotificationWorkOrderCreateOrUpdate = "notificationWorkOrderCreatedOrUpdated";
 
     /// <summary>
+    ///     Event that is fired when a new notificationcommpkg is created or updated
+    /// </summary>
+    public static string NotificationCommPkgCreateOrUpdate = "notificationCommPkgCreatedOrUpdated";
+
+    /// <summary>
     ///    Event that is fired when a new notification signature is created or updated 
     /// </summary>
     public static string NotificationSignatureCreateOrUpdate = "notificationSignatureCreatedOrUpdated";

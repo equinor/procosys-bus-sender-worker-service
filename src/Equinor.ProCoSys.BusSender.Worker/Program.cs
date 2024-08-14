@@ -13,7 +13,6 @@ using Microsoft.Extensions.Logging;
 
 namespace Equinor.ProCoSys.BusSender.Worker;
 
-
 // ReSharper disable once ClassNeverInstantiated.Global
 public class Program
 {

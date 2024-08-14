@@ -46,6 +46,7 @@ public static class PcsTopicConstants
     public const string Person = "Person";
     public const string Notification = "Notification";
     public const string NotificationWorkOrder = "NotificationWorkOrder";
+    public const string NotificationCommPkg = "NotificationCommPkg";
     public const string NotificationSignature = "NotificationSignature";
     public const string PunchPriorityLibraryRelation = "PunchPriorityLibraryRelation";
 }
