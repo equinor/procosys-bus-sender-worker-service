@@ -21,13 +21,13 @@ public class NotificationSignatureTests
             { "ProjectName", typeof(string) },
             { "ProjectGuid", typeof(Guid) },
             { "NotificationGuid", typeof(Guid) },
-            { "SignatureRole", typeof(string) },
+            { "SignatureRoleCode", typeof(string) },
             { "Sequence", typeof(long) },
             { "Status", typeof(string) },
-            { "SignerPersonOid", typeof(Guid) },
+            { "SignerPersonOid", typeof(Guid?) },
             { "SignerFunctionalRoleCode", typeof(string) },
-            { "SignedByOid", typeof(Guid) },
-            { "SignedAt", typeof(DateTime) },
+            { "SignedByOid", typeof(Guid?) },
+            { "SignedAt", typeof(DateTime?) },
             { "LastUpdated", typeof(DateTime) },
         };
 
