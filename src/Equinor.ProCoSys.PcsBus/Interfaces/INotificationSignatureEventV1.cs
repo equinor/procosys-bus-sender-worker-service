@@ -9,12 +9,12 @@ public interface INotificationSignatureEventV1 : IHasEventType
     string ProjectName { get; init; }
     Guid ProjectGuid { get; init; }
     Guid NotificationGuid { get; init; }
-    string SignatureRole { get; init; }
+    string? SignatureRole { get; init; }
     long Sequence { get; init; }
     string Status { get; init; }
-    Guid SignerPersonOid { get; init; }
-    string SignerFunctionalRoleCode { get; init; }
-    Guid SignedByOid { get; init; }
-    DateTime SignedAt { get; init; }
+    Guid? SignerPersonOid { get; init; }
+    string? SignerFunctionalRoleCode { get; init; }
+    Guid? SignedByOid { get; init; }
+    DateTime? SignedAt { get; init; }
     DateTime LastUpdated { get; init; }
 }
