@@ -11,7 +11,7 @@ public interface INotificationSignatureEventV1 : IHasEventType
     Guid NotificationGuid { get; init; }
     string? SignatureRoleCode { get; init; }
     long Sequence { get; init; }
-    string Status { get; init; }
+    string? Status { get; init; }
     Guid? SignerPersonOid { get; init; }
     string? SignerFunctionalRoleCode { get; init; }
     Guid? SignedByOid { get; init; }
