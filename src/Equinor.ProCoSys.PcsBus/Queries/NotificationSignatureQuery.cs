@@ -17,7 +17,24 @@ public class NotificationSignatureQuery
                 n.procosys_guid as NotificationGuid,
                 sr.description as SignatureRole,
                 ns.sequence as Sequence,
-                st.code as Status,
+                ( CASE
+                    WHEN (
+                    SELECT
+                        l.code
+                    FROM
+                        definelibraryfield dlf
+                        JOIN field f ON dlf.field_id = f.field_id
+                                        AND f.columnname = 'NOTIFICATION_SET_SIGNATURE_STATUS'
+                        JOIN libraryfield lf ON dlf.id = lf.definelibraryfield_id
+                        JOIN library l ON lf.value_id = l.library_id
+                    WHERE
+                        dlf.librarytype = 'NOTIFICATION_SIGNATURE_ROLE'
+                        AND   dlf.isvoided = 'N'
+                        AND   lf.library_id = SIGNATUREROLE_ID
+                        ) = 'Y' 
+                            AND SIGNEDAT IS NOT NULL THEN 'Accepted'
+                        ELSE NULL
+                    END ) as Status,
                 sp.azure_oid as SignerPersonOid,
                 fr.code as SignerFunctionalRoleCode,
                 sb.azure_oid as SignedByOid,
