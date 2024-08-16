@@ -15,7 +15,7 @@ public class NotificationSignatureQuery
                 p.name as ProjectName, 
                 p.procosys_guid as ProjectGuid, 
                 n.procosys_guid as NotificationGuid,
-                sr.description as SignatureRole,
+                sr.code as SignatureRoleCode,
                 ns.sequence as Sequence,
                 ( CASE
                     WHEN (
