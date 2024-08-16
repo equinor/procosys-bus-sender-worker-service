@@ -45,7 +45,6 @@ public class NotificationSignatureQuery
                 join project p on p.project_id = d.project_id
                 join library sr on ns.signaturerole_id = sr.library_id
                 join notification n on ns.document_id = n.document_id
-                left join library st on ns.status_id = st.library_id
                 left join person sp on sp.person_id = ns.signerperson_id
                 left join library fr on ns.signerfunctionalrole_id = fr.library_id
                 left join person sb on ns.signedby_id = sb.person_id
