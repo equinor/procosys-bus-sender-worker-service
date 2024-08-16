@@ -36,7 +36,7 @@ internal class EventRepository : IEventRepository
             var events = connection.Query<T>(query.queryString, query.parameters).ToList();
             if (events.Count == 0)
             {
-                _logger.LogError("Object/Entity with id {ObjectId} did not return anything", objectId);
+                _logger.LogError("Object/Entity {objectType} with id {ObjectId} did not return anything", typeof(T).Name, objectId);
                 return default;
             }
 
@@ -44,7 +44,7 @@ internal class EventRepository : IEventRepository
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $"An error occurred while executing query {query.queryString} for Object/Entity with id {objectId}");
+            _logger.LogError(ex, $"An error occurred while executing query {query.queryString} for Object/Entity {typeof(T).Name} with id {objectId}");
             throw;
         }
         finally
