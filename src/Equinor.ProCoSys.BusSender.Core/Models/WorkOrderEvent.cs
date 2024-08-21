@@ -12,7 +12,6 @@ public class WorkOrderEvent : IWorkOrderEventV1
     public DateOnly? ActualFinishedAtDate { get; init; }
     public DateOnly? ActualStartAtDate { get; init; }
     public string? AreaCode { get; init; }
-    public string? AreaDescription { get; init; }
     public string? CategoryCode { get; init; }
     public Guid? CommPkgGuid { get; init; }
     public string? CommPkgNo { get; init; }
@@ -20,7 +19,6 @@ public class WorkOrderEvent : IWorkOrderEventV1
     public DateTime CreatedAt { get; init; }
     public string? Description { get; init; }
     public string? DisciplineCode { get; init; }
-    public string? DisciplineDescription { get; init; }
     public string? EstimatedHours { get; init; }
     public string? ExpendedManHours { get; init; }
     public string? HoldByCode { get; init; }
@@ -30,7 +28,6 @@ public class WorkOrderEvent : IWorkOrderEventV1
     public string? MaterialComments { get; init; }
     public string? MaterialStatusCode { get; init; }
     public string? MilestoneCode { get; init; }
-    public string? MilestoneDescription { get; init; }
     public string? OnShoreOffShoreCode { get; init; }
     public DateOnly? PlannedFinishedAtDate { get; init; }
     public DateOnly? PlannedStartAtDate { get; init; }
@@ -41,7 +38,6 @@ public class WorkOrderEvent : IWorkOrderEventV1
     public double ProjectProgress { get; init; }
     public string? RemainingHours { get; init; }
     public string? ResponsibleCode { get; init; }
-    public string? ResponsibleDescription { get; init; }
     public string? SubMilestoneCode { get; init; }
     public string? Title { get; init; }
     public string? TypeOfWorkCode { get; init; }
