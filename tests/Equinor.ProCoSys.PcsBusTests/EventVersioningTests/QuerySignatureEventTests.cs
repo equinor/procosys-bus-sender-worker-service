@@ -30,7 +30,6 @@ public class QuerySignatureEventTests
             { "FunctionalRoleCode", typeof(string) },
             { "Sequence", typeof(int) },
             { "SignedByAzureOid", typeof(Guid?) },
-            { "FunctionalRoleDescription", typeof(string) },
             { "SignedDate", typeof(DateTime?) },
             { "LastUpdated", typeof(DateTime) }
         };

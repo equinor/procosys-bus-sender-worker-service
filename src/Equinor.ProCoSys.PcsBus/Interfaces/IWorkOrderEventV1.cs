@@ -15,16 +15,12 @@ public interface IWorkOrderEventV1 : IHasEventType
     string? Description { get; init; }
     string? MilestoneCode { get; init; }
     string? SubMilestoneCode { get; init; }
-    string? MilestoneDescription { get; init; }
     string? CategoryCode { get; init; }
     string? MaterialStatusCode { get; init; }
     string? HoldByCode { get; init; }
     string? DisciplineCode { get; init; }
-    string? DisciplineDescription { get; init; }
     string? ResponsibleCode { get; init; }
-    string? ResponsibleDescription { get; init; }
     string? AreaCode { get; init; }
-    string? AreaDescription { get; init; }
     string? JobStatusCode { get; init; }
     string? MaterialComments { get; init; }
     string? ConstructionComments { get; init; }
