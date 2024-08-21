@@ -8,12 +8,10 @@ public class McPkgEvent : IMcPkgEventV1
 {
     public string EventType => PcsEventConstants.McPkgCreateOrUpdate;
     public string? AreaCode { get; init; }
-    public string? AreaDescription { get; init; }
     public Guid CommPkgGuid { get; init; }
     public string CommPkgNo { get; init; }
     public DateTime CreatedAt { get; init; }
     public string? Description { get; init; }
-    public string Discipline { get; init; }
     public string DisciplineCode { get; init; }
     public bool IsVoided { get; init; }
     public DateTime LastUpdated { get; init; }
@@ -27,5 +25,4 @@ public class McPkgEvent : IMcPkgEventV1
     public string ProjectName { get; init; }
     public string? Remark { get; init; }
     public string ResponsibleCode { get; init; }
-    public string? ResponsibleDescription { get; init; }
 }

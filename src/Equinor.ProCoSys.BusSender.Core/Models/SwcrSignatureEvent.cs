@@ -8,7 +8,6 @@ public class SwcrSignatureEvent : ISwcrSignatureEventV1
 {
     public string EventType => PcsEventConstants.SwcrSignatureCreateOrUpdate;
     public string? FunctionalRoleCode { get; init; }
-    public string? FunctionalRoleDescription { get; init; }
     
     public string? StatusCode { get; init; }
     public DateTime LastUpdated { get; init; }
@@ -18,7 +17,6 @@ public class SwcrSignatureEvent : ISwcrSignatureEventV1
     public string ProjectName { get; init; }
     public int Sequence { get; init; }
     public string SignatureRoleCode { get; init; }
-    public string? SignatureRoleDescription { get; init; }
     public Guid? SignedByAzureOid { get; init; }
     public DateTime? SignedDate { get; init; }
     public Guid SwcrGuid { get; init; }

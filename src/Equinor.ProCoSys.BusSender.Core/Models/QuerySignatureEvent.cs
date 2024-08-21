@@ -8,7 +8,6 @@ public class QuerySignatureEvent : IQuerySignatureEventV1
 {
     public string EventType => PcsEventConstants.QuerySignatureCreateOrUpdate;
     public string? FunctionalRoleCode { get; init; }
-    public string? FunctionalRoleDescription { get; init; }
     public DateTime LastUpdated { get; init; }
     public Guid? LibraryStatusGuid { get; init; }
     public string Plant { get; init; }
