@@ -11,11 +11,9 @@ public interface ISwcrSignatureEventV1 : IHasEventType
     string SwcrNo { get; init; }
     Guid SwcrGuid { get; init; }
     string SignatureRoleCode { get; init; }
-    string? SignatureRoleDescription { get; init; }
     int Sequence { get; init; }
     Guid? SignedByAzureOid { get; init; }
     string? FunctionalRoleCode { get; init; }
-    string? FunctionalRoleDescription { get; init; }
     DateTime? SignedDate { get; init; }
     string? StatusCode { get; init; }
     DateTime LastUpdated { get; init; }

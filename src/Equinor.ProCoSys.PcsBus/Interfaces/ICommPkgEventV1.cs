@@ -21,9 +21,7 @@ public interface ICommPkgEventV1 : IHasEventType
     string? DescriptionOfWork { get; init; }
     string? Remark { get; init; }
     string ResponsibleCode { get; init; }
-    string? ResponsibleDescription { get; init; }
     string? AreaCode { get; init; }
-    string? AreaDescription { get; init; }
     string? Phase { get; init; }
     string? CommissioningIdentifier { get; init; }
     bool? Demolition { get; init; }

@@ -18,7 +18,6 @@ public interface IQuerySignatureEventV1 : IHasEventType
     string? FunctionalRoleCode { get; init; }
     int Sequence { get; init; }
     Guid? SignedByAzureOid { get; init; }
-    string? FunctionalRoleDescription { get; init; }
     DateTime? SignedDate { get; init; }
     DateTime LastUpdated { get; init; }
 }
