@@ -22,6 +22,7 @@ public class TagEvent : ITagEventV1
     public DateTime LastUpdated { get; init; }
     public Guid? McPkgGuid { get; init; }
     public string? McPkgNo { get; init; }
+    public string? ContractorCode { get; init; }
     public int? MountedOn { get; init; }
     public Guid? MountedOnGuid { get; init; }
 

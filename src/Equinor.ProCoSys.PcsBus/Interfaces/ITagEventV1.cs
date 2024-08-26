@@ -28,6 +28,7 @@ public interface ITagEventV1 : IHasEventType
     string? PurchaseOrderNo { get; init; }
     string? TagFunctionCode { get; init; }
     string? EngineeringCode { get; init; }
+    string? ContractorCode { get; init; }
     int? MountedOn { get; init; }
     Guid? MountedOnGuid { get; init; }
     bool IsVoided { get; init; }
