@@ -38,6 +38,7 @@ public class TagEventTests
             { "PurchaseOrderNo", typeof(string) },
             { "TagFunctionCode", typeof(string) },
             { "EngineeringCode", typeof(string) },
+            { "ContractorCode", typeof(string) },
             { "MountedOn", typeof(int?) },
             { "MountedOnGuid", typeof(Guid?) },
             { "IsVoided", typeof(bool) },

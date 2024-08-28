@@ -23,6 +23,10 @@ public class NotificationEventTest
             { "NotificationNo", typeof(string) },
             { "Title", typeof(string) },
             { "NotificationType", typeof(string) },
+            { "DocumentType", typeof(string) },
+            { "ResponsibleContractor", typeof(string) },
+            { "CreatedAt", typeof(DateTime) },
+            { "LastUpdated", typeof(DateTime) },
         };
 
         // Act
