@@ -28,6 +28,7 @@ public class TagTopic
     public string Status { get; set; }
     public string System { get; set; }
     public string CallOffNo { get; set; }
+    public string ContractorCode { get; set; }
     public string PurchaseOrderNo { get; set; }
     public string TagFunctionCode { get; set; }
     public string? TagDetails { get; set; }
