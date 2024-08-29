@@ -23,7 +23,6 @@ public class NotificationSignatureTests
             { "NotificationGuid", typeof(Guid) },
             { "SignatureRoleCode", typeof(string) },
             { "Sequence", typeof(long) },
-            { "Status", typeof(string) },
             { "SignerPersonOid", typeof(Guid?) },
             { "SignerFunctionalRoleCode", typeof(string) },
             { "SignedByOid", typeof(Guid?) },
