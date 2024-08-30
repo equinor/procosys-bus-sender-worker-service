@@ -539,6 +539,20 @@ public class BusEventService : IBusEventService
         return JsonSerializer.Serialize(commPkgEvent, DefaultSerializerHelper.SerializerOptions);
     }
 
+
+    public async Task<string?> CreateNotificationSignatureMessage(string message)
+    {
+        if (!Guid.TryParse(message, out _))
+        {
+            throw new Exception($"Failed to extract or parse guid NotificationSignature from message {message}");
+        }
+
+        var queryStringAndParams = NotificationSignatureQuery.GetQuery(message);
+        return JsonSerializer.Serialize(
+            await _eventRepository.QuerySingle<NotificationSignatureEvent>(
+                queryStringAndParams, message), DefaultSerializerHelper.SerializerOptions);
+    }
+
     public async Task<string?> CreatePunchPriorityLibRelationMessage(string message)
     {
         if (!Guid.TryParse(message, out _))

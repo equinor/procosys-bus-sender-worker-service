@@ -227,6 +227,11 @@ public static class PcsEventConstants
     public static string NotificationCommPkgCreateOrUpdate = "notificationCommPkgCreatedOrUpdated";
 
     /// <summary>
+    ///    Event that is fired when a new notification signature is created or updated 
+    /// </summary>
+    public static string NotificationSignatureCreateOrUpdate = "notificationSignatureCreatedOrUpdated";
+
+    /// <summary>
     ///    Event that is fired when a new punch priority lib relation is created or updated 
     /// </summary>
     public static string PunchPriorityLibRelationCreateOrUpdate = "punchPriorityLibRelationCreateOrUpdate";
