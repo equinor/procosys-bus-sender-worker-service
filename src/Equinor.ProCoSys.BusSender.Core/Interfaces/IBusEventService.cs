@@ -47,6 +47,7 @@ public interface IBusEventService
     Task<string?> CreateNotificationMessage(string message);
     Task<string?> CreateNotificationWorkOrderMessage(string message);
     Task<string?> CreateNotificationCommPkgMessage(string message);
+    Task<string?> CreateNotificationSignatureMessage(string message);
 
     string? WashString(string? message);
     Task<string?> CreatePunchPriorityLibRelationMessage(string message);

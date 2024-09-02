@@ -410,6 +410,14 @@ public class QueryTests
 
         yield return new object[]
         {
+            typeof(NotificationSignatureQuery),
+            typeof(INotificationSignatureEventV1),
+            new[] { typeof(string), typeof(string) },
+            new object[] { "abc", "testPlant" }
+        };
+
+        yield return new object[]
+        {
             typeof(PunchPriorityLibraryRelationQuery),
             typeof(IPunchPriorityLibRelationEventV1),
             new[] { typeof(string), typeof(string) },
