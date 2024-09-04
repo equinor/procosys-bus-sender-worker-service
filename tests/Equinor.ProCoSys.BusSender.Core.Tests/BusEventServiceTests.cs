@@ -296,9 +296,7 @@ public class BusEventServiceTests
             DescriptionOfWork = "Work1",
             Remark = "Remark1",
             ResponsibleCode = "Resp1",
-            ResponsibleDescription = "RespDesc1",
             AreaCode = "Area1",
-            AreaDescription = "AreaDesc1",
             Phase = "Phase1",
             CommissioningIdentifier = "CommId1",
             Demolition = false,
@@ -337,9 +335,7 @@ public class BusEventServiceTests
         Assert.AreEqual(commPkgEvent.DescriptionOfWork, deserializedResult.DescriptionOfWork);
         Assert.AreEqual(commPkgEvent.Remark, deserializedResult.Remark);
         Assert.AreEqual(commPkgEvent.ResponsibleCode, deserializedResult.ResponsibleCode);
-        Assert.AreEqual(commPkgEvent.ResponsibleDescription, deserializedResult.ResponsibleDescription);
         Assert.AreEqual(commPkgEvent.AreaCode, deserializedResult.AreaCode);
-        Assert.AreEqual(commPkgEvent.AreaDescription, deserializedResult.AreaDescription);
         Assert.AreEqual(commPkgEvent.Phase, deserializedResult.Phase);
         Assert.AreEqual(commPkgEvent.CommissioningIdentifier, deserializedResult.CommissioningIdentifier);
         Assert.AreEqual(commPkgEvent.Demolition, deserializedResult.Demolition);
@@ -787,10 +783,7 @@ public class BusEventServiceTests
             Description = "Description1",
             Remark = "Remark1",
             ResponsibleCode = "RCode1",
-            ResponsibleDescription = "ResponsibleDesc1",
             AreaCode = "Area1",
-            AreaDescription = "AreaDesc1",
-            Discipline = "Discipline1",
             DisciplineCode = "DisciplineCode1",
             McStatus = "Status1",
             Phase = "Phase1",
@@ -826,10 +819,7 @@ public class BusEventServiceTests
         Assert.AreEqual(mcPkgEvent.Description, deserializedResult.Description);
         Assert.AreEqual(mcPkgEvent.Remark, deserializedResult.Remark);
         Assert.AreEqual(mcPkgEvent.ResponsibleCode, deserializedResult.ResponsibleCode);
-        Assert.AreEqual(mcPkgEvent.ResponsibleDescription, deserializedResult.ResponsibleDescription);
         Assert.AreEqual(mcPkgEvent.AreaCode, deserializedResult.AreaCode);
-        Assert.AreEqual(mcPkgEvent.AreaDescription, deserializedResult.AreaDescription);
-        Assert.AreEqual(mcPkgEvent.Discipline, deserializedResult.Discipline);
         Assert.AreEqual(mcPkgEvent.DisciplineCode, deserializedResult.DisciplineCode);
         Assert.AreEqual(mcPkgEvent.McStatus, deserializedResult.McStatus);
         Assert.AreEqual(mcPkgEvent.Phase, deserializedResult.Phase);
@@ -1532,11 +1522,9 @@ public class BusEventServiceTests
             SwcrNo = "SWCR-001",
             SwcrGuid = Guid.NewGuid(),
             SignatureRoleCode = "WIZARD",
-            SignatureRoleDescription = "Wizard's approval",
             Sequence = 1,
             SignedByAzureOid = Guid.NewGuid(),
             FunctionalRoleCode = "MAGIC_ROLE",
-            FunctionalRoleDescription = "Magic-related tasks",
             SignedDate = DateTime.UtcNow,
             LastUpdated = DateTime.UtcNow
         };
@@ -1562,11 +1550,9 @@ public class BusEventServiceTests
         Assert.AreEqual(swcrSignatureEvent.SwcrNo, deserializedResult.SwcrNo);
         Assert.AreEqual(swcrSignatureEvent.SwcrGuid, deserializedResult.SwcrGuid);
         Assert.AreEqual(swcrSignatureEvent.SignatureRoleCode, deserializedResult.SignatureRoleCode);
-        Assert.AreEqual(swcrSignatureEvent.SignatureRoleDescription, deserializedResult.SignatureRoleDescription);
         Assert.AreEqual(swcrSignatureEvent.Sequence, deserializedResult.Sequence);
         Assert.AreEqual(swcrSignatureEvent.SignedByAzureOid, deserializedResult.SignedByAzureOid);
         Assert.AreEqual(swcrSignatureEvent.FunctionalRoleCode, deserializedResult.FunctionalRoleCode);
-        Assert.AreEqual(swcrSignatureEvent.FunctionalRoleDescription, deserializedResult.FunctionalRoleDescription);
         Assert.AreEqual(swcrSignatureEvent.SignedDate, deserializedResult.SignedDate);
         Assert.AreEqual(swcrSignatureEvent.LastUpdated, deserializedResult.LastUpdated);
     }
@@ -1882,16 +1868,12 @@ public class BusEventServiceTests
             Description = "Description",
             MilestoneCode = "MilestoneCode",
             SubMilestoneCode = "SubMilestoneCode",
-            MilestoneDescription = "MilestoneDescription",
             CategoryCode = "CategoryCode",
             MaterialStatusCode = "MaterialStatusCode",
             HoldByCode = "HoldByCode",
             DisciplineCode = "DisciplineCode",
-            DisciplineDescription = "DisciplineDescription",
             ResponsibleCode = "ResponsibleCode",
-            ResponsibleDescription = "ResponsibleDescription",
             AreaCode = "AreaCode",
-            AreaDescription = "AreaDescription",
             JobStatusCode = "JobStatusCode",
             MaterialComments = "MaterialComments",
             ConstructionComments = "ConstructionComments",
@@ -1938,16 +1920,12 @@ public class BusEventServiceTests
         Assert.AreEqual(workOrderEvent.Description, deserializedResult.Description);
         Assert.AreEqual(workOrderEvent.MilestoneCode, deserializedResult.MilestoneCode);
         Assert.AreEqual(workOrderEvent.SubMilestoneCode, deserializedResult.SubMilestoneCode);
-        Assert.AreEqual(workOrderEvent.MilestoneDescription, deserializedResult.MilestoneDescription);
         Assert.AreEqual(workOrderEvent.CategoryCode, deserializedResult.CategoryCode);
         Assert.AreEqual(workOrderEvent.MaterialStatusCode, deserializedResult.MaterialStatusCode);
         Assert.AreEqual(workOrderEvent.HoldByCode, deserializedResult.HoldByCode);
         Assert.AreEqual(workOrderEvent.DisciplineCode, deserializedResult.DisciplineCode);
-        Assert.AreEqual(workOrderEvent.DisciplineDescription, deserializedResult.DisciplineDescription);
         Assert.AreEqual(workOrderEvent.ResponsibleCode, deserializedResult.ResponsibleCode);
-        Assert.AreEqual(workOrderEvent.ResponsibleDescription, deserializedResult.ResponsibleDescription);
         Assert.AreEqual(workOrderEvent.AreaCode, deserializedResult.AreaCode);
-        Assert.AreEqual(workOrderEvent.AreaDescription, deserializedResult.AreaDescription);
         Assert.AreEqual(workOrderEvent.JobStatusCode, deserializedResult.JobStatusCode);
         Assert.AreEqual(workOrderEvent.MaterialComments, deserializedResult.MaterialComments);
         Assert.AreEqual(workOrderEvent.ConstructionComments, deserializedResult.ConstructionComments);

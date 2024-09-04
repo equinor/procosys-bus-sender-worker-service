@@ -17,11 +17,9 @@ public class SwcrSignatureQuery
             s.swcrno as SwcrNo,
             s.procosys_guid as SwcrGuid,
             sr.code as SignatureRoleCode,
-            sr.description as SignatureRoleDescription,
             sign.ranking as Sequence,
             p.azure_oid as SignedByAzureOid,
             fr.code as FunctionalRoleCode,
-            fr.description as FunctionalRoleDescription,
             sign.signedat as SignedDate,
             st.code as StatusCode,
             sign.last_updated as LastUpdated

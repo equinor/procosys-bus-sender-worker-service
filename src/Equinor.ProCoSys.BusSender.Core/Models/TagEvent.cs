@@ -8,14 +8,12 @@ public class TagEvent : ITagEventV1
 {
     public string EventType => PcsEventConstants.TagCreateOrUpdate;
     public string? AreaCode { get; init; }
-    public string? AreaDescription { get; init; }
     public Guid? CallOffGuid { get; init; }
     public string? CallOffNo { get; init; }
     public Guid? CommPkgGuid { get; init; }
     public string? CommPkgNo { get; init; }
     public string? Description { get; init; }
     public string? DisciplineCode { get; init; }
-    public string? DisciplineDescription { get; init; }
     public string? EngineeringCode { get; init; }
     public string? InstallationCode { get; init; }
     public bool IsVoided { get; init; }

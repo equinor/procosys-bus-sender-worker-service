@@ -8,7 +8,6 @@ namespace Equinor.ProCoSys.BusSenderWorker.Core.Models;
 public class CommPkgEvent : ICommPkgEventV1
 {
     public string? AreaCode { get; init; }
-    public string? AreaDescription { get; init; }
     public string? CommissioningIdentifier { get; init; }
     public long CommPkgId { get; init; }
     public string CommPkgNo { get; init; }
@@ -32,7 +31,6 @@ public class CommPkgEvent : ICommPkgEventV1
     public Guid ProjectGuid { get; init; }
     public string? Remark { get; init; }
     public string ResponsibleCode { get; init; }
-    public string? ResponsibleDescription { get; init; }
 
     public string EventType => PcsEventConstants.CommPkgCreateOrUpdate;
 }

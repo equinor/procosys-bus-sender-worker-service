@@ -23,11 +23,9 @@ public class SwcrSignatureEventTests
             { "SwcrNo", typeof(string) },
             { "SwcrGuid", typeof(Guid) },
             { "SignatureRoleCode", typeof(string) },
-            { "SignatureRoleDescription", typeof(string) },
             { "Sequence", typeof(int) },
             { "SignedByAzureOid", typeof(Guid?) },
             { "FunctionalRoleCode", typeof(string) },
-            { "FunctionalRoleDescription", typeof(string) },
             { "SignedDate", typeof(DateTime?) },
             {"StatusCode", typeof(string) },
             { "LastUpdated", typeof(DateTime) }

@@ -24,7 +24,6 @@ public class QuerySignatureQuery
             fr.code as FunctionalRoleCode,
             q.ranking as Sequence,
             p.azure_oid as SignedByAzureOid,
-            fr.description as FunctionalRoleDescription,
             q.signedat as SignedDate,
             q.last_updated as LastUpdated
         from querysignature q

@@ -16,9 +16,7 @@ public interface ITagEventV1 : IHasEventType
     string? Description { get; init; }
     string? ProjectName { get; init; }
     string? AreaCode { get; init; }
-    string? AreaDescription { get; init; }
     string? DisciplineCode { get; init; }
-    string? DisciplineDescription { get; init; }
     string? RegisterCode { get; init; }
     string? InstallationCode { get; init; }
     string? Status { get; init; }

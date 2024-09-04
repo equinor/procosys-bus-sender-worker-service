@@ -17,10 +17,7 @@ public interface IMcPkgEventV1 : IHasEventType
     string? Description { get; init; }
     string? Remark { get; init; }
     string ResponsibleCode { get; init; }
-    string? ResponsibleDescription { get; init; }
     string? AreaCode { get; init; }
-    string? AreaDescription { get; init; }
-    string Discipline { get; init; }
     string DisciplineCode { get; init; }
     string McStatus { get; init; }
     string? Phase { get; init; }
