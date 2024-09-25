@@ -14,7 +14,7 @@ public class NotificationSignatureQuery
                 ns.projectschema as Plant, 
                 p.name as ProjectName, 
                 p.procosys_guid as ProjectGuid, 
-                n.procosys_guid as NotificationGuid,
+                d.procosys_guid as NotificationGuid,
                 sr.code as SignatureRoleCode,
                 ns.sequence as Sequence,
                 sp.azure_oid as SignerPersonOid,
