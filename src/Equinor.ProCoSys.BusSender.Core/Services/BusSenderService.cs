@@ -90,29 +90,24 @@ public class BusSenderService : IBusSenderService
             {
                 using var messageBatch = await _pcsBusSender.CreateMessageBatchAsync(topic);
                 // add first unsent message to batch
-                if (messageBatch.TryAddMessage(
-                        new ServiceBusMessage(
-                            _service.WashString(messages.Peek().MessageToSend ?? messages.Peek().Message))))
+                
+                if (TryAddMessage(messageBatch, messages, out var msgId))
                 {
                     var m = messages.Dequeue();
                     m.Status = Status.Sent;
-                    TrackMessage(m);
+                    TrackMessage(m,msgId);
                 }
                 else
                 {
                     // if the first message can't fit, then it is too large for the batch
                     throw new Exception($"Message {messageCount - messages.Count} is too large and cannot be sent.");
                 }
-
-                // add as many messages as possible to the current batch
-                while (messages.Count > 0 &&
-                       messageBatch.TryAddMessage(
-                           new ServiceBusMessage(
-                               _service.WashString(messages.Peek().MessageToSend ?? messages.Peek().Message))))
+                
+                while (messages.Count > 0 && TryAddMessage(messageBatch, messages, out var messageId))
                 {
                     var m = messages.Dequeue();
                     m.Status = Status.Sent;
-                    TrackMessage(m);
+                    TrackMessage(m,messageId);
                 }
 
                 _logger.LogDebug("Sending amount: {Count} after {Ms} ms", messageBatch.Count, _sw.ElapsedMilliseconds);
@@ -121,6 +116,19 @@ public class BusSenderService : IBusSenderService
                 _logger.LogDebug("done sending and save after {Ms} ms", _sw.ElapsedMilliseconds);
             }
         }
+    }
+
+    private bool TryAddMessage(ServiceBusMessageBatch messageBatch, Queue<BusEvent> messages, out string messageId)
+    {
+        var serviceBusMessage = new ServiceBusMessage(
+            _service.WashString(messages.Peek().MessageToSend ?? messages.Peek().Message));
+        if (serviceBusMessage.Body == null || string.IsNullOrEmpty(serviceBusMessage.Body.ToString()))
+        {
+            _logger.LogError("MessageBody is null for {MessageId}", serviceBusMessage.MessageId);
+        }
+        messageId = serviceBusMessage.MessageId;
+        return messageBatch.TryAddMessage(
+            serviceBusMessage);
     }
 
     /***
@@ -207,11 +215,12 @@ public class BusSenderService : IBusSenderService
         return events;
     }
 
-    private void TrackMessage(BusEvent busEvent)
+    private void TrackMessage(BusEvent busEvent, string busMessageMessageId)
     {
         var busEventMessageToSend = busEvent.MessageToSend ?? busEvent.Message;
         var message = JsonSerializer.Deserialize<BusEventMessage>(_service.WashString(busEventMessageToSend)!,
             DefaultSerializerHelper.SerializerOptions);
+        
         if (message != null && string.IsNullOrEmpty(message.ProjectName))
         {
             message.ProjectName = "_";
@@ -222,7 +231,8 @@ public class BusSenderService : IBusSenderService
             {"ProCoSysGuid", message?.ProCoSysGuid ?? "NoGuid!!???"},
             {"Created", busEvent.Created.ToString(CultureInfo.InvariantCulture)},
             {"ProjectName", message?.ProjectName ?? "NoProject"},
-            {"Plant", message?.Plant ?? "NoPlant"}
+            {"Plant", message?.Plant ?? "NoPlant"},
+            {"MessageId", busMessageMessageId}
         });
     }
     
