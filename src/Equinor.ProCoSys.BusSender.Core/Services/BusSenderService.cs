@@ -14,6 +14,7 @@ using Equinor.ProCoSys.BusSenderWorker.Core.Telemetry;
 using Equinor.ProCoSys.PcsServiceBus.Sender.Interfaces;
 using Equinor.ProCoSys.PcsServiceBus.Topics;
 using Microsoft.Extensions.Logging;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace Equinor.ProCoSys.BusSenderWorker.Core.Services;
 
@@ -51,9 +52,9 @@ public class BusSenderService : IBusSenderService
 
     public async Task HandleBusEvents()
     {
+        _sw.Start();
         try
         {
-            _sw.Start();
             var events = await _busEventRepository.GetEarliestUnProcessedEventChunk();
             if (events.Any())
             {
@@ -64,7 +65,19 @@ public class BusSenderService : IBusSenderService
                 _logger.LogInformation("BusSenderService ProcessBusEvents used {Sw} ms", _sw.ElapsedMilliseconds);
             }
 
-            _sw.Reset();
+        }
+        catch (AggregateException aggEx)
+        {
+            var exceptionCount = aggEx.InnerExceptions.Count;
+            var exceptionIndex = 0;
+            _logger.LogInformation("BusSenderService ProcessBusEvents used {Sw} ms", _sw.ElapsedMilliseconds);
+            _logger.LogWarning("BusSenderService ProcessBusEvents encountered {errorCount} error(s) while sending batches of topic messages", exceptionCount);
+            foreach (var ex in aggEx.InnerExceptions)
+            {
+                exceptionIndex++;
+                _logger.LogError(ex, "Topic Batch Sending Error {number} of {count}", exceptionIndex, exceptionCount);
+            }
+
         }
         catch (Exception exception)
         {
@@ -72,49 +85,67 @@ public class BusSenderService : IBusSenderService
             throw;
         }
 
+        _sw.Reset();
         _logger.LogDebug("BusSenderService DoWorkerJob finished");
         _telemetryClient.Flush();
     }
 
     private async Task BatchAndSendPerTopic(List<(string Key, Queue<BusEvent> messages)> eventGroups)
     {
+        var exceptions = new List<Exception>();
+
         foreach (var (topic, messages) in eventGroups)
         {
-            /***
-            * group messages into batches, and fail before sending if message exceeds size limit
-            * Pattern taken from:
-            * https://github.com/Azure/azure-sdk-for-net/blob/main/sdk/servicebus/Azure.Messaging.ServiceBus/MigrationGuide.md
-            */
-            var messageCount = messages.Count;
-            while (messages.Count > 0)
+            try
             {
-                using var messageBatch = await _pcsBusSender.CreateMessageBatchAsync(topic);
-                // add first unsent message to batch
-                
-                if (TryAddMessage(messageBatch, messages, out var msgId))
+                /***
+                * group messages into batches, and fail before sending if message exceeds size limit
+                * Pattern taken from:
+                * https://github.com/Azure/azure-sdk-for-net/blob/main/sdk/servicebus/Azure.Messaging.ServiceBus/MigrationGuide.md
+                */
+                var messageCount = messages.Count;
+                while (messages.Count > 0)
                 {
-                    var m = messages.Dequeue();
-                    m.Status = Status.Sent;
-                    TrackMessage(m,msgId);
-                }
-                else
-                {
-                    // if the first message can't fit, then it is too large for the batch
-                    throw new Exception($"Message {messageCount - messages.Count} is too large and cannot be sent.");
-                }
-                
-                while (messages.Count > 0 && TryAddMessage(messageBatch, messages, out var messageId))
-                {
-                    var m = messages.Dequeue();
-                    m.Status = Status.Sent;
-                    TrackMessage(m,messageId);
-                }
+                    using var messageBatch = await _pcsBusSender.CreateMessageBatchAsync(topic);
+                    // add first unsent message to batch
 
-                _logger.LogDebug("Sending amount: {Count} after {Ms} ms", messageBatch.Count, _sw.ElapsedMilliseconds);
-                await _pcsBusSender.SendMessagesAsync(messageBatch, topic);
-                await _unitOfWork.SaveChangesAsync();
-                _logger.LogDebug("done sending and save after {Ms} ms", _sw.ElapsedMilliseconds);
+                    if (TryAddMessage(messageBatch, messages, out var msgId))
+                    {
+                        var m = messages.Dequeue();
+                        m.Status = Status.Sent;
+                        TrackMessage(m, msgId);
+                    }
+                    else
+                    {
+                        // if the first message can't fit, then it is too large for the batch
+                        throw new Exception($"Message {messageCount - messages.Count} is too large and cannot be sent.");
+                    }
+
+                    while (messages.Count > 0 && TryAddMessage(messageBatch, messages, out var messageId))
+                    {
+                        var m = messages.Dequeue();
+                        m.Status = Status.Sent;
+                        TrackMessage(m, messageId);
+                    }
+
+                    _logger.LogDebug("Sending amount: {Count} after {Ms} ms", messageBatch.Count, _sw.ElapsedMilliseconds);
+                    await _pcsBusSender.SendMessagesAsync(messageBatch, topic);
+                    await _unitOfWork.SaveChangesAsync();
+                    _logger.LogDebug("done sending and save after {Ms} ms", _sw.ElapsedMilliseconds);
+                }
             }
+            catch (Exception ex)
+            {
+                _logger.LogWarning("Something went wrong while sending a batch of messages for topic {topic}, continuing on to next topic", topic);
+                exceptions.Add(ex);
+
+                _unitOfWork.ClearChangeTracker();
+            }
+        }
+
+        if (exceptions.Count > 0)
+        {
+            throw new AggregateException("One or more errors occurred while batch sending topic messages", exceptions);
         }
     }
 

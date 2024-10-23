@@ -21,6 +21,8 @@ public class BusSenderServiceContext : DbContext, IUnitOfWork
 
     public Task<int> SaveChangesAsync() => base.SaveChangesAsync();
 
+    public void ClearChangeTracker() => base.ChangeTracker.Clear();
+
     public virtual DbSet<BusEvent> BusEvents { get; set; } = null!;
 
 
