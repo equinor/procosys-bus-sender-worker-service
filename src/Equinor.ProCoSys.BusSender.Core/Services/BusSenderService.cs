@@ -122,6 +122,7 @@ public class BusSenderService : IBusSenderService
     {
         var serviceBusMessage = new ServiceBusMessage(
             _service.WashString(messages.Peek().MessageToSend ?? messages.Peek().Message));
+        serviceBusMessage.MessageId = Guid.NewGuid().ToString();
         if (serviceBusMessage.Body == null || string.IsNullOrEmpty(serviceBusMessage.Body.ToString()))
         {
             _logger.LogError("MessageBody is null for {MessageId}", serviceBusMessage.MessageId);
