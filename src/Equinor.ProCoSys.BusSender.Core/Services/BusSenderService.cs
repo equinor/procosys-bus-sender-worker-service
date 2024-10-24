@@ -232,7 +232,7 @@ public class BusSenderService : IBusSenderService
             {"Created", busEvent.Created.ToString(CultureInfo.InvariantCulture)},
             {"ProjectName", message?.ProjectName ?? "NoProject"},
             {"Plant", message?.Plant ?? "NoPlant"},
-            {"MessageId", busMessageMessageId}
+            {"MessageId", busMessageMessageId?? "NoID"}
         });
     }
     
