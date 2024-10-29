@@ -91,11 +91,11 @@ public class BusSenderService : IBusSenderService
                 using var messageBatch = await _pcsBusSender.CreateMessageBatchAsync(topic);
                 // add first unsent message to batch
                 
-                if (TryAddMessage(messageBatch, messages, out var msgId))
+                if (TryAddMessage(messageBatch, messages, out var msgId, out var msgBody))
                 {
                     var m = messages.Dequeue();
                     m.Status = Status.Sent;
-                    TrackMessage(m,msgId);
+                    TrackMessage(m, msgId, msgBody);
                 }
                 else
                 {
@@ -103,11 +103,11 @@ public class BusSenderService : IBusSenderService
                     throw new Exception($"Message {messageCount - messages.Count} is too large and cannot be sent.");
                 }
                 
-                while (messages.Count > 0 && TryAddMessage(messageBatch, messages, out var messageId))
+                while (messages.Count > 0 && TryAddMessage(messageBatch, messages, out var messageId, out var messageBody))
                 {
                     var m = messages.Dequeue();
                     m.Status = Status.Sent;
-                    TrackMessage(m,messageId);
+                    TrackMessage(m,messageId, messageBody);
                 }
 
                 _logger.LogDebug("Sending amount: {Count} after {Ms} ms", messageBatch.Count, _sw.ElapsedMilliseconds);
@@ -118,13 +118,18 @@ public class BusSenderService : IBusSenderService
         }
     }
 
-    private bool TryAddMessage(ServiceBusMessageBatch messageBatch, Queue<BusEvent> messages, out string messageId)
+    private bool TryAddMessage(ServiceBusMessageBatch messageBatch, Queue<BusEvent> messages, out string messageId, out string body)
     {
         var serviceBusMessage = new ServiceBusMessage(
             _service.WashString(messages.Peek().MessageToSend ?? messages.Peek().Message));
         if (serviceBusMessage.Body == null || string.IsNullOrEmpty(serviceBusMessage.Body.ToString()))
         {
+            body = "Empty";
             _logger.LogError("MessageBody is null for {MessageId}", serviceBusMessage.MessageId);
+        }
+        else
+        {
+            body = serviceBusMessage.Body.ToString();
         }
         messageId = serviceBusMessage.MessageId;
         return messageBatch.TryAddMessage(
@@ -215,7 +220,7 @@ public class BusSenderService : IBusSenderService
         return events;
     }
 
-    private void TrackMessage(BusEvent busEvent, string busMessageMessageId)
+    private void TrackMessage(BusEvent busEvent, string busMessageMessageId, string busMessageBody)
     {
         var busEventMessageToSend = busEvent.MessageToSend ?? busEvent.Message;
         var message = JsonSerializer.Deserialize<BusEventMessage>(_service.WashString(busEventMessageToSend)!,
@@ -232,7 +237,8 @@ public class BusSenderService : IBusSenderService
             {"Created", busEvent.Created.ToString(CultureInfo.InvariantCulture)},
             {"ProjectName", message?.ProjectName ?? "NoProject"},
             {"Plant", message?.Plant ?? "NoPlant"},
-            {"MessageId", busMessageMessageId}
+            {"MessageId", busMessageMessageId ?? "NoID" },
+            {"MessageBody", string.IsNullOrEmpty(message?.ProCoSysGuid) ? busMessageBody : "Existing body" }
         });
     }
     
