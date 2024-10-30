@@ -238,7 +238,9 @@ public class BusSenderService : IBusSenderService
             {"ProjectName", message?.ProjectName ?? "NoProject"},
             {"Plant", message?.Plant ?? "NoPlant"},
             {"MessageId", busMessageMessageId ?? "NoID" },
-            {"MessageBody", string.IsNullOrEmpty(message?.ProCoSysGuid) ? busMessageBody : "Existing body" }
+            //Remove these after debugging
+            {"BusEventMessage", string.IsNullOrEmpty(message?.ProCoSysGuid)? busEvent.Message : "N/A"},
+            {"MessageBody", string.IsNullOrEmpty(message?.ProCoSysGuid) ? busMessageBody : "N/A" }
         });
     }
     
