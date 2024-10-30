@@ -120,8 +120,8 @@ public class BusSenderService : IBusSenderService
 
     private bool TryAddMessage(ServiceBusMessageBatch messageBatch, Queue<BusEvent> messages, out string messageId, out string body)
     {
-        var serviceBusMessage = new ServiceBusMessage(
-            _service.WashString(messages.Peek().MessageToSend ?? messages.Peek().Message));
+        var serviceBusMessage = new ServiceBusMessage(_service.WashString(messages.Peek().MessageToSend ?? messages.Peek().Message));
+        serviceBusMessage.MessageId = Guid.NewGuid().ToString();
         if (serviceBusMessage.Body == null || string.IsNullOrEmpty(serviceBusMessage.Body.ToString()))
         {
             body = "Empty";
