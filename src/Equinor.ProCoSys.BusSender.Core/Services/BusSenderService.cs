@@ -239,7 +239,8 @@ public class BusSenderService : IBusSenderService
             {"Plant", message?.Plant ?? "NoPlant"},
             {"MessageId", busMessageMessageId ?? "NoID" },
             //Remove these after debugging
-            {"BusEventMessage", string.IsNullOrEmpty(message?.ProCoSysGuid)? busEvent.Message : "N/A"},
+            {"BusEventMessageToSend", string.IsNullOrEmpty(message?.ProCoSysGuid) ? "MessageToSend: ( " + busEvent.MessageToSend + " )" : "N/A"  },
+            {"BusEventMessage", string.IsNullOrEmpty(message?.ProCoSysGuid) ? busEvent.Message : "N/A" },
             {"MessageBody", string.IsNullOrEmpty(message?.ProCoSysGuid) ? busMessageBody : "N/A" }
         });
     }
