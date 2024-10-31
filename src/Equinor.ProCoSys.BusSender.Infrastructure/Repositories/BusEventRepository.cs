@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Equinor.ProCoSys.BusSenderWorker.Core;
 using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 using Equinor.ProCoSys.BusSenderWorker.Core.Models;
 using Equinor.ProCoSys.BusSenderWorker.Infrastructure.Data;
+using Equinor.ProCoSys.Common.Time;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
@@ -29,4 +31,14 @@ public class BusEventRepository : IBusEventRepository
             .ToListAsync();
         return events;
     }
+
+    public async Task<long> GetUnProcessedCount() => 
+        await _busEvents.Where(e => e.Status == Status.UnProcessed)
+            .CountAsync();
+
+    public async Task<DateTime> GetOldestEvent() =>
+        await _busEvents.Where(e => e.Status == Status.UnProcessed)
+            .OrderBy(e => e.Created)
+            .Select(e => e.Created)
+            .FirstOrDefaultAsync();
 }

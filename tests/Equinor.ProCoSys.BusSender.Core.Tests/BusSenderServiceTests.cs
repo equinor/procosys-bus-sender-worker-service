@@ -32,6 +32,7 @@ public class BusSenderServiceTests
     private List<ServiceBusMessage> _messagesInTopicClient4;
     private ServiceBusMessageBatch _mockWoMessageBatch;
     private Mock<ITagDetailsRepository> _tagDetailsRepositoryMock;
+    private Mock<IQueueMonitorService> _queueMonitorService;
 
     private Mock<ServiceBusSender> _topicClientMock1,
         _topicClientMock2,
@@ -43,6 +44,7 @@ public class BusSenderServiceTests
     public void Setup()
     {
         _busSender = new PcsBusSender();
+        _queueMonitorService = new Mock<IQueueMonitorService>();
         _topicClientMock1 = new Mock<ServiceBusSender>();
         _topicClientMock1.Setup(t => t.CreateMessageBatchAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(() => ServiceBusModelFactory.ServiceBusMessageBatch(1000, new List<ServiceBusMessage>()));
@@ -98,7 +100,7 @@ public class BusSenderServiceTests
         _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk()).Returns(() => Task.FromResult(_busEvents));
         _dut = new BusSenderService(_busSender, _busEventRepository.Object, _iUnitOfWork.Object,
             new Mock<ILogger<BusSenderService>>().Object,
-            new Mock<ITelemetryClient>().Object, _busEventServiceMock.Object);
+            new Mock<ITelemetryClient>().Object, _busEventServiceMock.Object, _queueMonitorService.Object);
     }
     
     [TestMethod]

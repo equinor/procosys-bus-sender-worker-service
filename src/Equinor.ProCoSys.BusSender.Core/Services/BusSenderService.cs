@@ -23,6 +23,7 @@ public class BusSenderService : IBusSenderService
     private readonly ILogger<BusSenderService> _logger;
     private readonly IPcsBusSender _pcsBusSender;
     private readonly IBusEventService _service;
+    private readonly IQueueMonitorService _queueMonitor;
     private readonly Stopwatch _sw;
     private readonly ITelemetryClient _telemetryClient;
     private readonly IUnitOfWork _unitOfWork;
@@ -32,7 +33,8 @@ public class BusSenderService : IBusSenderService
         IUnitOfWork unitOfWork,
         ILogger<BusSenderService> logger,
         ITelemetryClient telemetryClient,
-        IBusEventService service)
+        IBusEventService service,
+        IQueueMonitorService queueMonitor)
     {
         _pcsBusSender = pcsBusSender;
         _busEventRepository = busEventRepository;
@@ -40,6 +42,7 @@ public class BusSenderService : IBusSenderService
         _logger = logger;
         _telemetryClient = telemetryClient;
         _service = service;
+        _queueMonitor = queueMonitor;
         _sw = new Stopwatch();
     }
 
@@ -53,6 +56,8 @@ public class BusSenderService : IBusSenderService
     {
         try
         {
+            await _queueMonitor.WriteQueueMetrics();
+
             _sw.Start();
             var events = await _busEventRepository.GetEarliestUnProcessedEventChunk();
             if (events.Any())
