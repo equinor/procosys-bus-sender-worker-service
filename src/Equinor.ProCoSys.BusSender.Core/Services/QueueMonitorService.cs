@@ -29,12 +29,12 @@ public class QueueMonitorService : IQueueMonitorService
         if (IsTimeToWriteQueueMetric(lastQueueWrite))
         {
             await WriteQueueLength();
-            await WriteWaitTime();
+            await WriteQueueAge();
             _configuration["LastQueueWrite"] = TimeService.UtcNow.ToString("O");
         }
     }
 
-    private async Task WriteWaitTime()
+    private async Task WriteQueueAge()
     {
         var queueOldestEvent = await _busEventRepository.GetOldestEvent();
         

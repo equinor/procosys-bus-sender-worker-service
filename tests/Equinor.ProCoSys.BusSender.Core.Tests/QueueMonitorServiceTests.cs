@@ -90,7 +90,7 @@ public class QueueMonitorServiceTests
     }
 
     [TestMethod]
-    public async Task WriteQueueMetrics_IfNoEventsFound_ShouldUseCurrentTimeForWaitTime()
+    public async Task WriteQueueMetrics_IfNoEventsFound_ShouldWriteQueueAgeAsZero()
     {
         // Arrange
         TimeService.SetProvider(new ManualTimeProvider(new DateTime(2020, 1, 1, 12, 10, 0, DateTimeKind.Utc)));
