@@ -1,18 +1,14 @@
-﻿using Equinor.ProCoSys.Common.Time;
-using System;
+﻿using System;
+using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 
 namespace Equinor.ProCoSys.BusSenderWorker.Core.Tests;
-public class ManualTimeProvider : ITimeProvider
+public class ManualTimeProvider : ISystemClock
 {
-    public ManualTimeProvider(DateTime now)
-    {
-        if (now.Kind != DateTimeKind.Utc)
-        {
-            throw new ArgumentException("Must be UTC");
-        }
-
-        UtcNow = now;
-    }
 
     public DateTime UtcNow { get; private set; }
+
+    public void Set(DateTime now)
+    {
+        UtcNow = now;
+    }
 }

@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 using Equinor.ProCoSys.BusSenderWorker.Core.Services;
 using Equinor.ProCoSys.BusSenderWorker.Core.Telemetry;
-using Equinor.ProCoSys.Common.Time;
 using Microsoft.Extensions.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -16,6 +15,7 @@ public class QueueMonitorServiceTests
 {
     private Mock<ITelemetryClient> _mockTelemetryClient;
     private Mock<IBusEventRepository> _mockBusEventRepository;
+    private ManualTimeProvider _manualTimeProvider;
     private QueueMonitorService _dut;
     private IConfiguration _configuration;
 
@@ -24,6 +24,7 @@ public class QueueMonitorServiceTests
     {
         _mockTelemetryClient = new Mock<ITelemetryClient>();
         _mockBusEventRepository = new Mock<IBusEventRepository>();
+        _manualTimeProvider = new ManualTimeProvider();
 
         var inMemorySettings = new Dictionary<string, string> {
             {"QueueWriteIntervalMinutes", "15"},
@@ -35,15 +36,17 @@ public class QueueMonitorServiceTests
         _dut = new QueueMonitorService(
             _mockTelemetryClient.Object,
             _mockBusEventRepository.Object,
-            _configuration);
+            _configuration,
+            _manualTimeProvider);
     }
 
     [TestMethod]
     public async Task WriteQueueMetrics_ShouldWriteQueueLengthAndAge()
     {
         // Arrange
-        TimeService.SetProvider(new ManualTimeProvider(new DateTime(2020, 1, 1, 12, 0, 0, DateTimeKind.Utc)));
-        var fakeDateTime = TimeService.UtcNow;
+        //TimeService.SetProvider(new ManualTimeProvider(new DateTime(2020, 1, 1, 12, 0, 0, DateTimeKind.Utc)));
+        _manualTimeProvider.Set(new DateTime(2020, 1, 1, 12, 0, 0, DateTimeKind.Utc));
+        var fakeDateTime = _manualTimeProvider.UtcNow;
         _mockBusEventRepository
             .Setup(m => m.GetUnProcessedCount())
             .ReturnsAsync(10); 
@@ -64,11 +67,11 @@ public class QueueMonitorServiceTests
     {
         // Arrange
         var initialDateTime = new DateTime(2020, 1, 1, 12, 10, 0, DateTimeKind.Utc);
-        TimeService.SetProvider(new ManualTimeProvider(initialDateTime)); 
+        _manualTimeProvider.Set(initialDateTime); 
 
         // Act
         await _dut.WriteQueueMetrics();
-        TimeService.SetProvider(new ManualTimeProvider(initialDateTime.AddMinutes(50))); 
+        _manualTimeProvider.Set(initialDateTime.AddMinutes(50)); 
         await _dut.WriteQueueMetrics();
 
         // Assert
@@ -79,7 +82,7 @@ public class QueueMonitorServiceTests
     public async Task WriteQueueMetrics_WhenElapsedIsLessThanSpecified_ShouldNotWriteQueueLengthAndAge()
     {
         // Arrange
-        TimeService.SetProvider(new ManualTimeProvider(new DateTime(2020, 1, 1, 12, 10, 0, DateTimeKind.Utc))); 
+        _manualTimeProvider.Set(new DateTime(2020, 1, 1, 12, 10, 0, DateTimeKind.Utc)); 
 
         // Act
         await _dut.WriteQueueMetrics();//Always write the first time
@@ -93,7 +96,7 @@ public class QueueMonitorServiceTests
     public async Task WriteQueueMetrics_IfNoEventsFound_ShouldWriteQueueAgeAsZero()
     {
         // Arrange
-        TimeService.SetProvider(new ManualTimeProvider(new DateTime(2020, 1, 1, 12, 10, 0, DateTimeKind.Utc)));
+        _manualTimeProvider.Set(new DateTime(2020, 1, 1, 12, 10, 0, DateTimeKind.Utc));
 
         _mockBusEventRepository.Setup(m => m.GetOldestEvent())
             .ReturnsAsync(DateTime.MinValue); // Mock no events found

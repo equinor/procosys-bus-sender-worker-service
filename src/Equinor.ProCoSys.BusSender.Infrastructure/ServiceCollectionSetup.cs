@@ -3,7 +3,6 @@ using Equinor.ProCoSys.BusSenderWorker.Core.Services;
 using Equinor.ProCoSys.BusSenderWorker.Core.Telemetry;
 using Equinor.ProCoSys.BusSenderWorker.Infrastructure.Data;
 using Equinor.ProCoSys.BusSenderWorker.Infrastructure.Repositories;
-using Equinor.ProCoSys.Common.Time;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -38,13 +37,12 @@ public static class ServiceCollectionSetup
 
     public static IServiceCollection AddServices(this IServiceCollection services)
     {
-        TimeService.SetProvider((ITimeProvider)new SystemTimeProvider());
-
         return services.AddSingleton<IEntryPointService, EntryPointService>()
             .AddScoped<ITelemetryClient, ApplicationInsightsTelemetryClient>()
             .AddScoped<IBusSenderService, BusSenderService>()
             .AddScoped<IBusEventService, BusEventService>()
             .AddScoped<IQueueMonitorService, QueueMonitorService>()
+            .AddScoped<ISystemClock, TimeService>()
             .AddScoped<IEventRepository, EventRepository>();
     }
 }

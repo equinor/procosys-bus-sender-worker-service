@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 using Equinor.ProCoSys.BusSenderWorker.Core.Telemetry;
-using Equinor.ProCoSys.Common.Time;
 using Microsoft.Extensions.Configuration;
 
 namespace Equinor.ProCoSys.BusSenderWorker.Core.Services;
@@ -12,25 +11,27 @@ public class QueueMonitorService : IQueueMonitorService
     private readonly ITelemetryClient _telemetryClient;
     private readonly IBusEventRepository _busEventRepository;
     private readonly IConfiguration _configuration;
+    private readonly ISystemClock _systemClock;
     private readonly int _queueWriteIntervalMinutes;
 
 
-    public QueueMonitorService(ITelemetryClient telemetryClient, IBusEventRepository busEventRepository, IConfiguration configuration)
+    public QueueMonitorService(ITelemetryClient telemetryClient, IBusEventRepository busEventRepository, IConfiguration configuration, ISystemClock systemClock)
     {
         _telemetryClient = telemetryClient;
         _busEventRepository = busEventRepository;
         _configuration = configuration;
-        _queueWriteIntervalMinutes = configuration.GetValue("MonitorQueueIntervalMinutes", 15);
+        _systemClock = systemClock;
+        _queueWriteIntervalMinutes = string.IsNullOrWhiteSpace(configuration["MonitorQueueIntervalMinutes"]) ? 15 : int.Parse(configuration["MonitorQueueIntervalMinutes"]);
     }
 
     public async Task WriteQueueMetrics()
     {
-        var lastQueueWrite = _configuration.GetValue<DateTime>("LastQueueWrite", default);
+        var lastQueueWrite = string.IsNullOrWhiteSpace(_configuration["LastQueueWrite"]) ? default : DateTime.Parse(_configuration["LastQueueWrite"]);
         if (IsTimeToWriteQueueMetric(lastQueueWrite))
         {
             await WriteQueueLength();
             await WriteQueueAge();
-            _configuration["LastQueueWrite"] = TimeService.UtcNow.ToString("O");
+            _configuration["LastQueueWrite"] = _systemClock.UtcNow.ToString("O");
         }
     }
 
@@ -40,10 +41,10 @@ public class QueueMonitorService : IQueueMonitorService
         
         if(NoEventFound(queueOldestEvent))
         {
-            queueOldestEvent = TimeService.UtcNow;
+            queueOldestEvent = _systemClock.UtcNow;
         }      
 
-        var waitTime = TimeService.UtcNow - queueOldestEvent;
+        var waitTime = _systemClock.UtcNow - queueOldestEvent;
         _telemetryClient.TrackMetric("QueueAge", waitTime.TotalMinutes);
     }
 
@@ -54,7 +55,7 @@ public class QueueMonitorService : IQueueMonitorService
     }
 
     private bool IsTimeToWriteQueueMetric(DateTime lastQueueWrite) =>
-        TimeService.UtcNow >= lastQueueWrite.ToUniversalTime().AddMinutes(_queueWriteIntervalMinutes);
+        _systemClock.UtcNow >= lastQueueWrite.ToUniversalTime().AddMinutes(_queueWriteIntervalMinutes);
 
     private bool NoEventFound(DateTime oldestEvent) => 
         oldestEvent.Equals(default);
