@@ -77,7 +77,7 @@ stages:
             inputs:
               restoreSolution: '**/*.sln'
               feedsToUse: 'select'
-              nugetConfigPath: 'nuget.config'
+              nugetConfigPath: './nuget.config'
           - task: DotNetCoreCLI@2
             inputs:
               command: test
