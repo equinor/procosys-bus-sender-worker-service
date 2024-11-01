@@ -6,7 +6,6 @@ using Equinor.ProCoSys.BusSenderWorker.Core;
 using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 using Equinor.ProCoSys.BusSenderWorker.Core.Models;
 using Equinor.ProCoSys.BusSenderWorker.Infrastructure.Data;
-using Equinor.ProCoSys.Common.Time;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 

@@ -11,7 +11,7 @@ public class QueueMonitorService : IQueueMonitorService
 {
     private readonly ITelemetryClient _telemetryClient;
     private readonly IBusEventRepository _busEventRepository;
-    private DateTime _lastQueueWrite = DateTime.MinValue;
+    private readonly IConfiguration _configuration;
     private readonly int _queueWriteIntervalMinutes;
 
 
@@ -19,16 +19,18 @@ public class QueueMonitorService : IQueueMonitorService
     {
         _telemetryClient = telemetryClient;
         _busEventRepository = busEventRepository;
-        _queueWriteIntervalMinutes = configuration.GetValue("QueueWriteIntervalMinutes", 15);
+        _configuration = configuration;
+        _queueWriteIntervalMinutes = configuration.GetValue("MonitorQueueIntervalMinutes", 15);
     }
 
     public async Task WriteQueueMetrics()
     {
-        if (ShouldWriteQueueMetrics())
+        var lastQueueWrite = _configuration.GetValue<DateTime>("LastQueueWrite", default);
+        if (IsTimeToWriteQueueMetric(lastQueueWrite))
         {
             await WriteQueueLength();
             await WriteWaitTime();
-            _lastQueueWrite = TimeService.UtcNow;
+            _configuration["LastQueueWrite"] = TimeService.UtcNow.ToString("O");
         }
     }
 
@@ -42,7 +44,7 @@ public class QueueMonitorService : IQueueMonitorService
         }      
 
         var waitTime = TimeService.UtcNow - queueOldestEvent;
-        _telemetryClient.TrackMetric("QueueAge", waitTime.Minutes);
+        _telemetryClient.TrackMetric("QueueAge", waitTime.TotalMinutes);
     }
 
     private async Task WriteQueueLength()
@@ -51,15 +53,9 @@ public class QueueMonitorService : IQueueMonitorService
         _telemetryClient.TrackMetric("QueueLength", queueLength);
     }
 
-    private bool ShouldWriteQueueMetrics() =>
-        IsFirstQueueWrite() || IsTimeToWriteQueueMetric();
+    private bool IsTimeToWriteQueueMetric(DateTime lastQueueWrite) =>
+        TimeService.UtcNow >= lastQueueWrite.ToUniversalTime().AddMinutes(_queueWriteIntervalMinutes);
 
-    private bool IsTimeToWriteQueueMetric() =>
-        TimeService.UtcNow >= _lastQueueWrite.AddMinutes(_queueWriteIntervalMinutes);
-
-    private bool IsFirstQueueWrite() =>
-        _lastQueueWrite.Equals(DateTime.MinValue);
-
-    private static bool NoEventFound(DateTime oldestEvent) => 
+    private bool NoEventFound(DateTime oldestEvent) => 
         oldestEvent.Equals(default);
 }

@@ -39,7 +39,7 @@ public class QueueMonitorServiceTests
     }
 
     [TestMethod]
-    public async Task WriteQueueMetrics_WhenFirstTime_ShouldWriteQueueLengthAndAge()
+    public async Task WriteQueueMetrics_ShouldWriteQueueLengthAndAge()
     {
         // Arrange
         TimeService.SetProvider(new ManualTimeProvider(new DateTime(2020, 1, 1, 12, 0, 0, DateTimeKind.Utc)));
@@ -49,14 +49,14 @@ public class QueueMonitorServiceTests
             .ReturnsAsync(10); 
         _mockBusEventRepository
             .Setup(m => m.GetOldestEvent())
-            .ReturnsAsync(fakeDateTime.AddMinutes(-30));
+            .ReturnsAsync(fakeDateTime.AddMinutes(-1470));
 
         // Act
         await _dut.WriteQueueMetrics();
 
         // Assert
         _mockTelemetryClient.Verify(t => t.TrackMetric("QueueLength", 10), Times.Once);
-        _mockTelemetryClient.Verify(t => t.TrackMetric("QueueAge", 30), Times.Once);
+        _mockTelemetryClient.Verify(t => t.TrackMetric("QueueAge", 1470), Times.Once);
     }
 
     [TestMethod]
