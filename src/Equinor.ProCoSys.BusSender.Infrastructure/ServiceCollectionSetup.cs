@@ -36,9 +36,13 @@ public static class ServiceCollectionSetup
             .AddScoped<ITagDetailsRepository, TagDetailsRepository>();
 
     public static IServiceCollection AddServices(this IServiceCollection services)
-        => services.AddSingleton<IEntryPointService, EntryPointService>()
+    {
+        return services.AddSingleton<IEntryPointService, EntryPointService>()
             .AddScoped<ITelemetryClient, ApplicationInsightsTelemetryClient>()
             .AddScoped<IBusSenderService, BusSenderService>()
             .AddScoped<IBusEventService, BusEventService>()
+            .AddScoped<IQueueMonitorService, QueueMonitorService>()
+            .AddScoped<ISystemClock, TimeService>()
             .AddScoped<IEventRepository, EventRepository>();
+    }
 }
