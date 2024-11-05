@@ -147,7 +147,7 @@ public class BusSenderService : IBusSenderService
     private static async Task CreateAndSetMessage(BusEvent busEvent, Func<string, Task<string?>> createMessageFunction)
     {
         var message = await createMessageFunction(busEvent.Message);
-        if (message == null)
+        if (string.IsNullOrEmpty(message) || message == "null")
         {
             busEvent.Status = Status.NotFound;
         }
