@@ -161,15 +161,26 @@ public class BusSenderServiceTests
             { Event = WoChecklistTopic.TopicName, Message = "10001,1003", Status = Status.UnProcessed };
         var wcl3 = new BusEvent
             { Event = WoChecklistTopic.TopicName, Message = "1003,10001", Status = Status.UnProcessed };
-
+        
+        
         _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk())
             .Returns(() => Task.FromResult(new List<BusEvent> { wcl1, wcl2, wcl3 }));
+      
+        _dapperRepositoryMock.Setup(d => d.QuerySingle<WorkOrderChecklistEvent>(It.IsAny<(string,DynamicParameters)>(), It.IsAny<string>()))
+            .ReturnsAsync(()=>new WorkOrderChecklistEvent
+            {
+                Plant = "AnyValidPlant",
+                ProjectName = "AnyProjectName",
+                WoNo = "SomeWoNo"
+            });
+           
 
         var topicClientMockWoCl = new Mock<ServiceBusSender>();
         _busSender.Add(WoChecklistTopic.TopicName, topicClientMockWoCl.Object);
         var woClMessageBatch = ServiceBusModelFactory.ServiceBusMessageBatch(1000, new List<ServiceBusMessage>());
         topicClientMockWoCl.Setup(t => t.CreateMessageBatchAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(() => woClMessageBatch);
+        
 
         //Act
         await _dut.HandleBusEvents();
@@ -195,6 +206,13 @@ public class BusSenderServiceTests
         var batch = ServiceBusModelFactory.ServiceBusMessageBatch(1000, new List<ServiceBusMessage>());
         topicClientMock.Setup(t => t.CreateMessageBatchAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(() => batch);
+        
+        _dapperRepositoryMock.Setup(d => d.QuerySingle<LibraryFieldEvent>(It.IsAny<(string,DynamicParameters)>(), It.IsAny<string>()))
+            .ReturnsAsync(()=>new LibraryFieldEvent()
+            {
+                Plant = "AnyValidPlant",
+                ProCoSysGuid = Guid.NewGuid()
+            });
 
         //Act
         await _dut.HandleBusEvents();
@@ -240,20 +258,20 @@ public class BusSenderServiceTests
         var wo2 = new BusEvent { Event = WorkOrderTopic.TopicName, Message = "10000", Status = Status.UnProcessed };
         var wo3 = new BusEvent { Event = WorkOrderTopic.TopicName, Message = "10001", Status = Status.UnProcessed };
 
-        var wo = new WorkOrderEvent { Plant = "AnyValidPlant", ProjectName = "AnyProjectName", WoNo = "SomeWoNo" };
+        var workOrderEvent = new WorkOrderEvent { Plant = "AnyValidPlant", ProjectName = "AnyProjectName", WoNo = "SomeWoNo" };
 
 
         _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk())
             .Returns(() => Task.FromResult(new List<BusEvent> { wo1, wo2, wo3 }));
         _dapperRepositoryMock.Setup(wr => wr.QuerySingle<WorkOrderEvent>(
-                It.IsAny<(string queryString, DynamicParameters parameters)>(), wo1.ToString()))
-            .Returns(() => Task.FromResult(wo));
+                It.IsAny<(string queryString, DynamicParameters parameters)>(), wo1.Message))
+            .ReturnsAsync(() => workOrderEvent);
         _dapperRepositoryMock.Setup(wr => wr.QuerySingle<WorkOrderEvent>(
-                It.IsAny<(string queryString, DynamicParameters parameters)>(), wo2.ToString()))
-            .Returns(() => Task.FromResult(wo));
+                It.IsAny<(string queryString, DynamicParameters parameters)>(), wo2.Message))
+            .ReturnsAsync(() => workOrderEvent);
         _dapperRepositoryMock.Setup(wr => wr.QuerySingle<WorkOrderEvent>(
-                It.IsAny<(string queryString, DynamicParameters parameters)>(), wo3.ToString()))
-            .Returns(() => Task.FromResult(wo));
+                It.IsAny<(string queryString, DynamicParameters parameters)>(), wo3.Message))
+            .ReturnsAsync(() => workOrderEvent);
 
         //Act
         await _dut.HandleBusEvents();
@@ -324,13 +342,13 @@ public class BusSenderServiceTests
         _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk())
             .Returns(() => Task.FromResult(new List<BusEvent> { wo1, wo2, wo3 }));
         _dapperRepositoryMock.Setup(wr => wr.QuerySingle<WorkOrderEvent>(
-                It.IsAny<(string queryString, DynamicParameters parameters)>(), wo1.ToString()))
+                It.IsAny<(string queryString, DynamicParameters parameters)>(), wo1.Message))
             .Returns(() => Task.FromResult(wo));
         _dapperRepositoryMock.Setup(wr => wr.QuerySingle<WorkOrderEvent>(
-                It.IsAny<(string queryString, DynamicParameters parameters)>(), wo2.ToString()))
+                It.IsAny<(string queryString, DynamicParameters parameters)>(), wo2.Message))
             .Returns(() => Task.FromResult(wo));
         _dapperRepositoryMock.Setup(wr => wr.QuerySingle<WorkOrderEvent>(
-                It.IsAny<(string queryString, DynamicParameters parameters)>(), wo3.ToString()))
+                It.IsAny<(string queryString, DynamicParameters parameters)>(), wo3.Message))
             .Returns(() => Task.FromResult(wo));
 
         //Act
