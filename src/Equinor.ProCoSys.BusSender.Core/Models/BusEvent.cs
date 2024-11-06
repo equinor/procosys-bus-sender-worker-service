@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Text.Json.Serialization;
 
 #pragma warning disable CS8618
 
@@ -11,8 +10,8 @@ public class BusEvent
     public string Event { get; set; }
     public string Message { get; set; }
     public DateTime Created { get; init; }
-    
     public Status Status { get; set; }
+    public string Plant {  get; set; }
 
     //untracked
     public string? MessageToSend { get; set; }
