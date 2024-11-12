@@ -38,7 +38,7 @@ public static class QueryHelper
 
         if (guid != null && plant != null)
         {
-            whereClause = $"where {shortHand}.ProjectSchema=:Plant AND {shortHand}.{idColumn}=:Guid";
+            whereClause = $"where {shortHand}.ProjectSchema=:Plant AND {shortHand}.{idColumn}=hextoraw(:Guid)";
             parameters.Add(":Plant", plant);
             parameters.Add(":Guid", guid);
         }
@@ -49,7 +49,7 @@ public static class QueryHelper
         }
         else if (guid != null)
         {
-            whereClause = $"where {shortHand}.{idColumn}=:Guid";
+            whereClause = $"where {shortHand}.{idColumn}=hextoraw(:Guid)";
             parameters.Add(":Guid", guid);
         }
 
