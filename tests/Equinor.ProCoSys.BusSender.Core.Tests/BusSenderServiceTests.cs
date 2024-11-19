@@ -77,6 +77,7 @@ public class BusSenderServiceTests
                 Event = "topic2",
                 Status = Status.UnProcessed,
                 Id = 1,
+                Plant = "NGPCS_TEST_BROWN",
                 Message = "{\"Plant\":\"NGPCS_TEST_BROWN\",\"ProjectName\":\"Message 10 minutes ago not sent\"}"
             },
             new()
@@ -85,6 +86,7 @@ public class BusSenderServiceTests
                 Event = "topic3",
                 Status = Status.UnProcessed,
                 Id = 1,
+                Plant = "PCS$HF_LNG",
                 Message =
                     "{\"Plant\" : \"PCS$HF_LNG\", \"Responsible\" : \"8460-E015\", \"Description\" : \"	Installere bonding til JBer ved V8 område\"}"
             }

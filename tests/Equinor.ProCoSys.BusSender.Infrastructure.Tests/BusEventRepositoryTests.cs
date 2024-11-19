@@ -37,17 +37,17 @@ public class BusEventRepositoryTests : RepositoryTestBase
     {
         _earliestEvent = new BusEvent
         {
-            Created = DateTime.Now.AddMinutes(-105), Event = "T", Status = Status.UnProcessed, Id = 1,
+            Created = DateTime.Now.AddMinutes(-105), Event = "T", Status = Status.UnProcessed, Id = 1, Plant = "PCS$Plant",
             Message = "Message 105 minutes ago not sent"
         };
         _latestEvent = new BusEvent
         {
-            Created = DateTime.Now.AddMinutes(-1), Event = "T", Status = Status.UnProcessed, Id = 7,
+            Created = DateTime.Now.AddMinutes(-1), Event = "T", Status = Status.UnProcessed, Id = 7, Plant = "PCS$Plant",
             Message = "Message 1 minutes ago not sent"
         };
         _secondToLatestEvent = new BusEvent
         {
-            Created = DateTime.Now.AddMinutes(-2), Event = "T", Status = Status.UnProcessed, Id = 6,
+            Created = DateTime.Now.AddMinutes(-2), Event = "T", Status = Status.UnProcessed, Id = 6, Plant = "PCS$Plant",
             Message = "Message 2 minutes ago not sent"
         };
 
@@ -55,24 +55,24 @@ public class BusEventRepositoryTests : RepositoryTestBase
         {
             new()
             {
-                Created = DateTime.Now.AddMinutes(-10), Event = "T", Status = Status.UnProcessed, Id = 5,
+                Created = DateTime.Now.AddMinutes(-10), Event = "T", Status = Status.UnProcessed, Id = 5, Plant = "PCS$Plant",
                 Message = "Message 10 minutes ago not sent"
             },
             _latestEvent,
             _secondToLatestEvent,
             new()
             {
-                Created = DateTime.Now.AddMinutes(-100), Event = "T", Status = Status.UnProcessed, Id = 2,
+                Created = DateTime.Now.AddMinutes(-100), Event = "T", Status = Status.UnProcessed, Id = 2, Plant = "PCS$Plant",
                 Message = "Message 100 minutes ago not sent"
             },
             new()
             {
-                Created = DateTime.Now.AddMinutes(-80), Event = "T", Status = Status.Failed, Id = 3,
+                Created = DateTime.Now.AddMinutes(-80), Event = "T", Status = Status.Failed, Id = 3, Plant = "PCS$Plant",
                 Message = "Message 80 minutes ago sent"
             },
             new()
             {
-                Created = DateTime.Now.AddMinutes(-30), Event = "T", Status = Status.UnProcessed, Id = 4,
+                Created = DateTime.Now.AddMinutes(-30), Event = "T", Status = Status.UnProcessed, Id = 4, Plant = "PCS$Plant",
                 Message = "Message 30 minutes ago not sent"
             },
             _earliestEvent
