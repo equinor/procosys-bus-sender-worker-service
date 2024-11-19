@@ -11,7 +11,7 @@ public class BusEvent
     public string Message { get; set; }
     public DateTime Created { get; init; }
     public Status Status { get; set; }
-    public string Plant {  get; set; }
+    public string? Plant {  get; set; }
 
     //untracked
     public string? MessageToSend { get; set; }
