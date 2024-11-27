@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 
 namespace Equinor.ProCoSys.PcsServiceBus.Queries;
+
 public class WorkOrderCutoffQuery
 {
     /// <summary>
