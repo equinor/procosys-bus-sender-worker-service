@@ -1,7 +1,7 @@
 ﻿using Dapper;
 using System.Collections.Generic;
 
-namespace Infrastructure.Repositories.SearchQueries;
+namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 public class WorkOrderCutoffQuery
 {
     /// <summary>
@@ -21,7 +21,7 @@ public class WorkOrderCutoffQuery
         if (cutoffWeek != null)
         {
             whereClause.parameters.Add(":CutoffWeek", cutoffWeek);
-            whereClause.clause += " and wc.cutoffweek <= :CutoffWeek and nvl(wc.cutoffweek_to, wc.cutoffweek) >= :CutoffWeek";
+            whereClause.clause += " and ((wc.cutoffweek = :CutoffWeek and wc.cutoffweek_to is null) or wc.cutoffweek_to = :CutoffWeek)";
         }
         if (weekNumber != null)
         {
