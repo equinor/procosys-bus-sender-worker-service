@@ -1,5 +1,5 @@
-﻿using Dapper;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Dapper;
 
 namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 
