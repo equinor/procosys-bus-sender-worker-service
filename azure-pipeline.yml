@@ -60,6 +60,13 @@ stages:
           solution: '**/*.sln'
           sourceFolder: '$(System.DefaultWorkingDirectory)/src/$(projectName)/bin/$(buildConfiguration)/net6.0'
           targetFolder: '$(Build.BinariesDirectory)/build/App_Data/jobs/continuous/$(projectName)'
+          testSelector: 'testAssemblies'
+          testAssemblyVer2: |
+            **/*.Specs/bin/$(buildConfiguration)/*.Specs.dll
+          testArtifactName: 'test'
+          testInstances:
+            - ServiceA
+            - ServiceB
           versionSpec: '6.7.0'
           projectName: '$(projectName)'
 

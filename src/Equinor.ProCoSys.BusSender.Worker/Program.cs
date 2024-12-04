@@ -40,6 +40,7 @@ public class Program
                                 kv.SetCredential(new DefaultAzureCredential());
                             })
                             .Select(KeyFilter.Any)
+                            .Select(KeyFilter.Any, settings["InstanceName"])
                             .Select(KeyFilter.Any, context.HostingEnvironment.EnvironmentName)
                             .ConfigureRefresh(refreshOptions =>
                             {
@@ -71,6 +72,7 @@ public class Program
                                 opt.SetCacheExpiration(TimeSpan.FromMinutes(5));
                             })
                             .Select(KeyFilter.Any)
+                            .Select(KeyFilter.Any, settings["InstanceName"])
                             .Select(KeyFilter.Any, settings["Azure:AppConfigLabelFilter"]);
                     });
                 }
@@ -92,6 +94,7 @@ public class Program
                                 opt.SetCacheExpiration(TimeSpan.FromMinutes(5));
                             })
                             .Select(KeyFilter.Any)
+                            .Select(KeyFilter.Any, settings["InstanceName"])
                             .Select(KeyFilter.Any, settings["Azure:AppConfigLabelFilter"]);
                     });
                 }
