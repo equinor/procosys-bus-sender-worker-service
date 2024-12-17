@@ -17,6 +17,7 @@ public class BusEventRepository : IBusEventRepository
     private readonly DbSet<BusEvent> _busEvents;
     private readonly int _messageChunkSize;
     private readonly List<string> _plants;
+    private readonly string _instanceName;
     private const string Plant = "PLANT";
     private const string NoPlant = "NOPLANT";
 
@@ -26,6 +27,7 @@ public class BusEventRepository : IBusEventRepository
         _messageChunkSize = int.Parse(configuration["MessageChunkSize"]?? "200");
         _busEvents = context.BusEvents;
         _plants = GetPlantsFromConfiguration(configuration);
+        _instanceName = configuration["InstanceName"]??"UNIQUE";
     }
 
     public async Task<List<BusEvent>> GetEarliestUnProcessedEventChunk()

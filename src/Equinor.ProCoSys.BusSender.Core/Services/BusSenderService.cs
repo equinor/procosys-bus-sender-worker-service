@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
@@ -13,6 +14,8 @@ using Equinor.ProCoSys.BusSenderWorker.Core.Models;
 using Equinor.ProCoSys.BusSenderWorker.Core.Telemetry;
 using Equinor.ProCoSys.PcsServiceBus.Sender.Interfaces;
 using Equinor.ProCoSys.PcsServiceBus.Topics;
+using Microsoft.ApplicationInsights;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace Equinor.ProCoSys.BusSenderWorker.Core.Services;
@@ -27,6 +30,7 @@ public class BusSenderService : IBusSenderService
     private readonly Stopwatch _sw;
     private readonly ITelemetryClient _telemetryClient;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly string? _instanceName;
 
     public BusSenderService(IPcsBusSender pcsBusSender,
         IBusEventRepository busEventRepository,
@@ -34,7 +38,8 @@ public class BusSenderService : IBusSenderService
         ILogger<BusSenderService> logger,
         ITelemetryClient telemetryClient,
         IBusEventService service,
-        IQueueMonitorService queueMonitor)
+        IQueueMonitorService queueMonitor,
+        IConfiguration configuration)
     {
         _pcsBusSender = pcsBusSender;
         _busEventRepository = busEventRepository;
@@ -43,6 +48,7 @@ public class BusSenderService : IBusSenderService
         _telemetryClient = telemetryClient;
         _service = service;
         _queueMonitor = queueMonitor;
+        _instanceName = configuration["InstanceName"];
         _sw = new Stopwatch();
     }
 
@@ -100,7 +106,7 @@ public class BusSenderService : IBusSenderService
                 {
                     var m = messages.Dequeue();
                     m.Status = Status.Sent;
-                    TrackMessage(m, msgId, msgBody);
+                    TrackMessage(m, msgId, msgBody, _instanceName);
                 }
                 else
                 {
@@ -112,7 +118,7 @@ public class BusSenderService : IBusSenderService
                 {
                     var m = messages.Dequeue();
                     m.Status = Status.Sent;
-                    TrackMessage(m,messageId, messageBody);
+                    TrackMessage(m,messageId, messageBody, _instanceName);
                 }
 
                 _logger.LogDebug("Sending amount: {Count} after {Ms} ms", messageBatch.Count, _sw.ElapsedMilliseconds);
@@ -225,7 +231,7 @@ public class BusSenderService : IBusSenderService
         return events;
     }
 
-    private void TrackMessage(BusEvent busEvent, string busMessageMessageId, string busMessageBody)
+    private void TrackMessage(BusEvent busEvent, string busMessageMessageId, string busMessageBody, string? instanceName = null)
     {
         var busEventMessageToSend = busEvent.MessageToSend ?? busEvent.Message;
         var message = JsonSerializer.Deserialize<BusEventMessage>(_service.WashString(busEventMessageToSend)!,
@@ -243,6 +249,7 @@ public class BusSenderService : IBusSenderService
             {"ProjectName", message?.ProjectName ?? "NoProject"},
             {"Plant", message?.Plant ?? "NoPlant"},
             {"MessageId", busMessageMessageId ?? "NoID" },
+            {"InstanceName", instanceName ?? "Unique"},
             //Remove these after debugging
             {"BusEventMessageToSend", string.IsNullOrEmpty(message?.ProCoSysGuid) ? "MessageToSend: ( " + busEvent.MessageToSend + " )" : "N/A"  },
             {"BusEventMessage", string.IsNullOrEmpty(message?.ProCoSysGuid) ? busEvent.Message : "N/A" },
