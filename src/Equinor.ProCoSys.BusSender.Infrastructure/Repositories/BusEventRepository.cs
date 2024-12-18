@@ -6,6 +6,7 @@ using Equinor.ProCoSys.BusSenderWorker.Core;
 using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 using Equinor.ProCoSys.BusSenderWorker.Core.Models;
 using Equinor.ProCoSys.BusSenderWorker.Infrastructure.Data;
+using Equinor.ProCoSys.PcsServiceBus;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -17,17 +18,14 @@ public class BusEventRepository : IBusEventRepository
     private readonly DbSet<BusEvent> _busEvents;
     private readonly int _messageChunkSize;
     private readonly List<string> _plants;
-    private readonly string _instanceName;
-    private const string Plant = "PLANT";
-    private const string NoPlant = "NOPLANT";
-
+    private readonly string? _instanceName;
 
     public BusEventRepository(BusSenderServiceContext context, IConfiguration configuration)
     {
         _messageChunkSize = int.Parse(configuration["MessageChunkSize"]?? "200");
         _busEvents = context.BusEvents;
+        _instanceName = string.IsNullOrEmpty(configuration["InstanceName"]) ? PcsServiceBusInstanceConstants.DefaultInstanceName : configuration["InstanceName"];
         _plants = GetPlantsFromConfiguration(configuration);
-        _instanceName = configuration["InstanceName"]??"UNIQUE";
     }
 
     public async Task<List<BusEvent>> GetEarliestUnProcessedEventChunk()
@@ -50,15 +48,15 @@ public class BusEventRepository : IBusEventRepository
 
     private IQueryable<BusEvent> GetUnProcessedFilteredQueryable()
     {
-        if (_plants.Contains(Plant) && _plants.Contains(NoPlant))
+        if (_plants.Contains(PcsServiceBusInstanceConstants.Plant) && _plants.Contains(PcsServiceBusInstanceConstants.NoPlant))
         {
             return _busEvents.Where(e => e.Status == Status.UnProcessed);
         }
-        else if (_plants.Contains(Plant))
+        else if (_plants.Contains(PcsServiceBusInstanceConstants.Plant))
         {
             return _busEvents.Where(e => e.Status == Status.UnProcessed && e.Plant != null);
         }
-        else if (_plants.Contains(NoPlant))
+        else if (_plants.Contains(PcsServiceBusInstanceConstants.NoPlant))
         {
             return _busEvents.Where(e => e.Status == Status.UnProcessed && e.Plant == null);
         }
@@ -68,7 +66,7 @@ public class BusEventRepository : IBusEventRepository
         }
     }
 
-    private static List<string> GetPlantsFromConfiguration(IConfiguration configuration)
+    private List<string> GetPlantsFromConfiguration(IConfiguration configuration)
     {
         var plantsString = configuration["MessageSites"];
         if (!string.IsNullOrWhiteSpace(plantsString))
@@ -77,9 +75,12 @@ public class BusEventRepository : IBusEventRepository
         }
         else
         {
-            return new List<string> { Plant, NoPlant };
+            return new List<string> { PcsServiceBusInstanceConstants.Plant, PcsServiceBusInstanceConstants.NoPlant };
         }
     }
+
+    public string? GetInstanceName() => _instanceName;
+    public string GetPlants() => string.Join(",", _plants);
 
     // Validate plants during initialization?
 }
