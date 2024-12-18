@@ -48,7 +48,7 @@ public class BusSenderService : IBusSenderService
         _telemetryClient = telemetryClient;
         _service = service;
         _queueMonitor = queueMonitor;
-        _instanceName = configuration["InstanceName"];
+        _instanceName = configuration["InstanceName"]??"UNIQUE";
         _sw = new Stopwatch();
     }
 
