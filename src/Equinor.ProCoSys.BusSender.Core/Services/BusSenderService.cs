@@ -181,7 +181,7 @@ public class BusSenderService : IBusSenderService
         var dsw = Stopwatch.StartNew();
 
         var unProcessedEvents = events.Where(busEvent => busEvent.Status == Status.UnProcessed).ToList();
-        _logger.LogInformation("Amount of messages to process: {Count} ", unProcessedEvents.Count);
+        _logger.LogInformation("[{InstanceName}] Amount of messages to process: {Count} ", _busEventRepository.GetInstanceName(), unProcessedEvents.Count);
 
         foreach (var simpleUnprocessedBusEvent in unProcessedEvents.Where(e =>
                      IsSimpleMessage(e) || e.Event == TagTopic.TopicName))
@@ -189,7 +189,7 @@ public class BusSenderService : IBusSenderService
             await UpdateEventBasedOnTopic(simpleUnprocessedBusEvent);
         }
 
-        _logger.LogInformation("Update loop finished at at {Sw} ms", dsw.ElapsedMilliseconds);
+        _logger.LogInformation("[{InstanceName}] Update loop finished at at {Sw} ms", _busEventRepository.GetInstanceName(), dsw.ElapsedMilliseconds);
         await _unitOfWork.SaveChangesAsync();
 
 

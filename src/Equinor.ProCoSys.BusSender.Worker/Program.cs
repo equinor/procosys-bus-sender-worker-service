@@ -124,7 +124,7 @@ public class Program
                         hostContext.Configuration["BlobStorage:ContainerName"]!);
                     var walletPath = hostContext.Configuration["WalletFileDir"]!;
                     Directory.CreateDirectory(walletPath);
-                    rep.Download(hostContext.Configuration["BlobStorage:WalletFileName"]!, walletPath + "\\cwallet.sso");
+                    rep.Download(hostContext.Configuration["BlobStorage:WalletFileName"]!);
                     Console.WriteLine("Created wallet file at: " + walletPath);
                     var connectionString = hostContext.Configuration["ConnectionString"]!;
                     services.AddDbContext(connectionString);
