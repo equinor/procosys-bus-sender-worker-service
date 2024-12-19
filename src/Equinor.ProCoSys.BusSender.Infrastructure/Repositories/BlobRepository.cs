@@ -21,6 +21,11 @@ public class BlobRepository
         if (!info.Exists)
         {
             info.Create();
+            Console.WriteLine("Created wallet directory at: " + info.FullName);
+        }
+        else
+        {
+            Console.WriteLine("Wallet directory already exists at: " + info.FullName);
         }
 
         using (var outputFileStream = new FileStream("./Wallets/cwallet.sso", FileMode.Create))
