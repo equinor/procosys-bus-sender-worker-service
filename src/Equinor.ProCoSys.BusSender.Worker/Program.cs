@@ -1,7 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using Azure.Data.AppConfiguration;
+using Azure;
 using Azure.Identity;
+using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 using Equinor.ProCoSys.BusSenderWorker.Infrastructure;
 using Equinor.ProCoSys.BusSenderWorker.Infrastructure.Repositories;
 using Equinor.ProCoSys.PcsServiceBus;
@@ -10,6 +14,8 @@ using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using static Dapper.SqlMapper;
+using Equinor.ProCoSys.BusSenderWorker.Core.Services;
 
 namespace Equinor.ProCoSys.BusSender.Worker;
 
@@ -21,6 +27,7 @@ public class Program
 
     private static IHostBuilder CreateHostBuilder(string[] args)
     {
+
         var builder = Host.CreateDefaultBuilder(args)
             .ConfigureAppConfiguration((context, config) =>
             {
@@ -49,7 +56,6 @@ public class Program
                             });
                     });
                 }
-
                 else if (settings["IsLocal"] == "True" && azConfig)
                 {
                     config.AddAzureAppConfiguration(options =>
@@ -107,7 +113,7 @@ public class Program
 
             logging.AddApplicationInsightsWebJobs(c
                 => c.ConnectionString = context.Configuration["ApplicationInsights:ConnectionString"]);
-            
+
         });
 
         builder.UseContentRoot(Directory.GetCurrentDirectory())
@@ -125,7 +131,6 @@ public class Program
                     var walletPath = hostContext.Configuration["WalletFileDir"]!;
                     Directory.CreateDirectory(walletPath);
                     rep.Download(hostContext.Configuration["BlobStorage:WalletFileName"]!);
-                    Console.WriteLine("Created wallet file at: " + walletPath);
                     var connectionString = hostContext.Configuration["ConnectionString"]!;
                     services.AddDbContext(connectionString);
                     services.AddApplicationInsightsTelemetryWorkerService(o =>
@@ -146,6 +151,18 @@ public class Program
     public static async Task Main(string[] args)
     {
         using var host = CreateHostBuilder(args).Build();
+        using var scope = host.Services.CreateScope();
+        var plantService = scope.ServiceProvider.GetService<IPlantService>();
+        var plantRepository = scope.ServiceProvider.GetService<IPlantRepository>();
+        List<string> plants = new List<string>();
+
+        if (plantRepository != null)
+        {
+            plants = await plantRepository.GetAllPlantsAsync();
+        }
+
+        plantService?.RegisterPlantsHandledByCurrentInstance(host, plants);   
+
         ILogger? logger = host.Services.GetService<ILogger<Program>>();
         await host.RunAsync();
     }

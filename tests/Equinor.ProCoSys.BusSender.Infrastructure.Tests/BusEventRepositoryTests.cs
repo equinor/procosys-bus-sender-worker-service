@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Equinor.ProCoSys.BusSenderWorker.Core;
+using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 using Equinor.ProCoSys.BusSenderWorker.Core.Models;
 using Equinor.ProCoSys.BusSenderWorker.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -85,8 +86,8 @@ public class BusEventRepositoryTests : RepositoryTestBase
             .Setup(x => x.BusEvents)
             .Returns(_busEventSetMock.Object);
 
-        var configuration = new Mock<IConfiguration>();
-        configuration.Setup(c => c["MessageChunkSize"]).Returns("5");
+        var configuration = new Mock<IPlantService>();
+        configuration.Setup(c => c.GetConfiguration()["MessageChunkSize"]).Returns("5");
         _dut = new BusEventRepository(ContextHelper.ContextMock.Object, configuration.Object);
     }
 }
