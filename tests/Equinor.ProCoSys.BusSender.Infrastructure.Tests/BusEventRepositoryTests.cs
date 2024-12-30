@@ -88,6 +88,8 @@ public class BusEventRepositoryTests : RepositoryTestBase
 
         var configuration = new Mock<IPlantService>();
         configuration.Setup(c => c.GetConfiguration()["MessageChunkSize"]).Returns("5");
+        configuration.Setup(c => c.GetPlantsHandledByCurrentInstance()).Returns(new List<string>() {"PCS$Plant"});
+
         _dut = new BusEventRepository(ContextHelper.ContextMock.Object, configuration.Object);
     }
 }
