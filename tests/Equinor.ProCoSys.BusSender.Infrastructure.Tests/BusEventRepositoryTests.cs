@@ -33,6 +33,55 @@ public class BusEventRepositoryTests : RepositoryTestBase
         Assert.AreEqual(_secondToLatestEvent, result.Result[4]);
     }
 
+    [TestMethod]
+    public void GetEarliestUnProcessedEventChunk_WithDifferentInstance_ShouldReturnItemsForAssignedPlantOnly()
+    {
+        // Arrange
+        var differentEarliestEvent = new BusEvent
+        {
+            Created = DateTime.Now.AddMinutes(-200),
+            Event = "T",
+            Status = Status.UnProcessed,
+            Id = 8,
+            Plant = "PCS$PlantA",
+            Message = "Message 200 minutes ago not sent"
+        };
+        var differentBusEvents = new List<BusEvent>
+        {
+            differentEarliestEvent,
+            new()
+            {
+                Created = DateTime.Now.AddMinutes(-150), Event = "T", Status = Status.UnProcessed, Id = 9, Plant = "PCS$PlantB",
+                Message = "Message 150 minutes ago not sent"
+            },
+            new()
+            {
+                Created = DateTime.Now.AddMinutes(-50), Event = "T", Status = Status.UnProcessed, Id = 10, Plant = "PCS$PlantC",
+                Message = "Message 50 minutes ago not sent"
+            }
+        };
+
+        var differentBusEventSetMock = differentBusEvents.AsQueryable().BuildMockDbSet();
+
+        ContextHelper
+            .ContextMock
+            .Setup(x => x.BusEvents)
+            .Returns(differentBusEventSetMock.Object);
+
+        var differentConfiguration = new Mock<IPlantService>();
+        differentConfiguration.Setup(c => c.GetConfiguration()["MessageChunkSize"]).Returns("3");
+        differentConfiguration.Setup(c => c.GetPlantsHandledByCurrentInstance()).Returns(new List<string>() { "PCS$PlantA", "PCS$PlantB" });
+
+        var differentDut = new BusEventRepository(ContextHelper.ContextMock.Object, differentConfiguration.Object);
+
+        Task<List<BusEvent>> result = differentDut.GetEarliestUnProcessedEventChunk();
+
+        Assert.AreEqual(2, result.Result.Count);
+        Assert.AreEqual(differentEarliestEvent, result.Result[0]);
+        Assert.AreEqual(differentBusEvents[1], result.Result[1]);
+    }
+
+
     [TestInitialize]
     public void Setup()
     {
