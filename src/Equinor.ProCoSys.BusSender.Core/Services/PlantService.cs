@@ -37,7 +37,7 @@ public class PlantService : IPlantService
         var connectionString = connectionStringsSection["AppConfig"];
         if (string.IsNullOrEmpty(connectionString))
         {
-            throw new InvalidOperationException("AppConfig connection string is missing in the configuration.");
+            throw new InvalidOperationException($"AppConfig connection string is missing in the configuration. Keys: {string.Join(",",connectionStringsSection.GetChildren().Select(x => x.Key))}");
         }
 
         var endpoint = connectionString.Split(';')[0].Split('=')[1];
