@@ -9,14 +9,14 @@ public class PcsServiceBusInstanceConstants
     public const string RemainingPlants = "REMAININGPLANTS";
     public const string DefaultInstanceName = "UNIQUE";
 
-    public static readonly List<string> AllPlantConstants = new List<string>
+    public static readonly List<string> AllPlantConstants = new()
     {
         Plant,
         NoPlant,
         RemainingPlants
     };
 
-    public static readonly List<string> AllPlantResolventConstants = new List<string>
+    public static readonly List<string> AllPlantResolventConstants = new()
     {
         RemainingPlants
     };

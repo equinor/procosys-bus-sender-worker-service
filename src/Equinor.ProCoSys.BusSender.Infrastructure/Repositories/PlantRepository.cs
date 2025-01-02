@@ -63,7 +63,6 @@ public class PlantRepository : IPlantRepository
         }
         finally
         {
-            //If we open it, we have to close it.
             if (connectionWasClosed)
             {
                 await _context.Database.CloseConnectionAsync();

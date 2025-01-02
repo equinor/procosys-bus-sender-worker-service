@@ -7,6 +7,7 @@ using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 using Equinor.ProCoSys.BusSenderWorker.Core.Models;
 using Equinor.ProCoSys.BusSenderWorker.Infrastructure.Data;
 using Equinor.ProCoSys.PcsServiceBus;
+using Microsoft.Azure.Amqp.Serialization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -18,7 +19,7 @@ public class BusEventRepository : IBusEventRepository
 {
     private readonly DbSet<BusEvent> _busEvents;
     private readonly int _messageChunkSize;
-    private readonly List<string>? _plants;
+    private readonly List<string> _plants;
     private readonly string? _instanceName;
 
     public BusEventRepository(BusSenderServiceContext context, IPlantService plantService)
@@ -30,13 +31,11 @@ public class BusEventRepository : IBusEventRepository
         _plants = plantService.GetPlantsHandledByCurrentInstance();
     }
 
-    public async Task<List<BusEvent>> GetEarliestUnProcessedEventChunk()
-    {
-        return await GetUnProcessedFilteredQueryable()
+    public async Task<List<BusEvent>> GetEarliestUnProcessedEventChunk() => 
+        await GetUnProcessedFilteredQueryable()
             .OrderBy(e => e.Created)
             .Take(_messageChunkSize)
             .ToListAsync();
-    }
 
     public async Task<long> GetUnProcessedCount() => 
         await GetUnProcessedFilteredQueryable()
@@ -69,19 +68,6 @@ public class BusEventRepository : IBusEventRepository
             query = _busEvents.Where(e => e.Status == Status.UnProcessed && e.Plant != null && _plants.Contains(e.Plant));
         }
         return query;
-    }
-
-    private List<string> GetPlantsFromConfiguration(IConfiguration configuration)
-    {
-        var plantsString = configuration["MessageSites"];
-        if (!string.IsNullOrWhiteSpace(plantsString))
-        {
-            return plantsString.Split(',').ToList();
-        }
-        else
-        {
-            return new List<string> { PcsServiceBusInstanceConstants.Plant, PcsServiceBusInstanceConstants.NoPlant };
-        }
     }
 
     public string? GetInstanceName() => _instanceName;
