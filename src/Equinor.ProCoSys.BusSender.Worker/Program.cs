@@ -161,13 +161,13 @@ public class Program
             plants = await plantRepository.GetAllPlantsAsync();
         }
 
-        plantService?.RegisterPlantsHandledByCurrentInstance(host, plants);   
-
         ILogger? logger = host.Services.GetService<ILogger<Program>>();
 
         var configuration = scope.ServiceProvider.GetService<IConfiguration>();
 
         LogConfiguration(configuration, logger);
+
+        plantService?.RegisterPlantsHandledByCurrentInstance(host, plants);   
 
         await host.RunAsync();
     }
