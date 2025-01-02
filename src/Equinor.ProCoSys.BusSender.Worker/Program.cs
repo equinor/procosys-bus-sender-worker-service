@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using Azure.Data.AppConfiguration;
-using Azure;
 using Azure.Identity;
 using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 using Equinor.ProCoSys.BusSenderWorker.Infrastructure;
@@ -14,8 +12,6 @@ using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using static Dapper.SqlMapper;
-using Equinor.ProCoSys.BusSenderWorker.Core.Services;
 
 namespace Equinor.ProCoSys.BusSender.Worker;
 
@@ -152,7 +148,7 @@ public class Program
     {
         using var host = CreateHostBuilder(args).Build();
         using var scope = host.Services.CreateScope();
-        var plantService = scope.ServiceProvider.GetService<IPlantService>();
+        var plantService = host.Services.GetService<IPlantService>();
         var plantRepository = scope.ServiceProvider.GetService<IPlantRepository>();
         List<string> plants = new List<string>();
 
@@ -167,7 +163,7 @@ public class Program
 
         LogConfiguration(configuration, logger);
 
-        plantService?.RegisterPlantsHandledByCurrentInstance(host, plants);   
+        plantService?.RegisterPlantsHandledByCurrentInstance(host, plants); 
 
         await host.RunAsync();
     }
@@ -178,7 +174,7 @@ public class Program
         {
             foreach (var kvp in configuration.AsEnumerable())
             {
-                logger.LogInformation("{Key}: {Value}", kvp.Key, kvp.Value);
+                logger.LogInformation("[{InstanceName}] {Key}: {Value}", configuration["InstanceName"], kvp.Key, kvp.Value);
             }
         }
     }

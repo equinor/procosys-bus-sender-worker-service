@@ -15,7 +15,7 @@ public class PlantService : IPlantService
 {
     private readonly IConfiguration _configuration;
     private readonly ILogger<PlantService> _logger;
-    private List<string> _plantsHandledByCurrentInstance;
+    private List<string> _plantsHandledByCurrentInstance = new();
 
     public List<string> GetPlantsHandledByCurrentInstance() => _plantsHandledByCurrentInstance;
     public IConfiguration GetConfiguration() => _configuration;
