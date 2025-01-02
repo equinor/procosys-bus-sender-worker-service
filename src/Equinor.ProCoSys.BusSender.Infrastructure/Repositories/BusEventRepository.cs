@@ -56,13 +56,13 @@ public class BusEventRepository : IBusEventRepository
         {
             query = _busEvents.Where(e => e.Status == Status.UnProcessed);
         }
+        else if (_plants.Contains(PcsServiceBusInstanceConstants.NoPlant))
+        {
+            query = _busEvents.Where(e => e.Status == Status.UnProcessed && (e.Plant == null || _plants.Contains(e.Plant)));
+        }
         else if (_plants.Contains(PcsServiceBusInstanceConstants.Plant))
         {
             query = _busEvents.Where(e => e.Status == Status.UnProcessed && e.Plant != null);
-        }
-        else if (_plants.Contains(PcsServiceBusInstanceConstants.NoPlant))
-        {
-            query = _busEvents.Where(e => e.Status == Status.UnProcessed && e.Plant == null);
         }
         else
         {

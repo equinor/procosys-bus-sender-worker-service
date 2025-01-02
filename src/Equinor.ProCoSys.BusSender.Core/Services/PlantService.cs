@@ -26,7 +26,7 @@ public class PlantService : IPlantService
         _logger = logger;
     }
 
-    private async Task<List<string>> RegisterHandledPlantsAsync(IHost host)
+    protected virtual async Task<List<string>> RegisterHandledPlantsAsync(IHost host)
     {
         var connectionString = _configuration["ConnectionStrings:AppConfig"];
         var endpoint = connectionString.Split(';')[0].Split('=')[1];
