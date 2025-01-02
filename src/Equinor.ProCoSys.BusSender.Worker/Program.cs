@@ -150,32 +150,22 @@ public class Program
         using var scope = host.Services.CreateScope();
         var plantService = host.Services.GetService<IPlantService>();
         var plantRepository = scope.ServiceProvider.GetService<IPlantRepository>();
-        List<string> plants = new List<string>();
+        var plants = new List<string>();
 
         if (plantRepository != null)
         {
             plants = await plantRepository.GetAllPlantsAsync();
         }
 
-        ILogger? logger = host.Services.GetService<ILogger<Program>>();
-
-        var configuration = scope.ServiceProvider.GetService<IConfiguration>();
-
-        LogConfiguration(configuration, logger);
-
-        plantService?.RegisterPlantsHandledByCurrentInstance(host, plants); 
-
+        plantService?.RegisterPlantsHandledByCurrentInstance(host, plants);
         await host.RunAsync();
     }
 
     private static void LogConfiguration(IConfiguration configuration, ILogger logger)
     {
-        if (configuration != null && logger != null)
+        foreach (var kvp in configuration.AsEnumerable())
         {
-            foreach (var kvp in configuration.AsEnumerable())
-            {
-                logger.LogInformation("[{InstanceName}] {Key}: {Value}", configuration["InstanceName"], kvp.Key, kvp.Value);
-            }
+            logger.LogInformation("[{InstanceName}] {Key}: {Value}", configuration["InstanceName"], kvp.Key, kvp.Value);
         }
     }
 
