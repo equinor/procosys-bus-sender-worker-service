@@ -164,7 +164,23 @@ public class Program
         plantService?.RegisterPlantsHandledByCurrentInstance(host, plants);   
 
         ILogger? logger = host.Services.GetService<ILogger<Program>>();
+
+        var configuration = scope.ServiceProvider.GetService<IConfiguration>();
+
+        LogConfiguration(configuration, logger);
+
         await host.RunAsync();
+    }
+
+    private static void LogConfiguration(IConfiguration configuration, ILogger logger)
+    {
+        if (configuration != null && logger != null)
+        {
+            foreach (var kvp in configuration.AsEnumerable())
+            {
+                logger.LogInformation("{Key}: {Value}", kvp.Key, kvp.Value);
+            }
+        }
     }
 
     public IConfiguration Configuration { get; }
