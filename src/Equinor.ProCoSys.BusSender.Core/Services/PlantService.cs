@@ -28,7 +28,18 @@ public class PlantService : IPlantService
 
     protected virtual async Task<List<string>> RegisterHandledPlantsAsync(IHost host)
     {
-        var connectionString = _configuration["ConnectionStrings:AppConfig"];
+        var connectionStringsSection = _configuration.GetSection("ConnectionStrings");
+        if (connectionStringsSection == null)
+        {
+            throw new InvalidOperationException("ConnectionStrings section is missing in the configuration.");
+        }
+
+        var connectionString = connectionStringsSection["AppConfig"];
+        if (string.IsNullOrEmpty(connectionString))
+        {
+            throw new InvalidOperationException("AppConfig connection string is missing in the configuration.");
+        }
+
         var endpoint = connectionString.Split(';')[0].Split('=')[1];
 
         if (!Uri.TryCreate(endpoint, UriKind.Absolute, out var uri))
