@@ -197,7 +197,7 @@ public class BusEventRepositoryTests : RepositoryTestBase
 
         var configuration = new Mock<Microsoft.Extensions.Configuration.IConfiguration>();
         configuration.Setup(c => c["MessageChunkSize"]).Returns("3");
-        configuration.Setup(c => c["MessageSites"]).Returns(plantsHandledByThisInstance);
+        configuration.Setup(c => c["PlantsHandledByInstance"]).Returns(plantsHandledByThisInstance);
         configuration.Setup(c => c["InstanceName"]).Returns("ServiceA");
 
         var plantService = new Mock<PlantService>(configuration.Object, mockLogger.Object) { CallBase = true };

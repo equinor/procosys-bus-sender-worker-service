@@ -68,6 +68,10 @@ stages:
           testInstances:
             - ServiceA
             - ServiceB
+          prodArtifactName: 'prod'
+          prodInstances:
+            - ServiceA
+            - ServiceB
           versionSpec: '6.7.0'
           projectName: '$(projectName)'
 

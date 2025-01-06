@@ -37,7 +37,7 @@ public class PlantService : IPlantService
         }
 
         var client = new ConfigurationClient(new Uri(endpoint), new DefaultAzureCredential());
-        var settingKey = "MessageSites";
+        var settingKey = "PlantsHandledByInstance";
         var selector = new SettingSelector { KeyFilter = settingKey, LabelFilter = "*" };
         var allHandledPlants = new List<string>();
 
@@ -51,7 +51,7 @@ public class PlantService : IPlantService
 
     public void RegisterPlantsHandledByCurrentInstance(IHost host, List<string> allPlants)
     {
-        var plantsString = _configuration["MessageSites"];
+        var plantsString = _configuration["PlantsHandledByInstance"];
         var instanceName = _configuration["InstanceName"];
         if (!string.IsNullOrWhiteSpace(plantsString))
         {
