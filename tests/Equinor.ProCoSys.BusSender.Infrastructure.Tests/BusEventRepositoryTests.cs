@@ -84,21 +84,21 @@ public class BusEventRepositoryTests : RepositoryTestBase
             .Returns(serviceABusEventSetMock.Object);
 
         var serviceAConfiguration = new Mock<IPlantService>();
-        serviceAConfiguration.Setup(c => c.GetConfiguration()["MessageChunkSize"]).Returns("3");
+        serviceAConfiguration.Setup(c => c.GetConfiguration()["MessageChunkSize"]).Returns("100");
         serviceAConfiguration.Setup(c => c.GetPlantsHandledByCurrentInstance()).Returns(new List<string>() { "PLANT" });
 
         var serviceADut = new BusEventRepository(ContextHelper.ContextMock.Object, serviceAConfiguration.Object);
 
         var result = serviceADut.GetEarliestUnProcessedEventChunk();
 
-        foreach (var busEvent in result.Result)
-        {
-            Assert.IsTrue(busEvent.Plant == "PCS$PlantA" || busEvent.Plant == "PCS$PlantB" || busEvent.Plant == "PCS$PlantC");
-        }
+        Assert.IsTrue(result.Result[0].Plant == "PCS$PlantA");
+        Assert.IsTrue(result.Result[1].Plant == "PCS$PlantB");
+        Assert.IsTrue(result.Result[2].Plant == "PCS$PlantC");
+        Assert.IsFalse(result.Result.Any(x => string.IsNullOrEmpty(x.Plant)));
     }
 
     [TestMethod]
-    public void GetEarliestUnProcessedEventChunk_WithDifferentInstance_ShouldReturnItemsForAssignedPlantsOnly()
+    public void GetEarliestUnProcessedEventChunk_WhenNonPlantConstant_ShouldReturnItemsForAssignedPlantsAndNullPlant()
     {
         // Arrange
         var serviceAEarliestEvent = new BusEvent
@@ -138,17 +138,16 @@ public class BusEventRepositoryTests : RepositoryTestBase
             .Returns(serviceABusEventSetMock.Object);
 
         var serviceAConfiguration = new Mock<IPlantService>();
-        serviceAConfiguration.Setup(c => c.GetConfiguration()["MessageChunkSize"]).Returns("3");
+        serviceAConfiguration.Setup(c => c.GetConfiguration()["MessageChunkSize"]).Returns("100");
         serviceAConfiguration.Setup(c => c.GetPlantsHandledByCurrentInstance()).Returns(new List<string>() { "PCS$PlantA", "PCS$PlantB", "NOPLANT" });
 
         var serviceADut = new BusEventRepository(ContextHelper.ContextMock.Object, serviceAConfiguration.Object);
 
         var result = serviceADut.GetEarliestUnProcessedEventChunk();
 
-        foreach (var busEvent in result.Result)
-        {
-            Assert.IsTrue(busEvent.Plant == "PCS$PlantA" || busEvent.Plant == "PCS$PlantB" || busEvent.Plant == null);
-        }
+        Assert.IsTrue(result.Result[0].Plant == "PCS$PlantA");
+        Assert.IsTrue(result.Result[1].Plant == "PCS$PlantB");
+        Assert.IsTrue(string.IsNullOrEmpty(result.Result[2].Plant));
     }
 
 
@@ -187,7 +186,6 @@ public class BusEventRepositoryTests : RepositoryTestBase
             .Setup(x => x.BusEvents)
             .Returns(differentBusEventSetMock.Object);
 
-        var host = new Mock<IHost>();
         var plantsHandledByThisInstance = "PCS$PlantA,REMAININGPLANTS";
         var allPlants = new List<string> { "PCS$PlantA", "PCS$PlantB", "PCS$PlantC" };
         var plantsHandledByOtherInstances = new List<string> { "PCS$PlantC" };
@@ -204,10 +202,10 @@ public class BusEventRepositoryTests : RepositoryTestBase
         // Using reflection to setup protected method
         plantService
             .Protected()
-            .Setup<Task<List<string>>>("RegisterHandledPlantsAsync", ItExpr.IsAny<IHost>())
+            .Setup<Task<List<string>>>("GetHandledPlantsAsync")
             .ReturnsAsync(plantsHandledByOtherInstances);
 
-        plantService.Object.RegisterPlantsHandledByCurrentInstance(host.Object, allPlants);
+        plantService.Object.RegisterPlantsHandledByCurrentInstance(allPlants);
         var serviceADut = new BusEventRepository(ContextHelper.ContextMock.Object, plantService.Object);
         var result = serviceADut.GetEarliestUnProcessedEventChunk();
 

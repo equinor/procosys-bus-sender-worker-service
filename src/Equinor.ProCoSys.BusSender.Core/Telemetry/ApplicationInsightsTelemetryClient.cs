@@ -4,14 +4,20 @@ using System.Configuration;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.Channel;
 using Microsoft.ApplicationInsights.Extensibility;
+using Microsoft.Extensions.Configuration;
 
 namespace Equinor.ProCoSys.BusSenderWorker.Core.Telemetry;
 
 public class RunningExecutableTelemetryInitializer : ITelemetryInitializer
 {
+    private readonly string _instanceName;
+
+    public RunningExecutableTelemetryInitializer(string instanceName) => _instanceName = instanceName;
+
     public void Initialize(ITelemetry telemetry)
     {
         telemetry.Context.Cloud.RoleName = AppDomain.CurrentDomain.FriendlyName;
+        telemetry.Context.GlobalProperties["InstanceName"] = _instanceName;
     }
 }
 
@@ -19,7 +25,7 @@ public class ApplicationInsightsTelemetryClient : ITelemetryClient
 {
     private readonly TelemetryClient _ai;
 
-    public ApplicationInsightsTelemetryClient(TelemetryConfiguration telemetryConfiguration)
+    public ApplicationInsightsTelemetryClient(TelemetryConfiguration telemetryConfiguration, IConfiguration configuration)
     {
         if (telemetryConfiguration == null)
         {
@@ -31,7 +37,7 @@ public class ApplicationInsightsTelemetryClient : ITelemetryClient
             // The InstrumentationKey isn't set through the configuration object. Setting it explicitly works.
             TelemetryConfiguration = { ConnectionString = telemetryConfiguration.ConnectionString }
         };
-        _ai.TelemetryConfiguration.TelemetryInitializers.Add(new RunningExecutableTelemetryInitializer());
+        _ai.TelemetryConfiguration.TelemetryInitializers.Add(new RunningExecutableTelemetryInitializer(configuration["InstanceName"]??"NoPlants"));
     }
 
     public void Flush() => _ai.Flush();

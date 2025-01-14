@@ -13,6 +13,7 @@ using Equinor.ProCoSys.BusSenderWorker.Core.Models;
 using Equinor.ProCoSys.BusSenderWorker.Core.Telemetry;
 using Equinor.ProCoSys.PcsServiceBus.Sender.Interfaces;
 using Equinor.ProCoSys.PcsServiceBus.Topics;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace Equinor.ProCoSys.BusSenderWorker.Core.Services;
@@ -27,6 +28,7 @@ public class BusSenderService : IBusSenderService
     private readonly Stopwatch _sw;
     private readonly ITelemetryClient _telemetryClient;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IConfiguration _configuration;
 
     public BusSenderService(IPcsBusSender pcsBusSender,
         IBusEventRepository busEventRepository,
@@ -34,7 +36,8 @@ public class BusSenderService : IBusSenderService
         ILogger<BusSenderService> logger,
         ITelemetryClient telemetryClient,
         IBusEventService service,
-        IQueueMonitorService queueMonitor)
+        IQueueMonitorService queueMonitor,
+        IConfiguration configuration)
     {
         _pcsBusSender = pcsBusSender;
         _busEventRepository = busEventRepository;
@@ -43,6 +46,7 @@ public class BusSenderService : IBusSenderService
         _telemetryClient = telemetryClient;
         _service = service;
         _queueMonitor = queueMonitor;
+        _configuration = configuration;
         _sw = new Stopwatch();
     }
 
@@ -62,11 +66,11 @@ public class BusSenderService : IBusSenderService
             var events = await _busEventRepository.GetEarliestUnProcessedEventChunk();
             if (events.Any())
             {
-                _logger.LogInformation("[{InstanceName}] BusSenderService found {Count} messages to process after {Sw} ms", _busEventRepository.GetInstanceName(), events.Count,
+                _logger.LogInformation("[{InstanceName}] BusSenderService found {Count} messages to process after {Sw} ms", _configuration["InstanceName"] ?? "NoPlants", events.Count,
                     _sw.ElapsedMilliseconds);
                 _telemetryClient.TrackMetric("BusSender Chunk", events.Count);
                 await ProcessBusEvents(events);
-                _logger.LogInformation("[{InstanceName}] BusSenderService ProcessBusEvents used {Sw} ms", _busEventRepository.GetInstanceName(),_sw.ElapsedMilliseconds);
+                _logger.LogInformation("[{InstanceName}] BusSenderService ProcessBusEvents used {Sw} ms", _configuration["InstanceName"] ?? "NoPlants",_sw.ElapsedMilliseconds);
             }
 
             _sw.Reset();
@@ -100,7 +104,7 @@ public class BusSenderService : IBusSenderService
                 {
                     var m = messages.Dequeue();
                     m.Status = Status.Sent;
-                    TrackMessage(m, msgId, msgBody, _busEventRepository.GetInstanceName());
+                    TrackMessage(m, msgId, msgBody, _configuration["InstanceName"] ?? "NoPlants");
                 }
                 else
                 {
@@ -112,7 +116,7 @@ public class BusSenderService : IBusSenderService
                 {
                     var m = messages.Dequeue();
                     m.Status = Status.Sent;
-                    TrackMessage(m,messageId, messageBody, _busEventRepository.GetInstanceName());
+                    TrackMessage(m,messageId, messageBody, _configuration["InstanceName"] ?? "NoPlants");
                 }
 
                 _logger.LogDebug("Sending amount: {Count} after {Ms} ms", messageBatch.Count, _sw.ElapsedMilliseconds);
@@ -180,7 +184,7 @@ public class BusSenderService : IBusSenderService
         var dsw = Stopwatch.StartNew();
 
         var unProcessedEvents = events.Where(busEvent => busEvent.Status == Status.UnProcessed).ToList();
-        _logger.LogInformation("[{InstanceName}] Amount of messages to process: {Count} ", _busEventRepository.GetInstanceName(), unProcessedEvents.Count);
+        _logger.LogInformation("[{InstanceName}] Amount of messages to process: {Count} ", _configuration["InstanceName"] ?? "NoPlants", unProcessedEvents.Count);
 
         foreach (var simpleUnprocessedBusEvent in unProcessedEvents.Where(e =>
                      IsSimpleMessage(e) || e.Event == TagTopic.TopicName))
@@ -188,7 +192,7 @@ public class BusSenderService : IBusSenderService
             await UpdateEventBasedOnTopic(simpleUnprocessedBusEvent);
         }
 
-        _logger.LogInformation("[{InstanceName}] Update loop finished at at {Sw} ms", _busEventRepository.GetInstanceName(), dsw.ElapsedMilliseconds);
+        _logger.LogInformation("[{InstanceName}] Update loop finished at at {Sw} ms", _configuration["InstanceName"] ?? "NoPlants", dsw.ElapsedMilliseconds);
         await _unitOfWork.SaveChangesAsync();
 
 
@@ -243,8 +247,8 @@ public class BusSenderService : IBusSenderService
             {"ProjectName", message?.ProjectName ?? "NoProject"},
             {"Plant", message?.Plant ?? "NoPlant"},
             {"MessageId", busMessageMessageId ?? "NoID" },
-            {"InstanceName", _busEventRepository.GetInstanceName()??"NoInstance"},
-            {"Plants", _busEventRepository.GetPlants()},
+            {"InstanceName", _configuration["InstanceName"]??"NoInstance"},
+            {"Plants", _configuration["PlantsHandledByInstance"]??"NoPlants"},
             //Remove these after debugging
             {"BusEventMessageToSend", string.IsNullOrEmpty(message?.ProCoSysGuid) ? "MessageToSend: ( " + busEvent.MessageToSend + " )" : "N/A"  },
             {"BusEventMessage", string.IsNullOrEmpty(message?.ProCoSysGuid) ? busEvent.Message : "N/A" },

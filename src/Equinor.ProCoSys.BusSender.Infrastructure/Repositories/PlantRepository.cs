@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Reflection.Metadata.Ecma335;
 using System.Threading.Tasks;
+using Dapper;
 using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 using Equinor.ProCoSys.BusSenderWorker.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -22,58 +20,11 @@ public class PlantRepository : IPlantRepository
         _logger = logger;
     }
 
-    public async Task<List<string>> GetAllPlantsAsync()
-    {
-        var dbConnection = _context.Database.GetDbConnection();
-        var connectionWasClosed = dbConnection.State != ConnectionState.Open;
-        if (connectionWasClosed)
-        {
-            await _context.Database.OpenConnectionAsync();
-        }
+    public async Task<List<string>> GetAllPlantsAsync() =>  
+        await _context.Plants
+            .Where(p => p.IsVoided == "N")
+            .Select(p => p.ProjectSchema)
+            .ToListAsync();
 
-        try
-        {
-            await using var command = _context.Database.GetDbConnection().CreateCommand();
-            command.CommandText = GetAllPlantsQuery();
 
-            await using var result = await command.ExecuteReaderAsync();
-
-            if (!result.HasRows)
-            {
-                _logger.LogInformation("No plants found in database.");
-                return new List<string>();
-            }
-
-            var plants = new List<string>();
-
-            while (await result.ReadAsync())
-            {
-                if (result[0] is not DBNull)
-                {
-                    plants.Add((string)result[0]);
-                }
-            }
-
-            if (!plants.Any())
-            {
-                _logger.LogInformation("No plants found in database.");
-            }
-
-            return plants;
-        }
-        finally
-        {
-            if (connectionWasClosed)
-            {
-                await _context.Database.CloseConnectionAsync();
-            }
-        }
-    }
-
-    private static string GetAllPlantsQuery() =>
-        @$"
-            select projectschema
-            from projectschema
-            where isvoided = 'N'
-        ";
 }

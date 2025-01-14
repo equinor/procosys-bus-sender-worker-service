@@ -23,7 +23,6 @@ public class Program
 
     private static IHostBuilder CreateHostBuilder(string[] args)
     {
-
         var builder = Host.CreateDefaultBuilder(args)
             .ConfigureAppConfiguration((context, config) =>
             {
@@ -106,10 +105,8 @@ public class Program
         {
             logging.ClearProviders();
             logging.AddConsole();
-
             logging.AddApplicationInsightsWebJobs(c
                 => c.ConnectionString = context.Configuration["ApplicationInsights:ConnectionString"]);
-
         });
 
         builder.UseContentRoot(Directory.GetCurrentDirectory())
@@ -140,7 +137,6 @@ public class Program
                 services.AddServices();
                 services.AddHostedService<TimedWorkerService>();
             });
-
         return builder;
     }
 
@@ -157,7 +153,7 @@ public class Program
             plants = await plantRepository.GetAllPlantsAsync();
         }
 
-        plantService?.RegisterPlantsHandledByCurrentInstance(host, plants);
+        plantService?.RegisterPlantsHandledByCurrentInstance(plants);
         await host.RunAsync();
     }
 

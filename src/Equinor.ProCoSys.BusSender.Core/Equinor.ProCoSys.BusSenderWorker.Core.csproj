@@ -9,6 +9,7 @@
     <PackageReference Include="Azure.Data.AppConfiguration" Version="1.2.0" />
     <PackageReference Include="Azure.Identity" Version="1.11.3" />
     <PackageReference Include="Microsoft.ApplicationInsights" Version="2.21.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.1.1" />
     <PackageReference Include="Oracle.EntityFrameworkCore" Version="7.21.12" />
     <PackageReference Include="System.Text.Json" Version="7.0.3" />
   </ItemGroup>

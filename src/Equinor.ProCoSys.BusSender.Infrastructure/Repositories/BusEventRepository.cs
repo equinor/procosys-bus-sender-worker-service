@@ -49,27 +49,26 @@ public class BusEventRepository : IBusEventRepository
 
     private IQueryable<BusEvent> GetUnProcessedFilteredQueryable()
     {
-        IQueryable<BusEvent> query;
+        var query = _busEvents.Where(e => e.Status == Status.UnProcessed);
+        var containsPlant = _plants.Contains(PcsServiceBusInstanceConstants.Plant);
+        var containsNoPlant = _plants.Contains(PcsServiceBusInstanceConstants.NoPlant);
 
-        if (_plants.Contains(PcsServiceBusInstanceConstants.Plant) && _plants.Contains(PcsServiceBusInstanceConstants.NoPlant))
+        if (containsPlant && containsNoPlant)
         {
-            query = _busEvents.Where(e => e.Status == Status.UnProcessed);
+            return query;
         }
-        else if (_plants.Contains(PcsServiceBusInstanceConstants.NoPlant))
+
+        if (containsNoPlant)
         {
-            query = _busEvents.Where(e => e.Status == Status.UnProcessed && (e.Plant == null || _plants.Contains(e.Plant)));
+            return query.Where(e => e.Plant == null || _plants.Contains(e.Plant));
         }
-        else if (_plants.Contains(PcsServiceBusInstanceConstants.Plant))
+
+        if (containsPlant)
         {
-            query = _busEvents.Where(e => e.Status == Status.UnProcessed && e.Plant != null);
+            return query.Where(e => e.Plant != null);
         }
-        else
-        {
-            query = _busEvents.Where(e => e.Status == Status.UnProcessed && e.Plant != null && _plants.Contains(e.Plant));
-        }
-        return query;
+
+        var test = query.Where(e => e.Plant != null).ToList();
+        return query.Where(e => e.Plant != null && _plants.Contains(e.Plant));
     }
-
-    public string? GetInstanceName() => _instanceName;
-    public string GetPlants() => string.Join(",", _plants);
 }

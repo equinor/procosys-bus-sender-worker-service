@@ -7,7 +7,7 @@ using Microsoft.Extensions.Hosting;
 namespace Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 public interface IPlantService
 {
-    void RegisterPlantsHandledByCurrentInstance(IHost host, List<string> allPlants);
+    void RegisterPlantsHandledByCurrentInstance(List<string> allPlants);
     List<string> GetPlantsHandledByCurrentInstance();
     IConfiguration GetConfiguration();
 }

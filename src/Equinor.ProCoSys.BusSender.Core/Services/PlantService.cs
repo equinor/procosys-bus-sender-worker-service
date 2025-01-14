@@ -26,8 +26,12 @@ public class PlantService : IPlantService
         _logger = logger;
     }
 
-    protected virtual async Task<List<string>> RegisterHandledPlantsAsync(IHost host)
-     * If placeholder REMAININGPLANTS is used, the method will replace it with the actual plants that are not handled by any other instance.
+
+    /**
+     * This method is used to identify and return the plants that are handled by the current instance.
+     * If placeholder REMAININGPLANTS is used, the method will replace it with the actual plants that are not handled by other instance(s).
+     */
+    protected virtual async Task<List<string>> GetHandledPlantsAsync()
     {
         var appConfigurationName = _configuration["Azure:AppConfig"];
         var endpoint = $"https://{appConfigurationName}.azconfig.io";
@@ -50,7 +54,7 @@ public class PlantService : IPlantService
         return allHandledPlants;
     }
 
-    public void RegisterPlantsHandledByCurrentInstance(IHost host, List<string> allPlants)
+    public void RegisterPlantsHandledByCurrentInstance(List<string> allPlants)
     {
         var plantsString = _configuration["PlantsHandledByInstance"];
         var instanceName = _configuration["InstanceName"];
@@ -60,12 +64,12 @@ public class PlantService : IPlantService
             _plantsHandledByCurrentInstance = plantsString.Split(',').ToList();
             if (_plantsHandledByCurrentInstance.Contains(PcsServiceBusInstanceConstants.RemainingPlants))
             {
-                var allHandedPlants = RegisterHandledPlantsAsync(host).Result;
+                var allHandedPlants = GetHandledPlantsAsync().Result;
 
                 // We are also handling cases where RemainingPlants constant is used in combination with actual plants. E.g. PCS$TROLL_A, PCS$OSEBERG_C, REMAININGPLANTS. 
                 _plantsHandledByCurrentInstance = _plantsHandledByCurrentInstance.Union(CalcPlantLeftovers(allHandedPlants, allPlants)).ToList();
             }
-            WashPlants(allPlants, instanceName);
+            RemoveInvalidPlants(allPlants, instanceName);
         }
         else
         {
@@ -74,7 +78,7 @@ public class PlantService : IPlantService
         }
     }
 
-    private void WashPlants(List<string> allPlants, string instanceName)
+    private void RemoveInvalidPlants(List<string> allPlants, string instanceName)
     {
         _plantsHandledByCurrentInstance =
             _plantsHandledByCurrentInstance.Except(PcsServiceBusInstanceConstants.AllPlantResolventConstants).ToList();
