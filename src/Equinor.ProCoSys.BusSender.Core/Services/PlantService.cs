@@ -27,6 +27,7 @@ public class PlantService : IPlantService
     }
 
     protected virtual async Task<List<string>> RegisterHandledPlantsAsync(IHost host)
+     * If placeholder REMAININGPLANTS is used, the method will replace it with the actual plants that are not handled by any other instance.
     {
         var appConfigurationName = _configuration["Azure:AppConfig"];
         var endpoint = $"https://{appConfigurationName}.azconfig.io";
