@@ -4,6 +4,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Azure.Identity;
 using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
+using Equinor.ProCoSys.BusSenderWorker.Core.Models;
 using Equinor.ProCoSys.BusSenderWorker.Infrastructure;
 using Equinor.ProCoSys.BusSenderWorker.Infrastructure.Repositories;
 using Equinor.ProCoSys.PcsServiceBus;
@@ -42,7 +43,6 @@ public class Program
                                 kv.SetCredential(new DefaultAzureCredential());
                             })
                             .Select(KeyFilter.Any, null)
-                            .Select(KeyFilter.Any, settings["InstanceName"])
                             .Select(KeyFilter.Any, context.HostingEnvironment.EnvironmentName)
                             .ConfigureRefresh(refreshOptions =>
                             {
@@ -73,7 +73,6 @@ public class Program
                                 opt.SetCacheExpiration(TimeSpan.FromMinutes(5));
                             })
                             .Select(KeyFilter.Any, null)
-                            .Select(KeyFilter.Any, settings["InstanceName"])
                             .Select(KeyFilter.Any, settings["Azure:AppConfigLabelFilter"]);
                     });
                 }
@@ -95,7 +94,6 @@ public class Program
                                 opt.SetCacheExpiration(TimeSpan.FromMinutes(5));
                             })
                             .Select(KeyFilter.Any, null)
-                            .Select(KeyFilter.Any, settings["InstanceName"])
                             .Select(KeyFilter.Any, settings["Azure:AppConfigLabelFilter"]);
                     });
                 }
@@ -145,15 +143,23 @@ public class Program
         using var host = CreateHostBuilder(args).Build();
         using var scope = host.Services.CreateScope();
         var plantService = host.Services.GetService<IPlantService>();
+        var configuration = host.Services.GetService<IConfiguration>();
         var plantRepository = scope.ServiceProvider.GetService<IPlantRepository>();
-        var plants = new List<string>();
+        var allPlants = new List<string>();
 
         if (plantRepository != null)
         {
-            plants = await plantRepository.GetAllPlantsAsync();
+            allPlants = await plantRepository.GetAllPlantsAsync();
         }
 
-        plantService?.RegisterPlantsHandledByCurrentInstance(plants);
+        var plantsByInstances = configuration?.GetSection("PlantsByInstance").Get<List<PlantsByInstance>>();
+        if (plantsByInstances == null)
+        {
+            throw new Exception("PlantsByInstance is not configured. Exiting.");
+
+        }
+
+        plantService?.RegisterPlantsHandledByCurrentInstance(plantsByInstances, allPlants);
         await host.RunAsync();
     }
 
