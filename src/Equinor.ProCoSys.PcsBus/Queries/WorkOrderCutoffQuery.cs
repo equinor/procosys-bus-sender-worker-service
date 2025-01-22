@@ -22,7 +22,7 @@ public class WorkOrderCutoffQuery
         if (cutoffWeek != null)
         {
             whereClause.parameters.Add(":CutoffWeek", cutoffWeek);
-            whereClause.clause += " and wc.cutoffweek = :CutoffWeek";
+            whereClause.clause += " and ((wc.cutoffweek = :CutoffWeek and wc.cutoffweek_to is null) or wc.cutoffweek_to = :CutoffWeek)";
         }
         if (weekNumber != null)
         {
@@ -49,6 +49,8 @@ public class WorkOrderCutoffQuery
             wc.LAST_UPDATED as LastUpdated,
             wc.CUTOFFWEEK as CutoffWeek,
             wc.CUTOFFDATE as CutoffDate,
+            wc.CUTOFFWEEK_TO as CutoffWeekTo,
+            wc.CUTOFFDATE_TO as CutoffDateTo,            
             wc.WOPLANNEDSTARTUPDATE as PlannedStartAtDate,
             wc.WOPLANNEDCOMPLETIONDATE as PlannedFinishedAtDate,
             wc.EXPENDED_MHRS as ExpendedManHours,
@@ -57,7 +59,7 @@ public class WorkOrderCutoffQuery
             wc.EXPENDED_LW as ManHoursExpendedLastWeek,
             wc.EARNED_LW as ManHoursEarnedLastWeek,
             wc.PROJECTPROGRESS as ProjectProgress
-        from v$wo_cutoff wc
+        from wo_cutoff wc
             join wo wo on wo.wo_id = wc.wo_id
             join projectschema ps ON ps.projectschema = wc.projectschema
             join project p ON p.project_id = wc.project_id and p.isvoided = 'N' and p.isclosed = 'N'
@@ -72,7 +74,7 @@ public class WorkOrderCutoffQuery
             left join library jsc ON jsc.library_id = wc.jobstatus_id
             left join library area ON area.library_id = wc.area_id
         {whereClause.clause}";
-       
+
         return (query,whereClause.parameters);
     }
 }
