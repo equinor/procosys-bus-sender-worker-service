@@ -7,11 +7,7 @@ using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 using Equinor.ProCoSys.BusSenderWorker.Core.Models;
 using Equinor.ProCoSys.BusSenderWorker.Infrastructure.Data;
 using Equinor.ProCoSys.PcsServiceBus;
-using Microsoft.Azure.Amqp.Serialization;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Equinor.ProCoSys.BusSenderWorker.Infrastructure.Repositories;
 

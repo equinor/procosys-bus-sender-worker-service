@@ -156,19 +156,14 @@ public class Program
         if (plantsByInstances == null)
         {
             throw new Exception("PlantsByInstance is not configured. Exiting.");
-
         }
-
-        plantService?.RegisterPlantsHandledByCurrentInstance(plantsByInstances, allPlants);
-        await host.RunAsync();
-    }
-
-    private static void LogConfiguration(IConfiguration configuration, ILogger logger)
-    {
-        foreach (var kvp in configuration.AsEnumerable())
+        if (plantService == null)
         {
-            logger.LogInformation("[{InstanceName}] {Key}: {Value}", configuration["InstanceName"], kvp.Key, kvp.Value);
+            throw new Exception("PlantService is not configured. Exiting.");
         }
+
+        plantService.RegisterPlantsHandledByCurrentInstance(plantsByInstances, allPlants);
+        await host.RunAsync();
     }
 
     public IConfiguration Configuration { get; }

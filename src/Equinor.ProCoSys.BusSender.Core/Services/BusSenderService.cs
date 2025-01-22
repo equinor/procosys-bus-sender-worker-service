@@ -104,7 +104,7 @@ public class BusSenderService : IBusSenderService
                 {
                     var m = messages.Dequeue();
                     m.Status = Status.Sent;
-                    TrackMessage(m, msgId, msgBody, _configuration["InstanceName"] ?? "NoPlants");
+                    TrackMessage(m, msgId, msgBody);
                 }
                 else
                 {
@@ -116,7 +116,7 @@ public class BusSenderService : IBusSenderService
                 {
                     var m = messages.Dequeue();
                     m.Status = Status.Sent;
-                    TrackMessage(m,messageId, messageBody, _configuration["InstanceName"] ?? "NoPlants");
+                    TrackMessage(m,messageId, messageBody);
                 }
 
                 _logger.LogDebug("Sending amount: {Count} after {Ms} ms", messageBatch.Count, _sw.ElapsedMilliseconds);
@@ -229,7 +229,7 @@ public class BusSenderService : IBusSenderService
         return events;
     }
 
-    private void TrackMessage(BusEvent busEvent, string busMessageMessageId, string busMessageBody, string? instanceName = null)
+    private void TrackMessage(BusEvent busEvent, string busMessageMessageId, string busMessageBody)
     {
         var busEventMessageToSend = busEvent.MessageToSend ?? busEvent.Message;
         var message = JsonSerializer.Deserialize<BusEventMessage>(_service.WashString(busEventMessageToSend)!,
