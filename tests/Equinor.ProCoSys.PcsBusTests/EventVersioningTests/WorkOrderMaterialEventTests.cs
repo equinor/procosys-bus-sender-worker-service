@@ -28,6 +28,7 @@ public class WorkOrderMaterialEventTests
             { "TagGuid", typeof(Guid?) },
             { "TagRegisterCode", typeof(string) },
             { "StockId", typeof(long?) },
+            { "StockGuid", typeof(Guid?) },
             { "Quantity", typeof(double?) },
             { "UnitName", typeof(string) },
             { "UnitDescription", typeof(string) },

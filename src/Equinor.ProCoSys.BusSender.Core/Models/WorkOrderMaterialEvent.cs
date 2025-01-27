@@ -20,6 +20,7 @@ public class WorkOrderMaterialEvent : IWorkOrderMaterialEventV1
     public double? Quantity { get; init; }
     public DateOnly? RequiredDate { get; init; }
     public long? StockId { get; init; }
+    public Guid? StockGuid { get; init; }
     public string? StockLocation { get; init; }
     public Guid? TagGuid { get; init; }
     public long? TagId { get; init; }

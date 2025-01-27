@@ -18,6 +18,7 @@ public interface IWorkOrderMaterialEventV1 : IHasEventType
     Guid? TagGuid { get; init; }
     string TagRegisterCode { get; init; }
     long? StockId { get; init; }
+    Guid? StockGuid { get; init; }
     double? Quantity { get; init; }
     string? UnitName { get; init; }
     string? UnitDescription { get; init; }
