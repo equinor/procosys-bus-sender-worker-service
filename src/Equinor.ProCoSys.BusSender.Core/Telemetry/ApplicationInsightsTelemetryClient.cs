@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
+using Equinor.ProCoSys.PcsServiceBus;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.Channel;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace Equinor.ProCoSys.BusSenderWorker.Core.Telemetry;
 
@@ -25,7 +26,7 @@ public class ApplicationInsightsTelemetryClient : ITelemetryClient
 {
     private readonly TelemetryClient _ai;
 
-    public ApplicationInsightsTelemetryClient(TelemetryConfiguration telemetryConfiguration, IConfiguration configuration)
+    public ApplicationInsightsTelemetryClient(TelemetryConfiguration telemetryConfiguration, IConfiguration configuration, IOptions<InstanceOptions> instanceOptions)
     {
         if (telemetryConfiguration == null)
         {
@@ -37,7 +38,7 @@ public class ApplicationInsightsTelemetryClient : ITelemetryClient
             // The InstrumentationKey isn't set through the configuration object. Setting it explicitly works.
             TelemetryConfiguration = { ConnectionString = telemetryConfiguration.ConnectionString }
         };
-        _ai.TelemetryConfiguration.TelemetryInitializers.Add(new RunningExecutableTelemetryInitializer(configuration["InstanceName"]??"NoPlants"));
+        _ai.TelemetryConfiguration.TelemetryInitializers.Add(new RunningExecutableTelemetryInitializer(instanceOptions.Value.InstanceName));
     }
 
     public void Flush() => _ai.Flush();
@@ -50,4 +51,8 @@ public class ApplicationInsightsTelemetryClient : ITelemetryClient
         _ai
             .GetMetric(name)
             .TrackValue(metric);
+
+    public void TrackMetric(string name, double metric, Dictionary<string, string> properties) =>
+        _ai
+            .TrackMetric(name, metric, properties);
 }

@@ -39,4 +39,7 @@ public class ConsoleTelemetryClient : ITelemetryClient
     public void TrackMetric(string name, double metric, string dimension1Name, string dimension1Value) =>
         Console.WriteLine(
             $"Metric:\t{name}:{Environment.NewLine}\t{metric}{Environment.NewLine}\t{dimension1Name}: {dimension1Value}");
+    public void TrackMetric(string name, double metric, Dictionary<string, string> properties) =>
+        Console.WriteLine(
+            $"Metric:\t{name}:{Environment.NewLine}\t{string.Join(Environment.NewLine, properties.Select(p => $"\t{p.Key}: {p.Value}"))}{Environment.NewLine}{metric}");
 }

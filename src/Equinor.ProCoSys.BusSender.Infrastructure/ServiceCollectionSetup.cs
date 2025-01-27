@@ -1,12 +1,18 @@
-﻿using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
+﻿using System.Collections.Generic;
+using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
+using Equinor.ProCoSys.BusSenderWorker.Core.Models;
 using Equinor.ProCoSys.BusSenderWorker.Core.Services;
 using Equinor.ProCoSys.BusSenderWorker.Core.Telemetry;
 using Equinor.ProCoSys.BusSenderWorker.Infrastructure.Data;
 using Equinor.ProCoSys.BusSenderWorker.Infrastructure.Repositories;
+using Equinor.ProCoSys.BusSenderWorker.Infrastructure.Validation;
+using Equinor.ProCoSys.PcsServiceBus;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Debug;
+using Microsoft.Extensions.Options;
 
 namespace Equinor.ProCoSys.BusSenderWorker.Infrastructure;
 
@@ -36,7 +42,7 @@ public static class ServiceCollectionSetup
             .AddScoped<IBusEventRepository, BusEventRepository>()
             .AddScoped<ITagDetailsRepository, TagDetailsRepository>();
 
-    public static IServiceCollection AddServices(this IServiceCollection services) 
+    public static IServiceCollection AddServices(this IServiceCollection services)
         => services.AddSingleton<IEntryPointService, EntryPointService>()
             .AddSingleton<IPlantService, PlantService>()
             .AddScoped<ITelemetryClient, ApplicationInsightsTelemetryClient>()
@@ -45,4 +51,31 @@ public static class ServiceCollectionSetup
             .AddScoped<IQueueMonitorService, QueueMonitorService>()
             .AddScoped<ISystemClock, TimeService>()
             .AddScoped<IEventRepository, EventRepository>();
+
+    public static IServiceCollection AddInstanceConfig(this IServiceCollection services, IConfiguration configuration)
+        => services.AddSingleton<InstanceConfig>(serviceProvider =>
+        {
+            var config = new InstanceConfig();
+            var instanceOptions = serviceProvider.GetRequiredService<IOptions<InstanceOptions>>();
+            var plantsByInstances = configuration.GetRequiredSection("PlantsByInstance").Get<List<PlantsByInstance>>();
+
+            ConfigurationValidator.ValidatePlantsByInstance(plantsByInstances);
+            ConfigurationValidator.ValidateInstanceOptions(instanceOptions.Value);
+
+            List<string>? allPlants = null;
+
+            // When using plantRepository from a singleton service, we need to create a new scope to avoid issues with the DbContext.
+            // To ensure that the DbContext is disposed after the scope is done, we use the using statement.
+            using (var scope = serviceProvider.CreateScope())
+            {
+                var scopedServices = scope.ServiceProvider;
+                var plantRepository = scopedServices.GetRequiredService<IPlantRepository>();
+                allPlants = plantRepository.GetAllPlants();
+            }
+
+            var plantService = serviceProvider.GetRequiredService<IPlantService>();
+            var plants = plantService.GetPlantsHandledByInstance(plantsByInstances, allPlants, instanceOptions.Value.InstanceName);
+            config.PlantsHandledByCurrentInstance = plants;
+            return config;
+        });
 }

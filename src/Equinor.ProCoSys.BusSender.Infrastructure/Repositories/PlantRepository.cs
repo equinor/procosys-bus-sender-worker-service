@@ -20,11 +20,11 @@ public class PlantRepository : IPlantRepository
         _logger = logger;
     }
 
-    public async Task<List<string>> GetAllPlantsAsync() =>  
-        await _context.Plants
+    public List<string> GetAllPlants() =>  
+        _context.Plants
             .Where(p => p.IsVoided == "N")
             .Select(p => p.ProjectSchema)
-            .ToListAsync();
+            .ToList();
 
 
 }

@@ -5,7 +5,6 @@ using Microsoft.Extensions.Configuration;
 namespace Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 public interface IPlantService
 {
-    void RegisterPlantsHandledByCurrentInstance(List<PlantsByInstance> plantsByInstances, List<string> allPlants);
-    List<string> GetPlantsHandledByCurrentInstance();
-    IConfiguration GetConfiguration();
+    List<string> GetPlantsHandledByInstance(List<PlantsByInstance>? plantsByInstances, List<string> allPlants,
+        string instanceName);
 }

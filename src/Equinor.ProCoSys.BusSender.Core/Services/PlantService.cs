@@ -4,37 +4,19 @@ using System.Linq;
 using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 using Equinor.ProCoSys.BusSenderWorker.Core.Models;
 using Equinor.ProCoSys.PcsServiceBus;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 
 namespace Equinor.ProCoSys.BusSenderWorker.Core.Services;
 public class PlantService : IPlantService
 {
-    private const string InstanceNameConfigKey = "InstanceName";
-    private readonly IConfiguration _configuration;
     private readonly ILogger<PlantService> _logger;
     private List<string> _plantsHandledByCurrentInstance = new();
 
-    public List<string> GetPlantsHandledByCurrentInstance() => _plantsHandledByCurrentInstance;
-    public IConfiguration GetConfiguration() => _configuration;
+    public PlantService(ILogger<PlantService> logger) => _logger = logger;
 
-    public PlantService(IConfiguration configuration, ILogger<PlantService> logger)
+    public List<string> GetPlantsHandledByInstance(List<PlantsByInstance>? plantsByInstances, List<string> allPlants, string instanceName)
     {
-        _configuration = configuration;
-        _logger = logger;
-    }
-
-    public void RegisterPlantsHandledByCurrentInstance(List<PlantsByInstance> plantsByInstances, List<string> allPlants)
-    {
-        var instanceName = _configuration[InstanceNameConfigKey];
-        if (string.IsNullOrEmpty(instanceName))
-        {
-            var message = $"{InstanceNameConfigKey} is not defined in configuration. Exiting.";
-            _logger.LogError(message);
-            throw new Exception(message);
-        }
-
         _plantsHandledByCurrentInstance = GetPlantsForInstance(plantsByInstances, instanceName);
         if (_plantsHandledByCurrentInstance.Any())
         {
@@ -55,7 +37,10 @@ public class PlantService : IPlantService
             _logger.LogError(message);
             throw new Exception(message);
         }
+
+        return _plantsHandledByCurrentInstance;
     }
+
 
     private void AddPlantLeftovers(IEnumerable<PlantsByInstance> plantsByInstances, IEnumerable<string> allPlants, string instanceName)
     {

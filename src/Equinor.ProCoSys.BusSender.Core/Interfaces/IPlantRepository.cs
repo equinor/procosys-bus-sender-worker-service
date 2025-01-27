@@ -5,5 +5,5 @@ namespace Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 
 public interface IPlantRepository
 {
-    Task<List<string>> GetAllPlantsAsync();
+    List<string> GetAllPlants();
 }

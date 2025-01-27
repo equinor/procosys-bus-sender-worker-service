@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Azure.Identity;
-using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
-using Equinor.ProCoSys.BusSenderWorker.Core.Models;
 using Equinor.ProCoSys.BusSenderWorker.Infrastructure;
 using Equinor.ProCoSys.BusSenderWorker.Infrastructure.Repositories;
 using Equinor.ProCoSys.PcsServiceBus;
@@ -131,8 +128,11 @@ public class Program
                 services.AddTopicClients(
                     hostContext.Configuration["ServiceBusConnectionString"]!,
                     hostContext.Configuration["TopicNames"]!);
-                services.AddRepositories();
+
+                services.Configure<InstanceOptions>(hostContext.Configuration.GetSection("InstanceOptions"));
                 services.AddServices();
+                services.AddRepositories();
+                services.AddInstanceConfig(hostContext.Configuration);
                 services.AddHostedService<TimedWorkerService>();
             });
         return builder;
@@ -141,28 +141,6 @@ public class Program
     public static async Task Main(string[] args)
     {
         using var host = CreateHostBuilder(args).Build();
-        using var scope = host.Services.CreateScope();
-        var plantService = host.Services.GetService<IPlantService>();
-        var configuration = host.Services.GetService<IConfiguration>();
-        var plantRepository = scope.ServiceProvider.GetService<IPlantRepository>();
-        var allPlants = new List<string>();
-
-        if (plantRepository != null)
-        {
-            allPlants = await plantRepository.GetAllPlantsAsync();
-        }
-
-        var plantsByInstances = configuration?.GetSection("PlantsByInstance").Get<List<PlantsByInstance>>();
-        if (plantsByInstances == null)
-        {
-            throw new Exception("PlantsByInstance is not configured. Exiting.");
-        }
-        if (plantService == null)
-        {
-            throw new Exception("PlantService is not configured. Exiting.");
-        }
-
-        plantService.RegisterPlantsHandledByCurrentInstance(plantsByInstances, allPlants);
         await host.RunAsync();
     }
 
