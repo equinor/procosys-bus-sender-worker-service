@@ -40,7 +40,7 @@ public class WorkOrderMaterialQuery
         from wo_material wm
             join wo on wo.wo_id = wm.wo_id
             join project p on p.project_id = wo.project_id
-            left join stock st on wo.stock_id = st.id
+            left join stock st on wm.stock_id = st.id
             left join tag t on t.tag_id = wm.tag_id
             left join library ms  on ms.library_id = wm.materialstatus_id
             left join library sl on sl.library_id = wm.stocklocation_id
