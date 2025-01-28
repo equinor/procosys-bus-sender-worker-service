@@ -10,10 +10,12 @@ using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 using Equinor.ProCoSys.BusSenderWorker.Core.Models;
 using Equinor.ProCoSys.BusSenderWorker.Core.Services;
 using Equinor.ProCoSys.BusSenderWorker.Core.Telemetry;
+using Equinor.ProCoSys.PcsServiceBus;
 using Equinor.ProCoSys.PcsServiceBus.Sender;
 using Equinor.ProCoSys.PcsServiceBus.Topics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Range = Moq.Range;
@@ -99,11 +101,12 @@ public class BusSenderServiceTests
         _busEventServiceMock = new Mock<BusEventService>(_tagDetailsRepositoryMock.Object, _dapperRepositoryMock.Object)
             { CallBase = true };
         _iUnitOfWork = new Mock<IUnitOfWork>();
+        var instanceOptions = Options.Create(new InstanceOptions { InstanceName = "TestInstance" });
 
         _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk()).Returns(() => Task.FromResult(_busEvents));
         _dut = new BusSenderService(_busSender, _busEventRepository.Object, _iUnitOfWork.Object,
             new Mock<ILogger<BusSenderService>>().Object,
-            new Mock<ITelemetryClient>().Object, _busEventServiceMock.Object, _queueMonitorService.Object, new Mock<IConfiguration>().Object);
+            new Mock<ITelemetryClient>().Object, _busEventServiceMock.Object, _queueMonitorService.Object, new Mock<IConfiguration>().Object, instanceOptions);
     }
     
     [TestMethod]

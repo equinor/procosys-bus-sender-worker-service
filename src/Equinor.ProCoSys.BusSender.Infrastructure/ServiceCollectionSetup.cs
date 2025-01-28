@@ -53,7 +53,18 @@ public static class ServiceCollectionSetup
             .AddScoped<IEventRepository, EventRepository>();
 
     public static IServiceCollection AddInstanceConfig(this IServiceCollection services, IConfiguration configuration)
-        => services.AddSingleton<InstanceConfig>(serviceProvider =>
+    {
+        // Create a scope and call GetAllPlants during the service registration
+        List<string>? allPlants;
+        using (var scope = services.BuildServiceProvider().CreateScope())
+        {
+            var scopedServices = scope.ServiceProvider;
+            var plantRepository = scopedServices.GetRequiredService<IPlantRepository>();
+            allPlants = plantRepository.GetAllPlants();
+        }
+
+        // Register the InstanceConfig with the pre-fetched allPlants
+        return services.AddSingleton<InstanceConfig>(serviceProvider =>
         {
             var config = new InstanceConfig();
             var instanceOptions = serviceProvider.GetRequiredService<IOptions<InstanceOptions>>();
@@ -62,20 +73,12 @@ public static class ServiceCollectionSetup
             ConfigurationValidator.ValidatePlantsByInstance(plantsByInstances);
             ConfigurationValidator.ValidateInstanceOptions(instanceOptions.Value);
 
-            List<string>? allPlants = null;
-
-            // When using plantRepository from a singleton service, we need to create a new scope to avoid issues with the DbContext.
-            // To ensure that the DbContext is disposed after the scope is done, we use the using statement.
-            using (var scope = serviceProvider.CreateScope())
-            {
-                var scopedServices = scope.ServiceProvider;
-                var plantRepository = scopedServices.GetRequiredService<IPlantRepository>();
-                allPlants = plantRepository.GetAllPlants();
-            }
-
             var plantService = serviceProvider.GetRequiredService<IPlantService>();
-            var plants = plantService.GetPlantsHandledByInstance(plantsByInstances, allPlants, instanceOptions.Value.InstanceName);
+            var plants =
+                plantService.GetPlantsHandledByInstance(plantsByInstances, allPlants,
+                    instanceOptions.Value.InstanceName);
             config.PlantsHandledByCurrentInstance = plants;
             return config;
         });
+    }
 }

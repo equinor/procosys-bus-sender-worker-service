@@ -11,10 +11,12 @@ using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 using Equinor.ProCoSys.BusSenderWorker.Core.Mappers;
 using Equinor.ProCoSys.BusSenderWorker.Core.Models;
 using Equinor.ProCoSys.BusSenderWorker.Core.Telemetry;
+using Equinor.ProCoSys.PcsServiceBus;
 using Equinor.ProCoSys.PcsServiceBus.Sender.Interfaces;
 using Equinor.ProCoSys.PcsServiceBus.Topics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Equinor.ProCoSys.BusSenderWorker.Core.Services;
 
@@ -28,7 +30,7 @@ public class BusSenderService : IBusSenderService
     private readonly Stopwatch _sw;
     private readonly ITelemetryClient _telemetryClient;
     private readonly IUnitOfWork _unitOfWork;
-    private readonly IConfiguration _configuration;
+    private readonly string _instanceName;
 
     public BusSenderService(IPcsBusSender pcsBusSender,
         IBusEventRepository busEventRepository,
@@ -37,7 +39,8 @@ public class BusSenderService : IBusSenderService
         ITelemetryClient telemetryClient,
         IBusEventService service,
         IQueueMonitorService queueMonitor,
-        IConfiguration configuration)
+        IConfiguration configuration,
+        IOptions<InstanceOptions> instanceOptions)
     {
         _pcsBusSender = pcsBusSender;
         _busEventRepository = busEventRepository;
@@ -46,8 +49,8 @@ public class BusSenderService : IBusSenderService
         _telemetryClient = telemetryClient;
         _service = service;
         _queueMonitor = queueMonitor;
-        _configuration = configuration;
         _sw = new Stopwatch();
+        _instanceName = instanceOptions.Value.InstanceName;
     }
 
     public async Task CloseConnections()
@@ -66,11 +69,11 @@ public class BusSenderService : IBusSenderService
             var events = await _busEventRepository.GetEarliestUnProcessedEventChunk();
             if (events.Any())
             {
-                _logger.LogInformation("[{InstanceName}] BusSenderService found {Count} messages to process after {Sw} ms", _configuration["InstanceName"] ?? "NoPlants", events.Count,
+                _logger.LogInformation("[{InstanceName}] BusSenderService found {Count} messages to process after {Sw} ms", _instanceName, events.Count,
                     _sw.ElapsedMilliseconds);
                 _telemetryClient.TrackMetric("BusSender Chunk", events.Count);
                 await ProcessBusEvents(events);
-                _logger.LogInformation("[{InstanceName}] BusSenderService ProcessBusEvents used {Sw} ms", _configuration["InstanceName"] ?? "NoPlants",_sw.ElapsedMilliseconds);
+                _logger.LogInformation("[{InstanceName}] BusSenderService ProcessBusEvents used {Sw} ms", _instanceName,_sw.ElapsedMilliseconds);
             }
 
             _sw.Reset();
@@ -184,7 +187,7 @@ public class BusSenderService : IBusSenderService
         var dsw = Stopwatch.StartNew();
 
         var unProcessedEvents = events.Where(busEvent => busEvent.Status == Status.UnProcessed).ToList();
-        _logger.LogInformation("[{InstanceName}] Amount of messages to process: {Count} ", _configuration["InstanceName"] ?? "NoPlants", unProcessedEvents.Count);
+        _logger.LogInformation("[{InstanceName}] Amount of messages to process: {Count} ", _instanceName, unProcessedEvents.Count);
 
         foreach (var simpleUnprocessedBusEvent in unProcessedEvents.Where(e =>
                      IsSimpleMessage(e) || e.Event == TagTopic.TopicName))
@@ -192,7 +195,7 @@ public class BusSenderService : IBusSenderService
             await UpdateEventBasedOnTopic(simpleUnprocessedBusEvent);
         }
 
-        _logger.LogInformation("[{InstanceName}] Update loop finished at at {Sw} ms", _configuration["InstanceName"] ?? "NoPlants", dsw.ElapsedMilliseconds);
+        _logger.LogInformation("[{InstanceName}] Update loop finished at at {Sw} ms", _instanceName, dsw.ElapsedMilliseconds);
         await _unitOfWork.SaveChangesAsync();
 
 
@@ -247,8 +250,7 @@ public class BusSenderService : IBusSenderService
             {"ProjectName", message?.ProjectName ?? "NoProject"},
             {"Plant", message?.Plant ?? "NoPlant"},
             {"MessageId", busMessageMessageId ?? "NoID" },
-            {"InstanceName", _configuration["InstanceName"]??"NoInstance"},
-            {"Plants", _configuration["PlantsHandledByInstance"]??"NoPlants"},
+            {"InstanceName", _instanceName},
             //Remove these after debugging
             {"BusEventMessageToSend", string.IsNullOrEmpty(message?.ProCoSysGuid) ? "MessageToSend: ( " + busEvent.MessageToSend + " )" : "N/A"  },
             {"BusEventMessage", string.IsNullOrEmpty(message?.ProCoSysGuid) ? busEvent.Message : "N/A" },
