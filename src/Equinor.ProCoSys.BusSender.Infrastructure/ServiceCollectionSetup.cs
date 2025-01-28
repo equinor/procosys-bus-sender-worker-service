@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 using Equinor.ProCoSys.BusSenderWorker.Core.Models;
 using Equinor.ProCoSys.BusSenderWorker.Core.Services;
@@ -52,33 +53,31 @@ public static class ServiceCollectionSetup
             .AddScoped<ISystemClock, TimeService>()
             .AddScoped<IEventRepository, EventRepository>();
 
-    public static IServiceCollection AddInstanceConfig(this IServiceCollection services, IConfiguration configuration)
-    {
-        // Create a scope and call GetAllPlants during the service registration
-        List<string>? allPlants;
-        using (var scope = services.BuildServiceProvider().CreateScope())
-        {
-            var scopedServices = scope.ServiceProvider;
-            var plantRepository = scopedServices.GetRequiredService<IPlantRepository>();
-            allPlants = plantRepository.GetAllPlants();
-        }
+    public static IServiceCollection AddInstanceConfig(this IServiceCollection services, IConfiguration configuration) => 
+        services.AddSingleton<InstanceConfig>(serviceProvider =>
+       {
+           var config = new InstanceConfig();
+           var instanceOptions = serviceProvider.GetRequiredService<IOptions<InstanceOptions>>();
+           var plantsByInstances = configuration.GetRequiredSection("PlantsByInstance").Get<List<PlantsByInstance>>();
 
-        // Register the InstanceConfig with the pre-fetched allPlants
-        return services.AddSingleton<InstanceConfig>(serviceProvider =>
-        {
-            var config = new InstanceConfig();
-            var instanceOptions = serviceProvider.GetRequiredService<IOptions<InstanceOptions>>();
-            var plantsByInstances = configuration.GetRequiredSection("PlantsByInstance").Get<List<PlantsByInstance>>();
+           ConfigurationValidator.ValidatePlantsByInstance(plantsByInstances);
+           ConfigurationValidator.ValidateInstanceOptions(instanceOptions.Value);
 
-            ConfigurationValidator.ValidatePlantsByInstance(plantsByInstances);
-            ConfigurationValidator.ValidateInstanceOptions(instanceOptions.Value);
+           var plantService = serviceProvider.GetRequiredService<IPlantService>();
 
-            var plantService = serviceProvider.GetRequiredService<IPlantService>();
-            var plants =
-                plantService.GetPlantsHandledByInstance(plantsByInstances, allPlants,
-                    instanceOptions.Value.InstanceName);
-            config.PlantsHandledByCurrentInstance = plants;
-            return config;
-        });
-    }
+           // Use Lazy to ensure GetAllPlants is called only once
+           var lazyAllPlants = new Lazy<List<string>>(() =>
+           {
+               using (var scope = serviceProvider.CreateScope())
+               {
+                   var plantRepository = scope.ServiceProvider.GetRequiredService<IPlantRepository>();
+                   return plantRepository.GetAllPlants();
+               }
+           });
+
+           var plants = plantService.GetPlantsHandledByInstance(plantsByInstances, lazyAllPlants.Value, instanceOptions.Value.InstanceName);
+           config.PlantsHandledByCurrentInstance = plants;
+
+           return config;
+       });
 }
