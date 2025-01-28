@@ -7,6 +7,7 @@ public interface ITelemetryClient
     void Flush();
     void TrackMetric(string name, double metric);
     
-    void TrackEvent(string name, Dictionary<string, string> properties);    
-    
+    void TrackEvent(string name, Dictionary<string, string> properties);
+    void TrackMetric(string name, double metric, Dictionary<string, string> properties);
+
 }

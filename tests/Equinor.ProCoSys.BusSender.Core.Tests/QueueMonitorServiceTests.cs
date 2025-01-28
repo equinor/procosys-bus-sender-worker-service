@@ -4,7 +4,9 @@ using System.Threading.Tasks;
 using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 using Equinor.ProCoSys.BusSenderWorker.Core.Services;
 using Equinor.ProCoSys.BusSenderWorker.Core.Telemetry;
+using Equinor.ProCoSys.PcsServiceBus;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
@@ -15,6 +17,7 @@ public class QueueMonitorServiceTests
 {
     private Mock<ITelemetryClient> _mockTelemetryClient;
     private Mock<IBusEventRepository> _mockBusEventRepository;
+    private IOptions<InstanceOptions> _instanceOptions;
     private ManualTimeProvider _manualTimeProvider;
     private QueueMonitorService _dut;
     private IConfiguration _configuration;
@@ -25,6 +28,7 @@ public class QueueMonitorServiceTests
         _mockTelemetryClient = new Mock<ITelemetryClient>();
         _mockBusEventRepository = new Mock<IBusEventRepository>();
         _manualTimeProvider = new ManualTimeProvider();
+        _instanceOptions = Options.Create(new InstanceOptions { InstanceName = "TestInstance" });
 
         var inMemorySettings = new Dictionary<string, string> {
             {"QueueWriteIntervalMinutes", "15"},
@@ -37,7 +41,8 @@ public class QueueMonitorServiceTests
             _mockTelemetryClient.Object,
             _mockBusEventRepository.Object,
             _configuration,
-            _manualTimeProvider);
+            _manualTimeProvider,
+            _instanceOptions);
     }
 
     [TestMethod]
@@ -58,8 +63,12 @@ public class QueueMonitorServiceTests
         await _dut.WriteQueueMetrics();
 
         // Assert
-        _mockTelemetryClient.Verify(t => t.TrackMetric("QueueLength", 10), Times.Once);
-        _mockTelemetryClient.Verify(t => t.TrackMetric("QueueAge", 1470), Times.Once);
+        var properties = new Dictionary<string, string>
+        {
+            { "InstanceName", "TestInstance" }
+        };
+        _mockTelemetryClient.Verify(t => t.TrackMetric("QueueLength", 10, properties), Times.Once);
+        _mockTelemetryClient.Verify(t => t.TrackMetric("QueueAge", 1470, properties), Times.Once);
     }
 
     [TestMethod]
@@ -75,7 +84,11 @@ public class QueueMonitorServiceTests
         await _dut.WriteQueueMetrics();
 
         // Assert
-        _mockTelemetryClient.Verify(t => t.TrackMetric("QueueAge", It.IsAny<double>()), Times.Exactly(2));
+        var properties = new Dictionary<string, string>
+        {
+            { "InstanceName", "TestInstance" }
+        };
+        _mockTelemetryClient.Verify(t => t.TrackMetric("QueueAge", It.IsAny<double>(), properties), Times.Exactly(2));
     }
 
     [TestMethod]
@@ -89,7 +102,11 @@ public class QueueMonitorServiceTests
         await _dut.WriteQueueMetrics();
 
         // Assert
-        _mockTelemetryClient.Verify(t => t.TrackMetric("QueueAge", It.IsAny<double>()), Times.Once);
+        var properties = new Dictionary<string, string>
+        {
+            { "InstanceName", "TestInstance" }
+        };
+        _mockTelemetryClient.Verify(t => t.TrackMetric("QueueAge", It.IsAny<double>(), properties), Times.Once);
     }
 
     [TestMethod]
@@ -105,6 +122,10 @@ public class QueueMonitorServiceTests
         await _dut.WriteQueueMetrics();
 
         // Assert
-        _mockTelemetryClient.Verify(t => t.TrackMetric("QueueAge", 0), Times.Once); 
+        var properties = new Dictionary<string, string>
+        {
+            { "InstanceName", "TestInstance" }
+        };
+        _mockTelemetryClient.Verify(t => t.TrackMetric("QueueAge", 0, properties), Times.Once); 
     }
 }
