@@ -28,7 +28,12 @@ namespace Equinor.ProCoSys.BusSenderWorker.Infrastructure.Validation
         {
             if (string.IsNullOrEmpty(options.InstanceName))
             {
-                throw new InvalidOperationException("InstanceName is required.");
+                throw new InvalidOperationException("InstanceName is required in configuration.");
+            }
+
+            if (options.MessageChunkSize <= 0)
+            {
+                throw new InvalidOperationException("MessageChunkSize must be greater than 0.");
             }
         }
     }
