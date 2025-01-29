@@ -12,7 +12,7 @@ resources:
       type: github
       name: equinor/procosys-infra
       endpoint: 'equinor'
-      ref: master
+      ref: GH00839-Use-two-web-job-instances-to-create-messages-to-Azure-service-bus-based-on-content-in-busevent-table
 
 variables:
   - template: src/variables/global-variables.yml@templates
@@ -59,7 +59,19 @@ stages:
           rootFolderOrFile: '$(Build.BinariesDirectory)/build'
           solution: '**/*.sln'
           sourceFolder: '$(System.DefaultWorkingDirectory)/src/$(projectName)/bin/$(buildConfiguration)/net6.0'
-          targetFolder: '$(Build.BinariesDirectory)/build/App_Data/jobs/continuous/$(projectName)'
+          searchFolder: '$(System.DefaultWorkingDirectory)'
+          targetFolder: '$(Build.BinariesDirectory)/build/App_Data/jobs/continuous'
+          testSelector: 'testAssemblies'
+          testAssemblyVer2: |
+            **/*.Specs/bin/$(buildConfiguration)/*.Specs.dll
+          testArtifactName: 'test'
+          testInstances:
+            - ServiceA
+            - ServiceB
+          prodArtifactName: 'prod'
+          prodInstances:
+            - ServiceA
+            - ServiceB
           versionSpec: '6.7.0'
           projectName: '$(projectName)'
 
