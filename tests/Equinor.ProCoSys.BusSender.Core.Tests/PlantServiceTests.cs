@@ -1,9 +1,11 @@
-﻿using Equinor.ProCoSys.BusSenderWorker.Core.Models;
+﻿using System;
+using Equinor.ProCoSys.BusSenderWorker.Core.Models;
 using Equinor.ProCoSys.BusSenderWorker.Core.Services;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System.Collections.Generic;
+using Equinor.ProCoSys.PcsServiceBus;
 
 namespace Equinor.ProCoSys.BusSenderWorker.Core.Tests;
 
@@ -49,7 +51,7 @@ public class PlantServiceTests
             new PlantsByInstance()
             {
                 InstanceName = "ServiceA",
-                Value = "PCS$PlantA,REMAININGPLANTS"
+                Value = $"PCS$PlantA,{PcsServiceBusInstanceConstants.RemainingPlants}"
             },
             new PlantsByInstance()
             {
@@ -85,5 +87,24 @@ public class PlantServiceTests
 
         Assert.IsTrue(plantsHandledByInstance[0] == "PCS$PlantA");
         Assert.IsTrue(plantsHandledByInstance[1] == "PCS$PlantB");
+    }
+
+    [TestMethod]
+    public void GetPlantsHandledByInstance_WhenNoPlantsConfigured_ShouldReturnException()
+    {
+        // Arrange
+        var allPlants = new List<string>() { "PCS$PlantA", "PCS$PlantB", "PCS$PlantC", "PCS$PlantD" };
+        var plantsByInstances = new List<PlantsByInstance>()
+        {
+            new PlantsByInstance()
+            {
+                InstanceName = "ServiceA",
+                Value = ""
+            }
+        };
+
+        var serviceADut = new PlantService(new Mock<ILogger<PlantService>>().Object);
+
+        Assert.ThrowsException<Exception>(() => serviceADut.GetPlantsHandledByInstance(plantsByInstances, allPlants, "ServiceA"));
     }
 }

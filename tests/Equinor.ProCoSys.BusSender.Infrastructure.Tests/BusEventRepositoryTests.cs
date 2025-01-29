@@ -89,7 +89,7 @@ public class BusEventRepositoryTests : RepositoryTestBase
             .Setup(x => x.BusEvents)
             .Returns(serviceABusEventSetMock.Object);
 
-        var plants = new List<string>() { "PLANT" };
+        var plants = new List<string>() { $"{PcsServiceBusInstanceConstants.Plant}" };
         var instanceConfig = new InstanceConfig()
         {
             PlantsHandledByCurrentInstance = plants
@@ -151,7 +151,7 @@ public class BusEventRepositoryTests : RepositoryTestBase
             .Setup(x => x.BusEvents)
             .Returns(serviceABusEventSetMock.Object);
 
-        var plants = new List<string>() { "PCS$PlantA", "PCS$PlantB", "NOPLANT" };
+        var plants = new List<string>() { "PCS$PlantA", "PCS$PlantB", $"{PcsServiceBusInstanceConstants.NoPlant}" };
         var instanceConfig = new InstanceConfig()
         {
             PlantsHandledByCurrentInstance = plants

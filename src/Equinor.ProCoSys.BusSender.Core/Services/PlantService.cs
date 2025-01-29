@@ -52,13 +52,14 @@ public class PlantService : IPlantService
     private static IEnumerable<string> GetPlantsForAllExceptInstance(IEnumerable<PlantsByInstance> plantsByInstances, string instanceName) =>
         plantsByInstances
             .Where(x => x.InstanceName != instanceName)
-            .SelectMany(x => x.Value.Split(','))
+            .SelectMany(x => x.Value.Split(',').Select(p => p.Trim()))
             .ToList();
 
     private static List<string> GetPlantsForInstance(IEnumerable<PlantsByInstance> plantsByInstances, string instanceName) =>
-        plantsByInstances
-            .First(x => x.InstanceName == instanceName).Value.Split(',')
-            .ToList();
+plantsByInstances
+    .Single(x => x.InstanceName == instanceName).Value.Split(',')
+    .Select(p => p.Trim())
+    .ToList();
 
     private void RemoveInvalidPlants(IEnumerable<string> allPlants, string instanceName)
     {

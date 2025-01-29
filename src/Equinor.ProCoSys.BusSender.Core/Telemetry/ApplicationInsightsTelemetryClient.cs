@@ -26,7 +26,7 @@ public class ApplicationInsightsTelemetryClient : ITelemetryClient
 {
     private readonly TelemetryClient _ai;
 
-    public ApplicationInsightsTelemetryClient(TelemetryConfiguration telemetryConfiguration, IConfiguration configuration, IOptions<InstanceOptions> instanceOptions)
+    public ApplicationInsightsTelemetryClient(TelemetryConfiguration telemetryConfiguration, IOptions<InstanceOptions> instanceOptions)
     {
         if (telemetryConfiguration == null)
         {
