@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System;
 using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 using Equinor.ProCoSys.BusSenderWorker.Core.Models;
 using Equinor.ProCoSys.BusSenderWorker.Core.Services;
@@ -45,7 +45,7 @@ public static class ServiceCollectionSetup
 
     public static IServiceCollection AddServices(this IServiceCollection services)
         => services.AddSingleton<IEntryPointService, EntryPointService>()
-            .AddSingleton<IPlantService, PlantService>()
+            .AddScoped<IPlantService, PlantService>()
             .AddScoped<ITelemetryClient, ApplicationInsightsTelemetryClient>()
             .AddScoped<IBusSenderService, BusSenderService>()
             .AddScoped<IBusEventService, BusEventService>()
@@ -53,31 +53,4 @@ public static class ServiceCollectionSetup
             .AddScoped<ISystemClock, TimeService>()
             .AddScoped<IEventRepository, EventRepository>();
 
-    public static IServiceCollection AddInstanceConfig(this IServiceCollection services, IConfiguration configuration) => 
-        services.AddSingleton<InstanceConfig>(serviceProvider =>
-       {
-           var config = new InstanceConfig();
-           var instanceOptions = serviceProvider.GetRequiredService<IOptions<InstanceOptions>>();
-           var plantsByInstances = configuration.GetRequiredSection("PlantsByInstance").Get<List<PlantsByInstance>>();
-
-           ConfigurationValidator.ValidatePlantsByInstance(plantsByInstances);
-           ConfigurationValidator.ValidateInstanceOptions(instanceOptions.Value);
-
-           var plantService = serviceProvider.GetRequiredService<IPlantService>();
-
-           // Use Lazy to ensure GetAllPlants is called only once
-           var lazyAllPlants = new Lazy<List<string>>(() =>
-           {
-               using (var scope = serviceProvider.CreateScope())
-               {
-                   var plantRepository = scope.ServiceProvider.GetRequiredService<IPlantRepository>();
-                   return plantRepository.GetAllPlants();
-               }
-           });
-
-           var plants = plantService.GetPlantsHandledByInstance(plantsByInstances, lazyAllPlants.Value, instanceOptions.Value.InstanceName);
-           config.PlantsHandledByCurrentInstance = plants;
-
-           return config;
-       });
 }

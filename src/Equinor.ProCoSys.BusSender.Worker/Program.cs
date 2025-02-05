@@ -1,15 +1,20 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Threading.Tasks;
 using Azure.Identity;
+using Equinor.ProCoSys.BusSenderWorker.Core.Models;
 using Equinor.ProCoSys.BusSenderWorker.Infrastructure;
 using Equinor.ProCoSys.BusSenderWorker.Infrastructure.Repositories;
+using Equinor.ProCoSys.BusSenderWorker.Infrastructure.Validation;
 using Equinor.ProCoSys.PcsServiceBus;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Equinor.ProCoSys.BusSender.Worker;
 
@@ -132,8 +137,8 @@ public class Program
                 services.Configure<InstanceOptions>(hostContext.Configuration.GetSection("InstanceOptions"));
                 services.AddServices();
                 services.AddRepositories();
-                services.AddInstanceConfig(hostContext.Configuration);
                 services.AddHostedService<TimedWorkerService>();
+                services.AddMemoryCache();
             });
         return builder;
     }
@@ -141,6 +146,13 @@ public class Program
     public static async Task Main(string[] args)
     {
         using var host = CreateHostBuilder(args).Build();
+        var serviceProvider = host.Services;
+        var configuration = serviceProvider.GetRequiredService<IConfiguration>();
+        var instanceOptions = serviceProvider.GetRequiredService<IOptions<InstanceOptions>>();
+        var plantsByInstances = configuration.GetRequiredSection("PlantsByInstance").Get<List<PlantsByInstance>>();
+
+        ConfigurationValidator.ValidatePlantsByInstance(plantsByInstances);
+        ConfigurationValidator.ValidateInstanceOptions(instanceOptions.Value);
         await host.RunAsync();
     }
 

@@ -5,13 +5,48 @@ using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System.Collections.Generic;
+using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 using Equinor.ProCoSys.PcsServiceBus;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace Equinor.ProCoSys.BusSenderWorker.Core.Tests;
 
 [TestClass]
 public class PlantServiceTests
 {
+
+    private PlantService GetServiceDut(List<string> allPlants, List<PlantsByInstance> plantsByInstances,
+        string instanceName, int messageChunkSize)
+    {
+        var instanceOptionsService = new InstanceOptions
+        {
+            InstanceName = instanceName,
+            MessageChunkSize = messageChunkSize
+        };
+
+        var mockPlantRepository = new Mock<IPlantRepository>();
+        mockPlantRepository.Setup(repo => repo.GetAllPlants()).Returns(allPlants);
+
+        var mockOptionsService = new Mock<IOptions<InstanceOptions>>();
+        mockOptionsService.Setup(o => o.Value).Returns(instanceOptionsService);
+
+        var mockConfiguration = new Mock<IConfiguration>();
+
+        var mockPlantService = new Mock<PlantService>(
+                new Mock<ILogger<PlantService>>().Object,
+                mockPlantRepository.Object,
+                mockOptionsService.Object,
+                mockConfiguration.Object
+            )
+            { CallBase = true };
+
+        mockPlantService.Setup(service => service.GetPlantsByInstance()).Returns(plantsByInstances);
+
+        return mockPlantService.Object;
+
+    }
+
     [TestMethod]
     public void GetPlantsHandledByInstance_WhenTwoInstancesAssignedSamePlants_ShouldReturnItemsForAssignedPlants()
     {
@@ -30,10 +65,12 @@ public class PlantServiceTests
                 Value = "PCS$PlantA,PCS$PlantB"
             }
         };
+        var serviceADut = GetServiceDut(allPlants, plantsByInstances, "ServiceA", 200);
+        var serviceBDut = GetServiceDut(allPlants, plantsByInstances, "ServiceB", 200);
 
-        var serviceADut = new PlantService(new Mock<ILogger<PlantService>>().Object);
-        var plantsHandledByInstanceA = serviceADut.GetPlantsHandledByInstance(plantsByInstances, allPlants, "ServiceA");
-        var plantsHandledByInstanceB = serviceADut.GetPlantsHandledByInstance(plantsByInstances, allPlants, "ServiceB");
+
+        var plantsHandledByInstanceA = serviceADut.GetPlantsHandledByInstance();
+        var plantsHandledByInstanceB = serviceBDut.GetPlantsHandledByInstance();
 
         Assert.IsTrue(plantsHandledByInstanceA[0] == "PCS$PlantA");
         Assert.IsTrue(plantsHandledByInstanceA[1] == "PCS$PlantB");
@@ -60,12 +97,12 @@ public class PlantServiceTests
             }
         };
 
-        var serviceADut = new PlantService(new Mock<ILogger<PlantService>>().Object);
-        var plantsHandledByInstance = serviceADut.GetPlantsHandledByInstance(plantsByInstances, allPlants, "ServiceA");
+        var serviceADut = GetServiceDut(allPlants, plantsByInstances, "ServiceA", 200);
+        var plantsHandledByInstanceA = serviceADut.GetPlantsHandledByInstance();
 
-        Assert.IsTrue(plantsHandledByInstance[0] == "PCS$PlantA");
-        Assert.IsTrue(plantsHandledByInstance[1] == "PCS$PlantC");
-        Assert.IsTrue(plantsHandledByInstance[2] == "PCS$PlantD");
+        Assert.IsTrue(plantsHandledByInstanceA[0] == "PCS$PlantA");
+        Assert.IsTrue(plantsHandledByInstanceA[1] == "PCS$PlantC");
+        Assert.IsTrue(plantsHandledByInstanceA[2] == "PCS$PlantD");
     }
 
     [TestMethod]
@@ -82,11 +119,11 @@ public class PlantServiceTests
             }
         };
 
-        var serviceADut = new PlantService(new Mock<ILogger<PlantService>>().Object);
-        var plantsHandledByInstance = serviceADut.GetPlantsHandledByInstance(plantsByInstances, allPlants, "ServiceA");
+        var serviceADut = GetServiceDut(allPlants, plantsByInstances, "ServiceA", 200);
+        var plantsHandledByInstanceA = serviceADut.GetPlantsHandledByInstance();
 
-        Assert.IsTrue(plantsHandledByInstance[0] == "PCS$PlantA");
-        Assert.IsTrue(plantsHandledByInstance[1] == "PCS$PlantB");
+        Assert.IsTrue(plantsHandledByInstanceA[0] == "PCS$PlantA");
+        Assert.IsTrue(plantsHandledByInstanceA[1] == "PCS$PlantB");
     }
 
     [TestMethod]
@@ -103,8 +140,9 @@ public class PlantServiceTests
             }
         };
 
-        var serviceADut = new PlantService(new Mock<ILogger<PlantService>>().Object);
+        var serviceADut = GetServiceDut(allPlants, plantsByInstances, "ServiceA", 200);
 
-        Assert.ThrowsException<Exception>(() => serviceADut.GetPlantsHandledByInstance(plantsByInstances, allPlants, "ServiceA"));
+        Assert.ThrowsException<Exception>(() =>
+            serviceADut.GetPlantsHandledByInstance());
     }
 }

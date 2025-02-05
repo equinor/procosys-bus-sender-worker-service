@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Equinor.ProCoSys.BusSenderWorker.Core;
 using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 using Equinor.ProCoSys.BusSenderWorker.Core.Models;
+using Equinor.ProCoSys.BusSenderWorker.Core.Services;
 using Equinor.ProCoSys.BusSenderWorker.Infrastructure.Data;
 using Equinor.ProCoSys.PcsServiceBus;
 using Microsoft.EntityFrameworkCore;
@@ -18,11 +19,11 @@ public class BusEventRepository : IBusEventRepository
     private readonly int _messageChunkSize;
     private readonly List<string> _plants;
 
-    public BusEventRepository(BusSenderServiceContext context, InstanceConfig instanceConfig, IOptions<InstanceOptions> instanceOptions)
+    public BusEventRepository(BusSenderServiceContext context, IPlantService plantService, IOptions<InstanceOptions> instanceOptions)
     {
         _messageChunkSize = instanceOptions.Value.MessageChunkSize;
         _busEvents = context.BusEvents;
-        _plants = instanceConfig.PlantsHandledByCurrentInstance;
+        _plants = plantService.GetPlantsHandledByInstance();
     }
 
     public async Task<List<BusEvent>> GetEarliestUnProcessedEventChunk() => 
