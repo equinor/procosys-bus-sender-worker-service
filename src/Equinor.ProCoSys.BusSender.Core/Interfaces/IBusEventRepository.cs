@@ -10,4 +10,5 @@ public interface IBusEventRepository
     Task<List<BusEvent>> GetEarliestUnProcessedEventChunk();
     Task<long> GetUnProcessedCount();
     Task<DateTime> GetOldestEvent();
+    void SetPlants(List<string> plants);
 }

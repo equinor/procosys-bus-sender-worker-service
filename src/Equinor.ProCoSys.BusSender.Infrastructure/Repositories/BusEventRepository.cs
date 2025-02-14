@@ -5,11 +5,10 @@ using System.Threading.Tasks;
 using Equinor.ProCoSys.BusSenderWorker.Core;
 using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 using Equinor.ProCoSys.BusSenderWorker.Core.Models;
-using Equinor.ProCoSys.BusSenderWorker.Core.Services;
 using Equinor.ProCoSys.BusSenderWorker.Infrastructure.Data;
 using Equinor.ProCoSys.PcsServiceBus;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Configuration;
 
 namespace Equinor.ProCoSys.BusSenderWorker.Infrastructure.Repositories;
 
@@ -17,14 +16,15 @@ public class BusEventRepository : IBusEventRepository
 {
     private readonly DbSet<BusEvent> _busEvents;
     private readonly int _messageChunkSize;
-    private readonly List<string> _plants;
+    private List<string> _plants;
 
-    public BusEventRepository(BusSenderServiceContext context, IPlantService plantService, IOptions<InstanceOptions> instanceOptions)
+    public BusEventRepository(BusSenderServiceContext context, IConfiguration configuration)
     {
-        _messageChunkSize = instanceOptions.Value.MessageChunkSize;
+        _messageChunkSize = int.Parse(configuration["MessageChunkSize"] ?? "200");
         _busEvents = context.BusEvents;
-        _plants = plantService.GetPlantsHandledByInstance();
     }
+
+    public void SetPlants(List<string> plants) => _plants = plants;
 
     public async Task<List<BusEvent>> GetEarliestUnProcessedEventChunk() => 
         await GetUnProcessedFilteredQueryable()
@@ -45,6 +45,12 @@ public class BusEventRepository : IBusEventRepository
     private IQueryable<BusEvent> GetUnProcessedFilteredQueryable()
     {
         var query = _busEvents.Where(e => e.Status == Status.UnProcessed);
+
+        if (_plants==null || !_plants.Any())
+        {
+            return query;
+        }
+
         var containsPlant = _plants.Contains(PcsServiceBusInstanceConstants.Plant);
         var containsNoPlant = _plants.Contains(PcsServiceBusInstanceConstants.NoPlant);
 

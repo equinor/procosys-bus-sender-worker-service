@@ -16,17 +16,15 @@ public class QueueMonitorService : IQueueMonitorService
     private readonly IConfiguration _configuration;
     private readonly ISystemClock _systemClock;
     private readonly int _queueWriteIntervalMinutes;
-    private readonly string _instanceName;
 
 
-    public QueueMonitorService(ITelemetryClient telemetryClient, IBusEventRepository busEventRepository, IConfiguration configuration, ISystemClock systemClock, IOptions<InstanceOptions> instanceOptions)
+    public QueueMonitorService(ITelemetryClient telemetryClient, IBusEventRepository busEventRepository, IConfiguration configuration, ISystemClock systemClock)
     {
         _telemetryClient = telemetryClient;
         _busEventRepository = busEventRepository;
         _configuration = configuration;
         _systemClock = systemClock;
         _queueWriteIntervalMinutes = string.IsNullOrWhiteSpace(configuration["MonitorQueueIntervalMinutes"]) ? 15 : int.Parse(configuration["MonitorQueueIntervalMinutes"]);
-        _instanceName = instanceOptions.Value.InstanceName;
     }
 
     public async Task WriteQueueMetrics()
@@ -50,21 +48,13 @@ public class QueueMonitorService : IQueueMonitorService
         }      
 
         var waitTime = _systemClock.UtcNow - queueOldestEvent;
-        var properties = new Dictionary<string, string>
-        {
-            { "InstanceName", _instanceName }
-        };
-        _telemetryClient.TrackMetric("QueueAge", waitTime.TotalMinutes, properties);
+        _telemetryClient.TrackMetric("QueueAge", waitTime.TotalMinutes);
     }
 
     private async Task WriteQueueLength()
     {
         var queueLength = await _busEventRepository.GetUnProcessedCount();
-        var properties = new Dictionary<string, string>
-        {
-            { "InstanceName", _instanceName }
-        };
-        _telemetryClient.TrackMetric("QueueLength", queueLength, properties);
+        _telemetryClient.TrackMetric("QueueLength", queueLength);
     }
 
     private bool IsTimeToWriteQueueMetric(DateTime lastQueueWrite) =>

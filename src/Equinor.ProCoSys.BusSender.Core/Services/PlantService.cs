@@ -7,113 +7,99 @@ using Equinor.ProCoSys.PcsServiceBus;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace Equinor.ProCoSys.BusSenderWorker.Core.Services;
 public class PlantService : IPlantService
 {
     private readonly IPlantRepository _plantRepository;
     private readonly ILogger<PlantService> _logger;
-    private readonly string _instanceName;
     private readonly IConfiguration _config;
     private readonly IMemoryCache _cache;
 
     public PlantService(ILogger<PlantService> logger,
         IPlantRepository plantRepository,
-        IOptions<InstanceOptions> instanceOptions,
         IConfiguration config,
         IMemoryCache cache)
     {
         _logger = logger;
         _plantRepository = plantRepository;
-        _instanceName = instanceOptions.Value.InstanceName;
         _config = config;
         _cache = cache;
     }
 
-    public List<string> GetPlantsHandledByInstance()
+    public virtual List<string>? GetAllPlants()
     {
-        if (_cache.TryGetValue(_instanceName, out List<string> cachedPlants))
+        if (!_cache.TryGetValue("AllPlants", out List<string>? allPlants))
         {
-            return cachedPlants;
-        }
-
-        var allPlants = _plantRepository.GetAllPlants();
-        var plantsByInstances = GetPlantsByInstance();
-
-        var plantsHandledByCurrentInstance = GetPlantsForInstance(plantsByInstances, _instanceName);
-        if (plantsHandledByCurrentInstance.Any())
-        {
-            _logger.LogInformation($"[{_instanceName}] Plants configured for this instance: {string.Join(",", plantsHandledByCurrentInstance)}");
-
-            var containsRemainingPlants = plantsHandledByCurrentInstance.Contains(PcsServiceBusInstanceConstants.RemainingPlants);
-            if (containsRemainingPlants)
+            allPlants = _plantRepository.GetAllPlants();
+            _cache.Set("AllPlants", allPlants, new MemoryCacheEntryOptions
             {
-                // We are also handling cases where RemainingPlants constant is used in combination with actual plants. E.g. PCS$TROLL_A, PCS$OSEBERG_C, REMAININGPLANTS. 
-                var plantLeftovers = GetPlantLeftovers(plantsByInstances, allPlants, _instanceName);
-                plantsHandledByCurrentInstance = plantsHandledByCurrentInstance.Union(plantLeftovers).ToList();
+                // Have to restart instance to reload plants configuration.
+                Priority = CacheItemPriority.NeverRemove
+            });
+        }
+
+        return allPlants;
+    }
+
+    public List<string> GetPlantsHandledByInstance(List<PlantLease> plantLeases)
+    {
+        var plantsHandledByCurrentInstance = new List<string>();
+        var allPlants = GetAllPlants();
+
+        if (allPlants != null && allPlants.Any())
+        {
+            var plant = plantLeases.First(x => x.IsCurrent).Plant;
+            if (!string.IsNullOrEmpty(plant))
+            {
+                _logger.LogInformation($"Handling messages for plant: {plant}");
+
+                if (plant.Equals(PcsServiceBusInstanceConstants.RemainingPlants))
+                {
+                    var definedPlants = plantLeases.Where(x => !x.IsCurrent).Select(x => x.Plant).ToList();
+                    // We are also handling cases where RemainingPlants constant is used in combination with actual plants. E.g. PCS$TROLL_A, PCS$OSEBERG_C, REMAININGPLANTS. 
+                    var plantLeftovers = GetPlantLeftovers(definedPlants, allPlants);
+                    plantsHandledByCurrentInstance = plantsHandledByCurrentInstance.Union(plantLeftovers).ToList();
+                }
+                else
+                {
+                    plantsHandledByCurrentInstance.Add(plant);
+                }
+
+                RemoveInvalidPlants(plantsHandledByCurrentInstance, allPlants);
             }
-            RemoveInvalidPlants(plantsHandledByCurrentInstance, allPlants, _instanceName);
-        }
 
-        if (!plantsHandledByCurrentInstance.Any())
-        {
-            var message = $"[{_instanceName}] No plants configured for this instance. Hence it will not start.";
-            _logger.LogError(message);
-            throw new Exception(message);
+            if (!plantsHandledByCurrentInstance.Any())
+            {
+                var message = "No plants to handle.";
+                _logger.LogError(message);
+                throw new Exception(message);
+            }
         }
-
-        _cache.Set(_instanceName, plantsHandledByCurrentInstance, new MemoryCacheEntryOptions
-        {
-            // Have to restart instance to reload plants configuration.
-            Priority = CacheItemPriority.NeverRemove
-        });
 
         return plantsHandledByCurrentInstance;
     }
 
-
-    private IEnumerable<string> GetPlantLeftovers(IEnumerable<PlantsByInstance> plantsByInstances, IEnumerable<string> allPlants, string instanceName)
+    private void RemoveInvalidPlants(List<string> plantsHandledByCurrentInstance, IEnumerable<string> allPlants)
     {
-        var plantsForAllExceptInstance = GetPlantsForAllExceptInstance(plantsByInstances, instanceName);
-        return GetPlantLeftovers(plantsForAllExceptInstance, allPlants);
-    }
-
-    private static IEnumerable<string> GetPlantsForAllExceptInstance(IEnumerable<PlantsByInstance> plantsByInstances, string instanceName) =>
-        plantsByInstances
-            .Where(x => x.InstanceName != instanceName)
-            .SelectMany(x => x.Value.Split(',').Select(p => p.Trim()))
+        var invalidPlants = plantsHandledByCurrentInstance
+            .Except(PcsServiceBusInstanceConstants.AllPlantReplacementConstants)
+            .Except(PcsServiceBusInstanceConstants.AllPlantConstants)
+            .Except(allPlants)
             .ToList();
 
-    private static List<string> GetPlantsForInstance(IEnumerable<PlantsByInstance> plantsByInstances, string instanceName) =>
-        plantsByInstances
-            .Single(x => x.InstanceName == instanceName).Value.Split(',')
-            .Select(p => p.Trim())
-            .ToList();
-
-    private void RemoveInvalidPlants(List<string> plantsHandledByCurrentInstance, IEnumerable<string> allPlants, string instanceName)
-    {
-        plantsHandledByCurrentInstance =
-            plantsHandledByCurrentInstance.Except(PcsServiceBusInstanceConstants.AllPlantReplacementConstants).ToList();
-
-        var plantsNotPresent = plantsHandledByCurrentInstance.Except(PcsServiceBusInstanceConstants.AllPlantConstants).Except(allPlants).ToList();
-        if (plantsNotPresent.Any())
+        foreach (var plant in invalidPlants)
         {
-            _logger.LogWarning(
-                $"[{instanceName}] The following plant(s) is/ are not valid: {string.Join(",", plantsNotPresent)}. Removing them/ it from plants being processed.");
-            plantsHandledByCurrentInstance = plantsHandledByCurrentInstance.Except(plantsNotPresent).ToList();
+            plantsHandledByCurrentInstance.Remove(plant);
         }
-        else
+
+        if (invalidPlants.Any())
         {
-            _logger.LogInformation($"[{instanceName}] Plants validated: {string.Join(",", plantsHandledByCurrentInstance)}");
+            _logger.LogWarning($"These plants are not valid: {string.Join(", ", invalidPlants)}");
         }
     }
 
     private static IEnumerable<string> GetPlantLeftovers(IEnumerable<string> handledPlants, IEnumerable<string> allNonVoidedPlants) =>
         allNonVoidedPlants.Except(handledPlants);
 
-    public virtual List<PlantsByInstance> GetPlantsByInstance()
-    {
-        return _config.GetRequiredSection("PlantsByInstance").Get<List<PlantsByInstance>>();
-    }
 }

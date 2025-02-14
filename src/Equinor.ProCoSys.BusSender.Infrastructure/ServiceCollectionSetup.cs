@@ -1,19 +1,12 @@
-﻿using System.Collections.Generic;
-using System;
-using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
-using Equinor.ProCoSys.BusSenderWorker.Core.Models;
+﻿using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 using Equinor.ProCoSys.BusSenderWorker.Core.Services;
 using Equinor.ProCoSys.BusSenderWorker.Core.Telemetry;
 using Equinor.ProCoSys.BusSenderWorker.Infrastructure.Data;
 using Equinor.ProCoSys.BusSenderWorker.Infrastructure.Repositories;
-using Equinor.ProCoSys.BusSenderWorker.Infrastructure.Validation;
-using Equinor.ProCoSys.PcsServiceBus;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Debug;
-using Microsoft.Extensions.Options;
 
 namespace Equinor.ProCoSys.BusSenderWorker.Infrastructure;
 
@@ -47,6 +40,7 @@ public static class ServiceCollectionSetup
         => services.AddSingleton<IEntryPointService, EntryPointService>()
             .AddScoped<IPlantService, PlantService>()
             .AddScoped<ITelemetryClient, ApplicationInsightsTelemetryClient>()
+            .AddScoped<IBlobLeaseService, BlobLeaseService>()
             .AddScoped<IBusSenderService, BusSenderService>()
             .AddScoped<IBusEventService, BusEventService>()
             .AddScoped<IQueueMonitorService, QueueMonitorService>()

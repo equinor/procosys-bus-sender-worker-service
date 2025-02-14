@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Equinor.ProCoSys.BusSenderWorker.Core;
+using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 using Equinor.ProCoSys.BusSenderWorker.Core.Models;
 using Equinor.ProCoSys.BusSenderWorker.Infrastructure.Repositories;
 using Equinor.ProCoSys.PcsServiceBus;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MockQueryable.Moq;
 using Moq;
@@ -19,7 +20,6 @@ public class BusEventRepositoryTests : RepositoryTestBase
 {
     private List<BusEvent> _busEvents;
     private Mock<DbSet<BusEvent>> _busEventSetMock;
-    private BusEventRepository _dut;
     private BusEvent _earliestEvent;
     private BusEvent _latestEvent;
     private BusEvent _secondToLatestEvent;
@@ -28,19 +28,11 @@ public class BusEventRepositoryTests : RepositoryTestBase
     public void GetEarliestUnProcessedEventChunk_ShouldReturnCorrectItemSequenceAndNumberOfItems()
     {
         var plants = new List<string>() { "PCS$Plant" };
-        var instanceConfig = new InstanceConfig()
-        {
-            PlantsHandledByCurrentInstance = plants
-        };
+        var configurationMock = new Mock<IConfiguration>();
+        configurationMock.Setup(config => config["MessageChunkSize"]).Returns("5");
 
-        var instanceOptions = new Mock<IOptions<InstanceOptions>>();
-        var instanceOptionsValue = new InstanceOptions
-        {
-            MessageChunkSize = 5
-        };
-        instanceOptions.Setup(io => io.Value).Returns(instanceOptionsValue);
-
-        var dut = new BusEventRepository(ContextHelper.ContextMock.Object, instanceConfig, instanceOptions.Object);
+        var dut = new BusEventRepository(ContextHelper.ContextMock.Object, configurationMock.Object);
+        dut.SetPlants(plants);
 
         Task<List<BusEvent>> result = dut.GetEarliestUnProcessedEventChunk();
 
@@ -90,19 +82,12 @@ public class BusEventRepositoryTests : RepositoryTestBase
             .Returns(serviceABusEventSetMock.Object);
 
         var plants = new List<string>() { $"{PcsServiceBusInstanceConstants.Plant}" };
-        var instanceConfig = new InstanceConfig()
-        {
-            PlantsHandledByCurrentInstance = plants
-        };
+        var configurationMock = new Mock<IConfiguration>();
+        configurationMock.Setup(config => config["MessageChunkSize"]).Returns("100");
 
-        var instanceOptions = new Mock<IOptions<InstanceOptions>>();
-        var instanceOptionsValue = new InstanceOptions
-        {
-            InstanceName = "ServiceA",
-            MessageChunkSize = 100
-        };
-        instanceOptions.Setup(io => io.Value).Returns(instanceOptionsValue);
-        var serviceADut = new BusEventRepository(ContextHelper.ContextMock.Object, instanceConfig, instanceOptions.Object);
+        var serviceADut = new BusEventRepository(ContextHelper.ContextMock.Object, configurationMock.Object);
+        serviceADut.SetPlants(plants);
+
         var result = serviceADut.GetEarliestUnProcessedEventChunk();
 
         Assert.IsTrue(result.Result[0].Plant == "PCS$PlantA");
@@ -152,86 +137,17 @@ public class BusEventRepositoryTests : RepositoryTestBase
             .Returns(serviceABusEventSetMock.Object);
 
         var plants = new List<string>() { "PCS$PlantA", "PCS$PlantB", $"{PcsServiceBusInstanceConstants.NoPlant}" };
-        var instanceConfig = new InstanceConfig()
-        {
-            PlantsHandledByCurrentInstance = plants
-        };
 
-        var instanceOptions = new Mock<IOptions<InstanceOptions>>();
-        var instanceOptionsValue = new InstanceOptions
-        {
-            InstanceName = "ServiceA"
-        };
-        instanceOptions.Setup(io => io.Value).Returns(instanceOptionsValue);
-        var serviceADut = new BusEventRepository(ContextHelper.ContextMock.Object, instanceConfig, instanceOptions.Object);
+        var configurationMock = new Mock<IConfiguration>();
+        configurationMock.Setup(config => config["MessageChunkSize"]).Returns("100");
+
+        var serviceADut = new BusEventRepository(ContextHelper.ContextMock.Object, configurationMock.Object);
+        serviceADut.SetPlants(plants);
         var result = serviceADut.GetEarliestUnProcessedEventChunk();
 
         Assert.IsTrue(result.Result[0].Plant == "PCS$PlantA");
         Assert.IsTrue(result.Result[1].Plant == "PCS$PlantB");
         Assert.IsTrue(string.IsNullOrEmpty(result.Result[2].Plant));
-    }
-
-
-    [TestMethod]
-    public void GetEarliestUnProcessedEventChunk_WhenTwoInstancesAssignedSamePlants_ShouldReturnItemsForAssignedPlants()
-    {
-        // Arrange
-        var serviceAEarliestEvent = new BusEvent
-        {
-            Created = DateTime.Now.AddMinutes(-200),
-            Event = "T",
-            Status = Status.UnProcessed,
-            Id = 8,
-            Plant = "PCS$PlantA",
-            Message = "Message 200 minutes ago not sent"
-        };
-        var serviceABusEvents = new List<BusEvent>
-        {
-            serviceAEarliestEvent,
-            new()
-            {
-                Created = DateTime.Now.AddMinutes(-150), Event = "T", Status = Status.UnProcessed, Id = 9, Plant = "PCS$PlantB",
-                Message = "Message 150 minutes ago not sent"
-            },
-            new()
-            {
-                Created = DateTime.Now.AddMinutes(-50), Event = "T", Status = Status.UnProcessed, Id = 10, Plant = "PCS$PlantC",
-                Message = "Message 50 minutes ago not sent"
-            },
-            new()
-            {
-                Created = DateTime.Now.AddMinutes(-50), Event = "T", Status = Status.UnProcessed, Id = 10, Plant = null,
-                Message = "Message 50 minutes ago not sent"
-            }
-        };
-
-        var serviceABusEventSetMock = serviceABusEvents.AsQueryable().BuildMockDbSet();
-
-        ContextHelper
-            .ContextMock
-            .Setup(x => x.BusEvents)
-            .Returns(serviceABusEventSetMock.Object); 
-
-        var plantsHandledByInstance = new List<string>() { "PCS$PlantA", "PCS$PlantB" };
-
-        var instanceConfig = new InstanceConfig()
-        {
-            PlantsHandledByCurrentInstance = plantsHandledByInstance
-        };
-
-        var instanceOptions = new Mock<IOptions<InstanceOptions>>();
-        var instanceOptionsValue = new InstanceOptions
-        {
-            InstanceName = "ServiceA",
-            MessageChunkSize = 100
-        };
-        instanceOptions.Setup(io => io.Value).Returns(instanceOptionsValue);
-
-        var serviceADut = new BusEventRepository(ContextHelper.ContextMock.Object, instanceConfig, instanceOptions.Object);
-        var result = serviceADut.GetEarliestUnProcessedEventChunk();
-
-        Assert.IsTrue(result.Result[0].Plant == "PCS$PlantA");
-        Assert.IsTrue(result.Result[1].Plant == "PCS$PlantB");
     }
 
 

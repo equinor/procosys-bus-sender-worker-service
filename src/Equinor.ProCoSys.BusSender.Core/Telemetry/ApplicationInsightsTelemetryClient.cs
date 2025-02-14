@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using Equinor.ProCoSys.PcsServiceBus;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.Channel;
 using Microsoft.ApplicationInsights.Extensibility;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
 
 namespace Equinor.ProCoSys.BusSenderWorker.Core.Telemetry;
 
@@ -18,7 +15,6 @@ public class RunningExecutableTelemetryInitializer : ITelemetryInitializer
     public void Initialize(ITelemetry telemetry)
     {
         telemetry.Context.Cloud.RoleName = AppDomain.CurrentDomain.FriendlyName;
-        telemetry.Context.GlobalProperties["InstanceName"] = _instanceName;
     }
 }
 
@@ -26,7 +22,7 @@ public class ApplicationInsightsTelemetryClient : ITelemetryClient
 {
     private readonly TelemetryClient _ai;
 
-    public ApplicationInsightsTelemetryClient(TelemetryConfiguration telemetryConfiguration, IOptions<InstanceOptions> instanceOptions)
+    public ApplicationInsightsTelemetryClient(TelemetryConfiguration telemetryConfiguration)
     {
         if (telemetryConfiguration == null)
         {
@@ -38,7 +34,6 @@ public class ApplicationInsightsTelemetryClient : ITelemetryClient
             // The InstrumentationKey isn't set through the configuration object. Setting it explicitly works.
             TelemetryConfiguration = { ConnectionString = telemetryConfiguration.ConnectionString }
         };
-        _ai.TelemetryConfiguration.TelemetryInitializers.Add(new RunningExecutableTelemetryInitializer(instanceOptions.Value.InstanceName));
     }
 
     public void Flush() => _ai.Flush();
