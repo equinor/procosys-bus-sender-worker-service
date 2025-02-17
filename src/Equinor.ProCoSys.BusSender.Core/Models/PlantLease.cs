@@ -6,7 +6,7 @@ public class PlantLease
 {
     [JsonConverter(typeof(DateTimeConverter))]
     public DateTime? LeaseExpiry { get; set; }
-    public string Plant { get; set; }
+    public required string Plant { get; set; }
     [JsonConverter(typeof(DateTimeConverter))]
     public DateTime? LastProcessed { get; set; }
 
