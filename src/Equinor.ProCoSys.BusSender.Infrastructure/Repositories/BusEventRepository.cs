@@ -16,7 +16,7 @@ public class BusEventRepository : IBusEventRepository
 {
     private readonly DbSet<BusEvent> _busEvents;
     private readonly int _messageChunkSize;
-    private List<string> _plants;
+    private List<string> _plants = new();
 
     public BusEventRepository(BusSenderServiceContext context, IConfiguration configuration)
     {

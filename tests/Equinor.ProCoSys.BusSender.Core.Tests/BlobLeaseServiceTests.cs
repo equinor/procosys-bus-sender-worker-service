@@ -193,7 +193,7 @@ namespace Equinor.ProCoSys.BusSenderWorker.Core.Tests
 
 
         [TestMethod]
-        public async Task ReleasePlantLease_ShouldKeepLeaseExpiry_WhenBlobIsNotAvailableAfterMaxRetries()
+        public void ReleasePlantLease_ShouldKeepLeaseExpiry_WhenBlobIsNotAvailableAfterMaxRetries()
         {
             var jsonString = @"
                     [

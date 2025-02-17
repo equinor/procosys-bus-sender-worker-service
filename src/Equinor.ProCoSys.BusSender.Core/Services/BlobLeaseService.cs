@@ -54,7 +54,7 @@ public class BlobLeaseService : IBlobLeaseService
             return null;
         }
 
-        var plantLease = await GetOldestUnprocessedPlantLeaseInfo(plantLeases);
+        var plantLease = GetOldestUnprocessedPlantLeaseInfo(plantLeases);
         if (plantLease == null)
         {
             // Nothing to do for now.
@@ -212,7 +212,7 @@ public class BlobLeaseService : IBlobLeaseService
         return blobContainerClient.GetBlobClient(blobLeaseFileName);
     }
 
-    private async Task<PlantLease?> GetOldestUnprocessedPlantLeaseInfo(List<PlantLease> plantLeases)
+    private PlantLease? GetOldestUnprocessedPlantLeaseInfo(List<PlantLease> plantLeases)
     {
         var unprocessedLeaseInfos = plantLeases
             .Where(p => p.LeaseExpiry == null || p.LeaseExpiry < DateTime.UtcNow)
