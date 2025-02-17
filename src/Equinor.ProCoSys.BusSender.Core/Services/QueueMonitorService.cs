@@ -21,12 +21,12 @@ public class QueueMonitorService : IQueueMonitorService
         _busEventRepository = busEventRepository;
         _configuration = configuration;
         _systemClock = systemClock;
-        _queueWriteIntervalMinutes = string.IsNullOrWhiteSpace(configuration["MonitorQueueIntervalMinutes"]) ? 15 : int.Parse(configuration["MonitorQueueIntervalMinutes"]);
+        _queueWriteIntervalMinutes = string.IsNullOrWhiteSpace(configuration["MonitorQueueIntervalMinutes"]) ? 15 : int.Parse(configuration["MonitorQueueIntervalMinutes"]!);
     }
 
     public async Task WriteQueueMetrics()
     {
-        var lastQueueWrite = string.IsNullOrWhiteSpace(_configuration["LastQueueWrite"]) ? default : DateTime.Parse(_configuration["LastQueueWrite"]);
+        var lastQueueWrite = string.IsNullOrWhiteSpace(_configuration["LastQueueWrite"]) ? default : DateTime.Parse(_configuration["LastQueueWrite"]!);
         if (IsTimeToWriteQueueMetric(lastQueueWrite))
         {
             await WriteQueueLength();
