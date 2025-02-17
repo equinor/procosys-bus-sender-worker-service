@@ -36,6 +36,7 @@ public class QueryTests
         foreach (var i in interfaces)
         {
             Assert.IsTrue(testedInterfaces.Contains(i), $"The interface {i} is not included in the test data, please create a test.");
+            
         }
     }
 
