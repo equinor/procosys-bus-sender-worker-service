@@ -31,18 +31,18 @@ public class PlantService : IPlantService
     {
         if (!_cache.TryGetValue("AllPlants", out List<string>? allPlants))
         {
-            _logger.LogDebug("Retrieving plants from memory cache.");
+            _logger.LogInformation("Retrieving plants from memory cache.");
             allPlants = _plantRepository.GetAllPlants();
             _cache.Set("AllPlants", allPlants, new MemoryCacheEntryOptions
             {
                 // Have to restart instance to reload plants configuration.
                 Priority = CacheItemPriority.NeverRemove
             });
-            _logger.LogDebug("Plants read from database and added to memory cache.");
+            _logger.LogInformation("Plants read from database and added to memory cache.");
         }
         else
         {
-            _logger.LogDebug("Plants retrieved from memory cache.");
+            _logger.LogInformation("Plants retrieved from memory cache.");
         }
 
         return allPlants;
