@@ -283,8 +283,6 @@ public class BusSenderService : IBusSenderService
     private void TrackMessage(BusEvent busEvent, string busMessageMessageId, string busMessageBody)
     {
         var busEventMessageToSend = busEvent.MessageToSend ?? busEvent.Message;
-        _logger.LogInformation(busEventMessageToSend);
-        _logger.LogInformation(_service.WashString(busEventMessageToSend));
 
         var message = JsonSerializer.Deserialize<BusEventMessage>(_service.WashString(busEventMessageToSend)!,
             DefaultSerializerHelper.SerializerOptions);
