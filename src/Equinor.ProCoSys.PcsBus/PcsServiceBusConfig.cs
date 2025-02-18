@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Azure.Core;
 
 namespace Equinor.ProCoSys.PcsServiceBus;
 
@@ -8,6 +9,15 @@ public class PcsServiceBusConfig
     public PcsServiceBusConfig UseBusConnection(string connectionString)
     {
         ConnectionString = connectionString;
+        return this;
+    }
+    
+    public PcsServiceBusConfig UseCredentialAuthentication(
+        string fullyQualifiedNamespace,
+        TokenCredential credential)
+    {
+        FullyQualifiedNamespace = fullyQualifiedNamespace;
+        TokenCredential = credential;
         return this;
     }
 
@@ -54,4 +64,7 @@ public class PcsServiceBusConfig
     public int RenewLeaseIntervalMilliseconds { get; private set; }
 
     public Uri? LeaderElectorUrl { get; private set; }
+    
+    internal string? FullyQualifiedNamespace { get; set; }
+    internal TokenCredential? TokenCredential { get; set; }
 }
