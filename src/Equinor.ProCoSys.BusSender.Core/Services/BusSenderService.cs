@@ -231,10 +231,8 @@ public class BusSenderService : IBusSenderService
         var unProcessedEvents = events.Where(busEvent => busEvent.Status == Status.UnProcessed).ToList();
         _logger.LogInformation("[{Plant}] Amount of messages to process: {Count} ", plant, unProcessedEvents.Count);
 
-        //foreach (var simpleUnprocessedBusEvent in unProcessedEvents.Where(e =>
-        //             IsSimpleMessage(e) || e.Event == TagTopic.TopicName))
         foreach (var simpleUnprocessedBusEvent in unProcessedEvents.Where(e =>
-                     IsSimpleMessage(e)))
+                     IsSimpleMessage(e) || e.Event == TagTopic.TopicName))
         {
                 await UpdateEventBasedOnTopic(simpleUnprocessedBusEvent);
         }
@@ -285,6 +283,9 @@ public class BusSenderService : IBusSenderService
     private void TrackMessage(BusEvent busEvent, string busMessageMessageId, string busMessageBody)
     {
         var busEventMessageToSend = busEvent.MessageToSend ?? busEvent.Message;
+        _logger.LogInformation(busEventMessageToSend);
+        _logger.LogInformation(_service.WashString(busEventMessageToSend));
+
         var message = JsonSerializer.Deserialize<BusEventMessage>(_service.WashString(busEventMessageToSend)!,
             DefaultSerializerHelper.SerializerOptions);
         
