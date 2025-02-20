@@ -27,6 +27,8 @@ public class BusSenderService : IBusSenderService
     private readonly Stopwatch _sw;
     private readonly ITelemetryClient _telemetryClient;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IBlobLeaseService _blobLeaseService;
+    private readonly IPlantService _plantService;
 
     public BusSenderService(IPcsBusSender pcsBusSender,
         IBusEventRepository busEventRepository,
@@ -34,7 +36,9 @@ public class BusSenderService : IBusSenderService
         ILogger<BusSenderService> logger,
         ITelemetryClient telemetryClient,
         IBusEventService service,
-        IQueueMonitorService queueMonitor)
+        IQueueMonitorService queueMonitor,
+        IBlobLeaseService blobLeaseService,
+        IPlantService plantService)
     {
         _pcsBusSender = pcsBusSender;
         _busEventRepository = busEventRepository;
@@ -44,6 +48,8 @@ public class BusSenderService : IBusSenderService
         _service = service;
         _queueMonitor = queueMonitor;
         _sw = new Stopwatch();
+        _blobLeaseService = blobLeaseService;
+        _plantService = plantService;
     }
 
     public async Task CloseConnections()
@@ -52,21 +58,58 @@ public class BusSenderService : IBusSenderService
         await _pcsBusSender.CloseAllAsync();
     }
 
+
+
     public async Task HandleBusEvents()
     {
+        PlantLease? plantLease = null;
         try
         {
+            _sw.Start();
+            var plantLeases = await _blobLeaseService.ClaimPlantLease();
+            if (plantLeases == null)
+            {
+                _logger.LogInformation("No plant lease available exiting.");
+                return;
+            }
+
+            plantLease = plantLeases?.FirstOrDefault(x => x.IsCurrent);
+  
+            if (plantLeases == null || plantLease?.Plant == null)
+            {
+                _logger.LogInformation("No plant leases available exiting.");
+                return;
+            }
+
+            if (ReleasePlantLeaseIfExpired(plantLease))
+            {
+                return;
+            }
+
+            var plants = _plantService.GetPlantsHandledByInstance(plantLeases);
+
             await _queueMonitor.WriteQueueMetrics();
 
-            _sw.Start();
+            _busEventRepository.SetPlants(plants);
             var events = await _busEventRepository.GetEarliestUnProcessedEventChunk();
             if (events.Any())
             {
-                _logger.LogInformation("BusSenderService found {Count} messages to process after {Sw} ms", events.Count,
+                var plant = plantLease.Plant;
+                _logger.LogInformation(
+                    "[{Plant}] BusSenderService found {Count} messages to process after {Sw} ms", plant,
+                    events.Count,
                     _sw.ElapsedMilliseconds);
                 _telemetryClient.TrackMetric("BusSender Chunk", events.Count);
-                await ProcessBusEvents(events);
-                _logger.LogInformation("BusSenderService ProcessBusEvents used {Sw} ms", _sw.ElapsedMilliseconds);
+                await ProcessBusEvents(events, plant);
+                _logger.LogInformation("[{Plant}] BusSenderService ProcessBusEvents used {Sw} ms", plant,
+                    _sw.ElapsedMilliseconds);
+            }
+
+            // Release plant lease if it has expired.
+            if (!ReleasePlantLeaseIfExpired(plantLease))
+            {
+                // ... or if there are no more unprocessed events for this plant.
+                await ReleasePlantLeaseIfProcessingCompleted(plantLease);
             }
 
             _sw.Reset();
@@ -74,11 +117,40 @@ public class BusSenderService : IBusSenderService
         catch (Exception exception)
         {
             _logger.LogError(exception, "BusSenderService execute send failed");
+            _blobLeaseService.ReleasePlantLease(plantLease);
             throw;
         }
 
         _logger.LogDebug("BusSenderService DoWorkerJob finished");
         _telemetryClient.Flush();
+    }
+
+    private bool ReleasePlantLeaseIfExpired(PlantLease? plantLease)
+    {
+        if (plantLease != null && plantLease.IsExpired())
+        {
+            _logger.LogInformation("Lease has expired for plant: {Plant}. Releasing it.", plantLease.Plant);
+            _blobLeaseService.ReleasePlantLease(plantLease);
+            return true;
+        }
+
+        return false;
+    }
+
+    private async Task<bool> ReleasePlantLeaseIfProcessingCompleted(PlantLease plantLease)
+    {
+        var remainingEvents = await _busEventRepository.GetEarliestUnProcessedEventChunk();
+        if (remainingEvents.Any())
+        {
+            _logger.LogInformation("[{Plant}] More unprocessed events are handled in the next loop by this instance. Keeping blob lease for this plant.", plantLease.Plant);
+            return false;
+        }
+        else
+        {
+            _logger.LogInformation("[{Plant}] No more unprocessed events for this plant. Releasing blob lease.", plantLease.Plant);
+            _blobLeaseService.ReleasePlantLease(plantLease);
+            return true;
+        }
     }
 
     private async Task BatchAndSendPerTopic(List<(string Key, Queue<BusEvent> messages)> eventGroups)
@@ -174,24 +246,30 @@ public class BusSenderService : IBusSenderService
            || Guid.TryParse(busEvent.Message, out _)
            || BusEventService.CanGetTwoIdsFromMessage(busEvent.Message.Split(","), out _, out _);
 
-    private async Task ProcessBusEvents(List<BusEvent> events)
+    private async Task ProcessBusEvents(List<BusEvent> events, string plant)
     {
         events = SetDuplicatesToSkipped(events);
         var dsw = Stopwatch.StartNew();
 
         var unProcessedEvents = events.Where(busEvent => busEvent.Status == Status.UnProcessed).ToList();
-        _logger.LogInformation("Amount of messages to process: {Count} ", unProcessedEvents.Count);
+        _logger.LogInformation("[{Plant}] Amount of messages to process: {Count} ", plant, unProcessedEvents.Count);
 
         foreach (var simpleUnprocessedBusEvent in unProcessedEvents.Where(e =>
                      IsSimpleMessage(e) || e.Event == TagTopic.TopicName))
         {
-            await UpdateEventBasedOnTopic(simpleUnprocessedBusEvent);
+                await UpdateEventBasedOnTopic(simpleUnprocessedBusEvent);
         }
 
-        _logger.LogInformation("Update loop finished at at {Sw} ms", dsw.ElapsedMilliseconds);
-        await _unitOfWork.SaveChangesAsync();
-
-
+        _logger.LogInformation("[{Plant}] Update loop finished at at {Sw} ms", plant, dsw.ElapsedMilliseconds);
+        if (!_blobLeaseService.CancellationToken.IsCancellationRequested)
+        {
+            await _unitOfWork.SaveChangesAsync();
+        }
+        else
+        {
+            _logger.LogWarning("[{Plant}] SaveChangesAsync skipped due to BlobLeaseExpiryTime.", plant);
+            return;
+        }
         /***
          * Group by topic and then create a queue of messages per topic
          */
@@ -228,6 +306,7 @@ public class BusSenderService : IBusSenderService
     private void TrackMessage(BusEvent busEvent, string busMessageMessageId, string busMessageBody)
     {
         var busEventMessageToSend = busEvent.MessageToSend ?? busEvent.Message;
+
         var message = JsonSerializer.Deserialize<BusEventMessage>(_service.WashString(busEventMessageToSend)!,
             DefaultSerializerHelper.SerializerOptions);
         
@@ -242,11 +321,7 @@ public class BusSenderService : IBusSenderService
             {"Created", busEvent.Created.ToString(CultureInfo.InvariantCulture)},
             {"ProjectName", message?.ProjectName ?? "NoProject"},
             {"Plant", message?.Plant ?? "NoPlant"},
-            {"MessageId", busMessageMessageId ?? "NoID" },
-            //Remove these after debugging
-            {"BusEventMessageToSend", string.IsNullOrEmpty(message?.ProCoSysGuid) ? "MessageToSend: ( " + busEvent.MessageToSend + " )" : "N/A"  },
-            {"BusEventMessage", string.IsNullOrEmpty(message?.ProCoSysGuid) ? busEvent.Message : "N/A" },
-            {"MessageBody", string.IsNullOrEmpty(message?.ProCoSysGuid) ? busMessageBody : "N/A" }
+            {"MessageId", busMessageMessageId ?? "NoID" }
         });
     }
     
