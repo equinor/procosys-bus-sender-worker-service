@@ -10,6 +10,7 @@ using Azure.Storage.Blobs.Models;
 using Azure.Storage.Blobs.Specialized;
 using Equinor.ProCoSys.BusSenderWorker.Core.Models;
 using Equinor.ProCoSys.BusSenderWorker.Core.Services;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -22,6 +23,7 @@ namespace Equinor.ProCoSys.BusSenderWorker.Core.Tests
     {
         private Mock<ILogger<BlobLeaseService>> _loggerMock;
         private Mock<IConfiguration> _configurationMock;
+        private Mock<IMemoryCache> _cacheMock;
         private Mock<BlobLeaseClient> _blobLeaseClientMock;
         private Mock<BlobClient> _blobClientMock;
         private Mock<BlobLeaseService> _blobLeaseServiceMock;
@@ -31,10 +33,11 @@ namespace Equinor.ProCoSys.BusSenderWorker.Core.Tests
         {
             _loggerMock = new Mock<ILogger<BlobLeaseService>>();
             _configurationMock = new Mock<IConfiguration>();
+            _cacheMock = new Mock<IMemoryCache>();
             _blobClientMock = new Mock<BlobClient>();
             _blobLeaseClientMock = new Mock<BlobLeaseClient>();
 
-            _blobLeaseServiceMock = new Mock<BlobLeaseService>(_loggerMock.Object, _configurationMock.Object) { CallBase = true }; // Partial mock.
+            _blobLeaseServiceMock = new Mock<BlobLeaseService>(_loggerMock.Object, _configurationMock.Object, _cacheMock.Object) { CallBase = true }; // Partial mock.
 
             _configurationMock.SetupGet(x => x["MaxBlobReleaseLeaseAttempts"]).Returns("3");
             _configurationMock.SetupGet(x => x["BlobLeaseExpiryTime"]).Returns("60");
@@ -53,6 +56,10 @@ namespace Equinor.ProCoSys.BusSenderWorker.Core.Tests
 
             _blobClientMock.Setup(x => x.DownloadAsync()).ReturnsAsync(Response.FromValue(BlobsModelFactory.BlobDownloadInfo(), null));
             _blobClientMock.Setup(x => x.UploadAsync(It.IsAny<MemoryStream>(), It.IsAny<BlobUploadOptions>(), It.IsAny<CancellationToken>())).ReturnsAsync(Response.FromValue(BlobsModelFactory.BlobContentInfo(new ETag(), DateTimeOffset.UtcNow, Array.Empty<byte>(), null, 0), null));
+
+            object cacheEntry = null;
+            _cacheMock.Setup(x => x.TryGetValue(It.IsAny<object>(), out cacheEntry)).Returns(false);
+            _cacheMock.Setup(x => x.CreateEntry(It.IsAny<object>())).Returns(Mock.Of<ICacheEntry>());
         }
 
         [TestMethod]
@@ -226,7 +233,7 @@ namespace Equinor.ProCoSys.BusSenderWorker.Core.Tests
                 .ThrowsAsync(new RequestFailedException(0, "Lease already present",
                     BlobErrorCode.LeaseAlreadyPresent.ToString(), null));
 
-            _blobLeaseServiceMock.Object.ReleasePlantLease(plantHandledByCurrentInstance, 3);
+            _blobLeaseServiceMock.Object.ReleasePlantLease(plantHandledByCurrentInstance);
 
             _blobLeaseServiceMock.Verify(service => service.UpdatePlantLeases(
                     It.IsAny<List<PlantLease>>(),

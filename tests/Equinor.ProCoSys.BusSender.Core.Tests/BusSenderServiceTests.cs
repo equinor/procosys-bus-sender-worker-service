@@ -10,12 +10,10 @@ using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 using Equinor.ProCoSys.BusSenderWorker.Core.Models;
 using Equinor.ProCoSys.BusSenderWorker.Core.Services;
 using Equinor.ProCoSys.BusSenderWorker.Core.Telemetry;
-using Equinor.ProCoSys.PcsServiceBus;
 using Equinor.ProCoSys.PcsServiceBus.Sender;
 using Equinor.ProCoSys.PcsServiceBus.Topics;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Range = Moq.Range;
@@ -37,6 +35,7 @@ public class BusSenderServiceTests
     private Mock<ITagDetailsRepository> _tagDetailsRepositoryMock;
     private Mock<IQueueMonitorService> _queueMonitorService;
     private Mock<IBlobLeaseService> _blobLeaseServiceMock;
+    private Mock<IMemoryCache> _cacheMock;
     private Mock<IPlantService> _plantServiceMock;
 
     private Mock<ServiceBusSender> _topicClientMock1,
@@ -45,13 +44,14 @@ public class BusSenderServiceTests
         _topicClientMock4,
         _topicClientMockWo;
 
-        [TestInitialize]
+    [TestInitialize]
     public void Setup()
     {
         _busSender = new PcsBusSender();
         _queueMonitorService = new Mock<IQueueMonitorService>();
-        _blobLeaseServiceMock = new Mock<IBlobLeaseService>();
         _plantServiceMock = new Mock<IPlantService>();
+        _cacheMock = new Mock<IMemoryCache>();
+        _blobLeaseServiceMock = new Mock<IBlobLeaseService>(); 
         _topicClientMock1 = new Mock<ServiceBusSender>();
         _topicClientMock1.Setup(t => t.CreateMessageBatchAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(() => ServiceBusModelFactory.ServiceBusMessageBatch(1000, new List<ServiceBusMessage>()));
@@ -106,6 +106,7 @@ public class BusSenderServiceTests
         var plants = new List<string> { "Plant1" };
 
         _blobLeaseServiceMock.Setup(x => x.ClaimPlantLease()).ReturnsAsync(plantLeases);
+        _blobLeaseServiceMock.Setup(x => x.GetCache()).Returns(_cacheMock.Object);
         _plantServiceMock.Setup(x => x.GetPlantsHandledByInstance(plantLeases)).Returns(plants);
 
         _busEventRepository = new Mock<IBusEventRepository>();
@@ -119,7 +120,7 @@ public class BusSenderServiceTests
         _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk()).Returns(() => Task.FromResult(_busEvents));
         _dut = new BusSenderService(_busSender, _busEventRepository.Object, _iUnitOfWork.Object,
             new Mock<ILogger<BusSenderService>>().Object,
-            new Mock<ITelemetryClient>().Object, _busEventServiceMock.Object, _queueMonitorService.Object, _blobLeaseServiceMock.Object, _plantServiceMock.Object, new Mock<IConfiguration>().Object);
+            new Mock<ITelemetryClient>().Object, _busEventServiceMock.Object, _queueMonitorService.Object, _blobLeaseServiceMock.Object, _plantServiceMock.Object);
     }
     
     [TestMethod]

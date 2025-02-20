@@ -15,6 +15,7 @@ using Polly;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 using System.Threading;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace Equinor.ProCoSys.BusSenderWorker.Core.Services;
 
@@ -23,59 +24,77 @@ public class BlobLeaseService : IBlobLeaseService
     private readonly ILogger<BlobLeaseService> _logger;
     private readonly IConfiguration _configuration;
     private CancellationTokenSource? _cancellationTokenSource;
+    private readonly IMemoryCache _cache;
 
     public CancellationToken CancellationToken => _cancellationTokenSource?.Token ?? CancellationToken.None;
 
-    public BlobLeaseService(ILogger<BlobLeaseService> logger, IConfiguration configuration)
+    public BlobLeaseService(ILogger<BlobLeaseService> logger, IConfiguration configuration, IMemoryCache cache)
     {
         _logger = logger;
         _configuration = configuration;
+        _cache = cache;
     }
+    public virtual IMemoryCache GetCache() => _cache;
 
-    public async Task<List<PlantLease>?> ClaimPlantLease()
+    public virtual async Task<List<PlantLease>?> ClaimPlantLease()
     {
-        if (!int.TryParse(_configuration["BlobLeaseExpiryTime"], out var blobLeaseExpiryTime))
+        if (!GetCache().TryGetValue("CurrentPlantLeases", out List<PlantLease>? plantLeases))
         {
-            _logger.LogError("Invalid BlobLeaseExpiryTime configuration value.");
-            return null;
+            if (!int.TryParse(_configuration["BlobLeaseExpiryTime"], out var blobLeaseExpiryTime))
+            {
+                _logger.LogError("Invalid BlobLeaseExpiryTime configuration value.");
+                return null;
+            }
+
+            if (_cancellationTokenSource == null || _cancellationTokenSource.Token == CancellationToken.None)
+            {
+                // Multiplying by a factor lower than 1 to ensure that message processing for this instance is cancelled shortly before the lease expires.
+                _cancellationTokenSource = new CancellationTokenSource((int)(blobLeaseExpiryTime * 1000 * 0.95));
+            }
+
+            var leaseId = Guid.NewGuid().ToString();
+            plantLeases = await GetPlantLeases(leaseId);
+            if (plantLeases == null)
+            {
+                // Nothing to do for now.
+                return null;
+            }
+
+            var plantLease = GetOldestUnprocessedPlantLeaseInfo(plantLeases);
+            if (plantLease == null)
+            {
+                // Nothing to do for now.
+                return null;
+            }
+
+            plantLeases.Where(x => x.Plant.Equals(plantLease.Plant)).ToList().ForEach(x =>
+            {
+                x.IsCurrent = true;
+                x.LeaseExpiry = DateTime.UtcNow.AddSeconds(blobLeaseExpiryTime);
+            });
+
+            UpdatePlantLeases(plantLeases, leaseId);
+            GetCache().Set("CurrentPlantLeases", plantLeases);
+        }
+        else
+        {
+            _logger.LogInformation("Plant leases retrieved from cache.");
         }
 
-        if (_cancellationTokenSource == null || _cancellationTokenSource.Token == CancellationToken.None)
-        {
-            // Multiplying by a factor lower than 1 to ensure that message processing for this instance is cancelled shortly before the lease expires.
-            _cancellationTokenSource = new CancellationTokenSource((int)(blobLeaseExpiryTime * 1000 * 0.95));
-        }
-
-        var leaseId = Guid.NewGuid().ToString();
-        var plantLeases = await GetPlantLeases(leaseId);
-        if (plantLeases == null)
-        {
-            // Nothing to do for now.
-            return null;
-        }
-
-        var plantLease = GetOldestUnprocessedPlantLeaseInfo(plantLeases);
-        if (plantLease == null)
-        {
-            // Nothing to do for now.
-            return null;
-        }
-
-        plantLeases.Where(x => x.Plant.Equals(plantLease.Plant)).ToList().ForEach(x =>
-        {
-            x.IsCurrent = true;
-            x.LeaseExpiry = DateTime.UtcNow.AddSeconds(blobLeaseExpiryTime);
-        });
-
-        UpdatePlantLeases(plantLeases, leaseId);
         return plantLeases;
     }
 
-    public async void ReleasePlantLease(PlantLease? plantLease, int maxRetryAttempts = 0)
+    public async void ReleasePlantLease(PlantLease? plantLease)
     {
         if (plantLease == null)
         {
-            _logger.LogWarning("Plant lease is null. Cannot release lease.");
+            _logger.LogWarning("Cannot release lease.");
+            return;
+        }
+
+        if (!int.TryParse(_configuration["MaxBlobReleaseLeaseAttempts"], out var maxRetryAttempts))
+        {
+            _logger.LogError("Invalid MaxBlobReleaseLeaseAttempts configuration value.");
             return;
         }
 
@@ -83,7 +102,7 @@ public class BlobLeaseService : IBlobLeaseService
         var plantLeases = await GetPlantLeases(leaseId,maxRetryAttempts);
         if (plantLeases == null)
         {
-            _logger.LogWarning("Plant leases is null. Cannot release lease.");
+            _logger.LogWarning("Cannot release plant lease.");
             return;
         }
 
@@ -93,6 +112,7 @@ public class BlobLeaseService : IBlobLeaseService
             x.LastProcessed = DateTime.UtcNow;
         });
         UpdatePlantLeases(plantLeases, leaseId);
+        GetCache().Remove("CurrentPlantLeases");
     }
 
     public virtual BlobLeaseClient GetBlobLeaseClient(BlobClient blobClient, string leaseId) => blobClient.GetBlobLeaseClient(leaseId);

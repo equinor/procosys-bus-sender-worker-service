@@ -5,11 +5,13 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Equinor.ProCoSys.BusSenderWorker.Core.Models;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 public interface IBlobLeaseService
 {
-    void ReleasePlantLease(PlantLease? plantLease, int maxRetryAttempts = 0);
+    void ReleasePlantLease(PlantLease? plantLease);
     Task<List<PlantLease>?> ClaimPlantLease();
     CancellationToken CancellationToken { get; }
+    IMemoryCache GetCache();
 }
