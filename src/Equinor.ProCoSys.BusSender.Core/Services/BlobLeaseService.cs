@@ -132,7 +132,7 @@ public class BlobLeaseService : IBlobLeaseService
         {
             _logger.LogError("Invalid BlobReleaseLeaseDelay configuration value.");
         }
-        delayBetweenAttempts ??= TimeSpan.FromSeconds(blobReleaseLeaseDelay);
+        delayBetweenAttempts ??= TimeSpan.FromMilliseconds(blobReleaseLeaseDelay);
 
         var retryPolicy = Policy
             .Handle<RequestFailedException>(ex => ex.ErrorCode == BlobErrorCode.LeaseAlreadyPresent)
