@@ -16,6 +16,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 using System.Threading;
 using Microsoft.Extensions.Caching.Memory;
+using System.Diagnostics;
 
 namespace Equinor.ProCoSys.BusSenderWorker.Core.Services;
 
@@ -25,6 +26,7 @@ public class BlobLeaseService : IBlobLeaseService
     private readonly IConfiguration _configuration;
     private CancellationTokenSource? _cancellationTokenSource;
     private readonly IMemoryCache _cache;
+    private readonly BlobClient _blobClient;
 
     public CancellationToken CancellationToken => _cancellationTokenSource?.Token ?? CancellationToken.None;
 
@@ -33,6 +35,10 @@ public class BlobLeaseService : IBlobLeaseService
         _logger = logger;
         _configuration = configuration;
         _cache = cache;
+        var sw = new Stopwatch();
+        sw.Start();
+        _blobClient = GetBlobClient();
+        _logger.LogInformation($"Init blob client used {sw.ElapsedMilliseconds}");
     }
     public virtual IMemoryCache GetCache() => _cache;
 
@@ -40,6 +46,8 @@ public class BlobLeaseService : IBlobLeaseService
     {
         if (!GetCache().TryGetValue("CurrentPlantLeases", out List<PlantLease>? plantLeases))
         {
+            var sw = new Stopwatch();
+            sw.Start();
             if (!int.TryParse(_configuration["BlobLeaseExpiryTime"], out var blobLeaseExpiryTime))
             {
                 _logger.LogError("Invalid BlobLeaseExpiryTime configuration value.");
@@ -75,6 +83,7 @@ public class BlobLeaseService : IBlobLeaseService
 
             UpdatePlantLeases(plantLeases, leaseId);
             GetCache().Set("CurrentPlantLeases", plantLeases);
+            _logger.LogInformation($"Claim used {sw.ElapsedMilliseconds}");
         }
         else
         {
@@ -171,11 +180,10 @@ public class BlobLeaseService : IBlobLeaseService
 
     private async Task<List<PlantLease>?> GetPlantLeases(string leaseId, int maxRetryAttempts = 0)
     {
-        var blobClient = GetBlobClient();
-        var newLeaseAcquired = await TryAcquireBlobLeaseAsync(blobClient, leaseId, TimeSpan.FromSeconds(15), maxRetryAttempts);
+        var newLeaseAcquired = await TryAcquireBlobLeaseAsync(_blobClient, leaseId, TimeSpan.FromSeconds(15), maxRetryAttempts);
         if (newLeaseAcquired)
         {
-            var plantLease = await GetPlantLeases(blobClient);
+            var plantLease = await GetPlantLeases(_blobClient);
             if (plantLease == null || !plantLease.Any())
             {
                 _logger.LogWarning("Could not read blob containing plant lease.");
@@ -202,7 +210,6 @@ public class BlobLeaseService : IBlobLeaseService
 
     public virtual async void UpdatePlantLeases(List<PlantLease> plantLeases, string leaseId)
     {
-        var blobClient = GetBlobClient();
         var options = new JsonSerializerOptions
         {
             WriteIndented = true,
@@ -219,8 +226,8 @@ public class BlobLeaseService : IBlobLeaseService
                 LeaseId = leaseId
             }
         };
-        await blobClient.UploadAsync(memoryStream, uploadOptions, CancellationToken.None);
-        await ReleaseBlobLeaseAsync(blobClient, leaseId);
+        await _blobClient.UploadAsync(memoryStream, uploadOptions, CancellationToken.None);
+        await ReleaseBlobLeaseAsync(_blobClient, leaseId);
     }
 
     public virtual BlobClient GetBlobClient()

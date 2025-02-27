@@ -112,6 +112,7 @@ public class BusSenderService : IBusSenderService
                 await ReleasePlantLeaseIfProcessingCompleted(plantLease);
             }
 
+            _logger.LogInformation($"BusSenderService ProcessBusEvents used {_sw.ElapsedMilliseconds} ms"); 
             _sw.Reset();
         }
         catch (Exception exception)
