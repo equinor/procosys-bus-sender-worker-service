@@ -64,7 +64,7 @@ public class BlobLeaseService : IBlobLeaseService
             plantLeases = await GetPlantLeases(leaseId);
             if (plantLeases == null)
             {
-                // Nothing to do for now.
+                _logger.LogInformation("No blob lease available. Awaiting next loop.");
                 return null;
             }
 
@@ -72,6 +72,8 @@ public class BlobLeaseService : IBlobLeaseService
             if (plantLease == null)
             {
                 // Nothing to do for now.
+                _logger.LogInformation("No available plants to lease. Awaiting next loop.");
+                await ReleaseBlobLeaseAsync(_blobClient, leaseId);
                 return null;
             }
 
@@ -133,6 +135,7 @@ public class BlobLeaseService : IBlobLeaseService
             _logger.LogError("Invalid BlobReleaseLeaseDelay configuration value.");
         }
         delayBetweenAttempts ??= TimeSpan.FromMilliseconds(blobReleaseLeaseDelay);
+        var leaseClient = GetBlobLeaseClient(blobClient, leaseId);
 
         var retryPolicy = Policy
             .Handle<RequestFailedException>(ex => ex.ErrorCode == BlobErrorCode.LeaseAlreadyPresent)
@@ -146,7 +149,6 @@ public class BlobLeaseService : IBlobLeaseService
         {
             await retryPolicy.ExecuteAsync(async () =>
             {
-                var leaseClient = GetBlobLeaseClient(blobClient, leaseId);
                 await leaseClient.AcquireAsync(leaseDuration, cancellationToken: CancellationToken.None);
             });
             return true;
@@ -187,6 +189,7 @@ public class BlobLeaseService : IBlobLeaseService
             if (plantLease == null || !plantLease.Any())
             {
                 _logger.LogWarning("Could not read blob containing plant lease.");
+                await ReleaseBlobLeaseAsync(_blobClient, leaseId);
                 return null;
             }
 
