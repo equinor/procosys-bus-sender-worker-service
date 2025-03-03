@@ -38,7 +38,6 @@ public class BlobLeaseService : IBlobLeaseService
         var sw = new Stopwatch();
         sw.Start();
         _blobClient = GetBlobClient();
-        _logger.LogInformation($"Init blob client used {sw.ElapsedMilliseconds}");
     }
     public virtual IMemoryCache GetCache() => _cache;
 
@@ -64,7 +63,7 @@ public class BlobLeaseService : IBlobLeaseService
             plantLeases = await GetPlantLeases(leaseId);
             if (plantLeases == null)
             {
-                _logger.LogInformation("No blob lease available. Awaiting next loop.");
+                _logger.LogDebug("No blob lease available. Awaiting next loop.");
                 return null;
             }
 
@@ -72,7 +71,7 @@ public class BlobLeaseService : IBlobLeaseService
             if (plantLease == null)
             {
                 // Nothing to do for now.
-                _logger.LogInformation("No available plants to lease. Awaiting next loop.");
+                _logger.LogDebug("No available plants to lease. Awaiting next loop.");
                 await ReleaseBlobLeaseAsync(_blobClient, leaseId);
                 return null;
             }
@@ -85,11 +84,11 @@ public class BlobLeaseService : IBlobLeaseService
 
             UpdatePlantLeases(plantLeases, leaseId);
             GetCache().Set("CurrentPlantLeases", plantLeases);
-            _logger.LogInformation($"Claim used {sw.ElapsedMilliseconds}");
+            _logger.LogDebug($"Claim used {sw.ElapsedMilliseconds}");
         }
         else
         {
-            _logger.LogInformation("Plant leases retrieved from cache.");
+            _logger.LogDebug("Plant leases retrieved from cache.");
         }
 
         return plantLeases;
@@ -141,7 +140,7 @@ public class BlobLeaseService : IBlobLeaseService
             .Handle<RequestFailedException>(ex => ex.ErrorCode == BlobErrorCode.LeaseAlreadyPresent)
             .WaitAndRetryAsync(maxRetryAttempts, retryAttempt =>
             {
-                _logger.LogInformation($"Attempt {retryAttempt} to acquire lease for blob: {blobClient.Name}");
+                _logger.LogDebug($"Attempt {retryAttempt} to acquire lease for blob: {blobClient.Name}");
                 return delayBetweenAttempts.Value;
             });
 
@@ -157,6 +156,14 @@ public class BlobLeaseService : IBlobLeaseService
         {
             if (rfe.ErrorCode == BlobErrorCode.LeaseAlreadyPresent)
             {
+                // We are only interested in warning when this method has been called with acceptance for multiple retry attempts (e.g. when releaseing plant lease)
+                // indicating higher importance of acquiring the lease. 
+                // We do not want to spam the logs with warnings when successful blob lease is of lower importance. (e.g. for Claim)
+                if (maxRetryAttempts > 0)
+                {
+                    _logger.LogWarning(rfe,
+                        $"Failed to acquire lease for blob: {blobClient.Name} after {maxRetryAttempts} attempts. ErrorCode: {rfe.ErrorCode} Message: {rfe.Message}");
+                }
                 return false;
             }
 

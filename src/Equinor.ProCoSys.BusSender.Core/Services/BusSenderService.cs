@@ -69,7 +69,7 @@ public class BusSenderService : IBusSenderService
             var plantLeases = await _blobLeaseService.ClaimPlantLease();
             if (plantLeases == null)
             {
-                _logger.LogInformation("No plant lease available exiting.");
+                _logger.LogDebug("No plant lease available exiting.");
                 return;
             }
 
@@ -77,7 +77,7 @@ public class BusSenderService : IBusSenderService
   
             if (plantLeases == null || plantLease?.Plant == null)
             {
-                _logger.LogInformation("No plant leases available exiting.");
+                _logger.LogDebug("No plant leases available exiting.");
                 return;
             }
 
@@ -130,7 +130,7 @@ public class BusSenderService : IBusSenderService
     {
         if (plantLease != null && plantLease.IsExpired())
         {
-            _logger.LogInformation("Lease has expired for plant: {Plant}. Releasing it.", plantLease.Plant);
+            _logger.LogDebug("Lease has expired for plant: {Plant}. Releasing it.", plantLease.Plant);
             _blobLeaseService.ReleasePlantLease(plantLease);
             return true;
         }
@@ -143,12 +143,12 @@ public class BusSenderService : IBusSenderService
         var remainingEvents = await _busEventRepository.GetEarliestUnProcessedEventChunk();
         if (remainingEvents.Any())
         {
-            _logger.LogInformation("[{Plant}] More unprocessed events are handled in the next loop by this instance. Keeping blob lease for this plant.", plantLease.Plant);
+            _logger.LogDebug("[{Plant}] More unprocessed events are handled in the next loop by this instance. Keeping blob lease for this plant.", plantLease.Plant);
             return false;
         }
         else
         {
-            _logger.LogInformation("[{Plant}] No more unprocessed events for this plant. Releasing blob lease.", plantLease.Plant);
+            _logger.LogDebug("[{Plant}] No more unprocessed events for this plant. Releasing blob lease.", plantLease.Plant);
             _blobLeaseService.ReleasePlantLease(plantLease);
             return true;
         }
