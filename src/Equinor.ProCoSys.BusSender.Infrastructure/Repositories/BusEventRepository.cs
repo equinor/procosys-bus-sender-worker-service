@@ -46,7 +46,7 @@ public class BusEventRepository : IBusEventRepository
     {
         var query = _busEvents.Where(e => e.Status == Status.UnProcessed);
 
-        if (_plants==null || !_plants.Any())
+        if (_plants == null || !_plants.Any())
         {
             return query;
         }

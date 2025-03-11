@@ -86,7 +86,7 @@ public class BusSenderService : IBusSenderService
                 return;
             }
 
-            var plants = _plantService.GetPlantsHandledByInstance(plantLeases);
+            var plants = _plantService.GetPlantsForCurrent(plantLeases);
 
             await _queueMonitor.WriteQueueMetrics();
 
@@ -261,7 +261,7 @@ public class BusSenderService : IBusSenderService
                 await UpdateEventBasedOnTopic(simpleUnprocessedBusEvent);
         }
 
-        _logger.LogInformation("[{Plant}] Update loop finished at at {Sw} ms", plant, dsw.ElapsedMilliseconds);
+        _logger.LogInformation("[{Plant}] Update loop finished at {Sw} ms", plant, dsw.ElapsedMilliseconds);
         if (!_blobLeaseService.CancellationToken.IsCancellationRequested)
         {
             await _unitOfWork.SaveChangesAsync();

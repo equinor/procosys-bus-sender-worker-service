@@ -63,7 +63,7 @@ public class PlantServiceTests
             }
         };
 
-        var plantsHandledByInstance = _plantServiceMock.Object.GetPlantsHandledByInstance(plantLeases);
+        var plantsHandledByInstance = _plantServiceMock.Object.GetPlantsForCurrent(plantLeases);
 
         // Arrange
 
@@ -94,6 +94,6 @@ public class PlantServiceTests
         };
 
         Assert.ThrowsException<Exception>(() =>
-            _plantServiceMock.Object.GetPlantsHandledByInstance(plantLeases));
+            _plantServiceMock.Object.GetPlantsForCurrent(plantLeases));
     }
 }

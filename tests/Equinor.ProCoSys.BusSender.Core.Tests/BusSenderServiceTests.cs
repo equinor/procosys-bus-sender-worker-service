@@ -107,7 +107,7 @@ public class BusSenderServiceTests
 
         _blobLeaseServiceMock.Setup(x => x.ClaimPlantLease()).ReturnsAsync(plantLeases);
         _blobLeaseServiceMock.Setup(x => x.GetCache()).Returns(_cacheMock.Object);
-        _plantServiceMock.Setup(x => x.GetPlantsHandledByInstance(plantLeases)).Returns(plants);
+        _plantServiceMock.Setup(x => x.GetPlantsForCurrent(plantLeases)).Returns(plants);
 
         _busEventRepository = new Mock<IBusEventRepository>();
         _tagDetailsRepositoryMock = new Mock<ITagDetailsRepository>();

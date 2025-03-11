@@ -27,6 +27,7 @@ public class BlobLeaseService : IBlobLeaseService
     private CancellationTokenSource? _cancellationTokenSource;
     private readonly IMemoryCache _cache;
     private readonly BlobClient _blobClient;
+    private static readonly TimeSpan blobLeaseDuration = TimeSpan.FromSeconds(15);
 
     public CancellationToken CancellationToken => _cancellationTokenSource?.Token ?? CancellationToken.None;
 
@@ -186,10 +187,9 @@ public class BlobLeaseService : IBlobLeaseService
             throw;
         }
     }
-
     private async Task<List<PlantLease>?> GetPlantLeases(string leaseId, int maxRetryAttempts = 0)
     {
-        var newLeaseAcquired = await TryAcquireBlobLeaseAsync(_blobClient, leaseId, TimeSpan.FromSeconds(15), maxRetryAttempts);
+        var newLeaseAcquired = await TryAcquireBlobLeaseAsync(_blobClient, leaseId, blobLeaseDuration, maxRetryAttempts);
         if (newLeaseAcquired)
         {
             var plantLease = await GetPlantLeases(_blobClient);
@@ -210,8 +210,7 @@ public class BlobLeaseService : IBlobLeaseService
     {
         var options = new JsonSerializerOptions
         {
-            PropertyNameCaseInsensitive = true,
-            Converters = { new DateTimeConverter() }
+            PropertyNameCaseInsensitive = true
         };
 
         var json = await GetBlobContentAsync(blobClient);
@@ -223,8 +222,7 @@ public class BlobLeaseService : IBlobLeaseService
         var options = new JsonSerializerOptions
         {
             WriteIndented = true,
-            PropertyNameCaseInsensitive = true,
-            Converters = { new DateTimeConverter() }
+            PropertyNameCaseInsensitive = true
         };
 
         var json = JsonSerializer.Serialize(plantLeases, options);

@@ -33,6 +33,12 @@ public class PlantService : IPlantService
         {
             _logger.LogDebug("Retrieving plants from memory cache.");
             allPlants = _plantRepository.GetAllPlants();
+            if (allPlants == null || !allPlants.Any())
+            {
+                var message = "No plants found in database.";
+                _logger.LogError(message);
+                throw new Exception(message);
+            }
             _cache.Set("AllPlants", allPlants, new MemoryCacheEntryOptions
             {
                 // Have to restart instance to reload plants configuration.
@@ -48,39 +54,41 @@ public class PlantService : IPlantService
         return allPlants;
     }
 
-    public List<string> GetPlantsHandledByInstance(List<PlantLease> plantLeases)
+    public List<string> GetPlantsForCurrent(List<PlantLease> plantLeases)
     {
         var plantsHandledByCurrentInstance = new List<string>();
         var allPlants = GetAllPlants();
 
-        if (allPlants != null && allPlants.Any())
+        if (allPlants == null || !allPlants.Any())
         {
-            var plant = plantLeases.First(x => x.IsCurrent).Plant;
-            if (!string.IsNullOrEmpty(plant))
+            throw new Exception("No plants found in database.");
+        }
+
+        var plant = plantLeases.First(x => x.IsCurrent).Plant;
+        if (!string.IsNullOrEmpty(plant))
+        {
+            _logger.LogInformation($"Handling messages for plant: {plant}");
+
+            if (plant.Equals(PcsServiceBusInstanceConstants.RemainingPlants))
             {
-                _logger.LogInformation($"Handling messages for plant: {plant}");
-
-                if (plant.Equals(PcsServiceBusInstanceConstants.RemainingPlants))
-                {
-                    var definedPlants = plantLeases.Where(x => !x.IsCurrent).Select(x => x.Plant).ToList();
-                    // We are also handling cases where RemainingPlants constant is used in combination with actual plants. E.g. PCS$TROLL_A, PCS$OSEBERG_C, REMAININGPLANTS. 
-                    var plantLeftovers = GetPlantLeftovers(definedPlants, allPlants);
-                    plantsHandledByCurrentInstance = plantsHandledByCurrentInstance.Union(plantLeftovers).ToList();
-                }
-                else
-                {
-                    plantsHandledByCurrentInstance.Add(plant);
-                }
-
-                RemoveInvalidPlants(plantsHandledByCurrentInstance, allPlants);
+                var definedPlants = plantLeases.Where(x => !x.IsCurrent).Select(x => x.Plant).ToList();
+                // We are also handling cases where RemainingPlants constant is used in combination with actual plants. E.g. PCS$TROLL_A, PCS$OSEBERG_C, REMAININGPLANTS. 
+                var plantLeftovers = GetPlantLeftovers(definedPlants, allPlants);
+                plantsHandledByCurrentInstance = plantsHandledByCurrentInstance.Union(plantLeftovers).ToList();
+            }
+            else
+            {
+                plantsHandledByCurrentInstance.Add(plant);
             }
 
-            if (!plantsHandledByCurrentInstance.Any())
-            {
-                var message = "No valid plants to handle for this configuration item. Check plantslease blob. E.g. has non valid plants been included?";
-                _logger.LogError(message);
-                throw new Exception(message);
-            }
+            RemoveInvalidPlants(plantsHandledByCurrentInstance, allPlants);
+        }
+
+        if (!plantsHandledByCurrentInstance.Any())
+        {
+            var message = "No valid plants to handle for this configuration item. Check plantslease blob. E.g. has non valid plants been included?";
+            _logger.LogError(message);
+            throw new Exception(message);
         }
 
         return plantsHandledByCurrentInstance;
