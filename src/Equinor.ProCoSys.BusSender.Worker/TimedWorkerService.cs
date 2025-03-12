@@ -48,10 +48,11 @@ public class TimedWorkerService : IHostedService, IDisposable
 
     private async void DoWork(object? state)
     {
+        var hasPendingEventsForCurrentPlant = false;
         try
         {
             _logger.LogInformation("TimedWorkerService started do work");
-            await _entryPointService.DoWorkerJob();
+            hasPendingEventsForCurrentPlant = await _entryPointService.DoWorkerJob();
             _logger.LogInformation("TimedWorkerService finished do work");
         }
         catch (Exception e)
@@ -60,7 +61,7 @@ public class TimedWorkerService : IHostedService, IDisposable
         }
         finally
         {
-            _timer?.Change(_timeout, Timeout.Infinite);
+            _timer?.Change(hasPendingEventsForCurrentPlant?0:_timeout, Timeout.Infinite);
         }
     }
 }

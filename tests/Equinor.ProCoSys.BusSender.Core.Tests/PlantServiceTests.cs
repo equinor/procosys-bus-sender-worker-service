@@ -134,8 +134,6 @@ public class PlantServiceTests
             }
         };
 
-        // Arrange
-
         var plantsHandledByInstance = _plantServiceMock.Object.GetPlantsForCurrent(plantLeases);
 
         // Arrange

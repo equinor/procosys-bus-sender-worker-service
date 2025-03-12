@@ -17,11 +17,11 @@ public class EntryPointService : IEntryPointService
         _configuration = configuration;
     }
 
-    public async Task DoWorkerJob()
+    public async Task<bool> DoWorkerJob()
     {
         using var scope = _services.CreateScope();
         var service = scope.ServiceProvider.GetRequiredService<IBusSenderService>();
-        bool multiInstanceSupport = bool.Parse(_configuration["MultiInstanceSupport"]??"false");
+        var multiInstanceSupport = bool.Parse(_configuration["MultiInstanceSupport"]??"false");
         if (multiInstanceSupport)
         {
             await service.HandleBusEvents();
@@ -30,6 +30,7 @@ public class EntryPointService : IEntryPointService
         {
             await service.HandleBusEventsSingleInstance();
         }
+        return service.HasPendingEventsForCurrentPlant();
     }
 
     public async Task StopService()

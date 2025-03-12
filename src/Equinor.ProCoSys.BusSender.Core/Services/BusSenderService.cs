@@ -29,6 +29,7 @@ public class BusSenderService : IBusSenderService
     private readonly IUnitOfWork _unitOfWork;
     private readonly IBlobLeaseService _blobLeaseService;
     private readonly IPlantService _plantService;
+    private bool _hasPendingEventsForCurrentPlant = false;
 
     public BusSenderService(IPcsBusSender pcsBusSender,
         IBusEventRepository busEventRepository,
@@ -58,7 +59,7 @@ public class BusSenderService : IBusSenderService
         await _pcsBusSender.CloseAllAsync();
     }
 
-
+    public bool HasPendingEventsForCurrentPlant() => _hasPendingEventsForCurrentPlant;
 
     public async Task HandleBusEvents()
     {
@@ -66,6 +67,7 @@ public class BusSenderService : IBusSenderService
         try
         {
             _sw.Start();
+            _hasPendingEventsForCurrentPlant = false;
             var plantLeases = await _blobLeaseService.ClaimPlantLease();
             if (plantLeases == null)
             {
@@ -168,19 +170,19 @@ public class BusSenderService : IBusSenderService
         return false;
     }
 
-    private async Task<bool> ReleasePlantLeaseIfProcessingCompleted(PlantLease plantLease)
+    private async Task ReleasePlantLeaseIfProcessingCompleted(PlantLease plantLease)
     {
         var remainingEvents = await _busEventRepository.GetEarliestUnProcessedEventChunk();
         if (remainingEvents.Any())
         {
             _logger.LogDebug("[{Plant}] More unprocessed events are handled in the next loop by this instance. Keeping blob lease for this plant.", plantLease.Plant);
-            return false;
+            _hasPendingEventsForCurrentPlant = true;
         }
         else
         {
             _logger.LogDebug("[{Plant}] No more unprocessed events for this plant. Releasing blob lease.", plantLease.Plant);
             _blobLeaseService.ReleasePlantLease(plantLease);
-            return true;
+            _hasPendingEventsForCurrentPlant = false;
         }
     }
 

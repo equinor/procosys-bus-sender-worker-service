@@ -7,4 +7,5 @@ public interface IBusSenderService
     Task CloseConnections();
     Task HandleBusEvents();
     Task HandleBusEventsSingleInstance();
+    bool HasPendingEventsForCurrentPlant();
 }
