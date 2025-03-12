@@ -126,6 +126,36 @@ public class BusSenderService : IBusSenderService
         _telemetryClient.Flush();
     }
 
+    public async Task HandleBusEventsSingleInstance()
+    {
+        try
+        {
+            await _queueMonitor.WriteQueueMetrics();
+
+            _sw.Start();
+            var events = await _busEventRepository.GetEarliestUnProcessedEventChunk();
+            if (events.Any())
+            {
+                _logger.LogInformation("BusSenderService found {Count} messages to process after {Sw} ms", events.Count,
+                    _sw.ElapsedMilliseconds);
+                _telemetryClient.TrackMetric("BusSender Chunk", events.Count);
+                await ProcessBusEvents(events);
+                _logger.LogInformation("BusSenderService ProcessBusEvents used {Sw} ms", _sw.ElapsedMilliseconds);
+            }
+
+            _sw.Reset();
+        }
+        catch (Exception exception)
+        {
+            _logger.LogError(exception, "BusSenderService execute send failed");
+            throw;
+        }
+
+        _logger.LogDebug("BusSenderService DoWorkerJob finished");
+        _telemetryClient.Flush();
+    }
+
+
     private bool ReleasePlantLeaseIfExpired(PlantLease? plantLease)
     {
         if (plantLease != null && plantLease.IsExpired())
@@ -247,7 +277,7 @@ public class BusSenderService : IBusSenderService
            || Guid.TryParse(busEvent.Message, out _)
            || BusEventService.CanGetTwoIdsFromMessage(busEvent.Message.Split(","), out _, out _);
 
-    private async Task ProcessBusEvents(List<BusEvent> events, string plant)
+    private async Task ProcessBusEvents(List<BusEvent> events, string plant = "ALL")
     {
         events = SetDuplicatesToSkipped(events);
         var dsw = Stopwatch.StartNew();

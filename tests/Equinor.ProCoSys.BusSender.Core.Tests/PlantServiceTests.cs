@@ -72,6 +72,83 @@ public class PlantServiceTests
     }
 
     [TestMethod]
+    public void GetPlantsHandledByInstance_WhenPlantOverlap_ShouldThrowException()
+    {
+        var plantLeases = new List<PlantLease>()
+        {
+            new PlantLease()
+            {
+                IsCurrent = true,
+                Plant = "PCS$PlantB,PCS$PlantC"
+            },
+            new PlantLease()
+            {
+                IsCurrent = false,
+                Plant = "PCS$PlantC,PCS$PlantD"
+            }
+        };
+
+        // Arrange
+
+        Assert.ThrowsException<Exception>(() =>
+            _plantServiceMock.Object.GetPlantsForCurrent(plantLeases));
+    }
+
+    [TestMethod]
+    public void GetPlantsHandledByInstance_WhenPlantOverlapAndPlaceholder_ShouldThrowException()
+    {
+        var plantLeases = new List<PlantLease>()
+        {
+            new PlantLease()
+            {
+                IsCurrent = true,
+                Plant = "NOPLANT,REMAININGPLANTS,PCS$PlantB,PCS$PlantC"
+            },
+            new PlantLease()
+            {
+                IsCurrent = false,
+                Plant = "PCS$PlantC,PCS$PlantD"
+            }
+        };
+
+        // Arrange
+
+        Assert.ThrowsException<Exception>(() =>
+            _plantServiceMock.Object.GetPlantsForCurrent(plantLeases));
+    }
+
+    [TestMethod]
+    public void GetPlantsHandledByInstance_WhenExplicitPlantAndPlaceholder_ShouldResolve()
+    {
+        var plantLeases = new List<PlantLease>()
+        {
+            new PlantLease()
+            {
+                IsCurrent = true,
+                Plant = "NOPLANT,REMAININGPLANTS,PCS$PlantB,PCS$PlantC"
+            },
+            new PlantLease()
+            {
+                IsCurrent = false,
+                Plant = "PCS$PlantX,PCS$PlantY"
+            }
+        };
+
+        // Arrange
+
+        var plantsHandledByInstance = _plantServiceMock.Object.GetPlantsForCurrent(plantLeases);
+
+        // Arrange
+
+        Assert.IsTrue(plantsHandledByInstance[0] == "NOPLANT");
+        Assert.IsTrue(plantsHandledByInstance[1] == "PCS$PlantB");
+        Assert.IsTrue(plantsHandledByInstance[2] == "PCS$PlantC");
+        Assert.IsTrue(plantsHandledByInstance[3] == "PCS$PlantA");
+        Assert.IsTrue(plantsHandledByInstance[4] == "PCS$PlantD");
+    }
+
+
+    [TestMethod]
     public void GetPlantsHandledByInstance_WhenInvalidPlantOnly_ShouldThrowException()
     {
         var plantLeases = new List<PlantLease>()

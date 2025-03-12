@@ -65,22 +65,34 @@ public class PlantService : IPlantService
         }
 
         var plant = plantLeases.First(x => x.IsCurrent).Plant;
+        var plants = plantLeases.Where(x => x.IsCurrent)
+                                .SelectMany(x => x.Plant.Split(',', StringSplitOptions.RemoveEmptyEntries))
+                                .ToList();
         if (!string.IsNullOrEmpty(plant))
         {
             _logger.LogInformation($"Handling messages for plant: {plant}");
 
-            if (plant.Equals(PcsServiceBusInstanceConstants.RemainingPlants))
+            var otherDefinedPlants = plantLeases.Where(x => !x.IsCurrent)
+                                    .SelectMany(x => x.Plant.Split(',', StringSplitOptions.RemoveEmptyEntries))
+                                    .ToList();
+            if (plants.Contains(PcsServiceBusInstanceConstants.RemainingPlants))
             {
-                var definedPlants = plantLeases.Where(x => !x.IsCurrent).Select(x => x.Plant).ToList();
                 // We are also handling cases where RemainingPlants constant is used in combination with actual plants. E.g. PCS$TROLL_A, PCS$OSEBERG_C, REMAININGPLANTS. 
-                var plantLeftovers = GetPlantLeftovers(definedPlants, allPlants);
-                plantsHandledByCurrentInstance = plantsHandledByCurrentInstance.Union(plantLeftovers).ToList();
+                var plantLeftovers = GetPlantLeftovers(otherDefinedPlants, allPlants);
+                plantsHandledByCurrentInstance = plants.Union(plantLeftovers).ToList();
+                RemovePlantReplacement(plantsHandledByCurrentInstance);
             }
             else
             {
-                plantsHandledByCurrentInstance.Add(plant);
+                plantsHandledByCurrentInstance.AddRange(plants);
             }
 
+            if (otherDefinedPlants.Intersect(plants).Any())
+            {
+                var message = "One or more plants are defined for multiple items. Check plantslease blob.";
+                _logger.LogError(message);
+                throw new Exception(message);
+            }
             RemoveInvalidPlants(plantsHandledByCurrentInstance, allPlants);
         }
 
@@ -112,6 +124,8 @@ public class PlantService : IPlantService
             _logger.LogWarning($"These plants are not valid: {string.Join(", ", invalidPlants)}");
         }
     }
+
+    private void RemovePlantReplacement(List<string> plants) => plants.RemoveAll(x => PcsServiceBusInstanceConstants.AllPlantReplacementConstants.Contains(x));
 
     private static IEnumerable<string> GetPlantLeftovers(IEnumerable<string> handledPlants, IEnumerable<string> allNonVoidedPlants) =>
         allNonVoidedPlants.Except(handledPlants);
