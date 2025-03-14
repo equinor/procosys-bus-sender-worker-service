@@ -407,4 +407,53 @@ public class BusSenderServiceTests
         // Assert
         _iUnitOfWork.Verify(t => t.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
     }
+
+    [TestMethod]
+    public async Task SendMessageChunk_ShouldContinueOnPlantIfRemainingEvents()
+    {
+        // Arrange
+        var _busEventsRemaining = new List<BusEvent>
+        {
+            new()
+            {
+                Created = DateTime.Now.AddMinutes(-10),
+                Event = "topic2",
+                Status = Status.UnProcessed,
+                Id = 1,
+                Plant = "NGPCS_TEST_BROWN",
+                Message = "{\"Plant\":\"NGPCS_TEST_BROWN\",\"ProjectName\":\"Message 10 minutes ago not sent\"}"
+            }
+        };
+
+        var callCount = 0;
+        _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk())
+            .Returns(() => Task.FromResult(callCount++ == 0 ? _busEvents : _busEventsRemaining));
+
+        // Act
+        await _dut.HandleBusEvents();
+
+        // Assert
+        Assert.IsTrue(_dut.HasPendingEventsForCurrentPlant());
+    }
+
+
+    [TestMethod]
+    public async Task SendMessageChunk_ShouldLeavePlantIfNoRemainingEvents()
+    {
+        // Arrange
+        var _busEventsRemaining = new List<BusEvent>
+        {
+        };
+
+        var callCount = 0;
+        _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk())
+            .Returns(() => Task.FromResult(callCount++ == 0 ? _busEvents : _busEventsRemaining));
+
+        // Act
+        await _dut.HandleBusEvents();
+
+        // Assert
+        Assert.IsFalse(_dut.HasPendingEventsForCurrentPlant());
+    }
+
 }
