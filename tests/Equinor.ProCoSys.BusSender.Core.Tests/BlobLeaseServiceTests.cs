@@ -57,6 +57,12 @@ namespace Equinor.ProCoSys.BusSenderWorker.Core.Tests
             _blobClientMock.Setup(x => x.DownloadAsync()).ReturnsAsync(Response.FromValue(BlobsModelFactory.BlobDownloadInfo(), null));
             _blobClientMock.Setup(x => x.UploadAsync(It.IsAny<MemoryStream>(), It.IsAny<BlobUploadOptions>(), It.IsAny<CancellationToken>())).ReturnsAsync(Response.FromValue(BlobsModelFactory.BlobContentInfo(new ETag(), DateTimeOffset.UtcNow, Array.Empty<byte>(), null, 0), null));
 
+            var blobProperties = BlobsModelFactory.BlobProperties(leaseState: LeaseState.Available, leaseStatus: LeaseStatus.Unlocked);
+            var response = Response.FromValue(blobProperties, Mock.Of<Response>());
+
+            _blobClientMock.Setup(b => b.GetPropertiesAsync(It.IsAny<BlobRequestConditions>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(response);
+
             object cacheEntry = null;
             _cacheMock.Setup(x => x.TryGetValue(It.IsAny<object>(), out cacheEntry)).Returns(false);
             _cacheMock.Setup(x => x.CreateEntry(It.IsAny<object>())).Returns(Mock.Of<ICacheEntry>());

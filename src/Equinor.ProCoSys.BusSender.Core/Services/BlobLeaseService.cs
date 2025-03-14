@@ -149,7 +149,19 @@ public class BlobLeaseService : IBlobLeaseService
         {
             await retryPolicy.ExecuteAsync(async () =>
             {
-                await leaseClient.AcquireAsync(leaseDuration, cancellationToken: CancellationToken.None);
+                // GetPropertiesAsync is called upfront of AcquireAsync in an attempt to reduce the number of calls to the latter method.
+                // In general, GetPropertiesAsync is expected to be quicker than AcquireAsync because it is a read-only operation,
+                // whereas AcquireAsync involves state changes and additional checks.
+                var properties = await blobClient.GetPropertiesAsync();
+                if (properties.Value.LeaseState == LeaseState.Available && properties.Value.LeaseStatus == LeaseStatus.Unlocked)
+                {
+                    await leaseClient.AcquireAsync(leaseDuration, cancellationToken: CancellationToken.None);
+                }
+                else
+                {
+                    throw new RequestFailedException(409, "Lease already present", BlobErrorCode.LeaseAlreadyPresent.ToString(),
+                        new InvalidOperationException("The lease is already present and cannot be acquired."));
+                }
             });
             return true;
         }
@@ -157,7 +169,7 @@ public class BlobLeaseService : IBlobLeaseService
         {
             if (rfe.ErrorCode == BlobErrorCode.LeaseAlreadyPresent)
             {
-                // We are only interested in warning when this method has been called with acceptance for multiple retry attempts (e.g. when releaseing plant lease)
+                // We are only interested in warning when this method has been called with acceptance for multiple retry attempts (e.g. when releasing plant lease)
                 // indicating higher importance of acquiring the lease. 
                 // We do not want to spam the logs with warnings when successful blob lease is of lower importance. (e.g. for Claim)
                 if (maxRetryAttempts > 0)
