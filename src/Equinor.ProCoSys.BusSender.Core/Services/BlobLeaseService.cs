@@ -60,8 +60,7 @@ public class BlobLeaseService : IBlobLeaseService
                 _cancellationTokenSource = new CancellationTokenSource((int)(blobLeaseExpiryTime * 1000 * 0.95));
             }
 
-            var leaseId = Guid.NewGuid().ToString();
-            plantLeases = await GetPlantLeases(leaseId);
+            plantLeases = await GetPlantLeases();
             if (plantLeases == null)
             {
                 _logger.LogDebug("No blob lease available. Awaiting next loop.");
@@ -73,9 +72,10 @@ public class BlobLeaseService : IBlobLeaseService
             {
                 // Nothing to do for now.
                 _logger.LogDebug("No available plants to lease. Awaiting next loop.");
-                await ReleaseBlobLeaseAsync(_blobClient, leaseId);
                 return null;
             }
+
+            var leaseId = Guid.NewGuid().ToString();
 
             plantLeases.Where(x => x.Plant.Equals(plantLease.Plant)).ToList().ForEach(x =>
             {
@@ -83,7 +83,11 @@ public class BlobLeaseService : IBlobLeaseService
                 x.LeaseExpiry = DateTime.UtcNow.AddSeconds(blobLeaseExpiryTime);
             });
 
-            UpdatePlantLeases(plantLeases, leaseId);
+            var didUpdatePlantLeases = await UpdatePlantLeases(plantLeases, leaseId, 0);
+            if (!didUpdatePlantLeases)
+            {
+                return null;
+            }
             GetCache().Set("CurrentPlantLeases", plantLeases);
             _logger.LogDebug($"Claim used {sw.ElapsedMilliseconds}");
         }
@@ -95,26 +99,26 @@ public class BlobLeaseService : IBlobLeaseService
         return plantLeases;
     }
 
-    public async void ReleasePlantLease(PlantLease? plantLease)
+    public async Task<bool> ReleasePlantLease(PlantLease? plantLease)
     {
         if (plantLease == null)
         {
             _logger.LogWarning("Cannot release lease.");
-            return;
+            return false;
         }
 
         if (!int.TryParse(_configuration["MaxBlobReleaseLeaseAttempts"], out var maxRetryAttempts))
         {
             _logger.LogError("Invalid MaxBlobReleaseLeaseAttempts configuration value.");
-            return;
+            return false;
         }
 
         var leaseId = Guid.NewGuid().ToString();
-        var plantLeases = await GetPlantLeases(leaseId,maxRetryAttempts);
+        var plantLeases = await GetPlantLeases();
         if (plantLeases == null)
         {
             _logger.LogWarning("Cannot release plant lease.");
-            return;
+            return false;
         }
 
         plantLeases.Where(x => x.Plant.Equals(plantLease?.Plant)).ToList().ForEach(x =>
@@ -122,8 +126,13 @@ public class BlobLeaseService : IBlobLeaseService
             x.LeaseExpiry = null;
             x.LastProcessed = DateTime.UtcNow;
         });
-        UpdatePlantLeases(plantLeases, leaseId);
-        GetCache().Remove("CurrentPlantLeases");
+        var didReleasePlantLeases = await UpdatePlantLeases(plantLeases, leaseId, maxRetryAttempts);
+        if (didReleasePlantLeases)
+        {
+            GetCache().Remove("CurrentPlantLeases");
+        }
+        return didReleasePlantLeases;
+        // If we fail to release the lease, we will try again in the next loop. Hence not moving from cache.
     }
 
     public virtual BlobLeaseClient GetBlobLeaseClient(BlobClient blobClient, string leaseId) => blobClient.GetBlobLeaseClient(leaseId);
@@ -153,7 +162,7 @@ public class BlobLeaseService : IBlobLeaseService
                 // In general, GetPropertiesAsync is expected to be quicker than AcquireAsync because it is a read-only operation,
                 // whereas AcquireAsync involves state changes and additional checks.
                 var properties = await blobClient.GetPropertiesAsync();
-                if (properties.Value.LeaseState == LeaseState.Available && properties.Value.LeaseStatus == LeaseStatus.Unlocked)
+                if (properties.Value.LeaseStatus == LeaseStatus.Unlocked && (properties.Value.LeaseState == LeaseState.Available || properties.Value.LeaseState == LeaseState.Expired))
                 {
                     await leaseClient.AcquireAsync(leaseDuration, cancellationToken: CancellationToken.None);
                 }
@@ -199,22 +208,15 @@ public class BlobLeaseService : IBlobLeaseService
             throw;
         }
     }
-    private async Task<List<PlantLease>?> GetPlantLeases(string leaseId, int maxRetryAttempts = 0)
+    private async Task<List<PlantLease>?> GetPlantLeases()
     {
-        var newLeaseAcquired = await TryAcquireBlobLeaseAsync(_blobClient, leaseId, blobLeaseDuration, maxRetryAttempts);
-        if (newLeaseAcquired)
+        var plantLease = await GetPlantLeases(_blobClient);
+        if (plantLease!=null && plantLease.Any())
         {
-            var plantLease = await GetPlantLeases(_blobClient);
-            if (plantLease == null || !plantLease.Any())
-            {
-                _logger.LogWarning("Could not read blob containing plant lease.");
-                await ReleaseBlobLeaseAsync(_blobClient, leaseId);
-                return null;
-            }
-
             return plantLease;
         }
 
+        _logger.LogWarning("Could not read blob containing plant lease.");
         return null;
     }
 
@@ -229,7 +231,7 @@ public class BlobLeaseService : IBlobLeaseService
         return JsonSerializer.Deserialize<List<PlantLease>>(json, options);
     }
 
-    public virtual async void UpdatePlantLeases(List<PlantLease> plantLeases, string leaseId)
+    public virtual async Task<bool> UpdatePlantLeases(List<PlantLease> plantLeases, string leaseId, int maxRetryAttempts = 0)
     {
         var options = new JsonSerializerOptions
         {
@@ -246,8 +248,14 @@ public class BlobLeaseService : IBlobLeaseService
                 LeaseId = leaseId
             }
         };
+        var newLeaseAcquired = await TryAcquireBlobLeaseAsync(_blobClient, leaseId, blobLeaseDuration, maxRetryAttempts);
+        if (!newLeaseAcquired)
+        {
+            return false;
+        }
         await _blobClient.UploadAsync(memoryStream, uploadOptions, CancellationToken.None);
         await ReleaseBlobLeaseAsync(_blobClient, leaseId);
+        return true;
     }
 
     public virtual BlobClient GetBlobClient()

@@ -120,7 +120,7 @@ public class BusSenderService : IBusSenderService
         catch (Exception exception)
         {
             _logger.LogError(exception, "BusSenderService execute send failed");
-            _blobLeaseService.ReleasePlantLease(plantLease);
+            await _blobLeaseService.ReleasePlantLease(plantLease);
             throw;
         }
 
@@ -181,7 +181,7 @@ public class BusSenderService : IBusSenderService
         else
         {
             _logger.LogDebug("[{Plant}] No more unprocessed events for this plant. Releasing blob lease.", plantLease.Plant);
-            _blobLeaseService.ReleasePlantLease(plantLease);
+            await _blobLeaseService.ReleasePlantLease(plantLease);
             _hasPendingEventsForCurrentPlant = false;
         }
     }

@@ -10,7 +10,7 @@ using Microsoft.Extensions.Caching.Memory;
 namespace Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 public interface IBlobLeaseService
 {
-    void ReleasePlantLease(PlantLease? plantLease);
+    Task<bool> ReleasePlantLease(PlantLease? plantLease);
     Task<List<PlantLease>?> ClaimPlantLease();
     CancellationToken CancellationToken { get; }
     IMemoryCache GetCache();

@@ -196,17 +196,17 @@ namespace Equinor.ProCoSys.BusSenderWorker.Core.Tests
             // Act
             var result = await _blobLeaseServiceMock.Object.ClaimPlantLease();
             var plantHandledByCurrentInstance = result.First(x => x.IsCurrent);
-            _blobLeaseServiceMock.Object.ReleasePlantLease(plantHandledByCurrentInstance);
+            await _blobLeaseServiceMock.Object.ReleasePlantLease(plantHandledByCurrentInstance);
 
             _blobLeaseServiceMock.Verify(service => service.UpdatePlantLeases(
                     It.Is<List<PlantLease>>(leases => leases.Any(x => x.Plant == "Plant2" && !x.IsCurrent && x.LeaseExpiry == null)),
-                    It.IsAny<string>()),
+                    It.IsAny<string>(), 3),
                 Times.Once);
         }
 
 
         [TestMethod]
-        public void ReleasePlantLease_ShouldKeepLeaseExpiry_WhenBlobIsNotAvailableAfterMaxRetries()
+        public async Task ReleasePlantLease_ShouldKeepLeaseExpiry_WhenBlobIsNotAvailableAfterMaxRetries()
         {
             var jsonString = @"
                     [
@@ -239,12 +239,8 @@ namespace Equinor.ProCoSys.BusSenderWorker.Core.Tests
                 .ThrowsAsync(new RequestFailedException(0, "Lease already present",
                     BlobErrorCode.LeaseAlreadyPresent.ToString(), null));
 
-            _blobLeaseServiceMock.Object.ReleasePlantLease(plantHandledByCurrentInstance);
-
-            _blobLeaseServiceMock.Verify(service => service.UpdatePlantLeases(
-                    It.IsAny<List<PlantLease>>(),
-                    It.IsAny<string>()),
-                Times.Never(), "When lease can not be taken upon release, UpdatePlantLeases should never be called.");
+            var didReleasePlantLease = await _blobLeaseServiceMock.Object.ReleasePlantLease(plantHandledByCurrentInstance);
+            Assert.IsFalse(didReleasePlantLease, "When lease can not be taken upon release, UpdatePlantLeases should never be called.");
         }
     }
 }
