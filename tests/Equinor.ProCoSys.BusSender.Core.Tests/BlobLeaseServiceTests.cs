@@ -40,7 +40,7 @@ namespace Equinor.ProCoSys.BusSenderWorker.Core.Tests
             _blobLeaseServiceMock = new Mock<BlobLeaseService>(_loggerMock.Object, _configurationMock.Object, _cacheMock.Object) { CallBase = true }; // Partial mock.
 
             _configurationMock.SetupGet(x => x["MaxBlobReleaseLeaseAttempts"]).Returns("3");
-            _configurationMock.SetupGet(x => x["BlobLeaseExpiryTime"]).Returns("60");
+            _configurationMock.SetupGet(x => x["PlantLeaseExpiryTime"]).Returns("60");
             _configurationMock.SetupGet(x => x["BlobReleaseLeaseDelay"]).Returns("2");
 
             _blobLeaseServiceMock

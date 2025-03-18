@@ -44,21 +44,15 @@ public class BlobLeaseService : IBlobLeaseService
 
     public virtual async Task<List<PlantLease>?> ClaimPlantLease()
     {
+        if (!int.TryParse(_configuration["PlantLeaseExpiryTime"], out var plantLeaseExpiryTime))
+        {
+            _logger.LogError("Invalid PlantLeaseExpiryTime configuration value.");
+            return null;
+        }
         if (!GetCache().TryGetValue("CurrentPlantLeases", out List<PlantLease>? plantLeases))
         {
             var sw = new Stopwatch();
             sw.Start();
-            if (!int.TryParse(_configuration["BlobLeaseExpiryTime"], out var blobLeaseExpiryTime))
-            {
-                _logger.LogError("Invalid BlobLeaseExpiryTime configuration value.");
-                return null;
-            }
-
-            if (_cancellationTokenSource == null || _cancellationTokenSource.Token == CancellationToken.None)
-            {
-                // Multiplying by a factor lower than 1 to ensure that message processing for this instance is cancelled shortly before the lease expires.
-                _cancellationTokenSource = new CancellationTokenSource((int)(blobLeaseExpiryTime * 1000 * 0.95));
-            }
 
             plantLeases = await GetPlantLeases();
             if (plantLeases == null)
@@ -80,7 +74,7 @@ public class BlobLeaseService : IBlobLeaseService
             plantLeases.Where(x => x.Plant.Equals(plantLease.Plant)).ToList().ForEach(x =>
             {
                 x.IsCurrent = true;
-                x.LeaseExpiry = DateTime.UtcNow.AddSeconds(blobLeaseExpiryTime);
+                x.LeaseExpiry = DateTime.UtcNow.AddSeconds(plantLeaseExpiryTime);
             });
 
             var didUpdatePlantLeases = await UpdatePlantLeases(plantLeases, leaseId, 0);
@@ -88,12 +82,19 @@ public class BlobLeaseService : IBlobLeaseService
             {
                 return null;
             }
-            GetCache().Set("CurrentPlantLeases", plantLeases);
+            GetCache().Set("CurrentPlantLeases", plantLeases, TimeSpan.FromSeconds(plantLeaseExpiryTime * 1000 * 0.95));
             _logger.LogDebug($"Claim used {sw.ElapsedMilliseconds}");
         }
         else
         {
-            _logger.LogDebug("Plant leases retrieved from cache.");
+            plantLeaseExpiryTime = GetSecondsUntilLeaseExpiry(plantLeases?.First(x => x.IsCurrent).LeaseExpiry);
+            _logger.LogDebug($"Plant leases retrieved from cache. {plantLeaseExpiryTime} until expired.");
+        }
+
+        if ((_cancellationTokenSource == null || _cancellationTokenSource.Token == CancellationToken.None) && (plantLeaseExpiryTime > 0))
+        {
+            // Multiplying by a factor lower than 1 to ensure that message processing for this instance is cancelled shortly before the lease expires.
+            _cancellationTokenSource = new CancellationTokenSource((int)(plantLeaseExpiryTime * 1000 * 0.95));
         }
 
         return plantLeases;
@@ -137,6 +138,8 @@ public class BlobLeaseService : IBlobLeaseService
 
     public virtual BlobLeaseClient GetBlobLeaseClient(BlobClient blobClient, string leaseId) => blobClient.GetBlobLeaseClient(leaseId);
 
+    private TimeSpan GetJitter(TimeSpan delayBetweenAttempts) => TimeSpan.FromMilliseconds(new Random().Next(0, (int)(delayBetweenAttempts.TotalMilliseconds * 0.25))); // 25% jitter
+
     protected async Task<bool> TryAcquireBlobLeaseAsync(BlobClient blobClient, string leaseId, TimeSpan leaseDuration, int maxRetryAttempts = 0, TimeSpan? delayBetweenAttempts = null)
     {
         if (!int.TryParse(_configuration["BlobReleaseLeaseDelay"], out var blobReleaseLeaseDelay))
@@ -151,7 +154,8 @@ public class BlobLeaseService : IBlobLeaseService
             .WaitAndRetryAsync(maxRetryAttempts, retryAttempt =>
             {
                 _logger.LogDebug($"Attempt {retryAttempt} to acquire lease for blob: {blobClient.Name}");
-                return delayBetweenAttempts.Value;
+                var jitter = GetJitter(delayBetweenAttempts.Value);
+                return delayBetweenAttempts.Value + jitter;
             });
 
         try
@@ -162,7 +166,9 @@ public class BlobLeaseService : IBlobLeaseService
                 // In general, GetPropertiesAsync is expected to be quicker than AcquireAsync because it is a read-only operation,
                 // whereas AcquireAsync involves state changes and additional checks.
                 var properties = await blobClient.GetPropertiesAsync();
-                if (properties.Value.LeaseStatus == LeaseStatus.Unlocked && (properties.Value.LeaseState == LeaseState.Available || properties.Value.LeaseState == LeaseState.Expired))
+                var leaseStateUnlocked = properties.Value.LeaseStatus == LeaseStatus.Unlocked;
+                var leaseStateAvailableOrExpired = properties.Value.LeaseState == LeaseState.Available || properties.Value.LeaseState == LeaseState.Expired;
+                if (leaseStateUnlocked && leaseStateAvailableOrExpired)
                 {
                     await leaseClient.AcquireAsync(leaseDuration, cancellationToken: CancellationToken.None);
                 }
@@ -262,9 +268,9 @@ public class BlobLeaseService : IBlobLeaseService
     {
         var connectionString = _configuration["BlobStorage:ConnectionString"];
         var containerName = _configuration["BlobStorage:BusSenderContainerName"];
-        var blobLeaseFileName = _configuration["BlobLeaseFileName"];
+        var plantLeaseFileName = _configuration["PlantLeaseFileName"];
         var blobContainerClient = new BlobContainerClient(connectionString, containerName);
-        return blobContainerClient.GetBlobClient(blobLeaseFileName);
+        return blobContainerClient.GetBlobClient(plantLeaseFileName);
     }
 
     private PlantLease? GetOldestUnprocessedPlantLeaseInfo(List<PlantLease> plantLeases)
@@ -291,5 +297,15 @@ public class BlobLeaseService : IBlobLeaseService
         {
             _logger.LogError(ex, "Unexpected error occurred while releasing lease for blob: {BlobName}", blobClient.Name);
         }
+    }
+    public static int GetSecondsUntilLeaseExpiry(DateTime? leaseExpiry)
+    {
+        if (leaseExpiry == null)
+        {
+            return 0;
+        }
+
+        var timeSpan = leaseExpiry.Value - DateTime.UtcNow;
+        return (int)(timeSpan.TotalSeconds > 0 ? timeSpan.TotalSeconds : 0);
     }
 }

@@ -300,7 +300,7 @@ public class BusSenderService : IBusSenderService
         }
         else
         {
-            _logger.LogWarning("[{Plant}] SaveChangesAsync skipped due to BlobLeaseExpiryTime.", plant);
+            _logger.LogWarning("[{Plant}] SaveChangesAsync skipped due to PlantLeaseExpiryTime.", plant);
             return;
         }
         /***
