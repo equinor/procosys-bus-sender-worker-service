@@ -287,7 +287,7 @@ public class BlobLeaseService : IBlobLeaseService
         try
         {
             var leaseClient = GetBlobLeaseClient(blobClient, leaseId);
-            await leaseClient.ReleaseAsync(cancellationToken: CancellationToken);
+            await leaseClient.ReleaseAsync(cancellationToken: CancellationToken.None);
         }
         catch (RequestFailedException ex)
         {
