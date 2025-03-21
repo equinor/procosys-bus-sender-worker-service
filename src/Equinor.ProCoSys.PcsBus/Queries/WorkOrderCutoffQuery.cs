@@ -62,7 +62,7 @@ public class WorkOrderCutoffQuery
         from wo_cutoff wc
             join wo wo on wo.wo_id = wc.wo_id
             join projectschema ps ON ps.projectschema = wc.projectschema
-            join project p ON p.project_id = wc.project_id and p.isvoided = 'N' and p.isclosed = 'N'
+            join project p ON p.project_id = wc.project_id
             left join library milestone ON milestone.library_id = wc.womilestone_id
             left join library submilestone on submilestone.library_id = wc.wosubmilestone_id
             left join library cat ON cat.library_id = wc.category_id
