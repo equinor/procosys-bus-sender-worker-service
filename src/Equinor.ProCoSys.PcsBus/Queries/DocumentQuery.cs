@@ -4,10 +4,15 @@ namespace Equinor.ProCoSys.PcsServiceBus.Queries;
 
 public class DocumentQuery
 {
-    public static (string queryString, DynamicParameters parameters) GetQuery(long? documentId, string? plant = null)
+    public static (string queryString, DynamicParameters parameters) GetQuery(long? documentId, string? plant = null, string? extraClause = null)
     {
         DetectFaultyPlantInput(plant);
         var whereClause = CreateWhereClause(documentId, plant, "d", "document_id");
+
+        if (extraClause != null)
+        {
+            whereClause.clause += extraClause;
+        }
 
         var query = @$"select
             d.projectschema as Plant,

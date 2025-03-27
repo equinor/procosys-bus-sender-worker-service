@@ -8,10 +8,15 @@ public class WorkOrderQuery
     ///     Call with either workOrderId, plantId or both. Not advised to call without either as result set could get very
     ///     large
     /// </summary>
-    public static (string queryString, DynamicParameters parameters) GetQuery(long? workOrderId = null, string? plant = null)
+    public static (string queryString, DynamicParameters parameters) GetQuery(long? workOrderId = null, string? plant = null, string? extraClause = null)
     {
         DetectFaultyPlantInput(plant);
         var whereClause = CreateWhereClause(workOrderId, plant, "w", "wo_id");
+
+        if (extraClause != null)
+        {
+            whereClause.clause += extraClause;
+        }
 
         var query = @$"select
                 w.projectschema as Plant, 
