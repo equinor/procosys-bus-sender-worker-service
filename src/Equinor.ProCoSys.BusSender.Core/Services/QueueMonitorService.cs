@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 using Equinor.ProCoSys.BusSenderWorker.Core.Telemetry;
+using Equinor.ProCoSys.PcsServiceBus;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace Equinor.ProCoSys.BusSenderWorker.Core.Services;
 
@@ -57,6 +60,6 @@ public class QueueMonitorService : IQueueMonitorService
     private bool IsTimeToWriteQueueMetric(DateTime lastQueueWrite) =>
         _systemClock.UtcNow >= lastQueueWrite.ToUniversalTime().AddMinutes(_queueWriteIntervalMinutes);
 
-    private bool NoEventFound(DateTime oldestEvent) => 
+    private static bool NoEventFound(DateTime oldestEvent) => 
         oldestEvent.Equals(default);
 }
