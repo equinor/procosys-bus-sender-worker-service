@@ -48,10 +48,10 @@ public class QueueMonitorServiceTests
         _manualTimeProvider.Set(new DateTime(2020, 1, 1, 12, 0, 0, DateTimeKind.Utc));
         var fakeDateTime = _manualTimeProvider.UtcNow;
         _mockBusEventRepository
-            .Setup(m => m.GetUnProcessedCount())
+            .Setup(m => m.GetUnProcessedCount(true))
             .ReturnsAsync(10); 
         _mockBusEventRepository
-            .Setup(m => m.GetOldestEvent())
+            .Setup(m => m.GetOldestEvent(true))
             .ReturnsAsync(fakeDateTime.AddMinutes(-1470));
 
         // Act
@@ -98,7 +98,7 @@ public class QueueMonitorServiceTests
         // Arrange
         _manualTimeProvider.Set(new DateTime(2020, 1, 1, 12, 10, 0, DateTimeKind.Utc));
 
-        _mockBusEventRepository.Setup(m => m.GetOldestEvent())
+        _mockBusEventRepository.Setup(m => m.GetOldestEvent(false))
             .ReturnsAsync(DateTime.MinValue); // Mock no events found
 
         // Act

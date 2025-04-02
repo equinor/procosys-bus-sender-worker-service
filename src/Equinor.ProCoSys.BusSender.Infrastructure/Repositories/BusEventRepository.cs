@@ -25,28 +25,29 @@ public class BusEventRepository : IBusEventRepository
     }
 
     public void SetPlants(List<string> plants) => _plants = plants;
+    public List<string> GetPlants() => _plants;
 
-    public async Task<List<BusEvent>> GetEarliestUnProcessedEventChunk() => 
-        await GetUnProcessedFilteredQueryable()
+    public async Task<List<BusEvent>> GetEarliestUnProcessedEventChunk(bool ignoreFilter = false) =>
+        await GetUnProcessedFilteredQueryable(ignoreFilter)
             .OrderBy(e => e.Created)
             .Take(_messageChunkSize)
             .ToListAsync();
 
-    public async Task<long> GetUnProcessedCount() => 
-        await GetUnProcessedFilteredQueryable()
+    public async Task<long> GetUnProcessedCount(bool ignoreFilter=false) => 
+        await GetUnProcessedFilteredQueryable(ignoreFilter)
             .CountAsync();
 
-    public async Task<DateTime> GetOldestEvent() =>
-        await GetUnProcessedFilteredQueryable()
+    public async Task<DateTime> GetOldestEvent(bool ignoreFilter = false) =>
+        await GetUnProcessedFilteredQueryable(ignoreFilter)
             .OrderBy(e => e.Created)
             .Select(e => e.Created)
             .FirstOrDefaultAsync();
 
-    private IQueryable<BusEvent> GetUnProcessedFilteredQueryable()
+    private IQueryable<BusEvent> GetUnProcessedFilteredQueryable(bool ignoreFilter = false)
     {
         var query = _busEvents.Where(e => e.Status == Status.UnProcessed);
 
-        if (_plants == null || !_plants.Any())
+        if (_plants == null || !_plants.Any() || ignoreFilter)
         {
             return query;
         }

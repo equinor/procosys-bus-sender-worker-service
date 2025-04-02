@@ -89,14 +89,14 @@ public class BusSenderService : IBusSenderService
             }
 
             var plants = _plantService.GetPlantsForCurrent(plantLeases);
-
-            await _queueMonitor.WriteQueueMetrics();
-
+            var plant = plantLease.Plant;
             _busEventRepository.SetPlants(plants);
+
+            await _queueMonitor.WriteQueueMetrics(plant);
+
             var events = await _busEventRepository.GetEarliestUnProcessedEventChunk();
             if (events.Any())
             {
-                var plant = plantLease.Plant;
                 _logger.LogInformation(
                     "[{Plant}] BusSenderService found {Count} messages to process after {Sw} ms", plant,
                     events.Count,

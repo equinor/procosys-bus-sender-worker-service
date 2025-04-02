@@ -117,7 +117,7 @@ public class BusSenderServiceTests
             { CallBase = true };
         _iUnitOfWork = new Mock<IUnitOfWork>();
 
-        _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk()).Returns(() => Task.FromResult(_busEvents));
+        _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk(false)).Returns(() => Task.FromResult(_busEvents));
         _dut = new BusSenderService(_busSender, _busEventRepository.Object, _iUnitOfWork.Object,
             new Mock<ILogger<BusSenderService>>().Object,
             new Mock<ITelemetryClient>().Object, _busEventServiceMock.Object, _queueMonitorService.Object, _blobLeaseServiceMock.Object, _plantServiceMock.Object);
@@ -140,7 +140,7 @@ public class BusSenderServiceTests
         var workOrderChecklistEvent1 = new WorkOrderChecklistEvent { WoNo = "SomeWoNo1" };
         var workOrderChecklistEvent2 = new WorkOrderChecklistEvent { WoNo = "SomeWoNo2" };
 
-        _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk())
+        _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk(false))
             .Returns(() => Task.FromResult(new List<BusEvent> { wcl1, wcl2, wcl3, wcDelete }));
 
         _dapperRepositoryMock.Setup(wcl => wcl.QuerySingle<WorkOrderChecklistEvent>(
@@ -183,7 +183,7 @@ public class BusSenderServiceTests
             { Event = WoChecklistTopic.TopicName, Message = "1003,10001", Status = Status.UnProcessed };
         
         
-        _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk())
+        _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk(false))
             .Returns(() => Task.FromResult(new List<BusEvent> { wcl1, wcl2, wcl3 }));
       
         _dapperRepositoryMock.Setup(d => d.QuerySingle<WorkOrderChecklistEvent>(It.IsAny<(string,DynamicParameters)>(), It.IsAny<string>()))
@@ -218,7 +218,7 @@ public class BusSenderServiceTests
         const string guid = "E9414BA9930E5FF6E0532510000AA1AB";
         var commPri = new BusEvent { Event = LibraryFieldTopic.TopicName, Message = guid, Status = Status.UnProcessed };
 
-        _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk())
+        _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk(false))
             .Returns(() => Task.FromResult(new List<BusEvent> { commPri }));
 
         var topicClientMock = new Mock<ServiceBusSender>();
@@ -252,7 +252,7 @@ public class BusSenderServiceTests
 
         var wo = new WorkOrderEvent { Plant = "AnyValidPlant", ProjectName = "AnyProjectName", WoNo = "Some0x0bWoNo" };
 
-        _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk())
+        _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk(false))
             .Returns(() => Task.FromResult(new List<BusEvent> { wo1, wo2, wo3 }));
         _dapperRepositoryMock.Setup(wr => wr.QuerySingle<WorkOrderEvent>(
                 It.IsAny<(string queryString, DynamicParameters parameters)>(), "10000"))
@@ -281,7 +281,7 @@ public class BusSenderServiceTests
         var workOrderEvent = new WorkOrderEvent { Plant = "AnyValidPlant", ProjectName = "AnyProjectName", WoNo = "SomeWoNo" };
 
 
-        _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk())
+        _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk(false))
             .Returns(() => Task.FromResult(new List<BusEvent> { wo1, wo2, wo3 }));
         _dapperRepositoryMock.Setup(wr => wr.QuerySingle<WorkOrderEvent>(
                 It.IsAny<(string queryString, DynamicParameters parameters)>(), wo1.Message))
@@ -313,7 +313,7 @@ public class BusSenderServiceTests
         };
         const string expectedWashedMessage = "{\"Plant\" : \"PCS$HF_LNG\",\"Parameter\":\"En streng\" }";
 
-        _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk())
+        _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk(false))
             .Returns(() => Task.FromResult(new List<BusEvent> { uncleanedTestMessage }));
 
         await _dut.HandleBusEvents();
@@ -359,7 +359,7 @@ public class BusSenderServiceTests
         var wo = new WorkOrderEvent { Plant = "AnyValidPlant", ProjectName = "AnyProjectName", WoNo = "SomeWoNo" };
 
 
-        _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk())
+        _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk(false))
             .Returns(() => Task.FromResult(new List<BusEvent> { wo1, wo2, wo3 }));
         _dapperRepositoryMock.Setup(wr => wr.QuerySingle<WorkOrderEvent>(
                 It.IsAny<(string queryString, DynamicParameters parameters)>(), wo1.Message))
@@ -426,7 +426,7 @@ public class BusSenderServiceTests
         };
 
         var callCount = 0;
-        _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk())
+        _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk(false))
             .Returns(() => Task.FromResult(callCount++ == 0 ? _busEvents : _busEventsRemaining));
 
         // Act
@@ -446,7 +446,7 @@ public class BusSenderServiceTests
         };
 
         var callCount = 0;
-        _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk())
+        _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk(false))
             .Returns(() => Task.FromResult(callCount++ == 0 ? _busEvents : _busEventsRemaining));
 
         // Act
