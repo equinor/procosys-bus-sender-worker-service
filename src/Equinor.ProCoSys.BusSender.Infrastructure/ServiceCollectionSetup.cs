@@ -32,17 +32,19 @@ public static class ServiceCollectionSetup
         }).AddScoped<IUnitOfWork>(serviceProvider => serviceProvider.GetRequiredService<BusSenderServiceContext>());
 
     public static IServiceCollection AddRepositories(this IServiceCollection services)
-        => services.AddScoped<IBusEventRepository, BusEventRepository>()
+        => services.AddScoped<IPlantRepository, PlantRepository>()
+            .AddScoped<IBusEventRepository, BusEventRepository>()
             .AddScoped<ITagDetailsRepository, TagDetailsRepository>();
 
     public static IServiceCollection AddServices(this IServiceCollection services)
-    {
-        return services.AddSingleton<IEntryPointService, EntryPointService>()
+        => services.AddSingleton<IEntryPointService, EntryPointService>()
+            .AddScoped<IPlantService, PlantService>()
             .AddScoped<ITelemetryClient, ApplicationInsightsTelemetryClient>()
+            .AddScoped<IBlobLeaseService, BlobLeaseService>()
             .AddScoped<IBusSenderService, BusSenderService>()
             .AddScoped<IBusEventService, BusEventService>()
             .AddScoped<IQueueMonitorService, QueueMonitorService>()
             .AddScoped<ISystemClock, TimeService>()
             .AddScoped<IEventRepository, EventRepository>();
-    }
+
 }

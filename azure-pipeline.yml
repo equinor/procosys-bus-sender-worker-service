@@ -12,7 +12,6 @@ resources:
       name: equinor/procosys-infra
       endpoint: 'equinor'
       ref: master
-
 variables:
   - template: src/variables/global-variables.yml@templates
   - template: src/resources/bus-sender/bus-sender-variables.yml@templates

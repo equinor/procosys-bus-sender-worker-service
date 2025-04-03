@@ -4,6 +4,6 @@ namespace Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 
 public interface IEntryPointService
 {
-    Task DoWorkerJob();
+    Task<bool> DoWorkerJob();
     Task StopService();
 }
