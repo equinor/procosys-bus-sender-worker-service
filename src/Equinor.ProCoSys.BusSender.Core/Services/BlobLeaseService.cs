@@ -93,8 +93,9 @@ public class BlobLeaseService : IBlobLeaseService
 
         if ((_cancellationTokenSource == null || _cancellationTokenSource.Token == CancellationToken.None) && (plantLeaseExpiryTime > 0))
         {
-            // Multiplying by a factor lower than 1 to ensure that message processing for this instance is cancelled shortly before the lease expires.
+            // Multiplying by a factor lower than 1 to ensure that message processing for this instance is cancelled shortly before the lease actually expires.
             _cancellationTokenSource = new CancellationTokenSource((int)(plantLeaseExpiryTime * 1000 * 0.95));
+            _logger.LogDebug($"A new cancellation token is initialized. {plantLeaseExpiryTime} until expired.");
         }
 
         return plantLeases;
@@ -128,12 +129,13 @@ public class BlobLeaseService : IBlobLeaseService
             x.LastProcessed = DateTime.UtcNow;
         });
         var didReleasePlantLeases = await UpdatePlantLeases(plantLeases, leaseId, maxRetryAttempts);
-        if (didReleasePlantLeases)
+        if (!didReleasePlantLeases)
         {
-            GetCache().Remove("CurrentPlantLeases");
+            _logger.LogWarning("Failed to update plant lease blob. Hence plant will not be handled until expired.");
         }
+        GetCache().Remove("CurrentPlantLeases");
+        _cancellationTokenSource?.TryReset();
         return didReleasePlantLeases;
-        // If we fail to release the lease, we will try again in the next loop. Hence not moving from cache.
     }
 
     public virtual BlobLeaseClient GetBlobLeaseClient(BlobClient blobClient, string leaseId) => blobClient.GetBlobLeaseClient(leaseId);

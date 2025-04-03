@@ -90,6 +90,8 @@ public class BusSenderService : IBusSenderService
 
             var plants = _plantService.GetPlantsForCurrent(plantLeases);
             var plant = plantLease.Plant;
+            _logger.LogInformation($"Handling messages for plant: {plant} with lease expiry time: {plantLease.LeaseExpiry}");
+
             _busEventRepository.SetPlants(plants);
 
             await _queueMonitor.WriteQueueMetrics(plant);
@@ -114,7 +116,6 @@ public class BusSenderService : IBusSenderService
                 await ReleasePlantLeaseIfProcessingCompleted(plantLease);
             }
 
-            _logger.LogInformation($"BusSenderService ProcessBusEvents used {_sw.ElapsedMilliseconds} ms"); 
             _sw.Reset();
         }
         catch (Exception exception)
@@ -160,7 +161,7 @@ public class BusSenderService : IBusSenderService
 
     private bool ReleasePlantLeaseIfExpired(PlantLease? plantLease)
     {
-        if (plantLease != null && plantLease.IsExpired())
+        if (plantLease != null && (plantLease.IsExpired() || _blobLeaseService.CancellationToken.IsCancellationRequested))
         {
             _logger.LogDebug("Lease has expired for plant: {Plant}. Releasing it.", plantLease.Plant);
             _blobLeaseService.ReleasePlantLease(plantLease);
@@ -300,7 +301,7 @@ public class BusSenderService : IBusSenderService
         }
         else
         {
-            _logger.LogWarning("[{Plant}] SaveChangesAsync skipped due to PlantLeaseExpiryTime.", plant);
+            _logger.LogWarning($"[{plant}] SaveChangesAsync skipped due to IsCancellationRequested.");
             return;
         }
         /***

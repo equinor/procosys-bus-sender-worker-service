@@ -70,8 +70,6 @@ public class PlantService : IPlantService
                                 .ToList();
         if (!string.IsNullOrEmpty(plant))
         {
-            _logger.LogInformation($"Handling messages for plant: {plant}");
-
             var otherDefinedPlants = plantLeases.Where(x => !x.IsCurrent)
                                     .SelectMany(x => x.Plant.Split(',', StringSplitOptions.RemoveEmptyEntries))
                                     .ToList();
