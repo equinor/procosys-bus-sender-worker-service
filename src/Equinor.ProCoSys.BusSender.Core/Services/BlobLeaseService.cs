@@ -82,7 +82,7 @@ public class BlobLeaseService : IBlobLeaseService
             {
                 return null;
             }
-            GetCache().Set("CurrentPlantLeases", plantLeases, TimeSpan.FromSeconds(plantLeaseExpiryTime * 1000 * 0.95));
+            GetCache().Set("CurrentPlantLeases", plantLeases, TimeSpan.FromSeconds(plantLeaseExpiryTime * 0.95));
             _logger.LogDebug($"Claim used {sw.ElapsedMilliseconds}");
         }
         else
