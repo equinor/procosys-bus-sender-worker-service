@@ -10,8 +10,10 @@
     <PackageReference Include="Azure.Storage.Blobs" Version="12.18.0" />
     <PackageReference Include="Dapper" Version="2.1.15" />
     <PackageReference Include="Microsoft.ApplicationInsights" Version="2.21.0" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="8.0.1" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.ApplicationInsights" Version="2.21.0" />
+    <PackageReference Include="Oracle.EntityFrameworkCore" Version="8.23.80" />
 
     <!-- This is added explicitly due to System.Text.Encodings.Web 4.7.1.
     Vulnerabily introduced in Azure.Storage.Blobs" Version="12.15.1"

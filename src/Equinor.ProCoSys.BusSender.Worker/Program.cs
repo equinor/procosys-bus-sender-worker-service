@@ -39,7 +39,7 @@ public class Program
                             {
                                 kv.SetCredential(new DefaultAzureCredential());
                             })
-                            .Select(KeyFilter.Any)
+                            .Select(KeyFilter.Any, null)
                             .Select(KeyFilter.Any, context.HostingEnvironment.EnvironmentName)
                             .ConfigureRefresh(refreshOptions =>
                             {
@@ -48,7 +48,6 @@ public class Program
                             });
                     });
                 }
-
                 else if (settings["IsLocal"] == "True" && azConfig)
                 {
                     config.AddAzureAppConfiguration(options =>
@@ -70,7 +69,7 @@ public class Program
                                 opt.Register("Sentinel", true);
                                 opt.SetCacheExpiration(TimeSpan.FromMinutes(5));
                             })
-                            .Select(KeyFilter.Any)
+                            .Select(KeyFilter.Any, null)
                             .Select(KeyFilter.Any, settings["Azure:AppConfigLabelFilter"]);
                     });
                 }
@@ -91,7 +90,7 @@ public class Program
                                 opt.Register("Sentinel", true);
                                 opt.SetCacheExpiration(TimeSpan.FromMinutes(5));
                             })
-                            .Select(KeyFilter.Any)
+                            .Select(KeyFilter.Any, null)
                             .Select(KeyFilter.Any, settings["Azure:AppConfigLabelFilter"]);
                     });
                 }
@@ -101,10 +100,8 @@ public class Program
         {
             logging.ClearProviders();
             logging.AddConsole();
-
             logging.AddApplicationInsightsWebJobs(c
                 => c.ConnectionString = context.Configuration["ApplicationInsights:ConnectionString"]);
-            
         });
 
         builder.UseContentRoot(Directory.GetCurrentDirectory())
@@ -121,8 +118,7 @@ public class Program
                         hostContext.Configuration["BlobStorage:ContainerName"]!);
                     var walletPath = hostContext.Configuration["WalletFileDir"]!;
                     Directory.CreateDirectory(walletPath);
-                    rep.Download(hostContext.Configuration["BlobStorage:WalletFileName"]!, walletPath + "\\cwallet.sso");
-                    Console.WriteLine("Created wallet file at: " + walletPath);
+                    rep.Download(hostContext.Configuration["BlobStorage:WalletFileName"]!);
                     var connectionString = hostContext.Configuration["ConnectionString"]!;
                     services.AddDbContext(connectionString);
                     services.AddApplicationInsightsTelemetryWorkerService(o =>
@@ -132,18 +128,19 @@ public class Program
                 services.AddTopicClients(
                     hostContext.Configuration["ServiceBusConnectionString"]!,
                     hostContext.Configuration["TopicNames"]!);
-                services.AddRepositories();
-                services.AddServices();
-                services.AddHostedService<TimedWorkerService>();
-            });
 
+                services.AddServices();
+                services.AddRepositories();
+                services.AddHostedService<TimedWorkerService>();
+                services.AddMemoryCache();
+            });
         return builder;
     }
 
     public static async Task Main(string[] args)
     {
         using var host = CreateHostBuilder(args).Build();
-        ILogger? logger = host.Services.GetService<ILogger<Program>>();
+        var serviceProvider = host.Services;
         await host.RunAsync();
     }
 
