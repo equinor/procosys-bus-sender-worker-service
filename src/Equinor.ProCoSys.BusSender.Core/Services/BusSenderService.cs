@@ -291,31 +291,36 @@ public class BusSenderService : IBusSenderService
         foreach (var simpleUnprocessedBusEvent in unProcessedEvents.Where(e =>
                      IsSimpleMessage(e) || e.Event == TagTopic.TopicName))
         {
-                await UpdateEventBasedOnTopic(simpleUnprocessedBusEvent);
+            if (_blobLeaseService.CancellationToken.IsCancellationRequested)
+            {
+                _logger.LogWarning($"[{plant}] Cancellation requested, exiting the loop.");
+                break;
+            }
+            await UpdateEventBasedOnTopic(simpleUnprocessedBusEvent);
         }
 
         _logger.LogInformation("[{Plant}] Update loop finished at {Sw} ms", plant, dsw.ElapsedMilliseconds);
+
         if (!_blobLeaseService.CancellationToken.IsCancellationRequested)
         {
             await _unitOfWork.SaveChangesAsync();
+            /***
+             * Group by topic and then create a queue of messages per topic
+             */
+            var topicQueues = events.Where(busEvent => busEvent.Status == Status.UnProcessed)
+                .GroupBy(e => BusEventToTopicMapper.Map(e.Event)).Select(group =>
+                {
+                    Queue<BusEvent> messages = new();
+                    group.ToList().ForEach(be => messages.Enqueue(be));
+                    return (group.Key, messages);
+                }).ToList();
+
+            await BatchAndSendPerTopic(topicQueues);
         }
         else
         {
             _logger.LogWarning($"[{plant}] SaveChangesAsync skipped due to IsCancellationRequested.");
-            return;
         }
-        /***
-         * Group by topic and then create a queue of messages per topic
-         */
-        var topicQueues = events.Where(busEvent => busEvent.Status == Status.UnProcessed)
-            .GroupBy(e => BusEventToTopicMapper.Map(e.Event)).Select(group =>
-            {
-                Queue<BusEvent> messages = new();
-                group.ToList().ForEach(be => messages.Enqueue(be));
-                return (group.Key, messages);
-            }).ToList();
-
-        await BatchAndSendPerTopic(topicQueues);
     }
 
     private static void SetAllButOneEventToSkipped(IEnumerable<BusEvent> group)

@@ -134,7 +134,7 @@ public class BlobLeaseService : IBlobLeaseService
             _logger.LogWarning("Failed to update plant lease blob. Hence plant will not be handled until expired.");
         }
         GetCache().Remove("CurrentPlantLeases");
-        _cancellationTokenSource?.TryReset();
+        _cancellationTokenSource = null;
         return didReleasePlantLeases;
     }
 
