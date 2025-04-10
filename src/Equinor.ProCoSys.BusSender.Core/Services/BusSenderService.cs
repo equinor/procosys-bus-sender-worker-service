@@ -293,7 +293,7 @@ public class BusSenderService : IBusSenderService
         {
             if (_blobLeaseService.CancellationToken.IsCancellationRequested)
             {
-                _logger.LogWarning($"[{plant}] Cancellation requested, exiting the loop.");
+                _logger.LogDebug($"[{plant}] Cancellation requested, exiting the loop.");
                 break;
             }
             await UpdateEventBasedOnTopic(simpleUnprocessedBusEvent);
