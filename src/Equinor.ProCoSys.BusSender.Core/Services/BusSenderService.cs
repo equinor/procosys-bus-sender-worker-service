@@ -195,7 +195,7 @@ public class BusSenderService : IBusSenderService
             await UpdateEventsBasedOnTagTopic(unProcessedEvents);
         }
 
-        _logger.LogInformation("Update loop finished at at {Sw} ms", dsw.ElapsedMilliseconds);
+        _logger.LogInformation("Update loop finished at {Sw} ms", dsw.ElapsedMilliseconds);
         await _unitOfWork.SaveChangesAsync();
 
 
