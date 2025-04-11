@@ -182,10 +182,17 @@ public class BusSenderService : IBusSenderService
         var unProcessedEvents = events.Where(busEvent => busEvent.Status == Status.UnProcessed).ToList();
         _logger.LogInformation("Amount of messages to process: {Count} ", unProcessedEvents.Count);
 
-        foreach (var simpleUnprocessedBusEvent in unProcessedEvents.Where(e =>
-                     IsSimpleMessage(e) || e.Event == TagTopic.TopicName))
+        var isOverInOperatorLimit = unProcessedEvents.Count >= 1000;
+        if (unProcessedEvents.Any(e => e.Event != TagTopic.TopicName) || isOverInOperatorLimit) { 
+            foreach (var simpleUnprocessedBusEvent in unProcessedEvents.Where(e =>
+                                IsSimpleMessage(e) || e.Event == TagTopic.TopicName))
+                {
+                    await UpdateEventBasedOnTopic(simpleUnprocessedBusEvent);
+                }
+        }
+        else
         {
-            await UpdateEventBasedOnTopic(simpleUnprocessedBusEvent);
+            await UpdateEventsBasedOnTagTopic(unProcessedEvents);
         }
 
         _logger.LogInformation("Update loop finished at at {Sw} ms", dsw.ElapsedMilliseconds);
@@ -249,7 +256,21 @@ public class BusSenderService : IBusSenderService
             {"MessageBody", string.IsNullOrEmpty(message?.ProCoSysGuid) ? busMessageBody : "N/A" }
         });
     }
-    
+
+    private async Task UpdateEventsBasedOnTagTopic(List<BusEvent> busEvents)
+    {
+
+
+        _logger.LogDebug("Started update for tag topic bus events");
+        var sw = Stopwatch.StartNew();
+        await _service.AttachTagDetails(busEvents);
+
+        _logger.LogDebug("Update for tag topic bus events took {Ms} ms", sw.ElapsedMilliseconds);
+        sw.Stop();
+
+
+    }
+
     private async Task UpdateEventBasedOnTopic(BusEvent busEvent)
     {
         _logger.LogDebug("Started update for {Event}", busEvent.Event);

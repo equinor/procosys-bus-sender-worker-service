@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -34,6 +35,38 @@ public class BusEventService : IBusEventService
 
         tagTopic.TagDetails = WashString(await _tagDetailsRepository.GetDetailsStringByTagId(tagId));
         return JsonSerializer.Serialize(tagTopic);
+    }
+    private static string? ExtractTagId(string json)
+    {
+        var regex = new Regex("\"TagId\"\\s*:\\s*\"([^\"]+)\"");
+        var match = regex.Match(json);
+        return match.Success ? match.Groups[1].Value : null;
+    }
+
+    public async Task AttachTagDetails(List<BusEvent> busEvents)
+    {
+        var tagMessages = busEvents.Select(x => x.Message).ToList();
+        var tagIds = tagMessages
+            .Select(x => ExtractTagId(x))
+            .Where(x => x != null && long.TryParse(x, out _))
+            .Select(x => long.Parse(x!))
+            .Distinct()
+            .ToArray();
+
+        var tagDetailsDictionary = await _tagDetailsRepository.GetDetailsListByTagId(tagIds)
+            ?? throw new Exception("DetailsList is null.");
+
+        foreach (var busEvent in busEvents)
+        {
+            var tagTopic = JsonSerializer.Deserialize<TagTopic>(WashString(busEvent.Message) ?? throw new InvalidOperationException());
+            if (tagTopic?.TagId == null || !long.TryParse(tagTopic.TagId, out var tagId))
+            {
+                throw new Exception("Could not deserialize TagTopic");
+            }
+
+            tagTopic.TagDetails = tagDetailsDictionary.TryGetValue(tagId, out var details) ? details : string.Empty;
+            busEvent.Message = JsonSerializer.Serialize(tagTopic);
+        }
     }
 
     public static bool CanGetTwoIdsFromMessage(IReadOnlyList<string> array, out long id1, out long id2)
