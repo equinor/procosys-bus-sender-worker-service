@@ -36,31 +36,30 @@ public class BusEventService : IBusEventService
         tagTopic.TagDetails = WashString(await _tagDetailsRepository.GetDetailsStringByTagId(tagId));
         return JsonSerializer.Serialize(tagTopic);
     }
-    private static string? ExtractTagId(string json)
-    {
-        var regex = new Regex("\"TagId\"\\s*:\\s*\"([^\"]+)\"");
-        var match = regex.Match(json);
-        return match.Success ? match.Groups[1].Value : null;
-    }
 
     public async Task AttachTagDetails(List<BusEvent> busEvents)
     {
-        var tagMessages = busEvents.Select(x => x.Message).ToList();
-        var tagIds = tagMessages
-            .Select(x => ExtractTagId(x))
-            .Where(x => x != null && long.TryParse(x, out _))
-            .Select(x => long.Parse(x!))
-            .Distinct()
-            .ToArray();
+        var jsonArrayString = "[" + string.Join(",", busEvents.Select(x => WashString(x.Message))) + "]";
+        var tagTopics = JsonSerializer.Deserialize<List<TagTopic>>(jsonArrayString) ?? throw new InvalidOperationException();
+        var tagTopicsDictionary = busEvents.Zip(tagTopics, (busEvent, tagTopic) => new { busEvent.Id, tagTopic })
+                                           .ToDictionary(x => x.Id, x => x.tagTopic);
+
+        var tagIds = tagTopics.Select(x =>
+        {
+            if (x?.TagId == null || !long.TryParse(x.TagId, out var tagId))
+            {
+                throw new Exception("Could not deserialize TagTopic");
+            }
+            return tagId;
+        });
 
         var tagDetailsDictionary = await _tagDetailsRepository.GetDetailsListByTagId(tagIds);
 
         foreach (var busEvent in busEvents)
         {
-            var tagTopic = JsonSerializer.Deserialize<TagTopic>(WashString(busEvent.Message) ?? throw new InvalidOperationException());
-            if (tagTopic?.TagId == null || !long.TryParse(tagTopic.TagId, out var tagId))
+            if (!tagTopicsDictionary.TryGetValue(busEvent.Id, out var tagTopic) || tagTopic?.TagId == null || !long.TryParse(tagTopic.TagId, out var tagId))
             {
-                throw new Exception("Could not deserialize TagTopic");
+                throw new Exception("Could not retrieve TagTopic from BusEvent");
             }
 
             tagTopic.TagDetails = tagDetailsDictionary.TryGetValue(tagId, out var details) ? WashString(details) : string.Empty;
