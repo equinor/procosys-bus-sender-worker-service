@@ -2222,6 +2222,4 @@ public class BusEventServiceTests
         Assert.IsNotNull(deserializedTagTopic2.CommPkgGuid);
 
     }
-
-
 }

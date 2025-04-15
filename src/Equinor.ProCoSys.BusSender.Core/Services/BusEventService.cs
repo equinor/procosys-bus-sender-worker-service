@@ -24,7 +24,7 @@ public class BusEventService : IBusEventService
         _eventRepository = eventRepository;
     }
 
-    public async Task<string> AttachTagDetails(string? tagMessage)
+    public virtual async Task<string> AttachTagDetails(string? tagMessage)
     {
         var tagTopic =
             JsonSerializer.Deserialize<TagTopic>(WashString(tagMessage) ?? throw new InvalidOperationException());
@@ -53,8 +53,7 @@ public class BusEventService : IBusEventService
             .Distinct()
             .ToArray();
 
-        var tagDetailsDictionary = await _tagDetailsRepository.GetDetailsListByTagId(tagIds)
-            ?? throw new Exception("DetailsList is null.");
+        var tagDetailsDictionary = await _tagDetailsRepository.GetDetailsListByTagId(tagIds);
 
         foreach (var busEvent in busEvents)
         {
@@ -64,7 +63,7 @@ public class BusEventService : IBusEventService
                 throw new Exception("Could not deserialize TagTopic");
             }
 
-            tagTopic.TagDetails = tagDetailsDictionary.TryGetValue(tagId, out var details) ? details : string.Empty;
+            tagTopic.TagDetails = tagDetailsDictionary.TryGetValue(tagId, out var details) ? WashString(details) : string.Empty;
             busEvent.Message = JsonSerializer.Serialize(tagTopic);
         }
     }

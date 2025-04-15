@@ -81,7 +81,7 @@ public class BusSenderService : IBusSenderService
         _telemetryClient.Flush();
     }
 
-    private async Task BatchAndSendPerTopic(List<(string Key, Queue<BusEvent> messages)> eventGroups)
+    public virtual async Task BatchAndSendPerTopic(List<(string Key, Queue<BusEvent> messages)> eventGroups)
     {
         foreach (var (topic, messages) in eventGroups)
         {
@@ -183,7 +183,8 @@ public class BusSenderService : IBusSenderService
         _logger.LogInformation("Amount of messages to process: {Count} ", unProcessedEvents.Count);
 
         var isOverInOperatorLimit = unProcessedEvents.Count >= 1000;
-        if (unProcessedEvents.Any(e => e.Event != TagTopic.TopicName) || isOverInOperatorLimit) { 
+        if (unProcessedEvents.Any(e => e.Event != TagTopic.TopicName) || isOverInOperatorLimit) 
+        { 
             foreach (var simpleUnprocessedBusEvent in unProcessedEvents.Where(e =>
                                 IsSimpleMessage(e) || e.Event == TagTopic.TopicName))
                 {
@@ -259,16 +260,16 @@ public class BusSenderService : IBusSenderService
 
     private async Task UpdateEventsBasedOnTagTopic(List<BusEvent> busEvents)
     {
-
+        if (busEvents.Any(e => e.Event != TagTopic.TopicName))
+        {
+            return;
+        }
 
         _logger.LogDebug("Started update for tag topic bus events");
         var sw = Stopwatch.StartNew();
         await _service.AttachTagDetails(busEvents);
-
         _logger.LogDebug("Update for tag topic bus events took {Ms} ms", sw.ElapsedMilliseconds);
         sw.Stop();
-
-
     }
 
     private async Task UpdateEventBasedOnTopic(BusEvent busEvent)
