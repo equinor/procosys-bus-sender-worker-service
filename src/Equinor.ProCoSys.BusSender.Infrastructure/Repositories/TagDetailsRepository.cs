@@ -91,17 +91,13 @@ public class TagDetailsRepository : ITagDetailsRepository
 
             var tagDetailsDictionary = new Dictionary<long, string>();
 
-            if (await result.ReadAsync())
-            {
-                if (result[0] is not DBNull)
-                {
-                    var firstTagId = result.GetInt64(0);
-                    var firstTagDetails = result.GetString(1);
-                    tagDetailsDictionary[firstTagId] = firstTagDetails;
-                }
-            }
             while (await result.ReadAsync())
             {
+                if (result[0] is DBNull)
+                {
+                    continue;
+                }
+
                 var tagId = result.GetInt64(0);
                 var tagDetails = result.GetString(1);
                 tagDetailsDictionary[tagId] = tagDetails;
