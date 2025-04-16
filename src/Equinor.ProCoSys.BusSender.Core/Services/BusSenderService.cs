@@ -262,7 +262,7 @@ public class BusSenderService : IBusSenderService
     {
         if (busEvents.Any(e => e.Event != TagTopic.TopicName))
         {
-            return;
+            throw new InvalidOperationException("This method can be used by TagTopic Events only.");
         }
 
         _logger.LogDebug("Started update for tag topic bus events");
