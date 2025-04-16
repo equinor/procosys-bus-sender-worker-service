@@ -30,7 +30,7 @@ public class BusEventService : IBusEventService
             JsonSerializer.Deserialize<TagTopic>(WashString(tagMessage) ?? throw new InvalidOperationException());
         if (tagTopic?.TagId == null || !long.TryParse(tagTopic.TagId, out var tagId))
         {
-            throw new Exception("Could not deserialize TagTopic");
+            throw new Exception($"Could not deserialize TagTopic. TagId: {tagTopic?.TagId}");
         }
 
         tagTopic.TagDetails = WashString(await _tagDetailsRepository.GetDetailsStringByTagId(tagId));
@@ -48,7 +48,7 @@ public class BusEventService : IBusEventService
         {
             if (x?.TagId == null || !long.TryParse(x.TagId, out var tagId))
             {
-                throw new Exception("Could not deserialize TagTopic");
+                throw new Exception($"Could not deserialize TagTopic. {x?.TagId}");
             }
             return tagId;
         });
@@ -59,7 +59,7 @@ public class BusEventService : IBusEventService
         {
             if (!tagTopicsDictionary.TryGetValue(busEvent.Id, out var tagTopic) || tagTopic?.TagId == null || !long.TryParse(tagTopic.TagId, out var tagId))
             {
-                throw new Exception("Could not retrieve TagTopic from BusEvent");
+                throw new Exception($"Could not retrieve TagTopic from BusEvent. BusEvent.Id: {busEvent.Id}");
             }
 
             tagTopic.TagDetails = tagDetailsDictionary.TryGetValue(tagId, out var details) ? WashString(details) : string.Empty;
