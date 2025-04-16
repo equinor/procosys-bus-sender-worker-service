@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
@@ -363,7 +364,40 @@ public class BusSenderServiceTests
         _topicClientMockWo.Verify(
             t => t.SendMessagesAsync(It.IsAny<ServiceBusMessageBatch>(), It.IsAny<CancellationToken>()), Times.Once);
     }
-    
+
+    [TestMethod]
+    public async Task SendMessageChunk_WhenTagAndOverInOperatorLimit_ShouldUseSingleQuery()
+    {
+        // Arrange
+        var busEvents = new List<BusEvent>();
+        for (int i = 0; i < 1001; i++)
+        {
+            busEvents.Add(new BusEvent
+            {
+                Event = TagTopic.TopicName,
+                Message = $"Message {i}",
+                Status = Status.UnProcessed
+            });
+        }
+
+        _busSender.Add("tag", _topicClientMock1.Object);
+
+        _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk())
+            .Returns(() => Task.FromResult(busEvents));
+
+        _busEventServiceMock.Setup(b => b.AttachTagDetails(It.IsAny<string>()))
+            .Returns(() => Task.FromResult("{}"));
+
+        // Act
+        await _dut.HandleBusEvents();
+
+        // Assert
+        Assert.AreEqual(1001, busEvents.Count);
+        Assert.IsTrue(busEvents.All(be => be.Event == TagTopic.TopicName));
+        _busEventServiceMock.Verify(
+            t => t.AttachTagDetails(It.IsAny<string>()), Times.AtLeastOnce());
+    }
+
     [TestMethod]
     public async Task StopService_ShouldCloseOnAllTopicClients()
     {
