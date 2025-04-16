@@ -81,7 +81,7 @@ public class BusSenderService : IBusSenderService
         _telemetryClient.Flush();
     }
 
-    public virtual async Task BatchAndSendPerTopic(List<(string Key, Queue<BusEvent> messages)> eventGroups)
+    private async Task BatchAndSendPerTopic(List<(string Key, Queue<BusEvent> messages)> eventGroups)
     {
         foreach (var (topic, messages) in eventGroups)
         {

@@ -380,29 +380,16 @@ public class BusSenderServiceTests
             });
         }
 
-        var busSenderServiceMock = new Mock<BusSenderService>(
-                _busSender,
-                _busEventRepository.Object,
-                _iUnitOfWork.Object,
-                new Mock<ILogger<BusSenderService>>().Object,
-                new Mock<ITelemetryClient>().Object,
-                _busEventServiceMock.Object,
-                _queueMonitorService.Object
-            )
-            { CallBase = true };
-
-        busSenderServiceMock
-            .Setup(service => service.BatchAndSendPerTopic(It.IsAny<List<(string Key, Queue<BusEvent> messages)>>()))
-            .Returns(Task.CompletedTask);
+        _busSender.Add("tag", _topicClientMock1.Object);
 
         _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk())
             .Returns(() => Task.FromResult(busEvents));
 
         _busEventServiceMock.Setup(b => b.AttachTagDetails(It.IsAny<string>()))
-            .Returns(() => Task.FromResult(It.IsAny<string>()));
+            .Returns(() => Task.FromResult("{}"));
 
         // Act
-        await busSenderServiceMock.Object.HandleBusEvents();
+        await _dut.HandleBusEvents();
 
         // Assert
         Assert.AreEqual(1001, busEvents.Count);
