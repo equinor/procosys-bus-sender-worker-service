@@ -24,7 +24,7 @@ public class BusEventService : IBusEventService
         _eventRepository = eventRepository;
     }
 
-    public virtual async Task<string> AttachTagDetails(string? tagMessage)
+    public async Task<string> AttachTagDetails(string? tagMessage)
     {
         var tagTopic =
             JsonSerializer.Deserialize<TagTopic>(WashString(tagMessage) ?? throw new InvalidOperationException());

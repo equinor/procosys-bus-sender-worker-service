@@ -25,7 +25,7 @@ public class BusSenderServiceTests
 {
     private Mock<IBusEventRepository> _busEventRepository;
     private List<BusEvent> _busEvents;
-    private Mock<BusEventService> _busEventServiceMock;
+    private Mock<IBusEventService> _busEventServiceMock;
     private PcsBusSender _busSender;
     private Mock<IEventRepository> _dapperRepositoryMock;
     private BusSenderService _dut;
@@ -97,7 +97,7 @@ public class BusSenderServiceTests
 
         _dapperRepositoryMock = new Mock<IEventRepository>();
         _busEventServiceMock = new Mock<BusEventService>(_tagDetailsRepositoryMock.Object, _dapperRepositoryMock.Object)
-            { CallBase = true };
+            { CallBase = true }.As<IBusEventService>();
         _iUnitOfWork = new Mock<IUnitOfWork>();
 
         _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk()).Returns(() => Task.FromResult(_busEvents));
@@ -387,7 +387,6 @@ public class BusSenderServiceTests
 
         _busEventServiceMock.Setup(b => b.AttachTagDetails(It.IsAny<string>()))
             .Returns(() => Task.FromResult("{}"));
-
         // Act
         await _dut.HandleBusEvents();
 
