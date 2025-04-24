@@ -65,7 +65,7 @@ public class BusEventService : IBusEventService
         // We only need to fetch the tag details once for each tagId when handled within the same loop.
         // Hence the use of distinct here.
 
-        return await _tagDetailsRepository.GetDetailsListByTagId(tagIds);
+        return await _tagDetailsRepository.GetDetailsByTagId(tagIds);
     }
 
     private void UpdateBusEventsWithTagDetails(List<BusEvent> busEvents, List<TagTopic> tagTopics, Dictionary<long, string> tagDetailsDictionary)

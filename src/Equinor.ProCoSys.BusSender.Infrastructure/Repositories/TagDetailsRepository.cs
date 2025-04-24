@@ -68,7 +68,7 @@ public class TagDetailsRepository : ITagDetailsRepository
     }
 
 
-    public async Task<Dictionary<long, string>> GetDetailsListByTagId(IEnumerable<long> tagIds)
+    public async Task<Dictionary<long, string>> GetDetailsByTagId(IEnumerable<long> tagIds)
     {
         var dbConnection = _context.Database.GetDbConnection();
         var connectionWasClosed = dbConnection.State != ConnectionState.Open;

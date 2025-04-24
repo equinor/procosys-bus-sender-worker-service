@@ -2119,7 +2119,7 @@ public class BusEventServiceTests
             { 116866655, "Details for tag 116866655" }
         };
 
-        _tagDetailsRepositoryMock.Setup(t => t.GetDetailsListByTagId(tagDetailsDictionary.Keys))
+        _tagDetailsRepositoryMock.Setup(t => t.GetDetailsByTagId(tagDetailsDictionary.Keys))
             .ReturnsAsync(tagDetailsDictionary);
         const string jsonMessage1 =
             @"{
