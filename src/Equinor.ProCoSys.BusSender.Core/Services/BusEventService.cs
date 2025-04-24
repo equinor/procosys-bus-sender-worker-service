@@ -59,7 +59,11 @@ public class BusEventService : IBusEventService
                 throw new Exception($"Could not deserialize TagTopic. {x?.TagId}");
             }
             return tagId;
-        });
+        }).Distinct();
+        // There could be multiple updates for the same tagId within a short time span.
+        // For simple messages duplicates are filtered out, but this is not the case for thick messages like this.
+        // We only need to fetch the tag details once for each tagId when handled within the same loop.
+        // Hence the use of distinct here.
 
         return await _tagDetailsRepository.GetDetailsListByTagId(tagIds);
     }

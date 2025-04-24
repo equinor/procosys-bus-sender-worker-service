@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Threading.Tasks;
 using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 using Equinor.ProCoSys.BusSenderWorker.Infrastructure.Data;
@@ -78,6 +79,10 @@ public class TagDetailsRepository : ITagDetailsRepository
 
         try
         {
+            // Initialize the dictionary with all tagIds and default value "{}"
+            // to ensure that all tagIds are present with a default of {} when no details are found.
+            var tagDetailsDictionary = tagIds.ToDictionary(id => id, _ => "{}");
+
             await using var command = _context.Database.GetDbConnection().CreateCommand();
             command.CommandText = GetTagDetailsQuery(tagIds);
 
@@ -85,29 +90,27 @@ public class TagDetailsRepository : ITagDetailsRepository
 
             if (!result.HasRows)
             {
-                _logger.LogInformation("No tag details found for the provided tag IDs.");
-                return new Dictionary<long, string>();
+                _logger.LogDebug("No tag details found for any of the provided tag IDs. Returning empty set for all tag ids.");
+                return tagDetailsDictionary;
             }
-
-            var tagDetailsDictionary = new Dictionary<long, string>();
 
             while (await result.ReadAsync())
             {
                 if (result[0] is DBNull)
                 {
-                    continue;
+                    throw new InvalidOperationException("Tag id is null in query result. This should never happen.");
                 }
 
                 var tagId = result.GetInt64(0);
-                var tagDetails = result.GetString(1);
-                tagDetailsDictionary[tagId] = tagDetails;
+                var tagDetails = result.IsDBNull(1) ? "{}" : result.GetString(1);
+                tagDetailsDictionary[tagId] = "{"+tagDetails+"}";
             }
 
             return tagDetailsDictionary;
         }
         finally
         {
-            // If we opened it, we have to close it.
+            // If we opened it, we have to close it.  
             if (connectionWasClosed)
             {
                 await _context.Database.CloseConnectionAsync();
