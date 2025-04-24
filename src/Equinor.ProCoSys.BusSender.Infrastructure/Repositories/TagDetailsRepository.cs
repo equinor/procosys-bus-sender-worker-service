@@ -23,50 +23,9 @@ public class TagDetailsRepository : ITagDetailsRepository
 
     public async Task<string> GetDetailsStringByTagId(long tagId)
     {
-        var dbConnection = _context.Database.GetDbConnection();
-        var connectionWasClosed = dbConnection.State != ConnectionState.Open;
-        if (connectionWasClosed)
-        {
-            await _context.Database.OpenConnectionAsync();
-        }
-
-        try
-        {
-            await using var command = _context.Database.GetDbConnection().CreateCommand();
-            command.CommandText = GetTagDetailsQuery([tagId]);
-
-            await using var result = await command.ExecuteReaderAsync();
-
-            if (!result.HasRows)
-            {
-                _logger.LogInformation("Tag with id {TagId} did not have any tagDetails", tagId);
-                return "{}";
-            }
-
-            if (!await result.ReadAsync() || result[0] is DBNull)
-            {
-                return "{}";
-            }
-
-            var tagDetails = result[0].ToString();
-
-            if (await result.ReadAsync())
-            {
-                _logger.LogError("TagDetails returned more than 1 row, this should not happen");
-            }
-
-            return "{" + tagDetails + "}";
-        }
-        finally
-        {
-            //If we open it, we have to close it.
-            if (connectionWasClosed)
-            {
-                await _context.Database.CloseConnectionAsync();
-            }
-        }
+        var result = await GetDetailsByTagId([tagId]);
+        return result.TryGetValue(tagId, out var details) ? details : "{}";
     }
-
 
     public async Task<Dictionary<long, string>> GetDetailsByTagId(IEnumerable<long> tagIds)
     {
