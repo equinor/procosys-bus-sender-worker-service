@@ -39,11 +39,19 @@ public class BusEventService : IBusEventService
 
     public async Task AttachTagDetails(List<BusEvent> busEvents)
     {
-        var jsonArrayString = "[" + string.Join(",", busEvents.Select(x => WashString(x.Message))) + "]";
-        var tagTopics = JsonSerializer.Deserialize<List<TagTopic>>(jsonArrayString) ?? throw new InvalidOperationException();
-        var tagTopicsDictionary = busEvents.Zip(tagTopics, (busEvent, tagTopic) => new { busEvent.Id, tagTopic })
-                                           .ToDictionary(x => x.Id, x => x.tagTopic);
+        var tagTopics = DeserializeTagTopics(busEvents);
+        var tagDetailsDictionary = await FetchTagDetails(tagTopics);
+        UpdateBusEventsWithTagDetails(busEvents, tagTopics, tagDetailsDictionary);
+    }
 
+    private List<TagTopic> DeserializeTagTopics(List<BusEvent> busEvents)
+    {
+        var jsonArrayString = "[" + string.Join(",", busEvents.Select(x => WashString(x.Message))) + "]";
+        return JsonSerializer.Deserialize<List<TagTopic>>(jsonArrayString) ?? throw new InvalidOperationException();
+    }
+
+    private async Task<Dictionary<long, string>> FetchTagDetails(List<TagTopic> tagTopics)
+    {
         var tagIds = tagTopics.Select(x =>
         {
             if (x?.TagId == null || !long.TryParse(x.TagId, out var tagId))
@@ -53,17 +61,17 @@ public class BusEventService : IBusEventService
             return tagId;
         });
 
-        var tagDetailsDictionary = await _tagDetailsRepository.GetDetailsListByTagId(tagIds);
+        return await _tagDetailsRepository.GetDetailsListByTagId(tagIds);
+    }
 
-        foreach (var busEvent in busEvents)
+    private void UpdateBusEventsWithTagDetails(List<BusEvent> busEvents, List<TagTopic> tagTopics, Dictionary<long, string> tagDetailsDictionary)
+    {
+        for (var i = 0; i < tagTopics.Count; i++)
         {
-            if (!tagTopicsDictionary.TryGetValue(busEvent.Id, out var tagTopic) || tagTopic?.TagId == null || !long.TryParse(tagTopic.TagId, out var tagId))
-            {
-                throw new Exception($"Could not retrieve TagTopic from BusEvent. BusEvent.Id: {busEvent.Id}");
-            }
-
+            var tagTopic = tagTopics[i];
+            var tagId = long.Parse(tagTopic.TagId);
             tagTopic.TagDetails = tagDetailsDictionary.TryGetValue(tagId, out var details) ? WashString(details) : string.Empty;
-            busEvent.Message = JsonSerializer.Serialize(tagTopic);
+            busEvents[i].Message = JsonSerializer.Serialize(tagTopic);
         }
     }
 

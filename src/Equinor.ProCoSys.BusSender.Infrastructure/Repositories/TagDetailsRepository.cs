@@ -47,7 +47,7 @@ public class TagDetailsRepository : ITagDetailsRepository
                 return "{}";
             }
 
-            var tagDetails = (string)result[0];
+            var tagDetails = result[0].ToString();
 
             if (await result.ReadAsync())
             {
