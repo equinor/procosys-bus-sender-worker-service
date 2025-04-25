@@ -182,23 +182,24 @@ public class BusSenderService : IBusSenderService
         var unProcessedEvents = events.Where(busEvent => busEvent.Status == Status.UnProcessed).ToList();
         _logger.LogInformation("Amount of messages to process: {Count} ", unProcessedEvents.Count);
 
-        var isOverInOperatorLimit = unProcessedEvents.Count >= 1000;
-        if (unProcessedEvents.Any(e => e.Event != TagTopic.TopicName) || isOverInOperatorLimit) 
-        { 
-            foreach (var simpleUnprocessedBusEvent in unProcessedEvents.Where(e =>
-                                IsSimpleMessage(e) || e.Event == TagTopic.TopicName))
-                {
-                    await UpdateEventBasedOnTopic(simpleUnprocessedBusEvent);
-                }
-        }
-        else
+        var unProcessedTagEvents = unProcessedEvents.Where(e => e.Event == TagTopic.TopicName).ToList();
+        var isOverInOperatorLimit = unProcessedTagEvents.Count > 1000;
+        var isMostEfficientToUseInOperator = unProcessedTagEvents.Count > 20; // Identified through comparison of performance tests for various amounts of tags.
+
+        if (unProcessedTagEvents.Any() && !isOverInOperatorLimit && isMostEfficientToUseInOperator)
         {
-            await UpdateEventsBasedOnTagTopic(unProcessedEvents);
+            await UpdateEventsBasedOnTagTopic(unProcessedTagEvents);
+            unProcessedEvents.RemoveAll(e => e.Event == TagTopic.TopicName);
+        }
+
+        foreach (var simpleUnprocessedBusEvent in unProcessedEvents.Where(e =>
+                            IsSimpleMessage(e) || e.Event == TagTopic.TopicName))
+        {
+            await UpdateEventBasedOnTopic(simpleUnprocessedBusEvent);
         }
 
         _logger.LogInformation("Update loop finished at {Sw} ms", dsw.ElapsedMilliseconds);
         await _unitOfWork.SaveChangesAsync();
-
 
         /***
          * Group by topic and then create a queue of messages per topic
