@@ -6,7 +6,7 @@ namespace Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 
 public interface IBusEventService
 {
-    Task<string> AttachTagDetails(string? tagMessage);
+    Task AttachTagDetails(BusEvent busEvent);
     Task AttachTagDetails(List<BusEvent> busEvent);
     Task<string?> CreateActionMessage(string busEventMessage);
     Task<string?> CreateCallOffMessage(string busEventMessage);

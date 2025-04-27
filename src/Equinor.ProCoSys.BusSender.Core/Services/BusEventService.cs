@@ -24,59 +24,47 @@ public class BusEventService : IBusEventService
         _eventRepository = eventRepository;
     }
 
-    public async Task<string> AttachTagDetails(string? tagMessage)
-    {
-        var tagTopic =
-            JsonSerializer.Deserialize<TagTopic>(WashString(tagMessage) ?? throw new InvalidOperationException());
-        if (tagTopic?.TagId == null || !long.TryParse(tagTopic.TagId, out var tagId))
-        {
-            throw new Exception($"Could not deserialize TagTopic. TagId: {tagTopic?.TagId}");
-        }
-
-        tagTopic.TagDetails = WashString(await _tagDetailsRepository.GetDetailsStringByTagId(tagId));
-        return JsonSerializer.Serialize(tagTopic);
-    }
+    public async Task AttachTagDetails(BusEvent busEvent) => await AttachTagDetails([busEvent]);
 
     public async Task AttachTagDetails(List<BusEvent> busEvents)
     {
-        var tagTopics = DeserializeTagTopics(busEvents);
-        var tagDetailsDictionary = await FetchTagDetails(tagTopics);
-        UpdateBusEventsWithTagDetails(busEvents, tagTopics, tagDetailsDictionary);
-    }
+        var tagTopics = busEvents
+            .Select(x => (Event: x, Topic: DeserializeTagTopic(x.Message)))
+            .ToList();
 
-    private List<TagTopic> DeserializeTagTopics(List<BusEvent> busEvents)
-    {
-        var jsonArrayString = "[" + string.Join(",", busEvents.Select(x => WashString(x.Message))) + "]";
-        return JsonSerializer.Deserialize<List<TagTopic>>(jsonArrayString) ?? throw new InvalidOperationException();
-    }
+        var tagIds = tagTopics
+            .Select(x => long.Parse(x.Topic.TagId))
+            .Distinct()
+            .ToList();
 
-    private async Task<Dictionary<long, string>> FetchTagDetails(List<TagTopic> tagTopics)
-    {
-        var tagIds = tagTopics.Select(x =>
-        {
-            if (x?.TagId == null || !long.TryParse(x.TagId, out var tagId))
-            {
-                throw new Exception($"Could not deserialize TagTopic. {x?.TagId}");
-            }
-            return tagId;
-        }).Distinct();
         // There could be multiple updates for the same tagId within a short time span.
         // For simple messages duplicates are filtered out, but this is not the case for thick messages like this.
         // We only need to fetch the tag details once for each tagId when handled within the same loop.
         // Hence the use of distinct here.
 
-        return await _tagDetailsRepository.GetDetailsByTagId(tagIds);
+        var tagDetailsDictionary = await _tagDetailsRepository.GetDetailsByTagId(tagIds);
+
+        foreach (var (busEvent, tagTopic) in tagTopics)
+        {
+            var tagId = long.Parse(tagTopic.TagId);
+            tagTopic.TagDetails = tagDetailsDictionary.TryGetValue(tagId, out var details)
+                ? WashString(details)
+                : throw new KeyNotFoundException($"Tag details not available in dictionary for TagId: {tagId}. This should never happen.");
+
+            busEvent.Message = JsonSerializer.Serialize(tagTopic);
+        }
     }
 
-    private void UpdateBusEventsWithTagDetails(List<BusEvent> busEvents, List<TagTopic> tagTopics, Dictionary<long, string> tagDetailsDictionary)
+    private TagTopic DeserializeTagTopic(string? message)
     {
-        for (var i = 0; i < tagTopics.Count; i++)
+        var washedMessage = WashString(message) ?? throw new InvalidOperationException("Message is null or empty");
+        var tagTopic = JsonSerializer.Deserialize<TagTopic>(washedMessage);
+
+        if (tagTopic?.TagId == null || !long.TryParse(tagTopic.TagId, out var _))
         {
-            var tagTopic = tagTopics[i];
-            var tagId = long.Parse(tagTopic.TagId);
-            tagTopic.TagDetails = tagDetailsDictionary.TryGetValue(tagId, out var details) ? WashString(details) : string.Empty;
-            busEvents[i].Message = JsonSerializer.Serialize(tagTopic);
+            throw new Exception($"Could not deserialize TagTopic. TagId: {tagTopic?.TagId}");
         }
+        return tagTopic;
     }
 
     public static bool CanGetTwoIdsFromMessage(IReadOnlyList<string> array, out long id1, out long id2)

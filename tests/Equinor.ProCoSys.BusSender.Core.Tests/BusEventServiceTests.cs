@@ -2062,8 +2062,13 @@ public class BusEventServiceTests
     {
         //Arrange
         const string tagDetailsString = "HubbaBubba";
-        _tagDetailsRepositoryMock.Setup(t => t.GetDetailsStringByTagId(116866654))
-            .ReturnsAsync(tagDetailsString);
+        var tagDetailsDictionary = new Dictionary<long, string>()
+        {
+           { 116866654, tagDetailsString }
+        };
+
+        _tagDetailsRepositoryMock.Setup(t => t.GetDetailsByTagId(It.IsAny<IEnumerable<long>>()))
+            .ReturnsAsync(tagDetailsDictionary);
         const string jsonMessage =
             @"{
                 ""TagNo"": ""P-PL470003"",
@@ -2098,11 +2103,16 @@ public class BusEventServiceTests
                 ]
             }";
 
+        var busEvent = new BusEvent()
+        {
+            Message = jsonMessage
+        };
+
         //Act
-        var result = await _dut.AttachTagDetails(jsonMessage);
+        await _dut.AttachTagDetails(busEvent);
 
         //Assert
-        var deserializedTagTopic = JsonSerializer.Deserialize<TagTopic>(result);
+        var deserializedTagTopic = JsonSerializer.Deserialize<TagTopic>(busEvent.Message);
         Assert.IsNotNull(deserializedTagTopic);
         Assert.AreEqual(tagDetailsString, deserializedTagTopic.TagDetails);
         Assert.IsNotNull(deserializedTagTopic.McPkgGuid);
@@ -2112,7 +2122,7 @@ public class BusEventServiceTests
     [TestMethod]
     public async Task HandleBusEvents_WhenTagsOnlyInChunk_AddsTagDetailsToTag()
     {
-        //Arrange
+        //Arrange  
         var tagDetailsDictionary = new Dictionary<long, string>
         {
             { 116866654, "Details for tag 116866654" },
@@ -2122,94 +2132,93 @@ public class BusEventServiceTests
         _tagDetailsRepositoryMock.Setup(t => t.GetDetailsByTagId(tagDetailsDictionary.Keys))
             .ReturnsAsync(tagDetailsDictionary);
         const string jsonMessage1 =
-            @"{
-                ""TagNo"": ""P-PL470003"",
-                ""TagId"": ""116866654"",
-                ""Description"": ""Power cable (110 V < U < 400 V AC)"",
-                ""ProjectName"": ""L.UKDBB.001"",
-                ""McPkgNo"": ""4701-E001"",
-                ""McPkgGuid"": ""EAC31FAFA85901BCE0532410000A10D9"",
-                ""CommPkgNo"": ""4701-P01"",
-                ""CommPkgGuid"": ""EAC31FA6823301BCE0532410000A10D9"",
-                ""AreaCode"": ""P129"",
-                ""AreaDescription"": ""Hypochlorite Room"",
-                ""DisciplineCode"": ""E"",
-                ""DisciplineDescription"": ""Electrical"",
-                ""RegisterCode"": ""CABLE"",
-                ""Status"": ""PLANNED"",
-                ""System"": ""47"",
-                ""CallOffNo"": """",
-                ""PurchaseOrderNo"": ""BE505A"",
-                ""TagFunctionCode"": ""PL"",
-                ""InstallationCode"": ""DBB"",
-                ""IsVoided"": false,
-                ""Plant"": ""PCS$DOGGER_BANK_B"",
-                ""PlantName"": ""Dogger Bank B"",
-                ""EngineeringCode"": ""A"",
-                ""MountedOn"": """",
-                ""ProCoSysGuid"": ""EDF5C7E95F2C2006E0532710000AD705"",
-                ""LastUpdated"": ""2022-12-12 11:25:26"",
-                ""ProjectNames"": [
-                    ""L.UKDBB.001"",
-                    ""DOGGER_BANK_B_PRO""
-                ]
-            }";
+            @"{  
+               ""TagNo"": ""P-PL470003"",  
+               ""TagId"": ""116866654"",  
+               ""Description"": ""Power cable (110 V < U < 400 V AC)"",  
+               ""ProjectName"": ""L.UKDBB.001"",  
+               ""McPkgNo"": ""4701-E001"",  
+               ""McPkgGuid"": ""EAC31FAFA85901BCE0532410000A10D9"",  
+               ""CommPkgNo"": ""4701-P01"",  
+               ""CommPkgGuid"": ""EAC31FA6823301BCE0532410000A10D9"",  
+               ""AreaCode"": ""P129"",  
+               ""AreaDescription"": ""Hypochlorite Room"",  
+               ""DisciplineCode"": ""E"",  
+               ""DisciplineDescription"": ""Electrical"",  
+               ""RegisterCode"": ""CABLE"",  
+               ""Status"": ""PLANNED"",  
+               ""System"": ""47"",  
+               ""CallOffNo"": """",  
+               ""PurchaseOrderNo"": ""BE505A"",  
+               ""TagFunctionCode"": ""PL"",  
+               ""InstallationCode"": ""DBB"",  
+               ""IsVoided"": false,  
+               ""Plant"": ""PCS$DOGGER_BANK_B"",  
+               ""PlantName"": ""Dogger Bank B"",  
+               ""EngineeringCode"": ""A"",  
+               ""MountedOn"": """",  
+               ""ProCoSysGuid"": ""EDF5C7E95F2C2006E0532710000AD705"",  
+               ""LastUpdated"": ""2022-12-12 11:25:26"",  
+               ""ProjectNames"": [  
+                   ""L.UKDBB.001"",  
+                   ""DOGGER_BANK_B_PRO""  
+               ]  
+           }";
 
         const string jsonMessage2 =
-            @"{
-                ""TagNo"": ""P-PL470004"",
-                ""TagId"": ""116866655"",
-                ""Description"": ""Power cable (110 V < U < 400 V AC)"",
-                ""ProjectName"": ""L.UKDBB.002"",
-                ""McPkgNo"": ""4701-E002"",
-                ""McPkgGuid"": ""EAC31FAFA85901BCE0532410000A10D8"",
-                ""CommPkgNo"": ""4701-P02"",
-                ""CommPkgGuid"": ""EAC31FA6823301BCE0532410000A10D8"",
-                ""AreaCode"": ""P130"",
-                ""AreaDescription"": ""Hypochlorite Room 2"",
-                ""DisciplineCode"": ""E"",
-                ""DisciplineDescription"": ""Electrical"",
-                ""RegisterCode"": ""CABLE"",
-                ""Status"": ""PLANNED"",
-                ""System"": ""48"",
-                ""CallOffNo"": """",
-                ""PurchaseOrderNo"": ""BE505B"",
-                ""TagFunctionCode"": ""PL"",
-                ""InstallationCode"": ""DBB"",
-                ""IsVoided"": false,
-                ""Plant"": ""PCS$DOGGER_BANK_B"",
-                ""PlantName"": ""Dogger Bank B"",
-                ""EngineeringCode"": ""A"",
-                ""MountedOn"": """",
-                ""ProCoSysGuid"": ""EDF5C7E95F2C2006E0532710000AD706"",
-                ""LastUpdated"": ""2022-12-12 11:25:26"",
-                ""ProjectNames"": [
-                    ""L.UKDBB.002"",
-                    ""DOGGER_BANK_B_PRO""
-                ]
-            }";
-
+            @"{  
+               ""TagNo"": ""P-PL470004"",  
+               ""TagId"": ""116866655"",  
+               ""Description"": ""Power cable (110 V < U < 400 V AC)"",  
+               ""ProjectName"": ""L.UKDBB.002"",  
+               ""McPkgNo"": ""4701-E002"",  
+               ""McPkgGuid"": ""EAC31FAFA85901BCE0532410000A10D8"",  
+               ""CommPkgNo"": ""4701-P02"",  
+               ""CommPkgGuid"": ""EAC31FA6823301BCE0532410000A10D8"",  
+               ""AreaCode"": ""P130"",  
+               ""AreaDescription"": ""Hypochlorite Room 2"",  
+               ""DisciplineCode"": ""E"",  
+               ""DisciplineDescription"": ""Electrical"",  
+               ""RegisterCode"": ""CABLE"",  
+               ""Status"": ""PLANNED"",  
+               ""System"": ""48"",  
+               ""CallOffNo"": """",  
+               ""PurchaseOrderNo"": ""BE505B"",  
+               ""TagFunctionCode"": ""PL"",  
+               ""InstallationCode"": ""DBB"",  
+               ""IsVoided"": false,  
+               ""Plant"": ""PCS$DOGGER_BANK_B"",  
+               ""PlantName"": ""Dogger Bank B"",  
+               ""EngineeringCode"": ""A"",  
+               ""MountedOn"": """",  
+               ""ProCoSysGuid"": ""EDF5C7E95F2C2006E0532710000AD706"",  
+               ""LastUpdated"": ""2022-12-12 11:25:26"",  
+               ""ProjectNames"": [  
+                   ""L.UKDBB.002"",  
+                   ""DOGGER_BANK_B_PRO""  
+               ]  
+           }";
 
         List<BusEvent> busEvents = new List<BusEvent>()
-        {
-            new BusEvent()
-            {
-                Event = "Tag",
-                Id = 116866654,
-                Message = jsonMessage1
-            },
-            new BusEvent()
-            {
-                Event = "Tag",
-                Id = 116866655,
-                Message = jsonMessage2
-            }
-        };
+       {
+           new BusEvent()
+           {
+               Event = "Tag",
+               Id = 116866654,
+               Message = jsonMessage1
+           },
+           new BusEvent()
+           {
+               Event = "Tag",
+               Id = 116866655,
+               Message = jsonMessage2
+           }
+       };
 
-        //Act
+        //Act  
         await _dut.AttachTagDetails(busEvents);
 
-        //Assert
+        //Assert  
         var deserializedTagTopic1 = JsonSerializer.Deserialize<TagTopic>(busEvents.First(x => x.Id == 116866654).Message);
         var deserializedTagTopic2 = JsonSerializer.Deserialize<TagTopic>(busEvents.First(x => x.Id == 116866655).Message);
         Assert.IsNotNull(deserializedTagTopic1);
@@ -2220,6 +2229,5 @@ public class BusEventServiceTests
         Assert.AreEqual(tagDetailsDictionary[116866655], deserializedTagTopic2.TagDetails);
         Assert.IsNotNull(deserializedTagTopic2.McPkgGuid);
         Assert.IsNotNull(deserializedTagTopic2.CommPkgGuid);
-
     }
 }

@@ -291,7 +291,7 @@ public class BusSenderService : IBusSenderService
                 }
             case TagTopic.TopicName:
                 {
-                    busEvent.Message = await _service.AttachTagDetails(busEvent.Message);
+                    await _service.AttachTagDetails(busEvent);
                     break;
                 }
             case "checklist":

@@ -375,7 +375,7 @@ public class BusSenderServiceTests
             busEvents.Add(new BusEvent
             {
                 Event = TagTopic.TopicName,
-                Message = $"Message {i}",
+                Message = $"{{ \"TagId\": \"{i}\" }}",
                 Status = Status.UnProcessed
             });
         }
@@ -385,7 +385,7 @@ public class BusSenderServiceTests
         _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk())
             .Returns(() => Task.FromResult(busEvents));
 
-        _busEventServiceMock.Setup(b => b.AttachTagDetails(It.IsAny<string>()))
+        _busEventServiceMock.Setup(b => b.AttachTagDetails(It.IsAny<BusEvent>()))
             .Returns(() => Task.FromResult("{}"));
         // Act
         await _dut.HandleBusEvents();
@@ -394,7 +394,7 @@ public class BusSenderServiceTests
         Assert.AreEqual(1001, busEvents.Count);
         Assert.IsTrue(busEvents.All(be => be.Event == TagTopic.TopicName));
         _busEventServiceMock.Verify(
-            t => t.AttachTagDetails(It.IsAny<string>()), Times.AtLeastOnce());
+            t => t.AttachTagDetails(It.IsAny<BusEvent>()), Times.AtLeastOnce());
     }
 
     [TestMethod]
