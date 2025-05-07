@@ -288,8 +288,18 @@ public class BusSenderService : IBusSenderService
         var unProcessedEvents = events.Where(busEvent => busEvent.Status == Status.UnProcessed).ToList();
         _logger.LogInformation("[{Plant}] Amount of messages to process: {Count} ", plant, unProcessedEvents.Count);
 
+        var unProcessedTagEvents = unProcessedEvents.Where(e => e.Event == TagTopic.TopicName).ToList();
+        var isOverInOperatorLimit = unProcessedTagEvents.Count > 1000;
+        var isMostEfficientToUseInOperator = unProcessedTagEvents.Count > 20; // Identified through comparison of performance tests for various amounts of tags.
+
+        if (unProcessedTagEvents.Any() && !isOverInOperatorLimit && isMostEfficientToUseInOperator)
+        {
+            await UpdateEventsBasedOnTagTopic(unProcessedTagEvents);
+            unProcessedEvents.RemoveAll(e => e.Event == TagTopic.TopicName);
+        }
+
         foreach (var simpleUnprocessedBusEvent in unProcessedEvents.Where(e =>
-                     IsSimpleMessage(e) || e.Event == TagTopic.TopicName))
+                            IsSimpleMessage(e) || e.Event == TagTopic.TopicName))
         {
             if (_blobLeaseService.CancellationToken.IsCancellationRequested)
             {
@@ -363,7 +373,21 @@ public class BusSenderService : IBusSenderService
             {"MessageId", busMessageMessageId ?? "NoID" }
         });
     }
-    
+
+    private async Task UpdateEventsBasedOnTagTopic(List<BusEvent> busEvents)
+    {
+        if (busEvents.Any(e => e.Event != TagTopic.TopicName))
+        {
+            throw new InvalidOperationException("This method can be used by TagTopic Events only.");
+        }
+
+        _logger.LogDebug("Started update for tag topic bus events");
+        var sw = Stopwatch.StartNew();
+        await _service.AttachTagDetails(busEvents);
+        _logger.LogDebug("Update for tag topic bus events took {Ms} ms", sw.ElapsedMilliseconds);
+        sw.Stop();
+    }
+
     private async Task UpdateEventBasedOnTopic(BusEvent busEvent)
     {
         _logger.LogDebug("Started update for {Event}", busEvent.Event);
@@ -382,7 +406,7 @@ public class BusSenderService : IBusSenderService
                 }
             case TagTopic.TopicName:
                 {
-                    busEvent.Message = await _service.AttachTagDetails(busEvent.Message);
+                    await _service.AttachTagDetails(busEvent);
                     break;
                 }
             case "checklist":

@@ -55,7 +55,7 @@ public static class IServiceCollectionExtensions
     private static PcsServiceBusProcessors CreateSubscriptionProcessors(PcsServiceBusConfig options)
     {
         var pcsProcessors = new PcsServiceBusProcessors(options.RenewLeaseIntervalMilliseconds);
-        var client = new ServiceBusClient(options.ConnectionString);
+        var client = InitializeServiceBusClient(options);
         var processorOptions = new ServiceBusProcessorOptions
         {
             MaxConcurrentCalls = 1, AutoCompleteMessages = false, ReceiveMode = ServiceBusReceiveMode.PeekLock
@@ -76,5 +76,15 @@ public static class IServiceCollectionExtensions
                         topicInfo.pcsTopic));
             });
         return pcsProcessors;
+    }
+
+    private static ServiceBusClient InitializeServiceBusClient(PcsServiceBusConfig options)
+    {
+        if (!string.IsNullOrEmpty(options.ConnectionString))
+        {
+            return new ServiceBusClient(options.ConnectionString);
+        }
+        
+        return new ServiceBusClient(options.FullyQualifiedNamespace, options.TokenCredential);
     }
 }

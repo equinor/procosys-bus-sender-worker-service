@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -23,17 +24,47 @@ public class BusEventService : IBusEventService
         _eventRepository = eventRepository;
     }
 
-    public async Task<string> AttachTagDetails(string? tagMessage)
-    {
-        var tagTopic =
-            JsonSerializer.Deserialize<TagTopic>(WashString(tagMessage) ?? throw new InvalidOperationException());
-        if (tagTopic?.TagId == null || !long.TryParse(tagTopic.TagId, out var tagId))
-        {
-            throw new Exception("Could not deserialize TagTopic");
-        }
+    public async Task AttachTagDetails(BusEvent busEvent) => await AttachTagDetails([busEvent]);
 
-        tagTopic.TagDetails = WashString(await _tagDetailsRepository.GetDetailsStringByTagId(tagId));
-        return JsonSerializer.Serialize(tagTopic);
+    public async Task AttachTagDetails(List<BusEvent> busEvents)
+    {
+        var tagTopics = busEvents
+            .Select(x => (Event: x, Topic: DeserializeTagTopic(x.Message)))
+            .ToList();
+
+        var tagIds = tagTopics
+            .Select(x => long.Parse(x.Topic.TagId))
+            .Distinct()
+            .ToList();
+
+        // There could be multiple updates for the same tagId within a short time span.
+        // For simple messages duplicates are filtered out, but this is not the case for thick messages like this.
+        // We only need to fetch the tag details once for each tagId when handled within the same loop.
+        // Hence the use of distinct here.
+
+        var tagDetailsDictionary = await _tagDetailsRepository.GetDetailsByTagId(tagIds);
+
+        foreach (var (busEvent, tagTopic) in tagTopics)
+        {
+            var tagId = long.Parse(tagTopic.TagId);
+            tagTopic.TagDetails = tagDetailsDictionary.TryGetValue(tagId, out var details)
+                ? WashString(details)
+                : throw new KeyNotFoundException($"Tag details not available in dictionary for TagId: {tagId}. This should never happen.");
+
+            busEvent.Message = JsonSerializer.Serialize(tagTopic);
+        }
+    }
+
+    private TagTopic DeserializeTagTopic(string? message)
+    {
+        var washedMessage = WashString(message) ?? throw new InvalidOperationException("Message is null or empty");
+        var tagTopic = JsonSerializer.Deserialize<TagTopic>(washedMessage);
+
+        if (tagTopic?.TagId == null || !long.TryParse(tagTopic.TagId, out var _))
+        {
+            throw new Exception($"Could not deserialize TagTopic. TagId: {tagTopic?.TagId}");
+        }
+        return tagTopic;
     }
 
     public static bool CanGetTwoIdsFromMessage(IReadOnlyList<string> array, out long id1, out long id2)

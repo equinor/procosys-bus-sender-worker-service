@@ -1,11 +1,13 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Equinor.ProCoSys.BusSenderWorker.Core.Models;
 
 namespace Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 
 public interface IBusEventService
 {
-    Task<string> AttachTagDetails(string? tagMessage);
+    Task AttachTagDetails(BusEvent busEvent);
+    Task AttachTagDetails(List<BusEvent> busEvent);
     Task<string?> CreateActionMessage(string busEventMessage);
     Task<string?> CreateCallOffMessage(string busEventMessage);
     Task<string?> CreateChecklistMessage(string busEventMessage);

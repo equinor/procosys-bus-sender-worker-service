@@ -149,8 +149,8 @@ public class QueryTests
         {
             typeof(DocumentQuery),
             typeof(IDocumentEventV1),
-            new[] { typeof(long?), typeof(string) },
-            new object[] { 1L, "testPlant" }
+            new[] { typeof(long?), typeof(string), typeof(string) },
+            new object[] { 1L, "testPlant", "noExtra" }
         };
         
         yield return new object[]
@@ -373,8 +373,8 @@ public class QueryTests
         {
             typeof(WorkOrderQuery),
             typeof(IWorkOrderEventV1),
-            new[] { typeof(long?), typeof(string) },
-            new object[] { 1L, "testPlant" }
+            new[] { typeof(long?), typeof(string), typeof(string) },
+            new object[] { 1L, "testPlant", "noExtra" }
         };
 
         yield return new object[]

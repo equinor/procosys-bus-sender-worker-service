@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
@@ -25,7 +26,7 @@ public class BusSenderServiceTests
 {
     private Mock<IBusEventRepository> _busEventRepository;
     private List<BusEvent> _busEvents;
-    private Mock<BusEventService> _busEventServiceMock;
+    private Mock<IBusEventService> _busEventServiceMock;
     private PcsBusSender _busSender;
     private Mock<IEventRepository> _dapperRepositoryMock;
     private BusSenderService _dut;
@@ -114,7 +115,7 @@ public class BusSenderServiceTests
 
         _dapperRepositoryMock = new Mock<IEventRepository>();
         _busEventServiceMock = new Mock<BusEventService>(_tagDetailsRepositoryMock.Object, _dapperRepositoryMock.Object)
-            { CallBase = true };
+            { CallBase = true }.As<IBusEventService>();
         _iUnitOfWork = new Mock<IUnitOfWork>();
 
         _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk(false)).Returns(() => Task.FromResult(_busEvents));
@@ -381,7 +382,39 @@ public class BusSenderServiceTests
         _topicClientMockWo.Verify(
             t => t.SendMessagesAsync(It.IsAny<ServiceBusMessageBatch>(), It.IsAny<CancellationToken>()), Times.Once);
     }
-    
+
+    [TestMethod]
+    public async Task SendMessageChunk_WhenTagAndOverInOperatorLimit_ShouldUseSingleQuery()
+    {
+        // Arrange
+        var busEvents = new List<BusEvent>();
+        for (int i = 0; i < 1001; i++)
+        {
+            busEvents.Add(new BusEvent
+            {
+                Event = TagTopic.TopicName,
+                Message = $"{{ \"TagId\": \"{i}\" }}",
+                Status = Status.UnProcessed
+            });
+        }
+
+        _busSender.Add("tag", _topicClientMock1.Object);
+
+        _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk())
+            .Returns(() => Task.FromResult(busEvents));
+
+        _busEventServiceMock.Setup(b => b.AttachTagDetails(It.IsAny<BusEvent>()))
+            .Returns(() => Task.FromResult("{}"));
+        // Act
+        await _dut.HandleBusEvents();
+
+        // Assert
+        Assert.AreEqual(1001, busEvents.Count);
+        Assert.IsTrue(busEvents.All(be => be.Event == TagTopic.TopicName));
+        _busEventServiceMock.Verify(
+            t => t.AttachTagDetails(It.IsAny<BusEvent>()), Times.AtLeastOnce());
+    }
+
     [TestMethod]
     public async Task StopService_ShouldCloseOnAllTopicClients()
     {

@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Threading.Tasks;
 using Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 using Equinor.ProCoSys.BusSenderWorker.Infrastructure.Data;
@@ -19,7 +21,7 @@ public class TagDetailsRepository : ITagDetailsRepository
         _logger = logger;
     }
 
-    public async Task<string> GetDetailsStringByTagId(long tagId)
+    public async Task<Dictionary<long, string>> GetDetailsByTagId(IEnumerable<long> tagIds)
     {
         var dbConnection = _context.Database.GetDbConnection();
         var connectionWasClosed = dbConnection.State != ConnectionState.Open;
@@ -30,34 +32,44 @@ public class TagDetailsRepository : ITagDetailsRepository
 
         try
         {
+            // Initialize the dictionary with all tagIds and default value "{}"
+            // to ensure that all tagIds are present with a default of {} when no details are found.
+            var tagDetailsDictionary = tagIds.ToDictionary(id => id, _ => "{}");
+
             await using var command = _context.Database.GetDbConnection().CreateCommand();
-            command.CommandText = GetTagDetailsQuery(tagId);
+            if (tagIds.Count()>1) {
+                command.CommandText = GetTagDetailsQuery(tagIds);
+            }
+            else
+            {
+                command.CommandText = GetTagDetailsQuerySingle(tagIds.First());
+            }
 
             await using var result = await command.ExecuteReaderAsync();
 
             if (!result.HasRows)
             {
-                _logger.LogInformation("Tag with id {TagId} did not have any tagDetails", tagId);
-                return "{}";
+                _logger.LogDebug("No tag details found for any of the provided tag IDs. Returning empty set for all tag ids.");
+                return tagDetailsDictionary;
             }
 
-            if (!await result.ReadAsync() || result[0] is DBNull)
+            while (await result.ReadAsync())
             {
-                return "{}";
+                if (result[0] is DBNull)
+                {
+                    throw new InvalidOperationException("Tag id is null in query result. This should never happen.");
+                }
+
+                var tagId = result.GetInt64(0);
+                var tagDetails = result.IsDBNull(1) ? "{}" : result.GetString(1);
+                tagDetailsDictionary[tagId] = "{"+tagDetails+"}";
             }
 
-            var tagDetails = (string)result[0];
-
-            if (await result.ReadAsync())
-            {
-                _logger.LogError("TagDetails returned more than 1 row, this should not happen");
-            }
-
-            return "{" + tagDetails + "}";
+            return tagDetailsDictionary;
         }
         finally
         {
-            //If we open it, we have to close it.
+            // If we opened it, we have to close it.  
             if (connectionWasClosed)
             {
                 await _context.Database.CloseConnectionAsync();
@@ -65,15 +77,16 @@ public class TagDetailsRepository : ITagDetailsRepository
         }
     }
 
-    private static string GetTagDetailsQuery(long tagId) =>
+    private static string GetTagDetailsQuery(IEnumerable<long> tagIds) =>
         @$"
-            select listagg('""'|| colName ||'"":""'|| regexp_replace(val, '([""\])', '\\\1') ||'""'
+            select tagId, listagg('""'|| colName ||'"":""'|| regexp_replace(val, '([""\])', '\\\1') ||'""'
             || case when colname2 is not null then ',' || '""'|| colName2 ||'"":""'|| val2 ||'""' end
             || case when colname3 is not null then ',' || '""'|| colName3 ||'"":""'|| val3 ||'""' end,
             ',')
-            within group (order by colName, colName2,colName3) as tagDetails
+            within group (order by colName, colName2, colName3) as tagDetails
             from (
                 select
+                val.element_id tagId,
                 decode(f.columnname, 'FROM_TAG_NUMBER', 'FromTagGuid', null) as colName2,
                 decode(f.columnname, 'TO_TAG_NUMBER', 'ToTagGuid', null) as colName3,
                 f.columnname as colName,
@@ -83,22 +96,65 @@ public class TagDetailsRepository : ITagDetailsRepository
                     to_char(val.valuenumber),
                     tag.tagno,
                     libval.code
-            ) as val,
-            tag.procosys_guid as val2,
-            tag.procosys_guid as val3
-            from defineelementfield def
-                left join field f on def.field_id = f.field_id
-                left join library unit on unit.library_id = f.unit_id
-                join elementfield val on (val.field_id = def.field_id and val.element_id = {tagId})
-                join tag t on t.tag_id = val.element_id 
-                left join library libval on libval.library_id = val.library_id
-                left join library reg on reg.library_id = def.register_id
-                left join tag on tag.tag_id = val.tag_id
-            where def.elementtype = 'TAG'
-            and (def.register_id is null or def.register_id = t.register_id)
-            and not def.isvoided = 'Y'
-            and f.columntype in ('NUMBER', 'DATE', 'STRING', 'LIBRARY', 'TAG')
-            and f.projectschema = t.projectschema
-            order by def.sortkey nulls first
-        )";
+                ) as val,
+                tag.procosys_guid as val2,
+                tag.procosys_guid as val3
+                from defineelementfield def
+                    left join field f on def.field_id = f.field_id
+                    left join library unit on unit.library_id = f.unit_id
+                    join elementfield val on (val.field_id = def.field_id and val.element_id IN ({string.Join(",", tagIds)}))
+                    join tag t on t.tag_id = val.element_id 
+                    left join library libval on libval.library_id = val.library_id
+                    left join library reg on reg.library_id = def.register_id
+                    left join tag on tag.tag_id = val.tag_id
+                where def.elementtype = 'TAG'
+                and (def.register_id is null or def.register_id = t.register_id)
+                and not def.isvoided = 'Y'
+                and f.columntype in ('NUMBER', 'DATE', 'STRING', 'LIBRARY', 'TAG')
+                and f.projectschema = t.projectschema
+                order by def.sortkey nulls first
+            )
+            group by tagId
+        ";
+
+    private static string GetTagDetailsQuerySingle(long tagId) =>
+        @$"
+            select tagId, listagg('""'|| colName ||'"":""'|| regexp_replace(val, '([""\])', '\\\1') ||'""'
+            || case when colname2 is not null then ',' || '""'|| colName2 ||'"":""'|| val2 ||'""' end
+            || case when colname3 is not null then ',' || '""'|| colName3 ||'"":""'|| val3 ||'""' end,
+            ',')
+            within group (order by colName, colName2, colName3) as tagDetails
+            from (
+                select
+                val.element_id tagId,
+                decode(f.columnname, 'FROM_TAG_NUMBER', 'FromTagGuid', null) as colName2,
+                decode(f.columnname, 'TO_TAG_NUMBER', 'ToTagGuid', null) as colName3,
+                f.columnname as colName,
+                coalesce(
+                    val.valuestring,
+                    to_char(val.valuedate, 'yyyy-mm-dd hh24:mi:ss'),
+                    to_char(val.valuenumber),
+                    tag.tagno,
+                    libval.code
+                ) as val,
+                tag.procosys_guid as val2,
+                tag.procosys_guid as val3
+                from defineelementfield def
+                    left join field f on def.field_id = f.field_id
+                    left join library unit on unit.library_id = f.unit_id
+                    join elementfield val on (val.field_id = def.field_id and val.element_id = {tagId})
+                    join tag t on t.tag_id = val.element_id 
+                    left join library libval on libval.library_id = val.library_id
+                    left join library reg on reg.library_id = def.register_id
+                    left join tag on tag.tag_id = val.tag_id
+                where def.elementtype = 'TAG'
+                and (def.register_id is null or def.register_id = t.register_id)
+                and not def.isvoided = 'Y'
+                and f.columntype in ('NUMBER', 'DATE', 'STRING', 'LIBRARY', 'TAG')
+                and f.projectschema = t.projectschema
+                order by def.sortkey nulls first
+            )
+            group by tagId
+        ";
+
 }
