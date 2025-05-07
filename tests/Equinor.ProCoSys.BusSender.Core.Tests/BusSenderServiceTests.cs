@@ -400,7 +400,7 @@ public class BusSenderServiceTests
 
         _busSender.Add("tag", _topicClientMock1.Object);
 
-        _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk())
+        _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk(It.IsAny<bool>()))
             .Returns(() => Task.FromResult(busEvents));
 
         _busEventServiceMock.Setup(b => b.AttachTagDetails(It.IsAny<BusEvent>()))
