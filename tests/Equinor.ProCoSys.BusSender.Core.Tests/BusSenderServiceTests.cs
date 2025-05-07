@@ -13,6 +13,7 @@ using Equinor.ProCoSys.BusSenderWorker.Core.Services;
 using Equinor.ProCoSys.BusSenderWorker.Core.Telemetry;
 using Equinor.ProCoSys.PcsServiceBus.Sender;
 using Equinor.ProCoSys.PcsServiceBus.Topics;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -34,6 +35,9 @@ public class BusSenderServiceTests
     private ServiceBusMessageBatch _mockWoMessageBatch;
     private Mock<ITagDetailsRepository> _tagDetailsRepositoryMock;
     private Mock<IQueueMonitorService> _queueMonitorService;
+    private Mock<IBlobLeaseService> _blobLeaseServiceMock;
+    private Mock<IMemoryCache> _cacheMock;
+    private Mock<IPlantService> _plantServiceMock;
 
     private Mock<ServiceBusSender> _topicClientMock1,
         _topicClientMock2,
@@ -41,11 +45,14 @@ public class BusSenderServiceTests
         _topicClientMock4,
         _topicClientMockWo;
 
-        [TestInitialize]
+    [TestInitialize]
     public void Setup()
     {
         _busSender = new PcsBusSender();
         _queueMonitorService = new Mock<IQueueMonitorService>();
+        _plantServiceMock = new Mock<IPlantService>();
+        _cacheMock = new Mock<IMemoryCache>();
+        _blobLeaseServiceMock = new Mock<IBlobLeaseService>(); 
         _topicClientMock1 = new Mock<ServiceBusSender>();
         _topicClientMock1.Setup(t => t.CreateMessageBatchAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(() => ServiceBusModelFactory.ServiceBusMessageBatch(1000, new List<ServiceBusMessage>()));
@@ -92,6 +99,17 @@ public class BusSenderServiceTests
                     "{\"Plant\" : \"PCS$HF_LNG\", \"Responsible\" : \"8460-E015\", \"Description\" : \"	Installere bonding til JBer ved V8 område\"}"
             }
         };
+
+        var plantLeases = new List<PlantLease>
+        {
+            new() { Plant = "Plant1", IsCurrent = true }
+        };
+        var plants = new List<string> { "Plant1" };
+
+        _blobLeaseServiceMock.Setup(x => x.ClaimPlantLease()).ReturnsAsync(plantLeases);
+        _blobLeaseServiceMock.Setup(x => x.GetCache()).Returns(_cacheMock.Object);
+        _plantServiceMock.Setup(x => x.GetPlantsForCurrent(plantLeases)).Returns(plants);
+
         _busEventRepository = new Mock<IBusEventRepository>();
         _tagDetailsRepositoryMock = new Mock<ITagDetailsRepository>();
 
@@ -100,10 +118,10 @@ public class BusSenderServiceTests
             { CallBase = true }.As<IBusEventService>();
         _iUnitOfWork = new Mock<IUnitOfWork>();
 
-        _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk()).Returns(() => Task.FromResult(_busEvents));
+        _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk(false)).Returns(() => Task.FromResult(_busEvents));
         _dut = new BusSenderService(_busSender, _busEventRepository.Object, _iUnitOfWork.Object,
             new Mock<ILogger<BusSenderService>>().Object,
-            new Mock<ITelemetryClient>().Object, _busEventServiceMock.Object, _queueMonitorService.Object);
+            new Mock<ITelemetryClient>().Object, _busEventServiceMock.Object, _queueMonitorService.Object, _blobLeaseServiceMock.Object, _plantServiceMock.Object);
     }
     
     [TestMethod]
@@ -123,7 +141,7 @@ public class BusSenderServiceTests
         var workOrderChecklistEvent1 = new WorkOrderChecklistEvent { WoNo = "SomeWoNo1" };
         var workOrderChecklistEvent2 = new WorkOrderChecklistEvent { WoNo = "SomeWoNo2" };
 
-        _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk())
+        _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk(false))
             .Returns(() => Task.FromResult(new List<BusEvent> { wcl1, wcl2, wcl3, wcDelete }));
 
         _dapperRepositoryMock.Setup(wcl => wcl.QuerySingle<WorkOrderChecklistEvent>(
@@ -166,7 +184,7 @@ public class BusSenderServiceTests
             { Event = WoChecklistTopic.TopicName, Message = "1003,10001", Status = Status.UnProcessed };
         
         
-        _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk())
+        _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk(false))
             .Returns(() => Task.FromResult(new List<BusEvent> { wcl1, wcl2, wcl3 }));
       
         _dapperRepositoryMock.Setup(d => d.QuerySingle<WorkOrderChecklistEvent>(It.IsAny<(string,DynamicParameters)>(), It.IsAny<string>()))
@@ -201,7 +219,7 @@ public class BusSenderServiceTests
         const string guid = "E9414BA9930E5FF6E0532510000AA1AB";
         var commPri = new BusEvent { Event = LibraryFieldTopic.TopicName, Message = guid, Status = Status.UnProcessed };
 
-        _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk())
+        _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk(false))
             .Returns(() => Task.FromResult(new List<BusEvent> { commPri }));
 
         var topicClientMock = new Mock<ServiceBusSender>();
@@ -235,7 +253,7 @@ public class BusSenderServiceTests
 
         var wo = new WorkOrderEvent { Plant = "AnyValidPlant", ProjectName = "AnyProjectName", WoNo = "Some0x0bWoNo" };
 
-        _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk())
+        _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk(false))
             .Returns(() => Task.FromResult(new List<BusEvent> { wo1, wo2, wo3 }));
         _dapperRepositoryMock.Setup(wr => wr.QuerySingle<WorkOrderEvent>(
                 It.IsAny<(string queryString, DynamicParameters parameters)>(), "10000"))
@@ -264,7 +282,7 @@ public class BusSenderServiceTests
         var workOrderEvent = new WorkOrderEvent { Plant = "AnyValidPlant", ProjectName = "AnyProjectName", WoNo = "SomeWoNo" };
 
 
-        _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk())
+        _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk(false))
             .Returns(() => Task.FromResult(new List<BusEvent> { wo1, wo2, wo3 }));
         _dapperRepositoryMock.Setup(wr => wr.QuerySingle<WorkOrderEvent>(
                 It.IsAny<(string queryString, DynamicParameters parameters)>(), wo1.Message))
@@ -296,7 +314,7 @@ public class BusSenderServiceTests
         };
         const string expectedWashedMessage = "{\"Plant\" : \"PCS$HF_LNG\",\"Parameter\":\"En streng\" }";
 
-        _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk())
+        _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk(false))
             .Returns(() => Task.FromResult(new List<BusEvent> { uncleanedTestMessage }));
 
         await _dut.HandleBusEvents();
@@ -342,7 +360,7 @@ public class BusSenderServiceTests
         var wo = new WorkOrderEvent { Plant = "AnyValidPlant", ProjectName = "AnyProjectName", WoNo = "SomeWoNo" };
 
 
-        _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk())
+        _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk(false))
             .Returns(() => Task.FromResult(new List<BusEvent> { wo1, wo2, wo3 }));
         _dapperRepositoryMock.Setup(wr => wr.QuerySingle<WorkOrderEvent>(
                 It.IsAny<(string queryString, DynamicParameters parameters)>(), wo1.Message))
@@ -382,7 +400,7 @@ public class BusSenderServiceTests
 
         _busSender.Add("tag", _topicClientMock1.Object);
 
-        _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk())
+        _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk(It.IsAny<bool>()))
             .Returns(() => Task.FromResult(busEvents));
 
         _busEventServiceMock.Setup(b => b.AttachTagDetails(It.IsAny<BusEvent>()))
@@ -406,4 +424,69 @@ public class BusSenderServiceTests
         _topicClientMock3.Verify(t => t.CloseAsync(It.IsAny<CancellationToken>()), Times.Once);
         _topicClientMock4.Verify(t => t.CloseAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
+    [TestMethod]
+    public async Task SendMessageChunk_ShouldNotSaveChangesWhenCancelled()
+    {
+        // Arrange
+        var cancellationTokenSource = new CancellationTokenSource();
+        cancellationTokenSource.Cancel();
+        var cancellationToken = cancellationTokenSource.Token;
+
+        _blobLeaseServiceMock.Setup(x => x.CancellationToken).Returns(cancellationToken);
+
+        // Act
+        await _dut.HandleBusEvents();
+
+        // Assert
+        _iUnitOfWork.Verify(t => t.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [TestMethod]
+    public async Task SendMessageChunk_ShouldContinueOnPlantIfRemainingEvents()
+    {
+        // Arrange
+        var _busEventsRemaining = new List<BusEvent>
+        {
+            new()
+            {
+                Created = DateTime.Now.AddMinutes(-10),
+                Event = "topic2",
+                Status = Status.UnProcessed,
+                Id = 1,
+                Plant = "NGPCS_TEST_BROWN",
+                Message = "{\"Plant\":\"NGPCS_TEST_BROWN\",\"ProjectName\":\"Message 10 minutes ago not sent\"}"
+            }
+        };
+
+        var callCount = 0;
+        _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk(false))
+            .Returns(() => Task.FromResult(callCount++ == 0 ? _busEvents : _busEventsRemaining));
+
+        // Act
+        await _dut.HandleBusEvents();
+
+        // Assert
+        Assert.IsTrue(_dut.HasPendingEventsForCurrentPlant());
+    }
+
+
+    [TestMethod]
+    public async Task SendMessageChunk_ShouldLeavePlantIfNoRemainingEvents()
+    {
+        // Arrange
+        var _busEventsRemaining = new List<BusEvent>
+        {
+        };
+
+        var callCount = 0;
+        _busEventRepository.Setup(b => b.GetEarliestUnProcessedEventChunk(false))
+            .Returns(() => Task.FromResult(callCount++ == 0 ? _busEvents : _busEventsRemaining));
+
+        // Act
+        await _dut.HandleBusEvents();
+
+        // Assert
+        Assert.IsFalse(_dut.HasPendingEventsForCurrentPlant());
+    }
+
 }

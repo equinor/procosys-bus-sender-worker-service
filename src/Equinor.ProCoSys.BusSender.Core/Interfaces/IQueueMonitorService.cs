@@ -4,5 +4,5 @@ namespace Equinor.ProCoSys.BusSenderWorker.Core.Interfaces;
 
 public interface IQueueMonitorService
 {
-    Task WriteQueueMetrics();
+    Task WriteQueueMetrics(string? plant = null);
 }

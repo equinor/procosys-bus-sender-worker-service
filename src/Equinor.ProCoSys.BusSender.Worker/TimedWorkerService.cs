@@ -40,7 +40,7 @@ public class TimedWorkerService : IHostedService, IDisposable
 
     public Task StopAsync(CancellationToken cancellationToken)
     {
-        _logger.LogInformation($"TimedWorkerService stopping at: at: {DateTimeOffset.Now}");
+        _logger.LogInformation($"TimedWorkerService stopping at: {DateTimeOffset.Now}");
         _timer?.Change(Timeout.Infinite, 0);
         _entryPointService.StopService();
         return Task.CompletedTask;
@@ -48,11 +48,12 @@ public class TimedWorkerService : IHostedService, IDisposable
 
     private async void DoWork(object? state)
     {
+        var hasPendingEventsForCurrentPlant = false;
         try
         {
-            _logger.LogDebug("TimedWorkerService started do work");
-            await _entryPointService.DoWorkerJob();
-            _logger.LogDebug("TimedWorkerService finished do work");
+            _logger.LogInformation("TimedWorkerService started do work");
+            hasPendingEventsForCurrentPlant = await _entryPointService.DoWorkerJob();
+            _logger.LogInformation("TimedWorkerService finished do work");
         }
         catch (Exception e)
         {
@@ -60,7 +61,7 @@ public class TimedWorkerService : IHostedService, IDisposable
         }
         finally
         {
-            _timer?.Change(_timeout, Timeout.Infinite);
+            _timer?.Change(hasPendingEventsForCurrentPlant?0:_timeout, Timeout.Infinite);
         }
     }
 }
