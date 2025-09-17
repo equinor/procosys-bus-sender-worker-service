@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using Azure.Messaging.ServiceBus;
 using Equinor.ProCoSys.PcsServiceBus.Receiver;
@@ -34,9 +35,8 @@ public static class IServiceCollectionExtensions
     }
 
     public static void AddTopicClients(this IServiceCollection services, string serviceBusConnectionString,
-        string topicNames)
+        List<string> topics)
     {
-        var topics = topicNames.Split(',');
         var pcsBusSender = new PcsBusSender();
         var options = new ServiceBusClientOptions { EnableCrossEntityTransactions = true };
         var client = new ServiceBusClient(serviceBusConnectionString, options);
