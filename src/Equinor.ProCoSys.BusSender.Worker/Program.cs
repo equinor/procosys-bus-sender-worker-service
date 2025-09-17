@@ -13,12 +13,8 @@ using Microsoft.Extensions.Logging;
 
 namespace Equinor.ProCoSys.BusSender.Worker;
 
-// ReSharper disable once ClassNeverInstantiated.Global
 public class Program
 {
-    public Program(IConfiguration configuration)
-        => Configuration = configuration;
-
     private static IHostBuilder CreateHostBuilder(string[] args)
     {
         var builder = Host.CreateDefaultBuilder(args)
@@ -27,84 +23,32 @@ public class Program
                 config.AddUserSecrets<Program>(true);
                 var settings = config.Build();
 
-                var azConfig = settings.GetValue<bool>("UseAzureAppConfiguration");
-                if (azConfig)
+                config.AddAzureAppConfiguration(options =>
                 {
-                    config.AddAzureAppConfiguration(options =>
-                    {
-                        var connectionString = settings["ConnectionStrings:AppConfig"];
+                    var appConfigurationName = settings["Azure:AppConfig"];
+                    var endpoint = $"https://{appConfigurationName}.azconfig.io";
 
-                        options.Connect(connectionString)
-                            .ConfigureKeyVault(kv =>
-                            {
-                                kv.SetCredential(new DefaultAzureCredential());
-                            })
-                            .Select(KeyFilter.Any)
-                            .Select(KeyFilter.Any, context.HostingEnvironment.EnvironmentName)
-                            .ConfigureRefresh(refreshOptions =>
-                            {
-                                refreshOptions.Register("Sentinel", true);
-                                refreshOptions.SetCacheExpiration(TimeSpan.FromMinutes(5));
-                            });
-                    });
-                }
-
-                else if (settings["IsLocal"] == "True" && azConfig)
-                {
-                    config.AddAzureAppConfiguration(options =>
-                    {
-                        var tenantId = settings["AZURE_TENANT_ID"];
-                        var clientId = settings["AZURE_CLIENT_ID"];
-                        var clientSecret = settings["AZURE_CLIENT_SECRET"];
-
-                        var credential = new ClientSecretCredential(tenantId, clientId, clientSecret);
-
-                        var connectionString = settings["ConnectionStrings:AppConfig"];
-                        options.Connect(connectionString)
-                            .ConfigureKeyVault(kv =>
-                            {
-                                kv.SetCredential(credential);
-                            })
-                            .ConfigureRefresh(opt =>
-                            {
-                                opt.Register("Sentinel", true);
-                                opt.SetCacheExpiration(TimeSpan.FromMinutes(5));
-                            })
-                            .Select(KeyFilter.Any)
-                            .Select(KeyFilter.Any, settings["Azure:AppConfigLabelFilter"]);
-                    });
-                }
-                else
-                {
-                    config.AddAzureAppConfiguration(options =>
-                    {
-                        var appConfigurationName = settings["Azure:AppConfig"];
-                        var endpoint = $"https://{appConfigurationName}.azconfig.io";
-
-                        options.Connect(new Uri(endpoint), new DefaultAzureCredential())
-                            .ConfigureKeyVault(kv =>
-                            {
-                                kv.SetCredential(new DefaultAzureCredential());
-                            })
-                            .ConfigureRefresh(opt =>
-                            {
-                                opt.Register("Sentinel", true);
-                                opt.SetCacheExpiration(TimeSpan.FromMinutes(5));
-                            })
-                            .Select(KeyFilter.Any)
-                            .Select(KeyFilter.Any, settings["Azure:AppConfigLabelFilter"]);
-                    });
-                }
+                    options.Connect(new Uri(endpoint), new DefaultAzureCredential())
+                        .ConfigureKeyVault(kv =>
+                        {
+                            kv.SetCredential(new DefaultAzureCredential());
+                        })
+                        .ConfigureRefresh(opt =>
+                        {
+                            opt.Register("Sentinel", true);
+                            opt.SetCacheExpiration(TimeSpan.FromMinutes(5));
+                        })
+                        .Select(KeyFilter.Any)
+                        .Select(KeyFilter.Any, settings["Azure:AppConfigLabelFilter"]);
+                });
             });
 
         builder.ConfigureLogging((context, logging) =>
         {
             logging.ClearProviders();
             logging.AddConsole();
-
             logging.AddApplicationInsightsWebJobs(c
                 => c.ConnectionString = context.Configuration["ApplicationInsights:ConnectionString"]);
-            
         });
 
         builder.UseContentRoot(Directory.GetCurrentDirectory())
@@ -130,8 +74,7 @@ public class Program
                 }
 
                 services.AddTopicClients(
-                    hostContext.Configuration["ServiceBusConnectionString"]!,
-                    hostContext.Configuration["TopicNames"]!);
+                    hostContext.Configuration["ServiceBusConnectionString"]!, TopicNameConstants.TopicNames);
                 services.AddRepositories();
                 services.AddServices();
                 services.AddHostedService<TimedWorkerService>();
@@ -143,9 +86,6 @@ public class Program
     public static async Task Main(string[] args)
     {
         using var host = CreateHostBuilder(args).Build();
-        ILogger? logger = host.Services.GetService<ILogger<Program>>();
         await host.RunAsync();
     }
-
-    public IConfiguration Configuration { get; }
 }
