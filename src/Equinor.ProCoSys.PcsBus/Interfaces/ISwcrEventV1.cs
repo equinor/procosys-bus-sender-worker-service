@@ -26,4 +26,5 @@ public interface ISwcrEventV1 : IHasEventType
     DateTime LastUpdated { get; init; }
     DateOnly? DueDate { get; init; }
     float? EstimatedManHours { get; init; }
+    string? Action { get; init; }
 }

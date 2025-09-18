@@ -48,8 +48,8 @@ public class CommPkgEventTests
             .ToDictionary(p => p.Name, p => p.PropertyType);
 
         // Assert
-        CollectionAssert.AreEquivalent(expectedProperties.Keys, actualProperties.Keys);
+        CollectionAssert.AreEquivalent(expectedProperties.Keys, actualProperties.Keys, EventVersioningError.ErrorMessage);
         foreach (KeyValuePair<string, Type> expectedProperty in expectedProperties)
-            Assert.AreEqual(expectedProperty.Value, actualProperties[expectedProperty.Key]);
+            Assert.AreEqual(expectedProperty.Value, actualProperties[expectedProperty.Key], EventVersioningError.ErrorMessage);
     }
 }
