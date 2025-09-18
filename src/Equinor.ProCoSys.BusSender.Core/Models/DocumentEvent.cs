@@ -22,6 +22,7 @@ public class DocumentEvent : IDocumentEventV1
     public Guid ProCoSysGuid { get; init; }
     public string ProjectName { get; init; }
     public string? RegisterType { get; init; }
+    public Guid RegisterGuid { get; init; }
     public string? ResponsibleContractor { get; init; }
     public DateOnly? RevisionDate { get; init; }
     public string? RevisionNo { get; init; }

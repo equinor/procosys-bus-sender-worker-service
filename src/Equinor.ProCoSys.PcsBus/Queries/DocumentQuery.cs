@@ -29,6 +29,7 @@ public class DocumentQuery
             dp.code as DisciplineId,
             dc.code as DocumentCategory,
             ho.code as HandoverStatus,
+            RT.procosys_guid as RegisterGuid,
             RT.code as RegisterType,
             d.revisionno as RevisionNo,
             rev.code as RevisionStatus,

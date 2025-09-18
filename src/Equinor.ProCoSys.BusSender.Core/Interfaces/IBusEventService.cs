@@ -53,4 +53,6 @@ public interface IBusEventService
 
     string? WashString(string? message);
     Task<string?> CreatePunchPriorityLibRelationMessage(string message);
+    Task<string?> CreateTagDocumentMessage(string message);
+    Task<string?> CreateLibraryToLibraryMessage(string message);
 }

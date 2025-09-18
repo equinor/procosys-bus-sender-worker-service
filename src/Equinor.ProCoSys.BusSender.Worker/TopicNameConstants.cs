@@ -52,6 +52,8 @@ public class TopicNameConstants
         "punchprioritylibraryrelation",
         "punchlistitemattachment",
         "notificationcommpkg",
-        "notificationsignature"
+        "notificationsignature",
+        "tagdocument",
+        "librarytolibrary"
     ];
 }
