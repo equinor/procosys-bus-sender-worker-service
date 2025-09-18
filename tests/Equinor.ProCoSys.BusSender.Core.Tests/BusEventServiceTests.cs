@@ -1437,7 +1437,8 @@ public class BusEventServiceTests
             IsVoided = false,
             LastUpdated = DateTime.UtcNow,
             DueDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(10)),
-            EstimatedManHours = 100.0f
+            EstimatedManHours = 100.0f,
+            Action = "Action"
         };
 
         _dapperRepositoryMock.Setup(repo => repo.QuerySingle<SwcrEvent>(
@@ -1476,6 +1477,7 @@ public class BusEventServiceTests
         Assert.AreEqual(swcrEvent.DueDate, deserializedResult.DueDate);
         Assert.AreEqual(swcrEvent.EstimatedManHours, deserializedResult.EstimatedManHours);
         Assert.AreEqual(swcrEvent.EventType, deserializedResult.EventType);
+        Assert.AreEqual(swcrEvent.Action, deserializedResult.Action);
     }
 
     [TestMethod]

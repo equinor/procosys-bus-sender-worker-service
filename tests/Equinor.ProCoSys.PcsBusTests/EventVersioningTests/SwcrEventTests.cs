@@ -9,6 +9,12 @@ namespace Equinor.ProCoSys.PcsServiceBusTests.EventVersioningTests;
 [TestClass]
 public class SwcrEventTests
 {
+    /**
+     * If this tests fails, its most likely because the versioning contract is breached. Consider creating a new version instead of
+     * modifying the existing one.
+     * If new properties are added to the interface (non breaking), this test should be updated with the new properties,
+     * It should however not fail.
+     */
     [TestMethod]
     public void ISwcrEventV1_InterfacePropertiesAndMethods_DoNotChange()
     {
@@ -37,15 +43,17 @@ public class SwcrEventTests
             { "IsVoided", typeof(bool) },
             { "LastUpdated", typeof(DateTime) },
             { "DueDate", typeof(DateOnly?) },
-            { "EstimatedManHours", typeof(float?) }
+            { "EstimatedManHours", typeof(float?) },
+            { "Action", typeof(string) }
         };
 
         // Act
         Dictionary<string, Type> actualProperties = swcrEventInterfaceType.GetProperties()
             .ToDictionary(p => p.Name, p => p.PropertyType);
         // Assert
+        
         CollectionAssert.AreEquivalent(expectedProperties.Keys, actualProperties.Keys);
         foreach (KeyValuePair<string, Type> expectedProperty in expectedProperties)
-            Assert.AreEqual(expectedProperty.Value, actualProperties[expectedProperty.Key]);
+            Assert.AreEqual(expectedProperty.Value, actualProperties[expectedProperty.Key], EventVersioningError.ErrorMessage);
     }
 }

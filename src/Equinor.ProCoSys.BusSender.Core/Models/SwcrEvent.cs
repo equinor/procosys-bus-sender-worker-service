@@ -32,4 +32,6 @@ public class SwcrEvent : ISwcrEventV1
     public DateTime LastUpdated { get; init; }
     public DateOnly? DueDate { get; init; }
     public float? EstimatedManHours { get; init; }
+    public string? Action { get; init; }
+
 }

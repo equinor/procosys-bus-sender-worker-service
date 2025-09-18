@@ -31,7 +31,8 @@ public class SwcrQuery
             e.IsVoided AS IsVoided,
             sw.LAST_UPDATED AS LastUpdated,
             sw.plannedfinishdate AS DueDate,
-            sw.ESTIMATEDMHRS AS EstimatedManHours
+            sw.ESTIMATEDMHRS AS EstimatedManHours,
+            act.code as Action
         from swcr sw
             join element e on  E.ELEMENT_ID = sw.swcr_ID
             join projectschema ps ON ps.projectschema = sw.projectschema
