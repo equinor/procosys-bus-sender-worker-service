@@ -31,6 +31,7 @@ public class DocumentEventTests
             {"DocumentCategory", typeof(string)},
             {"HandoverStatus", typeof(string)},
             {"RegisterType", typeof(string)},
+            {"RegisterGuid", typeof(Guid)},
             {"RevisionNo", typeof(string)},
             {"RevisionStatus", typeof(string)},
             {"ResponsibleContractor", typeof(string)},

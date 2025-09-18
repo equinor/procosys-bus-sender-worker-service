@@ -12,6 +12,8 @@ public class LibraryToLibraryQuery
         var query = @$"select
             ll.projectschema as Plant,
             ll.procosys_guid as ProCoSysGuid,
+            ll.role as Role,
+            ll.association as Association,
             l2.procosys_guid as LibraryGuid,
             l.procosys_guid as RelatedLibraryGuid,
             ll.LAST_UPDATED as LastUpdated

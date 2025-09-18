@@ -12,7 +12,7 @@ public class TagDocumentQuery
         var query = $@"select
             er.projectschema as Plant,
             er.procosys_guid as ProCoSysGuid,
-            t.tag_id as tagId,
+            t.tag_id as TagId,
             t.procosys_guid as TagGuid,
             d.document_id as DocumentId,
             d.documentno as DocumentNo,
