@@ -37,7 +37,8 @@ public class SwcrEventTests
             { "IsVoided", typeof(bool) },
             { "LastUpdated", typeof(DateTime) },
             { "DueDate", typeof(DateOnly?) },
-            { "EstimatedManHours", typeof(float?) }
+            { "EstimatedManHours", typeof(float?) },
+            { "Action", typeof(string) }
         };
 
         // Act
