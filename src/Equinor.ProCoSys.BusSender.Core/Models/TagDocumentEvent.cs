@@ -11,6 +11,8 @@ public sealed record TagDocumentEvent(
     Guid TagGuid,
     long DocumentId,
     Guid DocumentGuid,
-    DateTime LastUpdated,
-    string EventType = PcsEventConstants.TagDocumentCreateOrUpdate
-    ) : ITagDocumentEventV1;
+    DateTime LastUpdated
+) : ITagDocumentEventV1
+{
+    public string EventType => PcsEventConstants.TagDocumentCreateOrUpdate;
+}
