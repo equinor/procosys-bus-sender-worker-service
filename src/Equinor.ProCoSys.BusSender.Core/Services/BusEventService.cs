@@ -32,16 +32,15 @@ public class BusEventService : IBusEventService
             .Select(x => (Event: x, Topic: DeserializeTagTopic(x.Message)))
             .ToList();
 
+        // There could be multiple updates for the same tagId within a short time span.
+        // For simple messages duplicates are filtered out, but this is not the case for thick messages like this.
+        // We only need to fetch the tag details once for each tagId when handled within the same loop.
+        // That is why we use distinct here.
         var tagIds = tagTopics
             .Select(x => long.Parse(x.Topic.TagId))
             .Distinct()
             .ToList();
-
-        // There could be multiple updates for the same tagId within a short time span.
-        // For simple messages duplicates are filtered out, but this is not the case for thick messages like this.
-        // We only need to fetch the tag details once for each tagId when handled within the same loop.
-        // Hence the use of distinct here.
-
+        
         var tagDetailsDictionary = await _tagDetailsRepository.GetDetailsByTagId(tagIds);
 
         foreach (var (busEvent, tagTopic) in tagTopics)
@@ -220,6 +219,18 @@ public class BusEventService : IBusEventService
         var queryString = LibraryFieldQuery.GetQuery(message);
         var libraryFieldEvents = await _eventRepository.QuerySingle<LibraryFieldEvent>(queryString, message);
         return JsonSerializer.Serialize(libraryFieldEvents, DefaultSerializerHelper.SerializerOptions);
+    }
+    
+    public async Task<string?> CreateLibraryToLibraryMessage(string message)
+    {
+        if (!Guid.TryParse(message, out _))
+        {
+            throw new Exception($"Failed to extract libraryToLibrary guid from message: {message}");
+        }
+
+        return JsonSerializer.Serialize(
+            await _eventRepository.QuerySingle<LibraryToLibraryEvent>(
+                LibraryToLibraryQuery.GetQuery(message), message), DefaultSerializerHelper.SerializerOptions);
     }
 
     public async Task<string?> CreateLibraryMessage(string message)
@@ -426,6 +437,18 @@ public class BusEventService : IBusEventService
             await _eventRepository.QuerySingle<SwcrTypeEvent>(
                 SwcrTypeQuery.GetQuery(message), message));
     }
+    
+    public async Task<string?> CreateTagDocumentMessage(string busEventMessage)
+    {
+        if (!Guid.TryParse(busEventMessage, out _))
+        {
+            throw new Exception($"Failed to extract or parse guid TagDocument from message {busEventMessage}");
+        }
+
+        return JsonSerializer.Serialize(
+            await _eventRepository.QuerySingle<TagDocumentEvent>(TagDocumentQuery.GetQuery(busEventMessage),
+                busEventMessage));
+    }
 
     public async Task<string?> CreateTagEquipmentMessage(string busEventMessage)
     {
@@ -588,7 +611,7 @@ public class BusEventService : IBusEventService
     {
         if (!Guid.TryParse(message, out _))
         {
-            throw new Exception($"Failed to extract libtolibrelation guid from message: {message}");
+            throw new Exception($"Failed to extract libToLibRelation guid from message: {message}");
         }
 
         return JsonSerializer.Serialize(

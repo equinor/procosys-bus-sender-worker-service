@@ -251,7 +251,7 @@ public class BusSenderService : IBusSenderService
             {"Created", busEvent.Created.ToString(CultureInfo.InvariantCulture)},
             {"ProjectName", message?.ProjectName ?? "NoProject"},
             {"Plant", message?.Plant ?? "NoPlant"},
-            {"MessageId", busMessageMessageId ?? "NoID" },
+            {"MessageId", busMessageMessageId },
             //Remove these after debugging
             {"BusEventMessageToSend", string.IsNullOrEmpty(message?.ProCoSysGuid) ? "MessageToSend: ( " + busEvent.MessageToSend + " )" : "N/A"  },
             {"BusEventMessage", string.IsNullOrEmpty(message?.ProCoSysGuid) ? busEvent.Message : "N/A" },
@@ -472,6 +472,16 @@ public class BusSenderService : IBusSenderService
             case "punchprioritylibraryrelation":
                 {
                     await CreateAndSetMessage(busEvent, _service.CreatePunchPriorityLibRelationMessage);
+                    break;
+                }
+            case "librarytolibrary":
+                {
+                    await CreateAndSetMessage(busEvent, _service.CreateLibraryToLibraryMessage);
+                    break;
+                }
+            case "tagdocument":
+                {
+                    await CreateAndSetMessage(busEvent, _service.CreateTagDocumentMessage);
                     break;
                 }
         }

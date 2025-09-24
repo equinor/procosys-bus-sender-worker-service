@@ -214,25 +214,35 @@ public static class PcsEventConstants
     /// <summary>
     ///     Event that is fired when a new notification is created or updated
     /// </summary>
-    public static string NotificationCreateOrUpdate = "notificationCreatedOrUpdated";
+    public const string NotificationCreateOrUpdate = "notificationCreatedOrUpdated";
 
     /// <summary>
-    ///     Event that is fired when a new notificationworkorder is created or updated
+    ///     Event that is fired when a new notification workorder is created or updated
     /// </summary>
-    public static string NotificationWorkOrderCreateOrUpdate = "notificationWorkOrderCreatedOrUpdated";
+    public const string NotificationWorkOrderCreateOrUpdate = "notificationWorkOrderCreatedOrUpdated";
 
     /// <summary>
-    ///     Event that is fired when a new notificationcommpkg is created or updated
+    ///     Event that is fired when a new notification commpkg is created or updated
     /// </summary>
-    public static string NotificationCommPkgCreateOrUpdate = "notificationCommPkgCreatedOrUpdated";
+    public const string NotificationCommPkgCreateOrUpdate = "notificationCommPkgCreatedOrUpdated";
 
     /// <summary>
     ///    Event that is fired when a new notification signature is created or updated 
     /// </summary>
-    public static string NotificationSignatureCreateOrUpdate = "notificationSignatureCreatedOrUpdated";
+    public const string NotificationSignatureCreateOrUpdate = "notificationSignatureCreatedOrUpdated";
 
     /// <summary>
     ///    Event that is fired when a new punch priority lib relation is created or updated 
     /// </summary>
-    public static string PunchPriorityLibRelationCreateOrUpdate = "punchPriorityLibRelationCreateOrUpdate";
+    public const string PunchPriorityLibRelationCreateOrUpdate = "punchPriorityLibRelationCreateOrUpdate";
+
+    /// <summary>
+    ///    Event that is fired when a new tag document relation is created or updated
+    /// </summary>
+    public const string TagDocumentCreateOrUpdate = "tagDocumentCreatedOrUpdated";
+    
+    /// <summary>
+    ///   Event that is fired when a new library to library relation is created or updated
+    /// </summary>
+    public const string LibraryToLibraryCreateOrUpdate = "libraryToLibraryCreatedOrUpdated";
 }

@@ -18,6 +18,7 @@ public interface IDocumentEventV1 : IHasEventType
     string? DisciplineId { get; init; }
     string? DocumentCategory { get; init; }
     string? HandoverStatus { get; init; }
+    Guid RegisterGuid { get; init; }
     string? RegisterType { get; init; }
     string? RevisionNo { get; init; }
     string? RevisionStatus { get; init; }

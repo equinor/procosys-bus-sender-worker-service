@@ -77,353 +77,369 @@ public class QueryTests
 
     public static IEnumerable<object[]> GetTestData()
     {
-        yield return new object[]
-        {
+        yield return
+        [
             typeof(ActionQuery),
             typeof(IActionEventV1),
             new[] { typeof(long?), typeof(string) },
             new object[] { 1L, "testPlant" }
-        };
+        ];
 
-        yield return new object[]
-        {
+        yield return
+        [
             typeof(NotificationQuery),
             typeof(INotificationEventV1),
             new[] { typeof(long?), typeof(string) },
             new object[] { 1L, null }
-        };
+        ];
 
-        yield return new object[]
-        {
+        yield return
+        [
             typeof(CallOffQuery), 
             typeof(ICallOffEventV1), 
             new[] { typeof(long?), typeof(string) },
             new object[] { 1L, "testPlant" }
-        };
-        yield return new object[]
-        {
+        ];
+        yield return
+        [
             typeof(ChecklistQuery),
             typeof(IChecklistEventV1),
             new[] { typeof(long?), typeof(string) },
             new object[] { 1L, "testPlant" }
-        };
-        yield return new object[]
-        {
+        ];
+        yield return
+        [
             typeof(CommPkgQuery), 
             typeof(ICommPkgEventV1), 
             new[] { typeof(long?), typeof(string) },
             new object[] { 1L, "testPlant" }
-        };
-        yield return new object[]
-        {
+        ];
+        yield return
+        [
             typeof(CommPkgMilestoneQuery),
             typeof(ICommPkgMilestoneEventV1), 
             new[] { typeof(string), typeof(string) },
             new object[] { "abc", "testPlant" }
-        };
-        yield return new object[]
-        {
+        ];
+        yield return
+        [
             typeof(CommPkgOperationQuery), 
             typeof(ICommPkgOperationEventV1), 
             new[] { typeof(long?), typeof(string) },
             new object[] { 1L, "testPlant" }
-        };
+        ];
         
-        yield return new object[]
-        {
+        yield return
+        [
             typeof(CommPkgQueryQuery),
             typeof(ICommPkgQueryEventV1),
             new[] { typeof(long?),typeof(long?), typeof(string) },
             new object[] { 1L, 2L, "testPlant" }
-        };
+        ];
 
-        yield return new object[]
-        {
+        yield return
+        [
             typeof(CommPkgTaskQuery),
             typeof(ICommPkgTaskEventV1),
             new[] { typeof(long?),typeof(long?), typeof(string) },
             new object[] { 1L, 3L, "testPlant" }
-        };
+        ];
 
-        yield return new object[]
-        {
+        yield return
+        [
             typeof(DocumentQuery),
             typeof(IDocumentEventV1),
             new[] { typeof(long?), typeof(string), typeof(string) },
             new object[] { 1L, "testPlant", "noExtra" }
-        };
+        ];
         
-        yield return new object[]
-        {
+        yield return
+        [
             typeof(HeatTraceQuery),
             typeof(IHeatTraceEventV1),
             new[] { typeof(long?), typeof(string) },
             new object[] { 1L, "testPlant" }
-        };
+        ];
         
-        yield return new object[]
-        {
+        yield return
+        [
             typeof(LibraryFieldQuery),
             typeof(ILibraryFieldEventV1),
             new[] { typeof(string), typeof(string) },
-            new object[] { new Guid().ToString(), "testPlant" }
-        };
+            new object[] { Guid.NewGuid().ToString(), "testPlant" }
+        ];
         
-        yield return new object[]
-        {
+        yield return
+        [
             typeof(LibraryQuery),
             typeof(ILibraryEventV1),
             new[] { typeof(long?), typeof(string) },
             new object[] { 1L, "testPlant" }
-        };
+        ];
+
+        yield return
+        [
+            typeof(LibraryToLibraryQuery),
+            typeof(ILibraryToLibraryEventV1),
+            new[] { typeof(string), typeof(string) },
+            new object[] { Guid.NewGuid().ToString(), "testPlant" }
+        ];
         
-        yield return new object[]
-        {
+        yield return
+        [
             typeof(LoopContentQuery),
             typeof(ILoopContentEventV1),
             new[] { typeof(string), typeof(string) },
             new object[] { "abc", "testPlant" }
-        };
+        ];
         
-        yield return new object[]
-        {
+        yield return
+        [
             typeof(McPkgMilestoneQuery), 
             typeof(IMcPkgMilestoneEventV1), 
             new[] { typeof(string), typeof(string) },
             new object[] { "abc", "testPlant" }
-        };
+        ];
         
-        yield return new object[]
-        {
+        yield return
+        [
             typeof(McPkgQuery), 
             typeof(IMcPkgEventV1), 
             new[] { typeof(long?), typeof(string) },
             new object[] { 1L, "testPlant" }
-        };
+        ];
 
-        yield return new object[]
-        {
+        yield return
+        [
             typeof(PipingRevisionQuery),
             typeof(IPipingRevisionEventV1),
             new[] { typeof(long?), typeof(string) },
             new object[] { 1L, "testPlant" }
-        };
+        ];
         
-        yield return new object[]
-        {
+        yield return
+        [
             typeof(PipingSpoolQuery), 
             typeof(IPipingSpoolEventV1), 
             new[] { typeof(long?), typeof(string) },
             new object[] { 1L, "testPlant" }
-        };
+        ];
 
-        yield return new object[]
-        {
+        yield return
+        [
             typeof(ProjectQuery),
             typeof(IProjectEventV1),
             new[] { typeof(string), typeof(string) },
             new object[] { "1L", "testPlant" }
-        };
+        ];
 
-        yield return new object[]
-        {
+        yield return
+        [
             typeof(PersonQuery),
             typeof(IPersonEventV1),
             new[] { typeof(string) },
             new object[] { "1L" }
-        };
+        ];
 
-        yield return new object[]
-        {
+        yield return
+        [
             typeof(PunchListItemQuery),
             typeof(IPunchListItemEventV1),
             new[] { typeof(long?), typeof(string), typeof(string) },
             new object[] { 1L, "testPlant", null }
-        };
+        ];
         
-        yield return new object[]
-        {
+        yield return
+        [
             typeof(QueryQuery),
             typeof(IQueryEventV1),
             new[] { typeof(long?),  typeof(string) },
             new object[] { 1L, "testPlant" }
-        };
+        ];
         
-        yield return new object[]
-        {
+        yield return
+        [
             typeof(QuerySignatureQuery),
             typeof(IQuerySignatureEventV1),
             new[] { typeof(long?), typeof(string) },
             new object[] { 1L, "testPlant" }
-        };
+        ];
         
-        yield return new object[]
-        {
+        yield return
+        [
             typeof(ResponsibleQuery),
             typeof(IResponsibleEventV1),
             new[] { typeof(long?), typeof(string) },
             new object[] { 1L, "testPlant" }
-        };
+        ];
         
-        yield return new object[]
-        {
+        yield return
+        [
             typeof(StockQuery),
             typeof(IStockEventV1),
             new[] { typeof(long?), typeof(string) },
             new object[] { 1L, "testPlant" }
-        };
+        ];
         
-        yield return new object[]
-        {
+        yield return
+        [
             typeof(SwcrAttachmentQuery),
             typeof(IAttachmentEventV1),
             new[] { typeof(string), typeof(string) },
             new object[] { "1L, 2L,", "testPlant" }
-        };
+        ];
         
-        yield return new object[]
-        {
+        yield return
+        [
             typeof(SwcrOtherReferenceQuery),
             typeof(ISwcrOtherReferenceEventV1),
             new[] { typeof(string), typeof(string) },
-            new object[] { new Guid().ToString(), "testPlant" }
-        };
+            new object[] { Guid.NewGuid().ToString(), "testPlant" }
+        ];
         
-        yield return new object[]
-        {
+        yield return
+        [
             typeof(SwcrQuery),
             typeof(ISwcrEventV1),
             new[] { typeof(long?), typeof(string) },
             new object[] { 1L, "testPlant" }
-        };
+        ];
         
-        yield return new object[]
-        {
+        yield return
+        [
             typeof(SwcrSignatureQuery),
             typeof(ISwcrSignatureEventV1),
             new[] { typeof(long?), typeof(string) },
             new object[] { 1L, "testPlant" }
-        };
+        ];
         
-        yield return new object[]
-        {
+        yield return
+        [
             typeof(SwcrTypeQuery),
             typeof(ISwcrTypeEventV1),
             new[] { typeof(string), typeof(string) },
             new object[] { "abc", "testPlant" }
-        };
+        ];
         
-        yield return new object[]
-        {
+        yield return
+        [
             typeof(TagEquipmentQuery),
             typeof(ITagEquipmentEventV1),
             new[] { typeof(string), typeof(string) },
             new object[] { "abc", "testPlant" }
-        };
+        ];
         
-        yield return new object[]
-        {
+        yield return
+        [
             typeof(TagQuery),
             typeof(ITagEventV1),
             new[] { typeof(long?), typeof(string) },
             new object[] { 1L, "testPlant" }
-        };
+        ];
         
-        yield return new object[]
-        {
+        yield return 
+        [
+        typeof(TagDocumentQuery),
+            typeof(ITagDocumentEventV1),
+            new[] { typeof(string), typeof(string) },
+            new object[] { Guid.NewGuid().ToString(), "testPlant" }
+        ];
+        
+        yield return
+        [
             typeof(TaskQuery),
             typeof(ITaskEventV1),
             new[] { typeof(long?), typeof(string) },
             new object[] { 1L, "testPlant" }
-        };
+        ];
         
-        yield return new object[]
-        {
+        yield return
+        [
             typeof(WorkOrderChecklistQuery),
             typeof(IWorkOrderChecklistEventV1),
             new[] { typeof(long?), typeof(long?), typeof(string) },
             new object[] { 1L, 2L, "testPlant" }
-        };
+        ];
         
-        yield return new object[]
-        {
+        yield return
+        [
             typeof(WorkOrderCutoffQuery),
             typeof(IWorkOrderCutoffEventV1),
             new[] { typeof(long?),typeof(string), typeof(string),typeof(string),typeof(IEnumerable<long>) },
             new object[] { 123L, "testPlant", null, null, null}
-        };
+        ];
         
-        yield return new object[]
-        {
+        yield return
+        [
             typeof(WorkOrderMaterialQuery),
             typeof(IWorkOrderMaterialEventV1),
             new[] { typeof(string), typeof(string) },
             new object[] { "abc", "testPlant" }
-        };
+        ];
         
-        yield return new object[]
-        {
+        yield return
+        [
             typeof(WorkOrderMilestoneQuery),
             typeof(IWorkOrderMilestoneEventV1),
             new[] { typeof(long?), typeof(long?), typeof(string) },
             new object[] { 1L, 2L, "testPlant" }
-        };
+        ];
         
-        yield return new object[]
-        {
+        yield return
+        [
             typeof(WorkOrderQuery),
             typeof(IWorkOrderEventV1),
             new[] { typeof(long?), typeof(string), typeof(string) },
             new object[] { 1L, "testPlant", "noExtra" }
-        };
+        ];
 
-        yield return new object[]
-        {
+        yield return
+        [
             typeof(HeatTracePipeTestQuery),
             typeof(IHeatTracePipeTestEventV1),
             new[] { typeof(string), typeof(string) },
             new object[] { "abc", "testPlant" }
-        };
+        ];
         
-        yield return new object[]
-        {
+        yield return
+        [
             typeof(NotificationWorkOrderQuery),
             typeof(INotificationWorkOrderEventV1),
             new[] { typeof(string), typeof(string) },
             new object[] { "abc", "testPlant" }
-        };
+        ];
 
-        yield return new object[]
-        {
+        yield return
+        [
             typeof(NotificationCommPkgOtherQuery),
             typeof(INotificationCommPkgEventV1),
             new[] { typeof(string), typeof(string) },
             new object[] { "abc", "testPlant" }
-        };
+        ];
 
-        yield return new object[]
-        {
+        yield return
+        [
             typeof(NotificationCommPkgBoundaryQuery),
             typeof(INotificationCommPkgEventV1),
             new[] { typeof(string), typeof(string) },
             new object[] { "abc", "testPlant" }
-        };
+        ];
 
-        yield return new object[]
-        {
+        yield return
+        [
             typeof(NotificationSignatureQuery),
             typeof(INotificationSignatureEventV1),
             new[] { typeof(string), typeof(string) },
             new object[] { "abc", "testPlant" }
-        };
+        ];
 
-        yield return new object[]
-        {
+        yield return
+        [
             typeof(PunchPriorityLibraryRelationQuery),
             typeof(IPunchPriorityLibRelationEventV1),
             new[] { typeof(string), typeof(string) },
             new object[] { "abc", "testPlant" }
-        };
+        ];
 
 
     }

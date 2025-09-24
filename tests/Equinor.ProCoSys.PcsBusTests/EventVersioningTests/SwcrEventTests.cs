@@ -48,12 +48,12 @@ public class SwcrEventTests
         };
 
         // Act
-        Dictionary<string, Type> actualProperties = swcrEventInterfaceType.GetProperties()
+        var actualProperties = swcrEventInterfaceType.GetProperties()
             .ToDictionary(p => p.Name, p => p.PropertyType);
         // Assert
         
-        CollectionAssert.AreEquivalent(expectedProperties.Keys, actualProperties.Keys);
-        foreach (KeyValuePair<string, Type> expectedProperty in expectedProperties)
+        CollectionAssert.AreEquivalent(expectedProperties.Keys, actualProperties.Keys, EventVersioningError.ErrorMessage);
+        foreach (var expectedProperty in expectedProperties)
             Assert.AreEqual(expectedProperty.Value, actualProperties[expectedProperty.Key], EventVersioningError.ErrorMessage);
     }
 }
