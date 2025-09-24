@@ -214,12 +214,12 @@ public static class PcsEventConstants
     /// <summary>
     ///     Event that is fired when a new notification is created or updated
     /// </summary>
-    public static readonly string NotificationCreateOrUpdate = "notificationCreatedOrUpdated";
+    public const string NotificationCreateOrUpdate = "notificationCreatedOrUpdated";
 
     /// <summary>
-    ///     Event that is fired when a new notificationworkorder is created or updated
+    ///     Event that is fired when a new notification workorder is created or updated
     /// </summary>
-    public static readonly string NotificationWorkOrderCreateOrUpdate = "notificationWorkOrderCreatedOrUpdated";
+    public const string NotificationWorkOrderCreateOrUpdate = "notificationWorkOrderCreatedOrUpdated";
 
     /// <summary>
     ///     Event that is fired when a new notification commpkg is created or updated
