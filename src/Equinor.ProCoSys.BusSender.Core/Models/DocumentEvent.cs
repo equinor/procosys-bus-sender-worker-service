@@ -8,7 +8,7 @@ namespace Equinor.ProCoSys.BusSenderWorker.Core.Models;
 public sealed record DocumentEvent(
     string Plant,
     Guid ProCoSysGuid,
-    string ProjectName,
+    string? ProjectName,
     long DocumentId,
     string DocumentNo,
     string? Title,
