@@ -66,6 +66,12 @@ public class QueryTests
         // Assert
         foreach (var property in interfaceProperties)
         {
+            if (property == "InstallationCode" && interfaceType == typeof(IDocumentEventV1))
+         
+            {
+                // Special case: InstallationCode is not included in DocumentQuery, but queried seperatly after
+                continue;
+            }
             // Check if the SQL query contains the property name in the expected format
             // e.g. abc.property_name as PropertyName
             var expectedInQuery = $" as {property}";

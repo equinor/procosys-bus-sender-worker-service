@@ -180,9 +180,16 @@ public class BusEventService : IBusEventService
             throw new Exception($"Failed to extract documentId from message: {message}");
         }
 
+        var documentEvent = await _eventRepository.QuerySingle<DocumentEvent>(DocumentQuery.GetQuery(documentId),
+            documentId.ToString());
+        var installationCode = await _eventRepository.QuerySimple(DocumentQuery.GetInstallationCodeQuery(documentId),documentId);
+        if (documentEvent is  null)
+        {
+            return JsonSerializer.Serialize(documentEvent);
+        }
+        var documentEventWithInstallationCode = documentEvent with {InstallationCode = installationCode}; 
         return JsonSerializer.Serialize(
-            await _eventRepository.QuerySingle<DocumentEvent>(DocumentQuery.GetQuery(documentId),
-                documentId.ToString()), DefaultSerializerHelper.SerializerOptions);
+            documentEventWithInstallationCode, DefaultSerializerHelper.SerializerOptions);
     }
 
     public async Task<string?> CreateHeatTraceMessage(string message)

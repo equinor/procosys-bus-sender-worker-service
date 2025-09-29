@@ -6,7 +6,7 @@ public interface IDocumentEventV1 : IHasEventType
 {
     string Plant { get; init; }
     Guid ProCoSysGuid { get; init; }
-    string ProjectName { get; init; }
+    string? ProjectName { get; init; }
     long DocumentId { get; init; }
     string DocumentNo { get; init; }
     string? Title { get; init; }
@@ -26,4 +26,5 @@ public interface IDocumentEventV1 : IHasEventType
     DateTime LastUpdated { get; init; }
     DateOnly? RevisionDate { get; init; }
     bool IsVoided { get; init; }
+    string? InstallationCode { get; init; }
 }
