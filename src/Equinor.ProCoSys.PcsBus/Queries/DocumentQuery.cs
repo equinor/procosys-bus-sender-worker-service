@@ -37,15 +37,7 @@ public class DocumentQuery
             res.code as ResponsibleContractor,
             d.last_Updated as LastUpdated,
             d.revisiondate as RevisionDate,
-            e.IsVoided AS IsVoided,
-            select l.Code from defineelementfield df
-                join field f on f.field_id = df.field_id
-                join elementfield ef on ef.field_id = f.field_id
-                join library l on l.library_id = ef.library_id
-                where df.elementtype = 'DOCUMENT' 
-                and f.columnname = 'INST_CODE' 
-                and ef.element_id = d.document_ID
-                ) as InstallationCode
+            e.IsVoided AS IsVoided
         from document d
             join element e on  E.ELEMENT_ID = d.document_ID
             left join project p on p.project_id = d.project_id
@@ -65,6 +57,7 @@ public class DocumentQuery
         return (query, whereClause.parameters);
     }
 
+    [UsedImplicitly]
     public static (string queryString, DynamicParameters parameters) GetInstallationCodeQuery(long documentId)
     {
         var parameters = new DynamicParameters();
@@ -73,31 +66,14 @@ public class DocumentQuery
                                    "and f.columnname = 'INST_CODE' " +
                                    "and ef.element_id = :documentId";
 
-        return InstallationCodeQuery(WhereClause, parameters);
-    }
-    
-    [UsedImplicitly]
-    public static (string queryString, DynamicParameters parameters) GetInstallationCodeQuery(string plant)
-    {
-        var parameters = new DynamicParameters();
-        parameters.Add(":plant", plant);
-        const string WhereClause = "where df.elementtype = 'DOCUMENT' " +
-                                   "and f.columnname = 'INST_CODE' " +
-                                   "and ef.projectschema = :plant";
+        const string Query = $"""
+                              select l.Code from defineelementfield df
+                                                       join field f on f.field_id = df.field_id
+                                                       join elementfield ef on ef.field_id = f.field_id
+                                                       join library l on l.library_id = ef.library_id
+                                                       {WhereClause}
+                              """;
 
-        return InstallationCodeQuery(WhereClause, parameters);
-    }
-
-    private static (string queryString, DynamicParameters parameters) InstallationCodeQuery(string whereClause, DynamicParameters parameters)
-    {
-        var query = $"""
-                     select l.Code from defineelementfield df
-                                              join field f on f.field_id = df.field_id
-                                              join elementfield ef on ef.field_id = f.field_id
-                                              join library l on l.library_id = ef.library_id
-                                              {whereClause}
-                     """;
-
-        return (query, parameters);
+        return (Query, parameters);
     }
 }
