@@ -26,4 +26,5 @@ public interface IDocumentEventV1 : IHasEventType
     DateTime LastUpdated { get; init; }
     DateOnly? RevisionDate { get; init; }
     bool IsVoided { get; init; }
+    string? InstallationCode { get; init; }
 }

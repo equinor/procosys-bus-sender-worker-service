@@ -52,7 +52,24 @@ public class DocumentQuery
             left join library acc on acc.library_id = d.accesscode_id
             left join library com on com.library_id = d.complex_id
         {whereClause.clause}";
-        
+
         return (query, whereClause.parameters);
+    }
+
+    public static (string queryString, DynamicParameters parameters) GetInstallationCodeQuery(long? documentId)
+    {
+        var parameters = new DynamicParameters();
+        parameters.Add(":documentId", documentId);
+        const string WhereClause = "where df.elementtype = 'DOCUMENT' " +
+                                   "and f.columnname = 'INST_CODE' " +
+                                   "and ef.element_id = :documentId";
+
+        const string Query = @$"select l.Code from defineelementfield df
+                         join field f on f.field_id = df.field_id
+                         join elementfield ef on ef.field_id = f.field_id
+                         join library l on l.library_id = ef.library_id
+                         {WhereClause}";
+
+        return (Query, parameters);
     }
 }

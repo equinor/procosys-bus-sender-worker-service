@@ -21,6 +21,41 @@ internal class EventRepository : IEventRepository
         _context = context;
         _logger = logger;
     }
+    
+    public async Task<string> QuerySimple((string queryString, DynamicParameters parameters) query, long objectId)
+    {
+        var connection = _context.Database.GetDbConnection();
+        var connectionWasClosed = connection.State != ConnectionState.Open;
+        if (connectionWasClosed)
+        {
+            await _context.Database.OpenConnectionAsync();
+        }
+
+        try
+        {
+            var result = connection.QueryFirstOrDefault<string>(query.queryString, query.parameters);
+            if (result == null)
+            {
+                _logger.LogError("Object/Entity with id {ObjectId} did not return anything for simple query", objectId);
+                return string.Empty;
+            }
+
+            return result;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"An error occurred while executing query {query.queryString} for Object/Entity with id {objectId}");
+            throw;
+        }
+        finally
+        {
+            //If we open it, we have to close it.
+            if (connectionWasClosed)
+            {
+                await _context.Database.CloseConnectionAsync();
+            }
+        }
+    }
 
     public async Task<T?> QuerySingle<T>((string queryString, DynamicParameters parameters) query, string objectId) where T : IHasEventType
     {
