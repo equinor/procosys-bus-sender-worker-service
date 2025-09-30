@@ -182,7 +182,7 @@ public class BusEventService : IBusEventService
 
         var documentEvent = await _eventRepository.QuerySingle<DocumentEvent>(DocumentQuery.GetQuery(documentId),
             documentId.ToString());
-        var installationCode = await _eventRepository.QuerySimple(DocumentQuery.GetInstallationCodeQuery(documentId),documentId);
+        var installationCode = await _eventRepository.QuerySingleOrDefault<string>(DocumentQuery.GetInstallationCodeQuery(documentId),documentId);
         if (documentEvent is  null)
         {
             return JsonSerializer.Serialize(documentEvent);

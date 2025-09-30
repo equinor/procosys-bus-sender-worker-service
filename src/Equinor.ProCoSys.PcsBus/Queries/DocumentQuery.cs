@@ -62,18 +62,13 @@ public class DocumentQuery
     {
         var parameters = new DynamicParameters();
         parameters.Add(":documentId", documentId);
-        const string WhereClause = "where df.elementtype = 'DOCUMENT' " +
-                                   "and f.columnname = 'INST_CODE' " +
-                                   "and ef.element_id = :documentId";
-
-        const string Query = $"""
-                              select l.Code from defineelementfield df
-                                                       join field f on f.field_id = df.field_id
-                                                       join elementfield ef on ef.field_id = f.field_id
-                                                       join library l on l.library_id = ef.library_id
-                                                       {WhereClause}
-                              """;
-
+        const string Query = """
+                             select l.Code from elementfield ef
+                                 join field f on f.field_id = ef.field_id
+                                 join library l on l.library_id = ef.library_id
+                             where f.columnname = 'INST_CODE'
+                             and ef.element_id = :documentId
+                             """;
         return (Query, parameters);
     }
 }

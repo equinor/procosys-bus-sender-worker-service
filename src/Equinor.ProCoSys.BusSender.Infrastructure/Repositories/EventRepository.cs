@@ -22,7 +22,7 @@ internal class EventRepository : IEventRepository
         _logger = logger;
     }
     
-    public async Task<string> QuerySimple((string queryString, DynamicParameters parameters) query, long objectId)
+    public async Task<T?> QuerySingleOrDefault<T>((string queryString, DynamicParameters parameters) query, long objectId)
     {
         var connection = _context.Database.GetDbConnection();
         var connectionWasClosed = connection.State != ConnectionState.Open;
@@ -33,11 +33,11 @@ internal class EventRepository : IEventRepository
 
         try
         {
-            var result = connection.QueryFirstOrDefault<string>(query.queryString, query.parameters);
+            var result = await connection.QuerySingleOrDefaultAsync<T>(query.queryString, query.parameters);
             if (result == null)
             {
                 _logger.LogError("Object/Entity with id {ObjectId} did not return anything for simple query", objectId);
-                return string.Empty;
+                return default;
             }
 
             return result;
