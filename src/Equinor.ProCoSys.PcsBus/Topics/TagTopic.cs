@@ -25,6 +25,7 @@ public class TagTopic
     public string DisciplineCode { get; set; }
     public string DisciplineDescription { get; set; }
     public string RegisterCode { get; set; }
+    public string EngineeringCode { get; set; }
     public string Status { get; set; }
     public string System { get; set; }
     public string CallOffNo { get; set; }
