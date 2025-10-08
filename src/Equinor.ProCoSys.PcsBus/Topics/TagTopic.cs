@@ -25,9 +25,11 @@ public class TagTopic
     public string DisciplineCode { get; set; }
     public string DisciplineDescription { get; set; }
     public string RegisterCode { get; set; }
+    public string EngineeringCode { get; set; }
     public string Status { get; set; }
     public string System { get; set; }
     public string CallOffNo { get; set; }
+    public string CallOffGuid { get; set; }
     public string ContractorCode { get; set; }
     public string PurchaseOrderNo { get; set; }
     public string TagFunctionCode { get; set; }
@@ -36,4 +38,7 @@ public class TagTopic
     public string LastUpdated { get; set; }
     public bool IsVoided { get; set; }
     public string Behavior { get; set; }
+    public string InstallationCode { get; set; }
+    public string MountedOn { get; set; }
+    public string MountedOnGuid { get; set; }
 }
