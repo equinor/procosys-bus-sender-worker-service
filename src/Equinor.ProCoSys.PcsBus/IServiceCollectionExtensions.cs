@@ -66,7 +66,7 @@ public static class IServiceCollectionExtensions
     {
         var pcsBusSender = new PcsBusSender();
         
-        var sanitizedTopics = topics.Where(t => !string.IsNullOrWhiteSpace(t)).Distinct();
+        var sanitizedTopics = topics.Where(t => !string.IsNullOrWhiteSpace(t)).Distinct().ToList();
         foreach (var topicName in sanitizedTopics)
         {
             var serviceBusSender = client.CreateSender(topicName);
