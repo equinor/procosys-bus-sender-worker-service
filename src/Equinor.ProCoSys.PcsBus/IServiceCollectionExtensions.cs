@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
+using Azure.Core;
 using Azure.Messaging.ServiceBus;
 using Equinor.ProCoSys.PcsServiceBus.Receiver;
 using Equinor.ProCoSys.PcsServiceBus.Receiver.Interfaces;
@@ -34,19 +36,41 @@ public static class IServiceCollectionExtensions
         return services;
     }
 
-    public static void AddTopicClients(this IServiceCollection services, string serviceBusConnectionString,
-        List<string> topics)
+    public static void AddTopicClients(
+        this IServiceCollection services,
+        string serviceBusConnectionString,
+        IList<string> topics)
     {
-        var pcsBusSender = new PcsBusSender();
         var options = new ServiceBusClientOptions { EnableCrossEntityTransactions = true };
         var client = new ServiceBusClient(serviceBusConnectionString, options);
-        foreach (var topicName in topics)
+        
+        AddTopicClients(services, topics, client);
+    }
+    
+    public static void AddTopicClients(
+        this IServiceCollection services, 
+        IList<string> topics,
+        string fullyQualifiedNamespace,
+        TokenCredential tokenCredential)
+    {
+        var options = new ServiceBusClientOptions { EnableCrossEntityTransactions = true };
+        var client = new ServiceBusClient(fullyQualifiedNamespace, tokenCredential, options);
+        
+        AddTopicClients(services, topics, client);
+    }
+    
+    private static void AddTopicClients(
+        IServiceCollection services, 
+        IList<string> topics,
+        ServiceBusClient client)
+    {
+        var pcsBusSender = new PcsBusSender();
+        
+        var sanitizedTopics = topics.Where(t => !string.IsNullOrWhiteSpace(t)).Distinct();
+        foreach (var topicName in sanitizedTopics)
         {
-            if (!string.IsNullOrWhiteSpace(topicName))
-            {
-                var serviceBusSender = client.CreateSender(topicName);
-                pcsBusSender.Add(topicName, serviceBusSender);
-            }
+            var serviceBusSender = client.CreateSender(topicName);
+            pcsBusSender.Add(topicName, serviceBusSender);
         }
 
         services.AddSingleton<IPcsBusSender>(pcsBusSender);
